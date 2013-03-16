@@ -1,10 +1,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "mrkcommon/dumpm.h"
 #include "mrkcommon/list.h"
 #include "diag.h"
 
-#include "dumpm.h"
 
 static int
 list_data_init(list_t *lst)

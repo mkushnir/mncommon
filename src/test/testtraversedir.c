@@ -6,9 +6,9 @@
 #include <sys/stat.h>
 
 #include "unittest.h"
-#include "dumpm.h"
 #include "diag.h"
-#include "util.h"
+#include "mrkcommon/dumpm.h"
+#include "mrkcommon/util.h"
 #include "mrkcommon/array.h"
 #include "mrkcommon/traversedir.h"
 

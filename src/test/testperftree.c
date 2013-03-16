@@ -1,12 +1,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "dumpm.h"
+#include "mrkcommon/dumpm.h"
+#include "mrkcommon/util.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/rbt.h"
 #include "mrkcommon/trie.h"
 #include "rb.h"
-#include "util.h"
 
 static unsigned niter = 10;
 static unsigned nelem = 2;

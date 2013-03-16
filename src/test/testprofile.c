@@ -3,9 +3,8 @@
 #include <time.h>
 
 #include "unittest.h"
-#include "dumpm.h"
-#include "util.h"
 
+#include "mrkcommon/dumpm.h"
 #include "mrkcommon/logging.h"
 #include "mrkcommon/profile.h"
 

@@ -2,10 +2,10 @@
 #include <sys/sysctl.h>
 
 #include "diag.h"
-#include "dumpm.h"
+#include "mrkcommon/dumpm.h"
 #include "mrkcommon/list.h"
 #include "mrkcommon/profile.h"
-#include "util.h"
+#include "mrkcommon/util.h"
 
 /* Code profiling */
 static list_t profiles;

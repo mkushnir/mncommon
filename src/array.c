@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "mrkcommon/dumpm.h"
 #include "mrkcommon/array.h"
 #include "diag.h"
-#include "dumpm.h"
 
 
 /*

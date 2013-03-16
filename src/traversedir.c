@@ -3,9 +3,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "dumpm.h"
 #include "diag.h"
-#include "util.h"
+#include "mrkcommon/dumpm.h"
+#include "mrkcommon/util.h"
 #include "mrkcommon/traversedir.h"
 
 UNUSED static void

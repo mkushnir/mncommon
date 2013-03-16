@@ -7,11 +7,11 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "mrkcommon/dumpm.h"
+#include "mrkcommon/util.h"
 #include "mrkcommon/array.h"
 #include "conf_private.h"
 #include "diag.h"
-#include "dumpm.h"
-#include "util.h"
 
 
 static array_t conf_parser_words;

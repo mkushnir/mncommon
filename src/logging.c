@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "util.h"
+#include "mrkcommon/util.h"
 
 static FILE *logging_out = NULL;
 static int mylogopt;

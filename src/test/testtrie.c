@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "mrkcommon/dumpm.h"
+#include "mrkcommon/util.h"
 #include "mrkcommon/trie.h"
-#include "dumpm.h"
-#include "util.h"
 
 UNUSED static void
 test0(void)

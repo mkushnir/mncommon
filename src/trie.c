@@ -6,9 +6,9 @@
 #include <sys/limits.h>
 
 #include "diag.h"
-#include "dumpm.h"
+#include "mrkcommon/dumpm.h"
+#include "mrkcommon/util.h"
 #include "mrkcommon/trie.h"
-#include "util.h"
 
 void
 trie_node_dump(trie_node_t *n)

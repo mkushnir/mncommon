@@ -1,4 +1,13 @@
-Markiyan's library of "commonly used" functions.
+Markiyan's library of "commonly used" functions. The primary platform is
+FreeBSD. Default compiler: clang (please see _configure.ac_).
+
+
+TODO
+====
+
+* Linux;
+
+* ...
 
 
 mrkcommon/array.h
@@ -105,5 +114,27 @@ mrkcommon/traversedir.h
 A thin wrapper over _directory(3)_ 4.2BSD API. Just call
 _traverse\_dir(path, cb, udata)_ to traverse a directory using your own
 callback.
+
+
+mrkcommon/dumpm.h
+=================
+
+Miscellaneous debugging utilities:
+
+* logging macros (not from _mrkcommon/logging.h_): _TRACE()_ & co;
+
+* hexadecimal dump of a memory region: _D8()_, _D16()_, _D32()_,
+  _D64()_;
+
+* debugging wrappers over the "return" statement: _TRRET()_,
+  _TRRETNULL()_;
+
+* colored text formatting for the tty output; _F<...>()_;
+
+
+mrkcommon/util.h
+================
+
+Miscellaneous macros.
 
 

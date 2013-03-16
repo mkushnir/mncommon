@@ -1,5 +1,5 @@
 /* Must be included before this file */
-#include "dumpm.h"
+#include "mrkcommon/dumpm.h"
 
 #ifndef MRKCOMMON_LDUMPM_H
 #define MRKCOMMON_LDUMPM_H
