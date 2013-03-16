@@ -1,0 +1,53 @@
+# Created by make-project
+LIB=mrkcommon
+SHLIB_NAME=libmrkcommon.so
+
+LIBOWN=$(USER)
+LIBGRP=$(USER)
+
+DESTDIR=$(HOME)
+BINDIR=/bin
+LIBDIR=/lib
+LIBCOMPATDIR=/lib/compat
+LIBDATADIR=/libdata
+LINTLIBDIR=/libdata/lint
+SHAREDIR=/share
+INCLUDEDIR=/include
+# re-write bsd.libnames.mk
+LIBOBJC=/usr/lib/libobjc.a
+LIBC=/usr/lib/libc.a
+
+NO_MAN=
+CSTD=c99
+CFLAGS+= -Wall -Werror  -g
+
+.ifdef SHARED
+CFLAGS+= -shared
+.endif
+
+SRCS=	diag.c mrkcommon.c foo.c dumpm.c
+
+SUBDIR=test
+
+.ifndef USE_GCC
+CC=clang -Qunused-arguments -fcolor-diagnostics
+CXX=clang++
+CPP=clang -E
+.endif
+
+diag.c diag.h: diag.txt
+	sh ./gen-diag
+
+.include <bsd.lib.mk>
+
+shared:
+	${MAKE} -DSHARED
+
+run: all
+	./${PROG}
+
+testrun:
+.for i in $(SUBDIR)
+	cd $(i) && $(MAKE) testrun
+.endfor
+

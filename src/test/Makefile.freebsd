@@ -1,0 +1,41 @@
+PROGS=test-foo
+
+OBJS=../dumpm.o ../diag.o
+
+.for i in ${PROGS}
+PROGOBJS+= ${i}.o
+.endfor
+
+CFLAGS+= -Wall -Werror -g -std=iso9899:1999 -fstack-protector -I.. -I. -O0 -DTRRET_DEBUG
+LDADD+=
+LDFLAGS+=
+
+.ifndef USE_GCC
+CC=clang -Qunused-arguments -fcolor-diagnostics
+CXX=clang++
+CPP=clang -E
+.endif
+
+all: ${PROGS}
+
+${OBJS} ${PROGOBJS}:
+.for i in ${OBJS} ${PROGOBJS}
+	${CC} ${CFLAGS} -o ${i} -c ${i:C/\.o$/.c/}
+.endfor
+
+.for i in ${PROGS}
+${i}: ${i}.o ${OBJS}
+	${CC} -o ${.TARGET} ${LDFLAGS} ${LDADD} ${.ALLSRC}
+.endfor
+
+clean:
+	rm -f *.o *.core ${PROGS}
+
+cleandepend:
+
+depend:
+
+testrun:
+.for i in $(PROGS)
+	./$(i)
+.endfor
