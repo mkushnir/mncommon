@@ -13,7 +13,7 @@ TODO
 mrkcommon/array.h
 =================
 
-Resalable _realloc(3)_-based arrays of the specified element size.
+Resizable _realloc(3)_-based arrays of the specified element size.
 Elements are always allocated contiguously in memory.
 
 Automatic initializers (on element allocation) and finalizers (on element
