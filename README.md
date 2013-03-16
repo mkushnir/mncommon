@@ -4,8 +4,8 @@ Markiyan's library of "commonly used" functions.
 mrkcommon/array.h
 =================
 
-Resizable realloc(3)-based arrays of the specified element size.  Elements
-are always allocated contiguously in memory.
+Resizable _realloc(3)_-based arrays of the specified element size.
+Elements are always allocated contiguously in memory.
 
 Automatic initializers (on element allocation) and finalizers (on element
 deallocation).
@@ -18,7 +18,7 @@ Array iterators: first, last, next, previous.
 
 Array traversion given a callback.
 
-In-place sorting, a thin wrapper over standard qsort(3).
+In-place sorting, a thin wrapper over standard _qsort(3)_.
 
 Limitations: element addresses are not guaranteed to be preserved after
 any array resizing. Never refer to element addresses from elsewhere unless
@@ -28,10 +28,10 @@ you use allocate-once arrays.
 mrkcommon/list.h
 ================
 
-A limited alternative to sys/queue.h's LIST, although with the completely
-different interface.
+A limited alternative to _sys/queue.h_'s _LIST_, although with the
+completely different interface.
 
-Provides the same functionality as mrkcommon/array.h plus: element
+Provides the same functionality as _mrkcommon/array.h_ plus: element
 addresses are guaranteed to be preserved after list resizing. Elements are
 never allocated in continuous memory. As in array, provides O(1) access to
 a list element by index at the cost of maintaining internal index
@@ -43,25 +43,25 @@ Limitations: no insert/delete in the middle of the list, no in-place sort.
 mrkcommon/logging.h
 ===================
 
-A thin wrapper over syslog(3) mostly for debugging purposes. Adaptor over
-syslog(3) and user-defined FILE * -based output (for example stderr) which
-is very convenient during program development.
+A thin wrapper over _syslog(3)_ mostly for debugging purposes. Adaptor
+over _syslog(3)_ and user-defined _FILE *_ -based output (for example
+_stderr_) which is very convenient during program development.
 
-A set of macros for convenient logging: TRACE(), DEBUG(), INFO(),
-WARNING(), ERROR().
+A set of macros for convenient logging: _TRACE()_, _DEBUG()_, _INFO()_,
+_WARNING()_, _ERROR()_.
 
-Define file-level scope of logging: LOGGING_DECLARE(), LOGGING_SETLEVEL(),
-LOGGING_CLEARLEVEL(). Scoped logging (M for "module"): MTRACE(), MDEBUG(), MINFO(),
-MWARNING(), MERROR().
+Define file-level scope of logging: _LOGGING\_DECLARE()_,
+_LOGGING\_SETLEVEL()_, _LOGGING\_CLEARLEVEL()_. Scoped logging (_M_ for
+"module"): _MTRACE()_, _MDEBUG()_, _MINFO()_, _MWARNING()_, _MERROR()_.
 
 
 mrkcommon/profile.h
 ===================
 
-Selective profiling of program code using x86 rdtsc instruction.
+Selective profiling of program code using x86 _rdtsc_ instruction.
 
 Named profiling blocks. Profiling block is a fragment of a linear code
-enclosed between a symmetric pair of PROFILE_START()/PROFILE_STOP()
+enclosed between a symmetric pair of _PROFILE\_START()_/_PROFILE\_STOP()_
 macros.  Each block can be assigned a distinctive name.
 
 Pretty printing of profile statistics: total of calls, min/max/avg
@@ -75,20 +75,21 @@ Limitations: recursive blocks are not supported.
 mrkcommon/conf.h
 ================
 
-A tokenizer to build parsers from a simple space separated configuration
+A tokenizer to build parsers from a simple space-separated configuration
 language into internal structures.
 
 For each keyword, register a callback. Streaming input processing: parse
-as you read in. In a callback, conf_parser_tok() / conf_parser_toklen()
-/ conf_parser_tokidx() can be used to access current lexical token.
+as you read in. In a callback, _conf\_parser\_tok()_
+/ _conf\_parser\_toklen()_ / _conf\_parser\_tokidx()_ can be used to
+access current lexical token.
 
 
 mrkcommon/rbt.h
 ================
 
-My own implementation of red-black tree. Not as fast as sys/tree.h's RB_*
-macros because of probbaly recursive algorithm as opposed to iterative one
-in sys/tree.h.
+My own implementation of red-black tree. Not as fast as _sys/tree.h_'s
+_RB\_\*_ macros because of probbaly recursive algorithm as opposed to
+iterative one in _sys/tree.h_.
 
 
 mrkcommon/trie.h
@@ -101,7 +102,8 @@ show it's a bit faster.
 mrkcommon/traversedir.h
 =======================
 
-A thin wrapper over directory(3) 4.2BSD API. Just call traverse_dir(path,
-cb, udata) to traverse a directory using your own callback.
+A thin wrapper over _directory(3)_ 4.2BSD API. Just call
+_traverse\_dir(path, cb, udata)_ to traverse a directory using your own
+callback.
 
 
