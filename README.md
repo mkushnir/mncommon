@@ -60,7 +60,7 @@ A set of macros for convenient logging: _TRACE()_, _DEBUG()_, _INFO()_,
 _WARNING()_, _ERROR()_.
 
 Define file-level scope of logging: _LOGGING\_DECLARE()_,
-_LOGGING\_SETLEVEL()_, _LOGGING\_CLEARLEVEL()_. Scoped logging (_M_ for
+_LOGGING\_SETLEVEL()_, _LOGGING\_CLEARLEVEL()_. Scoped logging \(_M_ for
 "module"): _MTRACE()_, _MDEBUG()_, _MINFO()_, _MWARNING()_, _MERROR()_.
 
 
