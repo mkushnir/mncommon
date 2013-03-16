@@ -13,24 +13,24 @@ TODO
 mrkcommon/array.h
 =================
 
-Resizable _realloc(3)_-based arrays of the specified element size.
+Resalable _realloc(3)_-based arrays of the specified element size.
 Elements are always allocated contiguously in memory.
 
 Automatic initializers (on element allocation) and finalizers (on element
 deallocation).
 
-Array resizing: increment (tail grow by one), decrement (tail shrink by
-one), arbitrary resize. Arbitrary resize can either preserve the items, or
+Array re-sizing: increment (tail grow by one), decrement (tail shrink by
+one), arbitrary re-size. Arbitrary re-size can either preserve the items, or
 clean them up and produce a freshly initialized array of the given size.
 
 Array iterators: first, last, next, previous.
 
-Array traversion given a callback.
+Array traversing given a callback.
 
 In-place sorting, a thin wrapper over standard _qsort(3)_.
 
 Limitations: element addresses are not guaranteed to be preserved after
-any array resizing. Never refer to element addresses from elsewhere unless
+any array re-sizing. Never refer to element addresses from elsewhere unless
 you use allocate-once arrays.
 
 
@@ -41,7 +41,7 @@ A limited alternative to _sys/queue.h_'s _LIST_, although with the
 completely different interface.
 
 Provides the same functionality as _mrkcommon/array.h_ plus: element
-addresses are guaranteed to be preserved after list resizing. Elements are
+addresses are guaranteed to be preserved after list re-sizing. Elements are
 never allocated in continuous memory. As in array, provides O(1) access to
 a list element by index at the cost of maintaining internal index
 structure.  Internal index is implemented as a contiguous array.
@@ -52,7 +52,7 @@ Limitations: no insert/delete in the middle of the list, no in-place sort.
 mrkcommon/logging.h
 ===================
 
-A thin wrapper over _syslog(3)_ mostly for debugging purposes. Adaptor
+A thin wrapper over _syslog(3)_ mostly for debugging purposes. Adapter
 over _syslog(3)_ and user-defined _FILE *_ -based output (for example
 _stderr_) which is very convenient during program development.
 
@@ -97,7 +97,7 @@ mrkcommon/rbt.h
 ================
 
 My own implementation of red-black tree. Not as fast as _sys/tree.h_'s
-_RB\_\*_ macros because of probbaly recursive algorithm as opposed to
+_RB\_\*_ macros because of probably recursive algorithm as opposed to
 iterative one in _sys/tree.h_.
 
 
