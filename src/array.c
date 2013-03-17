@@ -7,7 +7,7 @@
 
 
 /*
- * Initialize array structure. Set ar->eoa at the beginning of array.
+ * Initialize array structure.
  *
  */
 int
@@ -41,8 +41,7 @@ array_init (array_t *ar, size_t elsz, size_t elnum,
 }
 
 /*
- * Make sure array is at least len long. ar->eoa is set at
- * len.
+ * Make sure array is at least newelnum long.
  */
 int
 array_ensure_len(array_t *ar, size_t newelnum, unsigned int flags)
