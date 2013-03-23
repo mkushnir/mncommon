@@ -15,20 +15,24 @@ dumpdir(struct dirent *de)
 }
 
 char *
-path_join(const char *path, const char *suffix)
+path_join(const char *a, const char *b)
 {
     char *res;
+    size_t sz1, sz2;
+    sz1 = strlen(a);
+    sz2 = strlen(b);
 
-    if ((res = malloc(strlen(path) + 1 + strlen(suffix) + 1)) == NULL) {
+    if ((res = malloc(sz1 + 1 + sz2 + 1)) == NULL) {
         FAIL("malloc");
     }
-    strcpy(res, path);
-    strcat(res, "/");
-    strcat(res, suffix);
-    //TRACE("path=%s suffix=%s res=%s", path, suffix, res);
+
+    memcpy(res, a, sz1);
+    memcpy(res + sz1, "/", 1);
+    memcpy(res + sz1 + 1, b, sz2);
+    *(res + sz1 + 1 + sz2) = '\0';
+
     return res;
 }
-
 
 int
 traverse_dir(const char *path,
@@ -85,5 +89,5 @@ traverse_dir(const char *path,
     }
 
     closedir(d);
-    return res;
+    return cb(path, NULL, udata);
 }

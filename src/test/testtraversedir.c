@@ -37,14 +37,16 @@ mycb(const char *path, struct dirent *de, void *ctx)
     //       path, de->d_fileno, de->d_reclen, de->d_type, de->d_namlen,
     //       de->d_name);
 
-    if ((fi = array_incr(files)) == NULL) {
-        return 1;
+    if (de != NULL) {
+        if ((fi = array_incr(files)) == NULL) {
+            return 1;
+        }
+        if ((fi->path = path_join(path, de->d_name)) == NULL) {
+            return 1;
+        }
+        fi->sz = strlen(fi->path);
+        fi->flags = 0;
     }
-    if ((fi->path = path_join(path, de->d_name)) == NULL) {
-        return 1;
-    }
-    fi->sz = strlen(fi->path);
-    fi->flags = 0;
     //if (stat(fi->path, &sb) == 0) {
     //    //TRACE("S_ISDIR=%d", S_ISDIR(sb.st_mode));
     //}
