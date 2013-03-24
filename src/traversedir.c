@@ -19,16 +19,20 @@ path_join(const char *a, const char *b)
 {
     char *res;
     size_t sz1, sz2;
-    sz1 = strlen(a);
-    sz2 = strlen(b);
+    sz1 = (a != NULL) ? strlen(a) : 0;
+    sz2 = (b != NULL) ? strlen(b) : 0;
 
     if ((res = malloc(sz1 + 1 + sz2 + 1)) == NULL) {
         FAIL("malloc");
     }
 
-    memcpy(res, a, sz1);
+    if (a != NULL) {
+        memcpy(res, a, sz1);
+    }
     memcpy(res + sz1, "/", 1);
-    memcpy(res + sz1 + 1, b, sz2);
+    if (b != NULL) {
+        memcpy(res + sz1 + 1, b, sz2);
+    }
     *(res + sz1 + 1 + sz2) = '\0';
 
     return res;
@@ -43,8 +47,10 @@ traverse_dir(const char *path,
     DIR *d;
     struct dirent *de;
 
+    //TRACE("traversing %s", path);
+
     if ((d = opendir(path)) == NULL) {
-        return 0;
+        return 1;
     }
 
     while ((de = readdir(d)) != NULL) {
