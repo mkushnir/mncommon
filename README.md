@@ -69,7 +69,7 @@ mrkcommon/profile.h
 
 Selective profiling of program code using x86 _rdtsc_ instruction.
 
-Named profiling blocks. Profiling block is a fragment of a linear code
+Named profiling blocks. Profiling block is a linear fragment of code
 enclosed between a symmetric pair of _PROFILE\_START()_/_PROFILE\_STOP()_
 macros.  Each block can be assigned a distinctive name.
 
