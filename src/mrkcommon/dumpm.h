@@ -38,12 +38,17 @@
 
 #endif
 
-#ifdef TRRET_DEBUG
-#   define TRRET(n) do { if (errno && 0) {perror("TRRET");} TRACE("%s", diag_str((n))); return (n); } while (0)
-#   define TRRETNULL(n) do { if (errno && 0) {perror("TRRETNULL");} TRACE("%s", diag_str((n))); return (NULL); } while (0)
+#ifdef TRRET_DEBUG_VERBOSE
+#   define TRRET(n) do { TRACE("%s", diag_str((n))); return (n); } while (0)
+#   define TRRETNULL(n) do { TRACE("%s", diag_str((n))); return (NULL); } while (0)
 #else
-#   define TRRET(n) return (n)
-#   define TRRETNULL(n) return (NULL)
+#   ifdef TRRET_DEBUG
+#       define TRRET(n) do { if (n) { TRACE("%s", diag_str((n))); } return (n); } while (0)
+#       define TRRETNULL(n) do { if(n) { TRACE("%s", diag_str((n))); } return (NULL); } while (0)
+#   else
+#       define TRRET(n) return (n)
+#       define TRRETNULL(n) return (NULL)
+#   endif
 #endif
 void dumpm(const void * m, size_t n, size_t l);
 #define D8(m, n) dumpm(m, n, 8)
