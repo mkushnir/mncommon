@@ -10,8 +10,7 @@
 #include "mrkcommon/util.h"
 //#define TRRET_DEBUG
 #include "mrkcommon/dumpm.h"
-
-#include "mrksvnup/bytestream.h"
+#include "mrkcommon/bytestream.h"
 
 #define BLOCKSZ (1024*1024)
 #define MAXBUFBLK 5
@@ -38,6 +37,7 @@ bytestream_init(bytestream_t *stream)
     stream->pos = 0;
     stream->read_more = NULL;
     stream->write = NULL;
+    stream->user_flags = 0L;
     return (0);
 }
 
@@ -265,5 +265,6 @@ bytestream_fini(bytestream_t *stream)
     }
     stream->read_more = NULL;
     stream->write = NULL;
+    stream->user_flags = 0L;
 }
 

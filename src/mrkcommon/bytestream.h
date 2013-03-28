@@ -17,6 +17,7 @@ typedef struct _bytestream {
     off_t pos;
     ssize_t (*read_more)(struct _bytestream *, int, ssize_t);
     ssize_t (*write)(struct _bytestream *, int, size_t);
+    unsigned long user_flags;
 
 } bytestream_t;
 
