@@ -28,18 +28,24 @@ AC_CONFIG_HEADERS(config.h)
 
 AC_CHECK_HEADERS([syslog.h])
 AC_CHECK_HEADERS([stddef.h])
+AC_CHECK_HEADERS([sys/socket.h])
 
 AC_C_CONST
 AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
+AC_TYPE_OFF_T
+AC_TYPE_SSIZE_T
 
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
 AC_CHECK_FUNCS([strdup])
+AC_CHECK_FUNCS([memmove])
+AC_CHECK_FUNCS([memset])
+
 
 
 AC_PRESERVE_HELP_ORDER
@@ -96,6 +102,13 @@ AC_ARG_ENABLE(traversedir,
                              [Enable traversedir (default=yes)]),
               [AM_CONDITIONAL([TRAVERSEDIR], [test "$enable_traversedir" = "yes"])],
               [AM_CONDITIONAL([TRAVERSEDIR], [enable_traversedir=yes])],
+             )
+
+AC_ARG_ENABLE(bytestream,
+              AC_HELP_STRING([--enable-bytestream],
+                             [Enable bytestream (default=yes)]),
+              [AM_CONDITIONAL([BYTESTREAM], [test "$enable_bytestream" = "yes"])],
+              [AM_CONDITIONAL([BYTESTREAM], [enable_bytestream=yes])],
              )
 
 if test "$enable_profile" = "yes" -a "$enable_list" != "yes"

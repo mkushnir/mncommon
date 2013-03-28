@@ -48,10 +48,14 @@ if TRAVERSEDIR
 traversedir_sources = traversedir.c
 traversedir_include_headers = mrkcommon/traversedir.h
 endif
+if BYTESTREAM
+bytestream_sources = bytestream.c
+bytestream_include_headers = mrkcommon/bytestream.h
+endif
 
-nobase_include_HEADERS = $(dumpm_include_headers) $(util_include_headers) $(array_include_headers) $(list_include_headers) $(logging_include_headers) $(profile_include_headers) $(conf_include_headers) $(trie_include_headers) $(rbt_include_headers) $(traversedir_include_headers)
+nobase_include_HEADERS = $(dumpm_include_headers) $(util_include_headers) $(array_include_headers) $(list_include_headers) $(logging_include_headers) $(profile_include_headers) $(conf_include_headers) $(trie_include_headers) $(rbt_include_headers) $(traversedir_include_headers) $(bytestream_include_headers)
 
-libmrkcommon_la_SOURCES = $(dumpm_sources) $(array_sources) $(list_sources) $(logging_sources) $(profile_sources) $(conf_sources) $(trie_sources) $(rbt_sources) $(traversedir_sources)
+libmrkcommon_la_SOURCES = $(dumpm_sources) $(array_sources) $(list_sources) $(logging_sources) $(profile_sources) $(conf_sources) $(trie_sources) $(rbt_sources) $(traversedir_sources) $(bytestream_sources)
 nodist_libmrkcommon_la_SOURCES = diag.c
 libmrkcommon_la_CFLAGS = -Wall -Wextra -Werror -g -std=c99 -O0 -ftrapv -fcatch-undefined-behavior
 libmrkcommon_la_LDFLAGS = -version-info 0:0:0
