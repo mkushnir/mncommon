@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <string.h>
@@ -12,15 +13,16 @@
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/bytestream.h"
 
-#define BLOCKSZ (1024*1024)
-#define MAXBUFBLK 5
+#define BLOCKSZ (1024 * 4)
+#define MAXBUFBLK 512
 
 int
 bytestream_dump(bytestream_t *stream)
 {
     TRACE("stream pos=%ld eod=%ld sz=%ld",
           stream->pos, stream->eod, stream->buf.sz);
-    D16(stream->buf.data, stream->eod);
+    TRACE("stream start");
+    D16(stream->buf.data, MIN(stream->eod, 128));
     return (0);
 }
 
@@ -37,11 +39,11 @@ bytestream_init(bytestream_t *stream)
     stream->pos = 0;
     stream->read_more = NULL;
     stream->write = NULL;
-    stream->user_flags = 0L;
+    stream->udata = NULL;
     return (0);
 }
 
-static int
+int
 bytestream_grow(bytestream_t *stream, size_t incr)
 {
     char *tmp;
@@ -244,15 +246,21 @@ bytestream_rewind(bytestream_t *stream)
     stream->eod = 0;
 }
 
-void bytestream_recycle(bytestream_t *stream)
+off_t
+bytestream_recycle(bytestream_t *stream, off_t from)
 {
-    if (stream->pos > (BLOCKSZ * MAXBUFBLK)) {
+    from -= (from % PAGE_SIZE);
+
+    if (from > (BLOCKSZ * MAXBUFBLK)) {
         memmove(stream->buf.data,
-                stream->buf.data + stream->pos,
-                stream->eod - stream->pos);
-        stream->eod -= stream->pos;
-        stream->pos = 0;
+                stream->buf.data + from,
+                stream->eod - from);
+        stream->eod -= from;
+        stream->pos -= from;
+        return from;
     }
+
+    return 0;
 }
 
 
@@ -265,6 +273,6 @@ bytestream_fini(bytestream_t *stream)
     }
     stream->read_more = NULL;
     stream->write = NULL;
-    stream->user_flags = 0L;
+    stream->udata = NULL;
 }
 

@@ -29,6 +29,7 @@ AC_CONFIG_HEADERS(config.h)
 AC_CHECK_HEADERS([syslog.h])
 AC_CHECK_HEADERS([stddef.h])
 AC_CHECK_HEADERS([sys/socket.h])
+AC_CHECK_HEADERS([sys/param.h])
 
 AC_C_CONST
 AC_C_INLINE

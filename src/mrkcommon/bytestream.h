@@ -1,6 +1,9 @@
 #ifndef BYTESTREAM_H
 #define BYTESTREAM_H
 
+#include <stdarg.h>
+#include <sys/types.h>
+
 /*
  * This macro is also defined in snproto_bytes.h for a different structure.
  * Surprisingly, it appears to be exactly the same.
@@ -17,7 +20,7 @@ typedef struct _bytestream {
     off_t pos;
     ssize_t (*read_more)(struct _bytestream *, int, ssize_t);
     ssize_t (*write)(struct _bytestream *, int, size_t);
-    unsigned long user_flags;
+    void *udata;
 
 } bytestream_t;
 
@@ -36,6 +39,8 @@ typedef struct _bytestream {
 int bytestream_init(bytestream_t *);
 void bytestream_fini(bytestream_t *);
 
+int bytestream_grow(bytestream_t *, size_t);
+
 ssize_t bytestream_read_more(bytestream_t *, int, ssize_t);
 ssize_t bytestream_recv_more(bytestream_t *, int, ssize_t);
 ssize_t bytestream_write(bytestream_t *, int, size_t);
@@ -45,7 +50,7 @@ ssize_t bytestream_send(bytestream_t *, int, size_t);
 int bytestream_consume_data(bytestream_t *, int);
 int bytestream_produce_data(bytestream_t *, int);
 void bytestream_rewind(bytestream_t *);
-void bytestream_recycle(bytestream_t *);
+off_t bytestream_recycle(bytestream_t *, off_t);
 int bytestream_nprintf(bytestream_t *, size_t, const char *, ...);
 int bytestream_cat(bytestream_t *, size_t, const char *);
 int bytestream_dump(bytestream_t *);
