@@ -12,3 +12,5 @@ autoreconf
 # cp mrkcommon-0.1.tar.gz /usr/data/distfiles
 # cd /usr/data/distfiles && git commit a -m update && git push
 # cd ports && make makesum
+# To test locally:
+# # PREFIX=$HOME sudo make reinstall clean
