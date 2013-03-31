@@ -9,8 +9,9 @@ COMMENT=	Markiyan\'s library of common C functions
 
 MAN3=		mrkcommon.3
 MANCOMPRESSED=	yes
+USE_LDCONFIG=	yes
+
 
 GNU_CONFIGURE=	yes
-HAS_CONFIGURE=	yes
 
 .include <bsd.port.mk>
