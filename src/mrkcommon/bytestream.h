@@ -11,6 +11,11 @@
  */
 #define BDATA(b) ((b) != NULL ? (b)->data : NULL)
 
+typedef struct _byterange {
+    off_t start;
+    off_t end;
+} byterange_t;
+
 typedef struct _bytestream {
     struct {
         char *data;
@@ -28,7 +33,10 @@ typedef struct _bytestream {
 #define SPCHR(stream) SNCHR((stream), (stream)->pos)
 #define SDATA(stream, n) ((stream)->buf.data + (n))
 #define SPOS(stream) (stream)->pos
+#define SDPOS(stream, addr) (addr - (stream)->buf.data)
+#define SPDATA(stream) ((stream)->buf.data + SPOS(stream))
 #define SEOD(stream) (stream)->eod
+#define SEDATA(stream) ((stream)->buf.data + SEOD(stream))
 #define SSIZE(stream) (stream)->buf.sz
 #define SNEEDMORE(stream) (SPOS(stream) >= SEOD(stream))
 #define SAVAIL(stream) (SEOD(stream) - SPOS(stream))
