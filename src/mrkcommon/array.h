@@ -44,5 +44,6 @@ void *array_prev(array_t *, array_iter_t *);
 int array_sort(array_t *);
 void *array_find(array_t *, const void *);
 int array_traverse(array_t *, array_traverser_t, void *);
+int array_cmp(array_t *, array_t *, array_compar_t);
 
 #endif

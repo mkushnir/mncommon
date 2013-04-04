@@ -273,3 +273,18 @@ array_traverse(array_t *ar, array_traverser_t tr, void *udata)
     return 0;
 }
 
+int
+array_cmp(array_t *ar1, array_t *ar2, array_compar_t cmp)
+{
+    ssize_t res;
+    unsigned i;
+
+    res = (ssize_t)(ar1->elnum) - (ssize_t)(ar2->elnum);
+
+    for (i = 0; res == 0 && i < ar1->elnum; ++i) {
+        res = cmp(array_get(ar1, i), array_get(ar2, i));
+    }
+
+    return (int)res;
+}
+
