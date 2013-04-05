@@ -3,6 +3,7 @@
 
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/array.h"
+#include "mrkcommon/util.h"
 #include "diag.h"
 
 
@@ -274,14 +275,23 @@ array_traverse(array_t *ar, array_traverser_t tr, void *udata)
 }
 
 int
-array_cmp(array_t *ar1, array_t *ar2, array_compar_t cmp)
+array_cmp(array_t *ar1, array_t *ar2, array_compar_t cmp, ssize_t sz)
 {
     ssize_t res;
+    ssize_t sz1, sz2;
     unsigned i;
 
-    res = (ssize_t)(ar1->elnum) - (ssize_t)(ar2->elnum);
+    if (sz > 0) {
+        sz1 = MIN(sz, (ssize_t)(ar1->elnum));
+        sz2 = MIN(sz, (ssize_t)(ar2->elnum));
+    } else {
+        sz1 = (ssize_t)(ar1->elnum);
+        sz2 = (ssize_t)(ar2->elnum);
+    }
+    res = sz1 - sz2;
 
-    for (i = 0; res == 0 && i < ar1->elnum; ++i) {
+
+    for (i = 0; res == 0 && i < sz1; ++i) {
         res = cmp(array_get(ar1, i), array_get(ar2, i));
     }
 
