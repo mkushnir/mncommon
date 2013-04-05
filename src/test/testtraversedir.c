@@ -90,6 +90,7 @@ test0(void)
         //{0, "/skyrta/data/music/beethowen"},
         //{0, "/skyrta/data/music/wagner"},
         {0, "."},
+        {0, "./"},
     };
     UNITTEST_PROLOG;
 

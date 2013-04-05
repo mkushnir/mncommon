@@ -31,17 +31,18 @@ path_join(const char *a, const char *b)
         *(res + sz1) = '\0';
     }
 
+    if (*(res + sz1 - 1) != '/') {
+        *(res + sz1) = '/';
+    } else {
+        --sz1;
+    }
     if (sz2 > 0) {
-        if (*(res + sz1 - 1) != '/') {
-            *(res + sz1) = '/';
-        } else {
-            --sz1;
-        }
         if (b != NULL) {
             memcpy(res + sz1 + 1, b, sz2);
         }
-        *(res + sz1 + 1 + sz2) = '\0';
     }
+
+    *(res + sz1 + 1 + sz2) = '\0';
 
     return res;
 }
