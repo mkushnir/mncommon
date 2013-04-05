@@ -28,12 +28,20 @@ path_join(const char *a, const char *b)
 
     if (a != NULL) {
         memcpy(res, a, sz1);
+        *(res + sz1) = '\0';
     }
-    memcpy(res + sz1, "/", 1);
-    if (b != NULL) {
-        memcpy(res + sz1 + 1, b, sz2);
+
+    if (sz2 > 0) {
+        if (*(res + sz1 - 1) != '/') {
+            *(res + sz1) = '/';
+        } else {
+            --sz1;
+        }
+        if (b != NULL) {
+            memcpy(res + sz1 + 1, b, sz2);
+        }
+        *(res + sz1 + 1 + sz2) = '\0';
     }
-    *(res + sz1 + 1 + sz2) = '\0';
 
     return res;
 }

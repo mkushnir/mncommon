@@ -33,11 +33,11 @@ mycb(const char *path, struct dirent *de, void *ctx)
     file_info_t *fi;
     UNUSED struct stat sb;
 
-    //TRACE("path=%s fileno=%d reclen=%hd type=%hhd namelen=%hhd name=%s",
-    //       path, de->d_fileno, de->d_reclen, de->d_type, de->d_namlen,
-    //       de->d_name);
-
     if (de != NULL) {
+        //TRACE("path=%s fileno=%d reclen=%hd type=%hhd namelen=%hhd name=%s",
+        //       path, de->d_fileno, de->d_reclen, de->d_type, de->d_namlen,
+        //       de->d_name);
+
         if ((fi = array_incr(files)) == NULL) {
             return 1;
         }
@@ -80,7 +80,7 @@ test0(void)
     } data[] = {
         //{0, "/usr"},
         //{0, "/usr/local"},
-        {0, "/usr/local/bin"},
+        //{0, "/usr/local/bin/"},
         //{0, "/usr/local/lib"},
         //{0, "/home/mkushnir/music"},
         //{0, "/usr/data"},
@@ -89,6 +89,7 @@ test0(void)
         //{0, "/skyrta/data/music/bruckner"},
         //{0, "/skyrta/data/music/beethowen"},
         //{0, "/skyrta/data/music/wagner"},
+        {0, "."},
     };
     UNITTEST_PROLOG;
 
@@ -101,7 +102,7 @@ test0(void)
             //assert(0);
             //break;
         }
-        //array_traverse(&files, (array_traverser_t)file_info_print);
+        array_traverse(&files, (array_traverser_t)file_info_print, NULL);
     }
 
     array_fini(&files);
