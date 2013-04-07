@@ -41,13 +41,16 @@
 #ifdef TRRET_DEBUG_VERBOSE
 #   define TRRET(n) do { TRACE("%s", diag_str((n))); return (n); } while (0)
 #   define TRRETNULL(n) do { TRACE("%s", diag_str((n))); return (NULL); } while (0)
+#   define TRRETVOID(n) do { TRACE("%s", diag_str((n))); return; } while (0)
 #else
 #   ifdef TRRET_DEBUG
 #       define TRRET(n) do { if (n) { TRACE("%s", diag_str((n))); } return (n); } while (0)
 #       define TRRETNULL(n) do { if(n) { TRACE("%s", diag_str((n))); } return (NULL); } while (0)
+#       define TRRETVOID(n) do { if(n) { TRACE("%s", diag_str((n))); } return; } while (0)
 #   else
 #       define TRRET(n) return (n)
 #       define TRRETNULL(n) return (NULL)
+#       define TRRETVOID(n) return
 #   endif
 #endif
 void dumpm(const void * m, size_t n, size_t l);
