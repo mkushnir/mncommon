@@ -59,7 +59,11 @@ void dumpm(const void * m, size_t n, size_t l);
 #define D32(m, n) dumpm(m, n, 32)
 #define D64(m, n) dumpm(m, n, 64)
 
-#define FCOLOR(b, c, s) "\033[0" b ";3" c "m" s "\033[00m"
+#ifndef NOFCOLOR
+#   define FCOLOR(b, c, s) "\033[0" b ";3" c "m" s "\033[00m"
+#else
+#   define FCOLOR(b, c, s) s
+#endif
 #define FRED(s)     FCOLOR("0", "1", s)
 #define FGREEN(s)   FCOLOR("0", "2", s)
 #define FYELLOW(s)  FCOLOR("0", "3", s)

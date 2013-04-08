@@ -38,6 +38,10 @@ path_join(const char *a, const char *b)
     }
     if (sz2 > 0) {
         if (b != NULL) {
+            if (*b == '/') {
+                ++b;
+                --sz2;
+            }
             memcpy(res + sz1 + 1, b, sz2);
         }
     }
