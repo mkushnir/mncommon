@@ -172,7 +172,7 @@ bytestream_consume_data(bytestream_t *stream, int fd)
 
     if (nread == 0) {
         /* eof */
-        TRRET(BYTESTREAM_CONSUME_DATA + 1);
+        TRRET(-1);
 
     } else if (nread < 0) {
         TRRET(BYTESTREAM_CONSUME_DATA + 2);
