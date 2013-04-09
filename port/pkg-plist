@@ -14,4 +14,3 @@ lib/libmrkcommon.so.0
 lib/libmrkcommon.so
 lib/libmrkcommon.la
 lib/libmrkcommon.a
-man/man3/mrkcommon.3

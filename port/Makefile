@@ -8,7 +8,7 @@ MAINTAINER=	markiyan.kushnir@gmail.com
 COMMENT=	Markiyan\'s library of common C functions
 
 MAN3=		mrkcommon.3
-MANCOMPRESSED=	yes
+MANCOMPRESSED=	no
 USE_LDCONFIG=	yes
 
 
