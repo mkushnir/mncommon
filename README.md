@@ -162,7 +162,9 @@ processors or parsers:
 
     void read_test_response(int fd)
     {
-        while (1) {
+        int done = 0;
+
+        while (!done) {
             if (SNEEDMORE(&in)) {
                 bytestream_recv_more(&in, fd, 1024);
             }
@@ -179,7 +181,7 @@ processors or parsers:
              *  -   read mrkcommon/bytestream.h for more macros.
              */
             if (... /* done? */ ) {
-                break;
+                done = 1;
             } else {
                 /* state machine to parse a piece of response */
             }
