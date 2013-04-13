@@ -116,6 +116,78 @@ _traverse\_dir(path, cb, udata)_ to traverse a directory using your own
 callback.
 
 
+mrkcommon/bytestream.h
+=======================
+Combine standard POSIX _read(2)_/_write(2))_ and related system calls
+(_send(2)_, _recv(2)_, etc) with memory management features: automatically
+extend via _realloc(3)_ when placing data into internal buffer.
+Conveniently access memory within the buffer, track current position and
+end of data that have been read up to now. When needed, reuse the buffer
+before the next read/write. One important thing that has to be remembered:
+memory locations inside the internal buffer are never guaranteed to be
+preserved across read()'s and write()'s due to automatic memory management
+inside the bytestream. Typical patterns of use are suitable for streaming
+processors or parsers:
+
+    static bytestream_t in, out;
+
+    void
+    init(void)
+    {
+        if (bytestream_init(&in) != 0) {
+            FAIL("bytestream_init");
+        }
+        if (bytestream_init(&out) != 0) {
+            FAIL("bytestream_init");
+        }
+        in.read_more = bytestream_recv_more;
+        in.write = bytestream_send;
+    }
+
+    void
+    fini(void)
+    {
+        bytestream_fini(&in);
+        bytestream_fini(&out);
+    }
+
+    void write_test_request(int fd)
+    {
+        bytestream_cat(&out, "GET / HTTP/1.0\r\n", strlen("GET / HTTP/1.0\r\n"));
+        bytestream_cat(&out, "Host: example.com\r\n", strlen("Host: example.com\r\n"));
+        bytestream_cat(&out, "\r\n", strlen("\r\n"));
+        bytestream_produce_data(&out, fd);
+        bytestream_rewind(&out);
+    }
+
+    void read_test_response(int fd)
+    {
+        while (1) {
+            if (SNEEDMORE(&in)) {
+                bytestream_recv_more(&in, fd, 1024);
+            }
+            /*
+             *  -   use SPDATA(&in) to access current data of your interest,
+             *      starting from zero offset.
+             *  -   use SEDATA(&in) to get the pointer right after the
+             *      last byte of the available data.
+             *  -   use SAVAIL(&in) to get the size of data you can
+             *      process in this cycle.
+             *  -   use SADVANCEPOS(&in, ...) to advance current data
+             *      pointer as you want. Don't try to advance current data
+             *      pointer more than by currently SAVAIL(&in) bytes.
+             *  -   read mrkcommon/bytestream.h for more macros.
+             */
+            if (... /* done? */ ) {
+                break;
+            } else {
+                /* state machine to parse a piece of response */
+            }
+        }
+        bytestream_recycle(&in, SPOS(&in));
+    }
+
+
 mrkcommon/dumpm.h
 =================
 
