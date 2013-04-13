@@ -63,7 +63,7 @@ bytestream_read_more(bytestream_t *stream, int fd, ssize_t sz)
 {
     ssize_t nread;
     ssize_t need;
-    
+
     need = (stream->eod + sz) - stream->buf.sz;
 
     if (need > 0) {
@@ -86,7 +86,7 @@ bytestream_recv_more(bytestream_t *stream, int fd, ssize_t sz)
 {
     ssize_t nrecv;
     ssize_t need;
-    
+
     need = (stream->eod + sz) - stream->buf.sz;
 
     //TRACE("need=%ld", need);
@@ -119,7 +119,7 @@ bytestream_write(bytestream_t *stream, int fd, size_t sz)
 
     nwritten = write(fd, stream->buf.data + stream->pos, sz);
     stream->pos += nwritten;
-    
+
     return (nwritten);
 }
 
@@ -139,7 +139,7 @@ bytestream_stderr_write(bytestream_t *stream, int fd, size_t sz)
     stream->pos += nwritten;
 
     write(fd, "\n", 1);
-    
+
     return (nwritten);
 }
 
@@ -155,7 +155,7 @@ bytestream_send(bytestream_t *stream, int fd, size_t sz)
 
     nwritten = send(fd, stream->buf.data + stream->pos, sz, 0);
     stream->pos += nwritten;
-    
+
     return (nwritten);
 }
 
@@ -200,9 +200,9 @@ bytestream_nprintf(bytestream_t *stream, size_t sz,
     int nused;
     ssize_t need;
     va_list ap;
-    
+
     need = (stream->eod + sz) - stream->buf.sz;
-    
+
     if (need > 0) {
         //TRACE("need more: %ld", need);
         if (bytestream_grow(stream, (need < BLOCKSZ) ? BLOCKSZ : need) != 0) {
@@ -225,7 +225,7 @@ bytestream_cat(bytestream_t *stream, size_t sz, const char *data)
     ssize_t need;
 
     need = (stream->eod + sz) - stream->buf.sz;
-    
+
     if (need > 0) {
         //TRACE("need more: %ld", need);
         if (bytestream_grow(stream, (need < BLOCKSZ) ? BLOCKSZ : need) != 0) {

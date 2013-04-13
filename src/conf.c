@@ -389,7 +389,7 @@ static fpos_t
 conf_seek_buf(void *cookie, fpos_t offset, int whence)
 {
     struct _read_ctx *ctx = (struct _read_ctx *)cookie;
-    
+
     if (whence == SEEK_SET) {
         ctx->pos = offset;
     } else if (whence == SEEK_CUR) {
