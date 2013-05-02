@@ -49,6 +49,12 @@ AC_CHECK_FUNCS([memset])
 
 AC_PRESERVE_HELP_ORDER
 
+AC_ARG_ENABLE(debug,
+              AC_HELP_STRING([--enable-debug],
+                             [Enable debug build (default=no)]),
+              [AM_CONDITIONAL([DEBUG], [enable_debug=yes])],
+              [AM_CONDITIONAL([DEBUG], [test "$enable_debug" = "yes"])]
+             )
 AC_ARG_ENABLE(array,
               AC_HELP_STRING([--enable-array],
                              [Enable resizable realloc(3)-based array

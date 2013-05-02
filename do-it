@@ -5,7 +5,10 @@
 #autoreconf
 #automake --add-missing
 #libtoolize
+make distclean
 autoreconf
+./configure --prefix=$HOME --enable-debug
+make
 
 # Before checking in to git: don't forget to update the port.
 # autoreconf

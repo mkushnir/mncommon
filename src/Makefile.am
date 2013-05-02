@@ -57,7 +57,14 @@ nobase_include_HEADERS = $(dumpm_include_headers) $(util_include_headers) $(arra
 
 libmrkcommon_la_SOURCES = $(dumpm_sources) $(array_sources) $(list_sources) $(logging_sources) $(profile_sources) $(conf_sources) $(trie_sources) $(rbt_sources) $(traversedir_sources) $(bytestream_sources)
 nodist_libmrkcommon_la_SOURCES = diag.c
-libmrkcommon_la_CFLAGS = -Wall -Wextra -Werror -g -std=c99 -O0 -ftrapv -fcatch-undefined-behavior
+
+if DEBUG
+DEBUG_FLAGS = -g -O0 -ftrapv -fcatch-undefined-behavior
+else
+DEBUG_FLAGS = -DNDEBUG -O3
+endif
+
+libmrkcommon_la_CFLAGS = $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99
 libmrkcommon_la_LDFLAGS = -version-info 0:0:0
 
 SUBDIRS = . test
