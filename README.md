@@ -190,6 +190,15 @@ processors or parsers:
     }
 
 
+mrkcommon/json.h
+=======================
+A fast callback-style JSON parser. Unlike traditional JSON parsers,
+doesn't build objects in memory. Individual callbacks can be registered
+for the following events: object start, object end, object key, object
+value, array start, array end, array item. Supported simple data types:
+string, signed integer, float, boolean, as well as special value _null_.
+
+
 mrkcommon/dumpm.h
 =================
 
