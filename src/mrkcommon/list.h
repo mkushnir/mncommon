@@ -1,5 +1,5 @@
-#ifndef LIST_H
-#define LIST_H
+#ifndef MRKCOMMON_LIST_H
+#define MRKCOMMON_LIST_H
 
 #include <assert.h>
 #include <sys/types.h>

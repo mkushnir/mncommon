@@ -1,5 +1,5 @@
-#ifndef CONF_H
-#define CONF_H
+#ifndef MRKCOMMON_CONF_H
+#define MRKCOMMON_CONF_H
 
 #include <stdio.h>
 

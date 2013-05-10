@@ -18,6 +18,9 @@ endif
 if TRAVERSEDIR
 noinst_PROGRAMS += testtraversedir
 endif
+if JSON
+noinst_PROGRAMS += testjson
+endif
 
 distdir = ../../$(PACKAGE)-$(VERSION)/src/test
 dist_HEADERS = unittest.h rb.h
@@ -56,6 +59,10 @@ testperftree_LDFLAGS =
 testtraversedir_SOURCES = ../traversedir.c testtraversedir.c
 testtraversedir_CFLAGS =
 testtraversedir_LDFLAGS =
+
+testjson_SOURCES = ../json.c testjson.c
+testjson_CFLAGS =
+testjson_LDFLAGS =
 
 ../diag.c ../diag.h: ../diag.txt
 	sh ../gen-diag

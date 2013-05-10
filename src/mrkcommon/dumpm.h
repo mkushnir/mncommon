@@ -1,5 +1,5 @@
-#ifndef DUMPM_H
-#define DUMPM_H
+#ifndef MRKCOMMON_DUMPM_H
+#define MRKCOMMON_DUMPM_H
 
 #ifdef MRKCOMMON_LDUMPM_H
 #error "Please use eigher this file or mrkcommon/ldumpm.h, or #include logging_private.h AFTER this file."
@@ -21,14 +21,16 @@
 #define DUMPM_INDENT_SIZE 4
 
 #ifdef USE_SYSLOG
-# define TRACEN(s, ...)     (syslog(LOG_DEBUG,    "[T]%s:%d:%s() " s       __FILE__, __LINE__, __func__, ##__VA_ARGS__))
+# define TRACEN(s, ...)     (syslog(LOG_DEBUG,    "[T]%s:%d:%s() " s,      __FILE__, __LINE__, __func__, ##__VA_ARGS__))
+# define TRACEC(s, ...)     (syslog(LOG_DEBUG,                     s,                                    ##__VA_ARGS__))
 # define TRACE(s, ...)      (syslog(LOG_DEBUG,    "[T]%s:%d:%s() " s "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define DEBUG(s, ...)      (syslog(LOG_DEBUG,    "[D]%s:%d:%s() " s "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define INFO(s, ...)       (syslog(LOG_INFO,     "[I]%s:%d:%s() " s "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define WARNING(s, ...)    (syslog(LOG_WARNING,  "[W]%s:%d:%s() " s "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define ERROR(s, ...)      (syslog(LOG_ERR,      "[E]%s:%d:%s() " s "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 #else
-# define TRACEN(s, ...) (fprintf(stderr, "[%5d] %s:%d:%s() " s getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
+# define TRACEN(s, ...) (fprintf(stderr, "[%5d] %s:%d:%s() " s, getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
+# define TRACEC(s, ...) (fprintf(stderr, s "\n", ##__VA_ARGS__))
 # define TRACE(s, ...) (fprintf(stderr, "[%5d] %s:%d:%s() " s "\n", getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define DEBUG   TRACE
 # define INFO    TRACE

@@ -1,5 +1,5 @@
-#ifndef RBT_H
-#define RBT_H
+#ifndef MRKCOMMON_RBT_H
+#define MRKCOMMON_RBT_H
 
 #include <stdint.h>
 

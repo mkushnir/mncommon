@@ -1,5 +1,5 @@
-#ifndef BYTESTREAM_H
-#define BYTESTREAM_H
+#ifndef MRKCOMMON_BYTESTREAM_H
+#define MRKCOMMON_BYTESTREAM_H
 
 #include <stdarg.h>
 #include <sys/types.h>

@@ -1,5 +1,5 @@
-#ifndef ARRAY_H
-#define ARRAY_H
+#ifndef MRKCOMMON_ARRAY_H
+#define MRKCOMMON_ARRAY_H
 
 #include <sys/types.h>
 

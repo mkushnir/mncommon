@@ -1,5 +1,5 @@
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef MRKCOMMON_UTIL_H
+#define MRKCOMMON_UTIL_H
 
 #ifndef MAX
 #   define MAX(a,b) ((a)>(b)?(a):(b))

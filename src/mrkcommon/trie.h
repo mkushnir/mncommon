@@ -1,5 +1,5 @@
-#ifndef TRIE_H
-#define TRIE_H
+#ifndef MRKCOMMON_TRIE_H
+#define MRKCOMMON_TRIE_H
 
 #include <stdint.h>
 #include <sys/limits.h>

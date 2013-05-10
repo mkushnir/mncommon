@@ -1,5 +1,5 @@
-#ifndef TRAVERSEDIR_H
-#define TRAVERSEDIR_H
+#ifndef MRKCOMMON_TRAVERSEDIR_H
+#define MRKCOMMON_TRAVERSEDIR_H
 
 #include <dirent.h>
 

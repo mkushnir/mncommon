@@ -1,5 +1,5 @@
-#ifndef PROFILE_H
-#define PROFILE_H
+#ifndef MRKCOMMON_PROFILE_H
+#define MRKCOMMON_PROFILE_H
 
 #include <stdint.h>
 

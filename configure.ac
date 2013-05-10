@@ -116,6 +116,13 @@ AC_ARG_ENABLE(bytestream,
               [AM_CONDITIONAL([BYTESTREAM], [enable_bytestream=yes])],
              )
 
+AC_ARG_ENABLE(json,
+              AC_HELP_STRING([--enable-json],
+                             [Enable json (default=yes)]),
+              [AM_CONDITIONAL([JSON], [test "$enable_json" = "yes"])],
+              [AM_CONDITIONAL([JSON], [enable_json=yes])],
+             )
+
 if test "$enable_profile" = "yes" -a "$enable_list" != "yes"
 then
     echo "ERROR: cannot disable the list feature because the profile feature requires it."
