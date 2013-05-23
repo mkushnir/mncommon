@@ -30,6 +30,7 @@ int array_init(array_t *, size_t, size_t,
 #define ARRAY_FLAG_SAVE 0x01
 int array_ensure_len(array_t *, size_t, unsigned int);
 void *array_get(array_t *, unsigned);
+#define ARRAY_GET(ty, a, i) (((ty *)((a)->data))[i])
 int array_index(array_t *, void *);
 void *array_get_iter(array_t *, array_iter_t *);
 int array_clear_item(array_t *, unsigned);
@@ -38,7 +39,9 @@ void *array_incr_iter(array_t *, array_iter_t *);
 int array_decr(array_t *);
 int array_fini(array_t *);
 void *array_first(array_t *, array_iter_t *);
+#define ARRAY_FIRST(ty, a) (((ty *)((a)->data))[0])
 void *array_last(array_t *, array_iter_t *);
+#define ARRAY_LAST(ty, a) (((ty *)((a)->data))[(a)->elnum - 1])
 void *array_next(array_t *, array_iter_t *);
 void *array_prev(array_t *, array_iter_t *);
 int array_sort(array_t *);

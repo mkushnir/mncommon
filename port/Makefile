@@ -14,4 +14,13 @@ USE_LDCONFIG=	yes
 
 GNU_CONFIGURE=	yes
 
+OPTIONS_DEFINE=	DEBUG
+DEBUG_DESC=	Build debugging version
+
+.include <bsd.port.options.mk>
+
+.if ${PORT_OPTIONS:MDEBUG}
+CONFIGURE_ARGS+= --enable-debug
+.endif
+
 .include <bsd.port.mk>
