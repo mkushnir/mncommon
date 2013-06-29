@@ -166,7 +166,7 @@ processors or parsers:
 
         while (!done) {
             if (SNEEDMORE(&in)) {
-                bytestream_recv_more(&in, fd, 1024);
+                bytestream_consume_data(&in, fd);
             }
             /*
              *  -   use SPDATA(&in) to access current data of your interest,
@@ -178,6 +178,9 @@ processors or parsers:
              *  -   use SADVANCEPOS(&in, ...) to advance current data
              *      pointer as you want. Don't try to advance current data
              *      pointer more than by currently SAVAIL(&in) bytes.
+             *      Always do SADVANCEPOS() within the loop to
+             *      indicate to bytestream_consume_data() how much data
+             *      you have processed.
              *  -   read mrkcommon/bytestream.h for more macros.
              */
             if (... /* done? */ ) {
