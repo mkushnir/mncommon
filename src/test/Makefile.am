@@ -68,4 +68,4 @@ testjson_LDFLAGS =
 	sh ../gen-diag
 
 testrun: all
-	for i in $(noinst_PROGRAMS); do if test -x ./$$i; then LD_LIRARY_PATH=$(libdir) ./$$i; fi; done;
+	for i in $(noinst_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;

@@ -119,7 +119,7 @@ array_clear_item(array_t *ar, unsigned idx)
 }
 
 void *
-array_get(array_t *ar, unsigned idx)
+array_get(const array_t *ar, unsigned idx)
 {
     if (idx < ar->elnum) {
         return ar->data + ar->elsz * idx;
@@ -128,7 +128,7 @@ array_get(array_t *ar, unsigned idx)
 }
 
 int
-array_index(array_t *ar, void *item)
+array_index(const array_t *ar, void *item)
 {
     uintptr_t n = (uintptr_t)item;
     uintptr_t s = (uintptr_t)ar->data;
@@ -143,7 +143,7 @@ array_index(array_t *ar, void *item)
 }
 
 void *
-array_get_iter(array_t *ar, array_iter_t *it)
+array_get_iter(const array_t *ar, array_iter_t *it)
 {
     if (it->iter < ar->elnum) {
         return ar->data + ar->elsz * it->iter;
@@ -170,7 +170,7 @@ array_fini (array_t *ar)
 }
 
 void *
-array_first(array_t *ar, array_iter_t *iter)
+array_first(const array_t *ar, array_iter_t *iter)
 {
     iter->iter = 0;
     if (iter->iter < ar->elnum) {
@@ -180,7 +180,7 @@ array_first(array_t *ar, array_iter_t *iter)
 }
 
 void *
-array_last(array_t *ar, array_iter_t *iter)
+array_last(const array_t *ar, array_iter_t *iter)
 {
     iter->iter = ar->elnum - 1;
     if (iter->iter < ar->elnum) {
@@ -190,7 +190,7 @@ array_last(array_t *ar, array_iter_t *iter)
 }
 
 void *
-array_next(array_t *ar, array_iter_t *iter)
+array_next(const array_t *ar, array_iter_t *iter)
 {
     if (++iter->iter < ar->elnum) {
         return ar->data + iter->iter * ar->elsz;
@@ -199,7 +199,7 @@ array_next(array_t *ar, array_iter_t *iter)
 }
 
 void *
-array_prev(array_t *ar, array_iter_t *iter)
+array_prev(const array_t *ar, array_iter_t *iter)
 {
     --iter->iter;
     if (iter->iter < ar->elnum) {
@@ -250,7 +250,7 @@ array_sort(array_t *ar)
 }
 
 void *
-array_find(array_t *ar, const void *key)
+array_find(const array_t *ar, const void *key)
 {
     if (ar->compar == NULL) {
         TRRETNULL(ARRAY_FIND + 1);
@@ -275,7 +275,7 @@ array_traverse(array_t *ar, array_traverser_t tr, void *udata)
 }
 
 int
-array_cmp(array_t *ar1, array_t *ar2, array_compar_t cmp, ssize_t sz)
+array_cmp(const array_t *ar1, const array_t *ar2, array_compar_t cmp, ssize_t sz)
 {
     ssize_t res;
     ssize_t sz1, sz2;

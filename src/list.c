@@ -342,7 +342,7 @@ list_clear_item(list_t *lst, unsigned idx)
 }
 
 void *
-list_get(list_t *lst, unsigned idx)
+list_get(const list_t *lst, unsigned idx)
 {
     if (idx < lst->elnum) {
         return DLE_DATA(lst->index[idx]);
@@ -351,7 +351,7 @@ list_get(list_t *lst, unsigned idx)
 }
 
 void *
-list_get_iter(list_t *lst, list_iter_t *it)
+list_get_iter(const list_t *lst, list_iter_t *it)
 {
     if (it->iter < lst->elnum) {
         return DLE_DATA(lst->index[it->iter]);
@@ -370,21 +370,21 @@ list_fini (list_t *lst)
 }
 
 void *
-list_first(list_t *lst, list_iter_t *iter)
+list_first(const list_t *lst, list_iter_t *iter)
 {
     iter->iter = 0;
     return DLE_DATA(lst->data.head);
 }
 
 void *
-list_last(list_t *lst, list_iter_t *iter)
+list_last(const list_t *lst, list_iter_t *iter)
 {
     iter->iter = lst->elnum - 1;
     return DLE_DATA(lst->data.tail);
 }
 
 void *
-list_next(list_t *lst, list_iter_t *iter)
+list_next(const list_t *lst, list_iter_t *iter)
 {
     if (++iter->iter < lst->elnum) {
         return DLE_DATA(lst->index[iter->iter]);
@@ -393,7 +393,7 @@ list_next(list_t *lst, list_iter_t *iter)
 }
 
 void *
-list_prev(list_t *lst, list_iter_t *iter)
+list_prev(const list_t *lst, list_iter_t *iter)
 {
     if (--iter->iter < lst->elnum) {
         return DLE_DATA(lst->index[iter->iter]);
@@ -430,7 +430,7 @@ list_decr(list_t *lst)
 }
 
 void *
-list_find(list_t *lst, const void *key)
+list_find(const list_t *lst, const void *key)
 {
     if (lst->compar == NULL) {
         TRRETNULL(LIST_FIND + 1);

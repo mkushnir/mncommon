@@ -45,18 +45,18 @@ int list_move(list_t *, list_t *);
 
 #define LIST_FLAG_SAVE 0x01
 int list_ensure_len(list_t *, size_t, unsigned int);
-void *list_get(list_t *, unsigned);
-void *list_get_iter(list_t *, list_iter_t *);
+void *list_get(const list_t *, unsigned);
+void *list_get_iter(const list_t *, list_iter_t *);
 int list_clear_item(list_t *, unsigned);
 void *list_incr(list_t *);
 void *list_incr_iter(list_t *, list_iter_t *);
 int list_decr(list_t *);
 int list_fini(list_t *);
-void *list_first(list_t *, list_iter_t *);
-void *list_last(list_t *, list_iter_t *);
-void *list_next(list_t *, list_iter_t *);
-void *list_prev(list_t *, list_iter_t *);
-void *list_find(list_t *, const void *);
+void *list_first(const list_t *, list_iter_t *);
+void *list_last(const list_t *, list_iter_t *);
+void *list_next(const list_t *, list_iter_t *);
+void *list_prev(const list_t *, list_iter_t *);
+void *list_find(const list_t *, const void *);
 int list_traverse(list_t *, list_traverser_t, void *);
 
 

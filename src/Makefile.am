@@ -77,7 +77,7 @@ diag.c diag.h: diag.txt
 	sh ./gen-diag
 
 run: all
-	for i in $(bin_PROGRAMS); do if test -x ./$$i; then LD_LIRARY_PATH=$(libdir) ./$$i; fi; done;
+	for i in $(bin_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;
 
 testrun:
 	for i in $(SUBDIRS); do if test "$$i" != "."; then cd $$i && $(MAKE) testrun; fi; done;
