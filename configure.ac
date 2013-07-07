@@ -44,6 +44,7 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([strdup])
+AC_CHECK_FUNCS([strndup])
 AC_CHECK_FUNCS([memmove])
 AC_CHECK_FUNCS([memset])
 AC_CHECK_FUNCS([strtol])
@@ -124,6 +125,13 @@ AC_ARG_ENABLE(json,
                              [Enable json (default=yes)]),
               [AM_CONDITIONAL([JSON], [test "$enable_json" = "yes"])],
               [AM_CONDITIONAL([JSON], [enable_json=yes])],
+             )
+
+AC_ARG_ENABLE(memdebug,
+              AC_HELP_STRING([--enable-memdebug],
+                             [Enable memdebug (default=yes)]),
+              [AM_CONDITIONAL([MEMDEBUG], [test "$enable_memdebug" = "yes"])],
+              [AM_CONDITIONAL([MEMDEBUG], [enable_memdebug=yes])],
              )
 
 if test "$enable_profile" = "yes" -a "$enable_list" != "yes"

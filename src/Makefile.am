@@ -56,10 +56,14 @@ if JSON
 json_sources = json.c
 json_include_headers = mrkcommon/json.h
 endif
+if MEMDEBUG
+memdebug_sources = memdebug.c
+memdebug_include_headers = mrkcommon/memdebug.h
+endif
 
-nobase_include_HEADERS = $(dumpm_include_headers) $(util_include_headers) $(array_include_headers) $(list_include_headers) $(logging_include_headers) $(profile_include_headers) $(conf_include_headers) $(trie_include_headers) $(rbt_include_headers) $(traversedir_include_headers) $(bytestream_include_headers) $(json_include_headers)
+nobase_include_HEADERS = $(dumpm_include_headers) $(util_include_headers) $(array_include_headers) $(list_include_headers) $(logging_include_headers) $(profile_include_headers) $(conf_include_headers) $(trie_include_headers) $(rbt_include_headers) $(traversedir_include_headers) $(bytestream_include_headers) $(json_include_headers) $(memdebug_include_headers)
 
-libmrkcommon_la_SOURCES = $(dumpm_sources) $(array_sources) $(list_sources) $(logging_sources) $(profile_sources) $(conf_sources) $(trie_sources) $(rbt_sources) $(traversedir_sources) $(bytestream_sources) $(json_sources)
+libmrkcommon_la_SOURCES = $(dumpm_sources) $(array_sources) $(list_sources) $(logging_sources) $(profile_sources) $(conf_sources) $(trie_sources) $(rbt_sources) $(traversedir_sources) $(bytestream_sources) $(json_sources) $(memdebug_sources)
 nodist_libmrkcommon_la_SOURCES = diag.c
 
 if DEBUG

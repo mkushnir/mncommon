@@ -21,6 +21,9 @@ endif
 if JSON
 noinst_PROGRAMS += testjson
 endif
+if MEMDEBUG
+noinst_PROGRAMS += testmemdebug
+endif
 
 distdir = ../../$(PACKAGE)-$(VERSION)/src/test
 dist_HEADERS = unittest.h rb.h
@@ -63,6 +66,10 @@ testtraversedir_LDFLAGS =
 testjson_SOURCES = ../json.c testjson.c
 testjson_CFLAGS =
 testjson_LDFLAGS =
+
+testmemdebug_SOURCES = ../memdebug.c testmemdebug.c
+testmemdebug_CFLAGS =
+testmemdebug_LDFLAGS =
 
 ../diag.c ../diag.h: ../diag.txt
 	sh ../gen-diag
