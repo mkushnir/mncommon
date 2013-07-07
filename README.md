@@ -202,6 +202,13 @@ value, array start, array end, array item. Supported simple data types:
 string, signed integer, float, boolean, as well as special value _null_.
 
 
+mrkcommon/memdebug.h
+=======================
+A thin macro-based layer over _memory(3)_ and _str\{n\}dup(3)_ that allows
+to track currently allocated memory. Limitation: doesn't track memory
+allocated by those compilation units that didn't include
+_"mrkcommon/memdebug.h"_.
+
 mrkcommon/dumpm.h
 =================
 
