@@ -6,7 +6,10 @@
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/array.h"
 #include "mrkcommon/list.h"
+//#define MEMDEBUG_SIMPLE
 #include "mrkcommon/memdebug.h"
+
+MEMDEBUG_DECLARE(qwe);
 
 static void
 test0(void)
@@ -28,6 +31,8 @@ test0(void)
         assert(CDATA.in == CDATA.expected);
     }
 
+    MEMDEBUG_REGISTER(qwe);
+
     TRACE("nallocated=%ld", memdebug_nallocated());
     p1 = malloc(100);
     TRACE("nallocated=%ld", memdebug_nallocated());
@@ -43,8 +48,11 @@ test0(void)
     TRACE("nallocated=%ld", memdebug_nallocated());
 
     free(p1);
+    TRACE("nallocated=%ld", memdebug_nallocated());
     free(p2);
+    TRACE("nallocated=%ld", memdebug_nallocated());
     free(s1);
+    TRACE("nallocated=%ld", memdebug_nallocated());
     free(s2);
     TRACE("nallocated=%ld", memdebug_nallocated());
     assert(memdebug_nallocated() == 0);
