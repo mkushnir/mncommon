@@ -4,6 +4,10 @@
 #include <assert.h>
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef int (*list_initializer_t) (void *);
 typedef int (*list_finalizer_t) (void *);
 typedef int (*list_traverser_t) (void *, void *);
@@ -59,5 +63,8 @@ void *list_prev(const list_t *, list_iter_t *);
 void *list_find(const list_t *, const void *);
 int list_traverse(list_t *, list_traverser_t, void *);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

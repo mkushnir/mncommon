@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct _rbt_node {
     struct _rbt_node *parent;
@@ -38,4 +41,9 @@ int rbt_remove_key(rbt_t *, uintptr_t);
 int rbt_node_init(rbt_node_t *, uintptr_t, void *);
 void rbt_node_dump_tree(rbt_node_t *, int);
 void rbt_node_dump_list(rbt_node_t *);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

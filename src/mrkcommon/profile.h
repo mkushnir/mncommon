@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _profile {
     const char *name;
     int id;
@@ -35,6 +39,10 @@ void profile_report(void);
 #   define PROFILE_START(id)
 #   define PROFILE_STOP(id)
 #   define PROFILE_REPORT()
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* PROFILE_H */

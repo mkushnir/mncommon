@@ -1,6 +1,10 @@
 #ifndef MRKCOMMON_DUMPM_H
 #define MRKCOMMON_DUMPM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef MRKCOMMON_LDUMPM_H
 #error "Please use eigher this file or mrkcommon/ldumpm.h, or #include logging_private.h AFTER this file."
 #endif
@@ -18,7 +22,9 @@
 #include <time.h>
 #include <unistd.h>
 
-#define DUMPM_INDENT_SIZE 4
+#ifndef DUMPM_INDENT_SIZE
+#   define DUMPM_INDENT_SIZE 4
+#endif
 
 #ifdef USE_SYSLOG
 # define TRACEN(s, ...)     (syslog(LOG_DEBUG,    "[T]%s:%d:%s() " s,      __FILE__, __LINE__, __func__, ##__VA_ARGS__))
@@ -28,6 +34,8 @@
 # define INFO(s, ...)       (syslog(LOG_INFO,     "[I]%s:%d:%s() " s "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define WARNING(s, ...)    (syslog(LOG_WARNING,  "[W]%s:%d:%s() " s "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define ERROR(s, ...)      (syslog(LOG_ERR,      "[E]%s:%d:%s() " s "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__))
+# define LTRACE(lvl, s, ...) (syslog(LOG_DEBUG,   "%*c"            s "\n", DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__))
+# define LTRACEN(lvl, s, ...) (syslog(LOG_DEBUG,  "%*c"            s,      DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__))
 #else
 # define TRACEN(s, ...) (fprintf(stderr, "[%5d] %s:%d:%s() " s, getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define TRACEC(s, ...) (fprintf(stderr, s "\n", ##__VA_ARGS__))
@@ -37,6 +45,7 @@
 # define WARNING TRACE
 # define ERROR   TRACE
 # define LTRACE(lvl, s, ...) fprintf(stderr, "%*c" s "\n", DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__)
+# define LTRACEN(lvl, s, ...) fprintf(stderr, "%*c" s, DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__)
 
 #endif
 
@@ -75,5 +84,9 @@ void dumpm(const void * m, size_t n, size_t l);
 #define FBYELLOW(s) FCOLOR("1", "3", s)
 #define FBBLUE(s)   FCOLOR("1", "4", s)
 #define FBWHITE(s)  FCOLOR("1", "0", s)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* DUMPM_H */

@@ -8,6 +8,10 @@
 
 #include "mrkcommon/logging.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef MD8
 #   undef MD8
 #endif
@@ -63,5 +67,9 @@
 #   undef D64
 #endif
 #define D64(m, n) MD64(LOGGING_MODULE, m, n)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

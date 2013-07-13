@@ -1,6 +1,12 @@
 #ifndef MRKCOMMON_MEMDEBUG_H
 #define MRKCOMMON_MEMDEBUG_H
 
+#include "mrkcommon/util.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _memdebug_stat {
     const char *name;
     size_t nallocated;
@@ -20,28 +26,28 @@ void memdebug_traverse_ctxes(int (*cb)(memdebug_stat_t *, void *), void *);
 #define CONCAT(a, b) a##b
 
 #define _DECLARE_MALLOC(n) \
-static void *__memdebug_malloc(size_t sz) { return memdebug_malloc(CONCAT(__memdebug_id_,n), sz); }
+UNUSED static void *__memdebug_malloc(size_t sz) { return memdebug_malloc(CONCAT(__memdebug_id_,n), sz); }
 
 #define _DECLARE_CALLOC(n) \
-static void *__memdebug_calloc(size_t e, size_t sz) { return memdebug_calloc(CONCAT(__memdebug_id_,n), e, sz); }
+UNUSED static void *__memdebug_calloc(size_t e, size_t sz) { return memdebug_calloc(CONCAT(__memdebug_id_,n), e, sz); }
 
 #define _DECLARE_REALLOC(n) \
-static void *__memdebug_realloc(void *ptr, size_t sz) { return memdebug_realloc(CONCAT(__memdebug_id_,n), ptr, sz); }
+UNUSED static void *__memdebug_realloc(void *ptr, size_t sz) { return memdebug_realloc(CONCAT(__memdebug_id_,n), ptr, sz); }
 
 #define _DECLARE_REALLOCF(n) \
-static void *__memdebug_reallocf(void *ptr, size_t sz) { return memdebug_reallocf(CONCAT(__memdebug_id_,n), ptr, sz); }
+UNUSED static void *__memdebug_reallocf(void *ptr, size_t sz) { return memdebug_reallocf(CONCAT(__memdebug_id_,n), ptr, sz); }
 
 #define _DECLARE_FREE(n) \
-static void __memdebug_free(void *ptr) { return memdebug_free(CONCAT(__memdebug_id_,n), ptr); }
+UNUSED static void __memdebug_free(void *ptr) { return memdebug_free(CONCAT(__memdebug_id_,n), ptr); }
 
 #define _DECLARE_STRDUP(n) \
-static char *__memdebug_strdup(const char *str) { return memdebug_strdup(CONCAT(__memdebug_id_,n), str); }
+UNUSED static char *__memdebug_strdup(const char *str) { return memdebug_strdup(CONCAT(__memdebug_id_,n), str); }
 
 #define _DECLARE_STRNDUP(n) \
-static char *__memdebug_strndup(const char *str, size_t len) { return memdebug_strndup(CONCAT(__memdebug_id_,n), str, len); }
+UNUSED static char *__memdebug_strndup(const char *str, size_t len) { return memdebug_strndup(CONCAT(__memdebug_id_,n), str, len); }
 
 #define _DECLARE_NALLOCATED(n) \
-static size_t __memdebug_nallocated(void) { memdebug_stat_t st; memdebug_stat(CONCAT(__memdebug_id_,n), &st); return st.nallocated; }
+UNUSED static size_t __memdebug_nallocated(void) { memdebug_stat_t st; memdebug_stat(CONCAT(__memdebug_id_,n), &st); return st.nallocated; }
 
 #define MEMDEBUG_DECLARE(n) \
 static int CONCAT(__memdebug_id_, n) = 0; \
@@ -65,5 +71,9 @@ _DECLARE_NALLOCATED(n);
 #define strdup __memdebug_strdup
 #define strndup __memdebug_strndup
 #define memdebug_nallocated __memdebug_nallocated
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

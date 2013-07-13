@@ -4,6 +4,10 @@
 #include <syslog.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _logmodule {
     const char *name;
     int id;
@@ -99,4 +103,9 @@ extern void (*logging_log)(int, const char *, ...) __printflike(2, 3);
 
 void logging_init(FILE *, const char *, int);
 void logging_fini();
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

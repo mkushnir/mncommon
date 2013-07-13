@@ -3,6 +3,10 @@
 
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef CONF_PARSER_CTX_T_DEFINED
 typedef struct _conf_parser_ctx conf_parser_ctx_t;
 #define CONF_PARSER_CTX_T_DEFINED
@@ -49,5 +53,10 @@ int conf_register_prefix_handler(const char *, int, int,
 
 int conf_init(void);
 int conf_fini(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

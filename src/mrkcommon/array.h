@@ -3,6 +3,10 @@
 
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef int (*array_initializer_t) (void *);
 typedef int (*array_finalizer_t) (void *);
 typedef int (*array_traverser_t) (void *, void *);
@@ -48,5 +52,9 @@ int array_sort(array_t *);
 void *array_find(const array_t *, const void *);
 int array_traverse(array_t *, array_traverser_t, void *);
 int array_cmp(const array_t *, const array_t *, array_compar_t, ssize_t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

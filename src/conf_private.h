@@ -3,6 +3,10 @@
 
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct _read_ctx {
     const char *buf;
     int pos;
@@ -39,6 +43,10 @@ typedef struct _conf_parser_handler_entry {
 #define CONF_PARSER_HANDLER_ENTRY_T_DEFINED
 
 #define TOK_MAXLEN 1023
+
+#ifdef __cplusplus
+}
+#endif
 
 #include "mrkcommon/conf.h"
 

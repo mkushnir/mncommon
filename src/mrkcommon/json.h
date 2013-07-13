@@ -3,6 +3,10 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum _json_type {
     JSON_OBJECT,
     JSON_ARRAY,
@@ -126,6 +130,10 @@ int json_parse_array(json_ctx_t *, char *, size_t);
 int json_parse_str(json_ctx_t *, char *, size_t);
 int json_parse_num(json_ctx_t *, char *, size_t);
 int json_parse_tok(json_ctx_t *, char *, size_t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 // vim:list

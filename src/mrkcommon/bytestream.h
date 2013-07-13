@@ -4,6 +4,10 @@
 #include <stdarg.h>
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * This macro is also defined in snproto_bytes.h for a different structure.
  * Surprisingly, it appears to be exactly the same.
@@ -62,5 +66,10 @@ off_t bytestream_recycle(bytestream_t *, off_t);
 int bytestream_nprintf(bytestream_t *, size_t, const char *, ...);
 int bytestream_cat(bytestream_t *, size_t, const char *);
 int bytestream_dump(bytestream_t *);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
