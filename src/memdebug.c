@@ -11,7 +11,13 @@ typedef struct _memdebug_ctx {
     size_t nallocated;
 } memdebug_ctx_t;
 
-static size_t nallocated = 0;
+/* copied from mrkcommon/memdebug.h, sigh ... */
+
+typedef struct _memdebug_stat {
+    const char *name;
+    size_t nallocated;
+} memdebug_stat_t;
+
 static memdebug_ctx_t *memdebug_ctxes = NULL;
 static int nctxes = 0;
 
@@ -27,21 +33,7 @@ int memdebug_register(const char *name)
 }
 
 void *
-memdebug_malloc(size_t sz)
-{
-    void *res;
-
-    res = malloc(sz);
-
-    if (res != NULL) {
-        nallocated += malloc_usable_size(res);
-    }
-
-    return res;
-}
-
-void *
-memdebug_malloc_named(int n, size_t sz)
+memdebug_malloc(int n, size_t sz)
 {
     void *res;
     memdebug_ctx_t *ctx;
@@ -59,21 +51,7 @@ memdebug_malloc_named(int n, size_t sz)
 }
 
 void *
-memdebug_calloc(size_t n, size_t sz)
-{
-    void *res;
-
-    res = calloc(n, sz);
-
-    if (res != NULL) {
-        nallocated += malloc_usable_size(res);
-    }
-
-    return res;
-}
-
-void *
-memdebug_calloc_named(int n, size_t e, size_t sz)
+memdebug_calloc(int n, size_t e, size_t sz)
 {
     void *res;
     memdebug_ctx_t *ctx;
@@ -91,25 +69,7 @@ memdebug_calloc_named(int n, size_t e, size_t sz)
 }
 
 void *
-memdebug_realloc(void * ptr, size_t sz)
-{
-    void *res;
-
-    if (ptr != NULL) {
-        nallocated -= malloc_usable_size(ptr);
-    }
-
-    res = realloc(ptr, sz);
-
-    if (res != NULL) {
-        nallocated += malloc_usable_size(res);
-    }
-
-    return res;
-}
-
-void *
-memdebug_realloc_named(int n, void * ptr, size_t sz)
+memdebug_realloc(int n, void * ptr, size_t sz)
 {
     void *res;
     memdebug_ctx_t *ctx;
@@ -131,25 +91,7 @@ memdebug_realloc_named(int n, void * ptr, size_t sz)
 }
 
 void *
-memdebug_reallocf(void * ptr, size_t sz)
-{
-    void *res;
-
-    if (ptr != NULL) {
-        nallocated -= malloc_usable_size(ptr);
-    }
-
-    res = reallocf(ptr, sz);
-
-    if (res != NULL) {
-        nallocated += malloc_usable_size(res);
-    }
-
-    return res;
-}
-
-void *
-memdebug_reallocf_named(int n, void * ptr, size_t sz)
+memdebug_reallocf(int n, void * ptr, size_t sz)
 {
     void *res;
     memdebug_ctx_t *ctx;
@@ -171,17 +113,7 @@ memdebug_reallocf_named(int n, void * ptr, size_t sz)
 }
 
 void
-memdebug_free(void *ptr)
-{
-    if (ptr != NULL) {
-        nallocated -= malloc_usable_size(ptr);
-    }
-
-    free(ptr);
-}
-
-void
-memdebug_free_named(int n, void *ptr)
+memdebug_free(int n, void *ptr)
 {
     memdebug_ctx_t *ctx;
 
@@ -196,21 +128,7 @@ memdebug_free_named(int n, void *ptr)
 }
 
 char *
-memdebug_strdup(const char *str)
-{
-    char *res;
-
-    res = strdup(str);
-
-    if (res != NULL) {
-        nallocated += malloc_usable_size(res);
-    }
-
-    return res;
-}
-
-char *
-memdebug_strdup_named(int n, const char *str)
+memdebug_strdup(int n, const char *str)
 {
     char *res;
     memdebug_ctx_t *ctx;
@@ -228,21 +146,7 @@ memdebug_strdup_named(int n, const char *str)
 }
 
 char *
-memdebug_strndup(const char *str, size_t len)
-{
-    char *res;
-
-    res = strndup(str, len);
-
-    if (res != NULL) {
-        nallocated += malloc_usable_size(res);
-    }
-
-    return res;
-}
-
-char *
-memdebug_strndup_named(int n, const char *str, size_t len)
+memdebug_strndup(int n, const char *str, size_t len)
 {
     char *res;
     memdebug_ctx_t *ctx;
@@ -259,20 +163,37 @@ memdebug_strndup_named(int n, const char *str, size_t len)
     return res;
 }
 
-size_t
-memdebug_nallocated(void)
+void
+memdebug_traverse_ctxes(int (*cb)(memdebug_stat_t *, void *), void *udata)
 {
-    return nallocated;
+    memdebug_stat_t st;
+    int i;
+
+    assert(cb != NULL);
+
+    for (i = 0; i < nctxes; ++i) {
+        memdebug_ctx_t *ctx;
+
+        ctx = memdebug_ctxes + i;
+        st.name = ctx->name;
+        st.nallocated = ctx->nallocated;
+
+        if (cb(&st, udata) != 0) {
+            break;
+        }
+    }
 }
 
-size_t
-memdebug_nallocated_named(int n)
+void
+memdebug_stat(int n, memdebug_stat_t *st)
 {
     memdebug_ctx_t *ctx;
 
-
     assert(n < nctxes);
+    assert(st != NULL);
+
     ctx = memdebug_ctxes + n;
 
-    return ctx->nallocated;
+    st->name = ctx->name;
+    st->nallocated = ctx->nallocated;
 }

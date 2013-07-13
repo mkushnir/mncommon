@@ -6,10 +6,16 @@
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/array.h"
 #include "mrkcommon/list.h"
-//#define MEMDEBUG_SIMPLE
 #include "mrkcommon/memdebug.h"
 
 MEMDEBUG_DECLARE(qwe);
+
+static int
+mycb(memdebug_stat_t *st, UNUSED void *udata)
+{
+    TRACE("%s: %ld", st->name, st->nallocated);
+    return 0;
+}
 
 static void
 test0(void)
@@ -47,6 +53,8 @@ test0(void)
     s2 = strndup(s1, 32);
     TRACE("nallocated=%ld", memdebug_nallocated());
 
+    memdebug_traverse_ctxes(mycb, NULL);
+
     free(p1);
     TRACE("nallocated=%ld", memdebug_nallocated());
     free(p2);
@@ -56,6 +64,8 @@ test0(void)
     free(s2);
     TRACE("nallocated=%ld", memdebug_nallocated());
     assert(memdebug_nallocated() == 0);
+
+    memdebug_traverse_ctxes(mycb, NULL);
 }
 
 int
