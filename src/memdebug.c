@@ -28,6 +28,7 @@ int memdebug_register(const char *name)
     ctx = memdebug_ctxes + nctxes;
     ctx->name = name;
     ctx->id = nctxes;
+    ctx->nallocated = 0;
     ++nctxes;
     return ctx->id;
 }
