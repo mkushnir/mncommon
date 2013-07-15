@@ -22,6 +22,7 @@ char *memdebug_strdup(int, const char *);
 char *memdebug_strndup(int, const char *, size_t);
 void memdebug_stat(int, memdebug_stat_t *);
 void memdebug_traverse_ctxes(int (*cb)(memdebug_stat_t *, void *), void *);
+void memdebug_print_stats(void);
 
 #define CONCAT(a, b) a##b
 

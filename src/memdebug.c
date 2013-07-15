@@ -198,3 +198,24 @@ memdebug_stat(int n, memdebug_stat_t *st)
     st->name = ctx->name;
     st->nallocated = ctx->nallocated;
 }
+
+static int
+my_memdebug_cb(memdebug_stat_t *st, void *udata)
+{
+    size_t *ntotal = udata;
+
+    TRACEC("%-16s % 12ld", st->name, st->nallocated);
+    *(ntotal) += st->nallocated;
+    return 0;
+}
+
+void
+memdebug_print_stats(void)
+{
+    size_t ntotal = 0;
+
+    memdebug_traverse_ctxes(my_memdebug_cb, &ntotal);
+    TRACEC("%-16s %-12s", "----------------", "------------");
+    TRACEC("%-16s % 12ld", "Total", ntotal);
+}
+
