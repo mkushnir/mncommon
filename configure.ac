@@ -127,6 +127,13 @@ AC_ARG_ENABLE(json,
               [AM_CONDITIONAL([JSON], [enable_json=yes])],
              )
 
+AC_ARG_ENABLE(stqueue,
+              AC_HELP_STRING([--enable-stqueue],
+                             [Enable stqueue (default=yes)]),
+              [AM_CONDITIONAL([STQUEUE], [test "$enable_stqueue" = "yes"])],
+              [AM_CONDITIONAL([STQUEUE], [enable_stqueue=yes])],
+             )
+
 AC_ARG_ENABLE(memdebug,
               AC_HELP_STRING([--enable-memdebug],
                              [Enable memdebug (default=yes)]),

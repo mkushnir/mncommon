@@ -194,7 +194,7 @@ processors or parsers:
 
 
 mrkcommon/json.h
-=======================
+================
 A fast callback-style JSON parser. Unlike traditional JSON parsers,
 doesn't build objects in memory. Individual callbacks can be registered
 for the following events: object start, object end, object key, object
@@ -202,8 +202,13 @@ value, array start, array end, array item. Supported simple data types:
 string, signed integer, float, boolean, as well as special value _null_.
 
 
+mrkcommon/stqueue.h
+===================
+Singly-linked tail queue with O(1) insertions at queue's tail, _enqueue_
+and O(1) deletions from head, _dequeue_. All other operations are O(n).
+
 mrkcommon/memdebug.h
-=======================
+====================
 A thin macro-based layer over _memory(3)_ and _str\{n\}dup(3)_ that allows
 to track currently allocated memory. Limitation: doesn't track memory
 allocated by those compilation units that didn't include

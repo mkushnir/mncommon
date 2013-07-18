@@ -21,6 +21,9 @@ endif
 if JSON
 noinst_PROGRAMS += testjson
 endif
+if STQUEUE
+noinst_PROGRAMS += teststqueue
+endif
 if MEMDEBUG
 noinst_PROGRAMS += testmemdebug
 endif
@@ -66,6 +69,10 @@ testtraversedir_LDFLAGS =
 testjson_SOURCES = ../json.c testjson.c
 testjson_CFLAGS =
 testjson_LDFLAGS =
+
+teststqueue_SOURCES = teststqueue.c
+teststqueue_CFLAGS =
+teststqueue_LDFLAGS =
 
 testmemdebug_SOURCES = ../memdebug.c testmemdebug.c
 testmemdebug_CFLAGS =
