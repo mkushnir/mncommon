@@ -21,6 +21,13 @@ then
     autoreconf
     ./configure --prefix=$HOME --enable-debug
     make
+elif test "$1" = "dev-ndebug"
+then
+    export LDFLAGS=-L$HOME/lib
+    export CFLAGS=-I$HOME/include
+    autoreconf
+    ./configure --prefix=$HOME
+    make
 elif test "$1" = "dist"
 then
     unset LDFLAGS
@@ -30,7 +37,7 @@ then
     make dist
     cp -v *.tar.gz /usr/data/distfiles/
 else
-    echo "`basename $0` {init|dev|dist}"
+    echo "`basename $0` {init|dev|dist|dev-ndebug}"
 fi
 
 
