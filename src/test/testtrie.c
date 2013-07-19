@@ -44,7 +44,7 @@ test0(void)
         //TRACE("removing: %d", values1[i]);
         n = trie_find_exact(&tr, values1[i]);
         if (n != NULL) {
-            trie_node_remove(n);
+            trie_remove_node(&tr, n);
         }
     }
 
@@ -100,7 +100,7 @@ test1(void)
         //TRACE("found %p for %ld", n, values2[i]);
         //trie_node_dump(n);
         if (n != NULL) {
-            trie_node_remove(n);
+            trie_remove_node(&tr, n);
             //TRACE("removed %ld OK", values2[i]);
         } else {
             //TRACE("removed %ld FAIL", values2[i]);

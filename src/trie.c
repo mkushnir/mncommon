@@ -1,4 +1,3 @@
-// vim:list
 #include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -9,6 +8,11 @@
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/util.h"
 #include "mrkcommon/trie.h"
+
+#ifndef NDEBUG
+#include "mrkcommon/memdebug.h"
+MEMDEBUG_DECLARE(trie);
+#endif
 
 void
 trie_node_dump(trie_node_t *n)
@@ -97,23 +101,27 @@ trie_init(trie_t *tr)
     for (i = 0; i < countof(tr->roots); ++i) {
         trie_node_init(&tr->roots[i], NULL, -1, NULL);
     }
+    tr->volume = 0;
+    tr->nelems = 0;
 }
 
-void
-trie_node_fini(trie_node_t *n)
+static void
+trie_node_fini(trie_t *tr, trie_node_t *n)
 {
 
     assert(n != NULL);
 
     if (n->child[0] != NULL) {
-        trie_node_fini(n->child[0]);
+        trie_node_fini(tr, n->child[0]);
         free(n->child[0]);
         n->child[0] = NULL;
+        --(tr->volume);
     }
     if (n->child[1] != NULL) {
-        trie_node_fini(n->child[1]);
+        trie_node_fini(tr, n->child[1]);
         free(n->child[1]);
         n->child[1] = NULL;
+        --(tr->volume);
     }
     n->parent = NULL;
 }
@@ -126,7 +134,68 @@ trie_fini(trie_t *tr)
     assert(tr != NULL);
 
     for (i = 0; i < countof(tr->roots); ++i) {
-        trie_node_fini(&tr->roots[i]);
+        trie_node_fini(tr, &tr->roots[i]);
+    }
+}
+
+static int
+trie_node_is_orphan(trie_node_t *n)
+{
+    return (n->child[0] == NULL) && (n->child[1] == NULL && n->value == NULL);
+
+}
+
+static void
+trie_node_cleanup(trie_t *tr, trie_node_t *n)
+{
+    if (n == NULL) {
+        return;
+    }
+
+    if (trie_node_is_orphan(n)) {
+        return;
+    }
+
+    if (n->child[0] != NULL) {
+        if (!trie_node_is_orphan(n->child[0])) {
+            trie_node_cleanup(tr, n->child[0]);
+            if (trie_node_is_orphan(n->child[0])) {
+                free(n->child[0]);
+                n->child[0] = NULL;
+                --(tr->volume);
+            }
+        } else {
+            free(n->child[0]);
+            n->child[0] = NULL;
+            --(tr->volume);
+        }
+    }
+    if (n->child[1] != NULL) {
+        if (!trie_node_is_orphan(n->child[1])) {
+            trie_node_cleanup(tr, n->child[1]);
+            if (trie_node_is_orphan(n->child[1])) {
+                free(n->child[1]);
+                n->child[1] = NULL;
+                --(tr->volume);
+            }
+        } else {
+            free(n->child[1]);
+            n->child[1] = NULL;
+            --(tr->volume);
+        }
+    }
+}
+
+
+void
+trie_cleanup(trie_t *tr)
+{
+    unsigned i;
+
+    assert(tr != NULL);
+
+    for (i = 0; i < countof(tr->roots); ++i) {
+        trie_node_cleanup(tr, &tr->roots[i]);
     }
 }
 
@@ -202,11 +271,13 @@ trie_add_node(trie_t *tr, uintptr_t key)
                 FAIL("malloc");
             }
             trie_node_init(*n, cur, i | (sel << CHILD_SELECTOR_SHIFT), NULL);
+            ++(tr->volume);
         }
         cur = *n;
         ++i;
     } while (--idx);
 
+    ++(tr->nelems);
     return cur;
 }
 
@@ -427,27 +498,8 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
     return NULL;
 }
 
-UNUSED static void
-trie_cleanup_orphans(trie_node_t *n)
-{
-    trie_node_t *parent;
-
-    if (n->child[0] == NULL && n->child[1] == NULL) {
-        parent = n->parent;
-        if (parent != NULL) {
-            free(n);
-            if (parent->child[0] == n) {
-                parent->child[0] = NULL;
-            } else if (parent->child[1] == n) {
-                parent->child[1] = NULL;
-            }
-            trie_cleanup_orphans(parent);
-        }
-    }
-}
-
 int
-trie_node_remove(trie_node_t *n)
+trie_remove_node(trie_t *tr, trie_node_t *n)
 {
     trie_node_t *parent;
 
@@ -461,8 +513,24 @@ trie_node_remove(trie_node_t *n)
             FAIL("trie_node_remove");
         }
     }
-    trie_node_fini(n);
+    trie_node_fini(tr, n);
     free(n);
+    --(tr->volume);
+    --(tr->nelems);
     return 0;
 }
 
+size_t
+trie_get_volume(trie_t *tr)
+{
+    return tr->volume;
+}
+
+size_t
+trie_get_nelems(trie_t *tr)
+{
+    return tr->nelems;
+}
+
+
+// vim:list

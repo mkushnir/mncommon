@@ -129,7 +129,7 @@ test_trie(void)
         n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
         *n = *(keys + i);
         nn = trie_find_exact(&tr, *n);
-        trie_node_remove(nn);
+        trie_remove_node(&tr, nn);
     }
     PROFILE_STOP(RBT_TEST_PROF_TRIE_REMOVE);
 }

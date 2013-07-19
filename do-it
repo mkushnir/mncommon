@@ -1,14 +1,38 @@
 #!/bin/sh
 
-aclocal
-autoheader
-autoreconf
-automake --add-missing
-libtoolize
-make distclean
-autoreconf
-./configure --prefix=$HOME --enable-debug
-make
+if test "$1" = "init"
+then
+    export LDFLAGS=-L$HOME/lib
+    export CFLAGS=-I$HOME/include
+
+    aclocal
+    autoheader
+    autoreconf
+    automake --add-missing
+    libtoolize
+    make distclean
+    autoreconf
+    ./configure --prefix=$HOME --enable-debug
+    make
+elif test "$1" = "dev"
+then
+    export LDFLAGS=-L$HOME/lib
+    export CFLAGS=-I$HOME/include
+    autoreconf
+    ./configure --prefix=$HOME --enable-debug
+    make
+elif test "$1" = "dist"
+then
+    unset LDFLAGS
+    unset CFLAGS
+    autoreconf
+    ./configure
+    make dist
+    cp -v *.tar.gz /usr/data/distfiles/
+else
+    echo "`basename $0` {init|dev|dist}"
+fi
+
 
 # Before checking in to git: don't forget to update the port.
 # autoreconf

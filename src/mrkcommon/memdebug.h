@@ -51,7 +51,7 @@ UNUSED static char *__memdebug_strndup(const char *str, size_t len) { return mem
 UNUSED static size_t __memdebug_nallocated(void) { memdebug_stat_t st; memdebug_stat(CONCAT(__memdebug_id_,n), &st); return st.nallocated; }
 
 #define MEMDEBUG_DECLARE(n) \
-static int CONCAT(__memdebug_id_, n) = 0; \
+int CONCAT(__memdebug_id_, n) = 0; \
 _DECLARE_MALLOC(n); \
 _DECLARE_CALLOC(n); \
 _DECLARE_REALLOC(n); \
@@ -62,6 +62,7 @@ _DECLARE_STRNDUP(n); \
 _DECLARE_NALLOCATED(n);
 
 #define MEMDEBUG_REGISTER(n) \
+    extern int CONCAT(__memdebug_id_, n); \
     CONCAT(__memdebug_id_, n) = memdebug_register(#n)
 
 #define malloc __memdebug_malloc

@@ -17,6 +17,8 @@ typedef struct _trie_node {
 typedef struct _trie {
     /* flsl(3) can return TREE_DEPTH + 1 values for any of its input */
     struct _trie_node roots[TREE_DEPTH + 1];
+    size_t volume;
+    size_t nelems;
 } trie_t;
 
 typedef struct _test_data {
@@ -32,7 +34,11 @@ int trie_node_traverse(trie_node_t *, trie_traverser_t, void *);
 int trie_traverse(trie_t *, int (*)(trie_node_t *, void *), void *);
 
 trie_node_t *trie_add_node(trie_t *, uintptr_t);
-int trie_node_remove(trie_node_t *);
+int trie_remove_node(trie_t *, trie_node_t *);
+size_t trie_get_volume(trie_t *);
+size_t trie_get_nelems(trie_t *);
+void trie_cleanup(trie_t *);
+
 
 trie_node_t *trie_find_exact(trie_t *, uintptr_t);
 trie_node_t *trie_find_closest(trie_t *, uintptr_t, int);

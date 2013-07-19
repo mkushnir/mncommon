@@ -5,6 +5,10 @@
 #include "mrkcommon/list.h"
 #include "diag.h"
 
+#ifndef NDEBUG
+#include "mrkcommon/memdebug.h"
+MEMDEBUG_DECLARE(list);
+#endif
 
 static int
 list_data_init(list_t *lst)
