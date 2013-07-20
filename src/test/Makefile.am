@@ -13,7 +13,7 @@ if CONF
 noinst_PROGRAMS += testconf
 endif
 if TRIE
-noinst_PROGRAMS += testtrie testperftree testperftrie testperfrb
+noinst_PROGRAMS += testtrie testperftree testperftrie testperfrb testrborder testtrieorder
 endif
 if TRAVERSEDIR
 noinst_PROGRAMS += testtraversedir
@@ -74,6 +74,14 @@ testperftrie_LDFLAGS =
 testperfrb_SOURCES = rb.c ../profile.c testperfrb.c
 testperfrb_CFLAGS =
 testperfrb_LDFLAGS =
+
+testrborder_SOURCES = rb.c testrborder.c
+testrborder_CFLAGS =
+testrborder_LDFLAGS =
+
+testtrieoeder_SOURCES = ../trie.c testtrieoeder.c
+testtrieoeder_CFLAGS =
+testtrieoeder_LDFLAGS =
 
 testtraversedir_SOURCES = ../traversedir.c testtraversedir.c
 testtraversedir_CFLAGS =
