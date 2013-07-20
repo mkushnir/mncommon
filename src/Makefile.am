@@ -97,7 +97,7 @@ libmrkcommon_la_SOURCES = $(dumpm_sources) \
 nodist_libmrkcommon_la_SOURCES = diag.c
 
 if DEBUG
-DEBUG_FLAGS = -g -O0 -ftrapv -fcatch-undefined-behavior
+DEBUG_FLAGS = -g -O0 $(CLANG_DEBUG)
 else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif

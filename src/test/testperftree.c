@@ -9,7 +9,7 @@
 #include "rb.h"
 
 static unsigned niter = 10;
-static unsigned nelem = 2;
+static unsigned nelem = 1024 * 1024;
 
 struct rb foo = RB_INITIALIZER();
 rbt_t rbt;
@@ -305,7 +305,7 @@ main(UNUSED int argc, UNUSED char *argv[])
     }
     PROFILE_STOP(RBT_TEST_PROF_TRIE);
 
-    //profile_report();
+    profile_report();
     profile_fini_module();
     return 0;
 }

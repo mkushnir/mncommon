@@ -16,6 +16,7 @@ rdtsc(void)
 {
   uint32_t lo, hi;
 
+  //__asm __volatile ("" ::: "memory");
   __asm __volatile ("rdtsc" : "=a"(lo), "=d"(hi));
   return (uint64_t) hi << 32 | lo;
 }
@@ -90,7 +91,7 @@ profile_start(const profile_t *p)
     //TRACE("start=%ld", pp->start);
 }
 
-void
+uint64_t
 profile_stop(const profile_t *p)
 {
     profile_t *pp = (profile_t *)p;
@@ -107,6 +108,7 @@ profile_stop(const profile_t *p)
     ++pp->n;
     pp->avg = (long double)pp->running_aggr / (long double)pp->n;
     pp->start = 0;
+    return diff;
 }
 
 void

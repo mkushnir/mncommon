@@ -13,7 +13,7 @@ if CONF
 noinst_PROGRAMS += testconf
 endif
 if TRIE
-noinst_PROGRAMS += testtrie testperftree
+noinst_PROGRAMS += testtrie testperftree testperftrie testperfrb
 endif
 if TRAVERSEDIR
 noinst_PROGRAMS += testtraversedir
@@ -33,9 +33,14 @@ dist_HEADERS = unittest.h rb.h
 
 BUILT_SOURCES = ../diag.c ../diag.h
 
-#CFLAGS = -Wall -Wextra -Werror -std=c99 -I.. -g -O3 -DNDEBUG
-CFLAGS = -Wall -Wextra -Werror -std=c99 -I.. -g -O0 -ftrapv -fcatch-undefined-behavior
-#CFLAGS = -Wall -Wextra -Werror -std=c99 -I.. -g -O0 -DTRRET_DEBUG
+if DEBUG
+DEBUG_FLAGS = -g -O0 $(CLANG_DEBUG)
+#DEBUG_FLAGS = -g -O0 -ftrapv $(CLANG_DEBUG) -DTRRET_DEBUG
+else
+DEBUG_FLAGS = -DNDEBUG -O3
+endif
+
+CFLAGS = $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I..
 LDFLAGS += -L../.libs -lmrkcommon
 
 testfoo_SOURCES =  testfoo.c
@@ -61,6 +66,14 @@ testtrie_LDFLAGS =
 testperftree_SOURCES = ../list.c ../trie.c ../rbt.c ../profile.c rb.c testperftree.c
 testperftree_CFLAGS =
 testperftree_LDFLAGS =
+
+testperftrie_SOURCES = ../trie.c ../profile.c testperftrie.c
+testperftrie_CFLAGS =
+testperftrie_LDFLAGS =
+
+testperfrb_SOURCES = rb.c ../profile.c testperfrb.c
+testperfrb_CFLAGS =
+testperfrb_LDFLAGS =
 
 testtraversedir_SOURCES = ../traversedir.c testtraversedir.c
 testtraversedir_CFLAGS =

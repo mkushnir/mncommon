@@ -33,7 +33,6 @@ bytestream_init(bytestream_t *stream)
     if ((stream->buf.data = malloc(stream->buf.sz)) == NULL) {
         TRRET(BYTESTREAM_INIT + 1);
     }
-    memset(stream->buf.data, '0x5a', stream->buf.sz);
 
     stream->eod = 0;
     stream->pos = 0;
@@ -52,7 +51,6 @@ bytestream_grow(bytestream_t *stream, size_t incr)
         TRRET(BYTESTREAM_GROW + 1);
     }
     stream->buf.data = tmp;
-    //memset(stream->buf.data + stream->buf.sz, '0x5a', incr);
     //TRACE("grown to %ld", stream->buf.sz);
     stream->buf.sz += incr;
     return (0);

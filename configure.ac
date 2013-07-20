@@ -4,6 +4,8 @@ then
     CC="clang -Qunused-arguments -fcolor-diagnostics"
     CXX="clang++ -Qunused-arguments -fcolor-diagnostics"
     CPP="clang -E"
+else
+    CLANG_DEBUG='-ftrapv -fcatch-undefined-behavior'
 fi
 
 AC_CONFIG_MACRO_DIR([m4])

@@ -22,7 +22,7 @@ void profile_init_module(void);
 void profile_fini_module(void);
 const profile_t *profile_register(const char *);
 void profile_start(const profile_t *);
-void profile_stop(const profile_t *);
+uint64_t profile_stop(const profile_t *);
 void profile_report(void);
 
 #ifndef NO_PROFILE
