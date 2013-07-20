@@ -135,6 +135,13 @@ AC_ARG_ENABLE(stqueue,
               [AM_CONDITIONAL([STQUEUE], [enable_stqueue=yes])],
              )
 
+AC_ARG_ENABLE(dtqueue,
+              AC_HELP_STRING([--enable-dtqueue],
+                             [Enable dtqueue (default=yes)]),
+              [AM_CONDITIONAL([DTQUEUE], [test "$enable_dtqueue" = "yes"])],
+              [AM_CONDITIONAL([DTQUEUE], [enable_dtqueue=yes])],
+             )
+
 AC_ARG_ENABLE(memdebug,
               AC_HELP_STRING([--enable-memdebug],
                              [Enable memdebug (default=yes)]),

@@ -60,6 +60,10 @@ if STQUEUE
 stqueue_sources =
 stqueue_include_headers = mrkcommon/stqueue.h
 endif
+if DTQUEUE
+dtqueue_sources =
+dtqueue_include_headers = mrkcommon/dtqueue.h
+endif
 if MEMDEBUG
 memdebug_sources = memdebug.c
 memdebug_include_headers = mrkcommon/memdebug.h
@@ -78,6 +82,7 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(bytestream_include_headers) \
 			 $(json_include_headers) \
 			 $(stqueue_include_headers) \
+			 $(dtqueue_include_headers) \
 			 $(memdebug_include_headers)
 
 libmrkcommon_la_SOURCES = $(dumpm_sources) \
@@ -92,6 +97,7 @@ libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(bytestream_sources) \
 			  $(json_sources) \
 			  $(stqueue_sources) \
+			  $(dtqueue_sources) \
 			  $(memdebug_sources)
 
 nodist_libmrkcommon_la_SOURCES = diag.c

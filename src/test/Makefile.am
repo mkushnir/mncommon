@@ -24,6 +24,9 @@ endif
 if STQUEUE
 noinst_PROGRAMS += teststqueue
 endif
+if DTQUEUE
+noinst_PROGRAMS += testdtqueue
+endif
 if MEMDEBUG
 noinst_PROGRAMS += testmemdebug
 endif
@@ -94,6 +97,10 @@ testjson_LDFLAGS =
 teststqueue_SOURCES = teststqueue.c
 teststqueue_CFLAGS =
 teststqueue_LDFLAGS =
+
+testdtqueue_SOURCES = testdtqueue.c
+testdtqueue_CFLAGS =
+testdtqueue_LDFLAGS =
 
 testmemdebug_SOURCES = ../memdebug.c testmemdebug.c
 testmemdebug_CFLAGS =

@@ -3,8 +3,8 @@
 
 #include "unittest.h"
 #include "diag.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
+#include <mrkcommon/dumpm.h>
+#include <mrkcommon/util.h>
 #include <mrkcommon/stqueue.h>
 
 typedef struct _asd {
@@ -28,10 +28,13 @@ main(void)
 
     for (i = 0; i < 10; ++i) {
         elm = malloc(sizeof(asd_t));
-        STQUEUE_ENTRY_INIT(elm, link);
-        STQUEUE_ENQUEUE(a.q, elm, link);
-        STQUEUE_ENQUEUE(qq, elm, link);
+        STQUEUE_ENTRY_INIT(link, elm);
+        STQUEUE_ENQUEUE(a.q, link, elm);
+        STQUEUE_ENQUEUE(qq, link, elm);
     }
+
+    TRACE("a.q length=%ld", STQUEUE_LENGTH(a.q));
+    TRACE("qq length=%ld", STQUEUE_LENGTH(qq));
 
     while ((elm = STQUEUE_HEAD(a.q)) != NULL) {
         TRACE("elm=%p", elm);
@@ -39,6 +42,7 @@ main(void)
     }
 
     TRACE("head=%p tail=%p", STQUEUE_HEAD(a.q), STQUEUE_TAIL(a.q));
+    TRACE("a.q length=%ld", STQUEUE_LENGTH(a.q));
 
     while ((elm = STQUEUE_HEAD(qq)) != NULL) {
         TRACE("elm=%p", elm);
@@ -47,6 +51,7 @@ main(void)
     }
 
     TRACE("head=%p tail=%p", STQUEUE_HEAD(qq), STQUEUE_TAIL(qq));
+    TRACE("qq length=%ld", STQUEUE_LENGTH(qq));
     STQUEUE_FINI(qq);
     TRACE("head=%p tail=%p", STQUEUE_HEAD(qq), STQUEUE_TAIL(qq));
     return 0;
