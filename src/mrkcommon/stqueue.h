@@ -60,10 +60,10 @@ struct _##ty##_stqueue_entry { \
             if ((q).head == NULL) { \
                 (q).tail = NULL; \
             } \
+            --((q).nelems); \
         } else { \
             (q).tail = NULL; \
         } \
-        --((q).nelems); \
     } while (0)
 
 /*
@@ -97,7 +97,7 @@ struct _##ty##_stqueue_entry { \
             (e)->link.next = (a)->link.next; \
             (a)->link.next = (e); \
         } \
-        --((q).nelems); \
+        ++((q).nelems); \
     } while (0)
 
 #ifdef __cplusplus

@@ -65,10 +65,10 @@ struct _##ty##_dtqueue_entry { \
             } else { \
                 (q).head->link.prev = NULL; \
             } \
+            --((q).nelems); \
         } else { \
             (q).tail = NULL; \
         } \
-        --((q).nelems); \
     } while (0)
 
 /*

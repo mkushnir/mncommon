@@ -35,7 +35,19 @@ then
     autoreconf
     ./configure
     make dist
-    cp -v *.tar.gz /usr/data/distfiles/
+    if test -f port/distinfo
+    then
+        truncate -s0 port/distinfo
+    fi
+    for i in *.tar.gz
+    do
+        cp -v $i /usr/data/distfiles/
+        if test -f port/distinfo
+        then
+            /sbin/sha256 $i >port/distinfo
+            echo "SIZE ($i) = `stat -f%z $i`" >>port/distinfo
+        fi
+    done
 else
     echo "`basename $0` {init|dev|dist|dev-ndebug}"
 fi
