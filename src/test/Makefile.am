@@ -34,8 +34,8 @@ dist_HEADERS = unittest.h rb.h
 BUILT_SOURCES = ../diag.c ../diag.h
 
 if DEBUG
-DEBUG_FLAGS = -g -O0 $(CLANG_DEBUG)
-#DEBUG_FLAGS = -g -O0 -ftrapv $(CLANG_DEBUG) -DTRRET_DEBUG
+DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
+#DEBUG_FLAGS = -g -O0 -ftrapv @CLANG_DEBUG@ -DTRRET_DEBUG
 else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
