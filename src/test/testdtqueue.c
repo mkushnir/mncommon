@@ -23,37 +23,37 @@ main(void)
     asd_t *elm;
     DTQUEUE(_asd, qq);
 
-    DTQUEUE_INIT(a.q);
-    DTQUEUE_INIT(qq);
+    DTQUEUE_INIT(&a.q);
+    DTQUEUE_INIT(&qq);
 
     for (i = 0; i < 10; ++i) {
         elm = malloc(sizeof(asd_t));
         DTQUEUE_ENTRY_INIT(link, elm);
-        DTQUEUE_ENQUEUE(a.q, link, elm);
-        DTQUEUE_ENQUEUE(qq, link, elm);
+        DTQUEUE_ENQUEUE(&a.q, link, elm);
+        DTQUEUE_ENQUEUE(&qq, link, elm);
     }
 
-    TRACE("a.q length=%ld", DTQUEUE_LENGTH(a.q));
-    TRACE("qq length=%ld", DTQUEUE_LENGTH(qq));
+    TRACE("a.q length=%ld", DTQUEUE_LENGTH(&a.q));
+    TRACE("qq length=%ld", DTQUEUE_LENGTH(&qq));
 
-    while ((elm = DTQUEUE_HEAD(a.q)) != NULL) {
+    while ((elm = DTQUEUE_HEAD(&a.q)) != NULL) {
         TRACE("elm=%p", elm);
-        DTQUEUE_DEQUEUE(a.q, link);
+        DTQUEUE_DEQUEUE(&a.q, link);
     }
 
-    TRACE("head=%p tail=%p", DTQUEUE_HEAD(a.q), DTQUEUE_TAIL(a.q));
-    TRACE("a.q length=%ld", DTQUEUE_LENGTH(a.q));
+    TRACE("head=%p tail=%p", DTQUEUE_HEAD(&a.q), DTQUEUE_TAIL(&a.q));
+    TRACE("a.q length=%ld", DTQUEUE_LENGTH(&a.q));
 
-    while ((elm = DTQUEUE_HEAD(qq)) != NULL) {
+    while ((elm = DTQUEUE_HEAD(&qq)) != NULL) {
         TRACE("elm=%p", elm);
-        DTQUEUE_DEQUEUE_FAST(qq, link);
+        DTQUEUE_DEQUEUE_FAST(&qq, link);
         free(elm);
     }
 
-    TRACE("head=%p tail=%p", DTQUEUE_HEAD(qq), DTQUEUE_TAIL(qq));
-    TRACE("qq length=%ld", DTQUEUE_LENGTH(qq));
-    DTQUEUE_FINI(qq);
-    TRACE("head=%p tail=%p", DTQUEUE_HEAD(qq), DTQUEUE_TAIL(qq));
+    TRACE("head=%p tail=%p", DTQUEUE_HEAD(&qq), DTQUEUE_TAIL(&qq));
+    TRACE("qq length=%ld", DTQUEUE_LENGTH(&qq));
+    DTQUEUE_FINI(&qq);
+    TRACE("head=%p tail=%p", DTQUEUE_HEAD(&qq), DTQUEUE_TAIL(&qq));
     return 0;
 }
 

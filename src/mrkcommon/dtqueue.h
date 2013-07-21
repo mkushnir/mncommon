@@ -23,9 +23,9 @@ struct _##ty##_dtqueue_entry { \
 
 #define DTQUEUE_INIT(q) \
     do { \
-        (q).head = NULL; \
-        (q).tail = NULL; \
-        (q).nelems = 0; \
+        (q)->head = NULL; \
+        (q)->tail = NULL; \
+        (q)->nelems = 0; \
     } while (0)
 
 #define DTQUEUE_FINI DTQUEUE_INIT
@@ -36,38 +36,44 @@ struct _##ty##_dtqueue_entry { \
         (entry)->link.prev = NULL; \
     } while (0)
 
+#define DTQUEUE_ENTRY_FINI DTQUEUE_ENTRY_INIT
+
 #define DTQUEUE_ENQUEUE(q, link, entry) \
     do { \
-        if ((q).tail == NULL) { \
-            (q).head = entry; \
-            (q).tail = entry; \
+        if ((q)->tail == NULL) { \
+            (q)->head = entry; \
+            (q)->tail = entry; \
         } else { \
-            (q).tail->link.next = (entry); \
-            (entry)->link.prev = (q).tail; \
+            (q)->tail->link.next = (entry); \
+            (entry)->link.prev = (q)->tail; \
             (entry)->link.next = NULL; \
-            (q).tail = (entry); \
+            (q)->tail = (entry); \
         } \
-        ++((q).nelems); \
+        ++((q)->nelems); \
     } while (0)
 
-#define DTQUEUE_HEAD(q) ((q).head)
+#define DTQUEUE_HEAD(q) ((q)->head)
 
-#define DTQUEUE_TAIL(q) ((q).tail)
+#define DTQUEUE_NEXT(link, e) ((e)->link.next)
 
-#define DTQUEUE_LENGTH(q) ((q).nelems)
+#define DTQUEUE_PREV(link, e) ((e)->link.prev)
+
+#define DTQUEUE_TAIL(q) ((q)->tail)
+
+#define DTQUEUE_LENGTH(q) ((q)->nelems)
 
 #define DTQUEUE_DEQUEUE(q, link) \
     do { \
-        if ((q).head != NULL) { \
-            (q).head = (q).head->link.next; \
-            if ((q).head == NULL) { \
-                (q).tail = NULL; \
+        if ((q)->head != NULL) { \
+            (q)->head = (q)->head->link.next; \
+            if ((q)->head == NULL) { \
+                (q)->tail = NULL; \
             } else { \
-                (q).head->link.prev = NULL; \
+                (q)->head->link.prev = NULL; \
             } \
-            --((q).nelems); \
+            --((q)->nelems); \
         } else { \
-            (q).tail = NULL; \
+            (q)->tail = NULL; \
         } \
     } while (0)
 
@@ -85,43 +91,43 @@ struct _##ty##_dtqueue_entry { \
  */
 #define DTQUEUE_DEQUEUE_FAST(q, link) \
     do { \
-        (q).head = (q).head->link.next; \
-        if ((q).head != NULL) { \
-            (q).head->link.prev = NULL; \
+        (q)->head = (q)->head->link.next; \
+        if ((q)->head != NULL) { \
+            (q)->head->link.prev = NULL; \
         } \
-        --((q).nelems); \
+        --((q)->nelems); \
     } while (0)
 
 #define DTQUEUE_REMOVE(q, link, e) \
     do { \
         if ((e)->link.prev != NULL) { \
-            ((e)->link.prev)->link.lext = (e)->link.next; \
+            ((e)->link.prev)->link.next = (e)->link.next; \
             (e)->link.prev = NULL; \
         } else { \
-            (q).head = (e)->link.next; \
-            if ((q).head != NULL) { \
-                (q).head->prev = NULL; \
+            (q)->head = (e)->link.next; \
+            if ((q)->head != NULL) { \
+                (q)->head->link.prev = NULL; \
             } \
         } \
         if ((e)->link.next != NULL) { \
             ((e)->link.next)->link.prev = (e)->link.prev; \
             (e)->link.next = NULL; \
         } else { \
-            (q).tail = (e)->link.prev; \
-            if ((q).tail != NULL) { \
-                (q).tail->next = NULL; \
+            (q)->tail = (e)->link.prev; \
+            if ((q)->tail != NULL) { \
+                (q)->tail->link.next = NULL; \
             } \
         } \
-        --((q).nelems); \
+        --((q)->nelems); \
     } while (0)
 
-#define DTQUEUE_ORPHAN(link, e) (((e)->link.prev == NULL) && ((e)->link.next == NULL))
+#define DTQUEUE_ORPHAN(q, link, e) ((((q)->head) != (e)) && ((e)->link.prev == NULL) && ((e)->link.next == NULL))
 
 #define DTQUEUE_INSERT_AFTER(q, link, a, e) \
     do { \
         assert((a) != NULL && (e) != NULL); \
         if ((a)->link.next == NULL) { \
-            (q).tail = (e); \
+            (q)->tail = (e); \
             (e)->link.next = NULL; \
             (a)->link.next = (e); \
             (e)->link.prev = (a); \
@@ -138,7 +144,7 @@ struct _##ty##_dtqueue_entry { \
     do { \
         assert((b) != NULL && (e) != NULL); \
         if ((b)->link.prev == NULL) { \
-            (q).head = (e); \
+            (q)->head = (e); \
             (e)->link.prev = NULL; \
             (b)->link.prev = (e); \
             (e)->link.next = (b); \
@@ -148,7 +154,7 @@ struct _##ty##_dtqueue_entry { \
             ((e)->link.prev)->link.next = (e); \
             (e)->link.next = (b); \
         } \
-        ++((q).nelems); \
+        ++((q)->nelems); \
     } while (0)
 
 #ifdef __cplusplus

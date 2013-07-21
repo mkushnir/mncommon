@@ -22,9 +22,9 @@ struct _##ty##_stqueue_entry { \
 
 #define STQUEUE_INIT(q) \
     do { \
-        (q).head = NULL; \
-        (q).tail = NULL; \
-        (q).nelems = 0; \
+        (q)->head = NULL; \
+        (q)->tail = NULL; \
+        (q)->nelems = 0; \
     } while (0)
 
 #define STQUEUE_FINI STQUEUE_INIT
@@ -36,33 +36,33 @@ struct _##ty##_stqueue_entry { \
 
 #define STQUEUE_ENQUEUE(q, link, entry) \
     do { \
-        if ((q).tail == NULL) { \
-            (q).head = entry; \
-            (q).tail = entry; \
+        if ((q)->tail == NULL) { \
+            (q)->head = entry; \
+            (q)->tail = entry; \
         } else { \
-            (q).tail->link.next = (entry); \
+            (q)->tail->link.next = (entry); \
             (entry)->link.next = NULL; \
-            (q).tail = (entry); \
+            (q)->tail = (entry); \
         } \
-        ++((q).nelems); \
+        ++((q)->nelems); \
     } while (0)
 
-#define STQUEUE_HEAD(q) ((q).head)
+#define STQUEUE_HEAD(q) ((q)->head)
 
-#define STQUEUE_TAIL(q) ((q).tail)
+#define STQUEUE_TAIL(q) ((q)->tail)
 
-#define STQUEUE_LENGTH(q) ((q).nelems)
+#define STQUEUE_LENGTH(q) ((q)->nelems)
 
 #define STQUEUE_DEQUEUE(q, link) \
     do { \
-        if ((q).head != NULL) { \
-            (q).head = (q).head->link.next; \
-            if ((q).head == NULL) { \
-                (q).tail = NULL; \
+        if ((q)->head != NULL) { \
+            (q)->head = (q)->head->link.next; \
+            if ((q)->head == NULL) { \
+                (q)->tail = NULL; \
             } \
-            --((q).nelems); \
+            --((q)->nelems); \
         } else { \
-            (q).tail = NULL; \
+            (q)->tail = NULL; \
         } \
     } while (0)
 
@@ -80,24 +80,24 @@ struct _##ty##_stqueue_entry { \
  */
 #define STQUEUE_DEQUEUE_FAST(q, link) \
     do { \
-        (q).head = (q).head->link.next; \
-        --((q).nelems); \
+        (q)->head = (q)->head->link.next; \
+        --((q)->nelems); \
     } while (0)
 
-#define STQUEUE_ORPHAN(q, link, e) (((q).tail != (e)) && ((e)->link.next == NULL))
+#define STQUEUE_ORPHAN(q, link, e) (((q)->tail != (e)) && ((e)->link.next == NULL))
 
 #define STQUEUE_INSERT_AFTER(q, link, a, e) \
     do { \
         assert((a) != NULL && (e) != NULL); \
         if ((a)->link.next == NULL) { \
-            (q).tail = (e); \
+            (q)->tail = (e); \
             (e)->link.next = NULL; \
             (a)->link.next = (e); \
         } \ else { \
             (e)->link.next = (a)->link.next; \
             (a)->link.next = (e); \
         } \
-        ++((q).nelems); \
+        ++((q)->nelems); \
     } while (0)
 
 #ifdef __cplusplus
