@@ -9,14 +9,14 @@ extern "C" {
 #endif
 
 #define DTQUEUE(ty, n) \
-struct _##ty##_dtqueue { \
+struct { \
     struct ty *head; \
     struct ty *tail; \
     size_t nelems; \
 } n
 
 #define DTQUEUE_ENTRY(ty, n) \
-struct _##ty##_dtqueue_entry { \
+struct { \
     struct ty *next; \
     struct ty *prev; \
 } n

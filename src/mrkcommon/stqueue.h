@@ -9,14 +9,14 @@ extern "C" {
 #endif
 
 #define STQUEUE(ty, n) \
-struct _##ty##_stqueue { \
+struct { \
     struct ty *head; \
     struct ty *tail; \
     size_t nelems; \
 } n
 
 #define STQUEUE_ENTRY(ty, n) \
-struct _##ty##_stqueue_entry { \
+struct { \
     struct ty *next; \
 } n
 
