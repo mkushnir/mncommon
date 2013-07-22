@@ -33,8 +33,8 @@ new_id_random(void)
 UNUSED static uint64_t
 new_id_successive(void)
 {
-    static uint64_t id = 0;
-    return ++id;
+    static uint64_t id = 0xffffffffffffffff;
+    return --id;
 }
 
 static void
@@ -43,7 +43,7 @@ initialize_ids(void)
     unsigned i;
 
     for (i = 0; i < countof(keys); ++i) {
-        keys[i].key = new_id_random();
+        keys[i].key = new_id_successive();
     }
 }
 
@@ -82,6 +82,7 @@ test0(void)
 
         profile_start(p_add_node);
         n = trie_add_node(&tr, keys[i].key);
+        n->value = (void *)(uintptr_t)(keys[i].key);
         keys[i].add_time = profile_stop(p_add_node);
 
         assert(n != NULL);

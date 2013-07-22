@@ -498,6 +498,35 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
     return NULL;
 }
 
+static void
+cleanup_orphans(trie_t *tr, trie_node_t *n)
+{
+    trie_node_t *parent;
+
+    while (n != NULL) {
+        if (n->parent == NULL) {
+            break;
+        }
+        if (trie_node_is_orphan(n)) {
+            parent = n->parent;
+            if (parent != NULL) {
+                if (parent->child[0] == n) {
+                    parent->child[0] = NULL;
+                } else {
+                    assert(parent->child[1] == n);
+                    parent->child[1] = NULL;
+                }
+            }
+            free(n);
+            --(tr->volume);
+            n = parent;
+        } else {
+            break;
+        }
+    }
+}
+
+
 int
 trie_remove_node(trie_t *tr, trie_node_t *n)
 {
@@ -510,6 +539,10 @@ trie_remove_node(trie_t *tr, trie_node_t *n)
         } else if (parent->child[1] == n) {
             parent->child[1] = NULL;
         } else {
+            TRACE("tr=%p parent=%p n=%p "
+                  "parent->child[0]=%p parent->child[1]=%p",
+                  tr, parent, n,
+                  parent->child[0], parent->child[1]);
             FAIL("trie_node_remove");
         }
     }
@@ -517,6 +550,7 @@ trie_remove_node(trie_t *tr, trie_node_t *n)
     free(n);
     --(tr->volume);
     --(tr->nelems);
+    cleanup_orphans(tr, parent);
     return 0;
 }
 
