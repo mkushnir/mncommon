@@ -152,10 +152,6 @@ trie_node_cleanup(trie_t *tr, trie_node_t *n)
         return;
     }
 
-    if (n->parent == NULL) {
-        return;
-    }
-
     if (trie_node_is_orphan(n)) {
         return;
     }
