@@ -100,6 +100,10 @@ struct { \
         ++((q)->nelems); \
     } while (0)
 
+#define STQUEUE_ORPHAN(q, link, e) (((q)->tail != (e)) && ((e)->link.next == NULL))
+
+#define STQUEUE_EMPTY(q) ((q)->tail == NULL)
+
 #ifdef __cplusplus
 }
 #endif

@@ -121,7 +121,9 @@ struct { \
         --((q)->nelems); \
     } while (0)
 
-#define DTQUEUE_ORPHAN(q, link, e) ((((q)->head) != (e)) && ((e)->link.prev == NULL) && ((e)->link.next == NULL))
+#define DTQUEUE_ORPHAN(q, link, e) (((q)->head != (e)) && ((e)->link.prev == NULL) && ((e)->link.next == NULL))
+
+#define DTQUEUE_EMPTY(q) ((q)->head == NULL && (q)->tail == NULL)
 
 #define DTQUEUE_INSERT_AFTER(q, link, a, e) \
     do { \

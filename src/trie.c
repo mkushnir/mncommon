@@ -200,7 +200,11 @@ trie_cleanup(trie_t *tr)
 }
 
 int
-trie_node_traverse(trie_node_t *n, int (*cb)(trie_node_t *, void *), void *udata)
+trie_node_traverse(trie_node_t *n,
+                   int idx,
+                   uint64_t key,
+                   int (*cb)(trie_node_t *, uint64_t, void *),
+                   void *udata)
 {
     int res;
 
@@ -208,18 +212,20 @@ trie_node_traverse(trie_node_t *n, int (*cb)(trie_node_t *, void *), void *udata
         return 0;
     }
 
+    idx = idx ? (idx - 1) : 0;
+
     if (n->child[0] != NULL) {
-        if ((res = trie_node_traverse(n->child[0], cb, udata)) != 0) {
+        if ((res = trie_node_traverse(n->child[0], idx, key, cb, udata)) != 0) {
             return res;
         }
     }
 
-    if ((res = cb(n, udata)) != 0) {
+    if ((res = cb(n, key, udata)) != 0) {
         return res;
     }
 
     if (n->child[1] != NULL) {
-        if ((res = trie_node_traverse(n->child[1], cb, udata)) != 0) {
+        if ((res = trie_node_traverse(n->child[1], idx, key | (1ul << idx), cb, udata)) != 0) {
             return res;
         }
     }
@@ -228,13 +234,20 @@ trie_node_traverse(trie_node_t *n, int (*cb)(trie_node_t *, void *), void *udata
 }
 
 int
-trie_traverse(trie_t *tr, int (*cb)(trie_node_t *, void *), void *udata)
+trie_traverse(trie_t *tr, int (*cb)(trie_node_t *, uint64_t, void *), void *udata)
 {
     int res;
     unsigned i;
 
-    for (i = 0; i < countof(tr->roots); ++i) {
-        if ((res = trie_node_traverse(&tr->roots[i], cb, udata)) != 0) {
+    for (i = 0; i < (countof(tr->roots) - 1); ++i) {
+        uint64_t key;
+
+        if (i == 0) {
+            key = 0ul;
+        } else {
+            key = 1ul << (i-1);
+        }
+        if ((res = trie_node_traverse(&tr->roots[i], i, key, cb, udata)) != 0) {
             return res;
         }
     }
