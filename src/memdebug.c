@@ -37,15 +37,14 @@ void *
 memdebug_malloc(int n, size_t sz)
 {
     void *res;
-    memdebug_ctx_t *ctx;
-
-    assert(n < nctxes);
-    ctx = memdebug_ctxes + n;
-
     res = malloc(sz);
 
     if (res != NULL) {
-        ctx->nallocated += malloc_usable_size(res);
+        if (n < nctxes) {
+            memdebug_ctx_t *ctx;
+            ctx = memdebug_ctxes + n;
+            ctx->nallocated += malloc_usable_size(res);
+        }
     }
 
     return res;
@@ -55,15 +54,14 @@ void *
 memdebug_calloc(int n, size_t e, size_t sz)
 {
     void *res;
-    memdebug_ctx_t *ctx;
-
-    assert(n < nctxes);
-    ctx = memdebug_ctxes + n;
-
     res = calloc(e, sz);
 
     if (res != NULL) {
-        ctx->nallocated += malloc_usable_size(res);
+        if (n < nctxes) {
+            memdebug_ctx_t *ctx;
+            ctx = memdebug_ctxes + n;
+            ctx->nallocated += malloc_usable_size(res);
+        }
     }
 
     return res;
@@ -73,19 +71,23 @@ void *
 memdebug_realloc(int n, void * ptr, size_t sz)
 {
     void *res;
-    memdebug_ctx_t *ctx;
-
-    assert(n < nctxes);
-    ctx = memdebug_ctxes + n;
 
     if (ptr != NULL) {
-        ctx->nallocated -= malloc_usable_size(ptr);
+        if (n < nctxes) {
+            memdebug_ctx_t *ctx;
+            ctx = memdebug_ctxes + n;
+            ctx->nallocated -= malloc_usable_size(ptr);
+        }
     }
 
     res = realloc(ptr, sz);
 
     if (res != NULL) {
-        ctx->nallocated += malloc_usable_size(res);
+        if (n < nctxes) {
+            memdebug_ctx_t *ctx;
+            ctx = memdebug_ctxes + n;
+            ctx->nallocated += malloc_usable_size(res);
+        }
     }
 
     return res;
@@ -95,19 +97,23 @@ void *
 memdebug_reallocf(int n, void * ptr, size_t sz)
 {
     void *res;
-    memdebug_ctx_t *ctx;
-
-    assert(n < nctxes);
-    ctx = memdebug_ctxes + n;
 
     if (ptr != NULL) {
-        ctx->nallocated -= malloc_usable_size(ptr);
+        if (n < nctxes) {
+            memdebug_ctx_t *ctx;
+            ctx = memdebug_ctxes + n;
+            ctx->nallocated -= malloc_usable_size(ptr);
+        }
     }
 
     res = reallocf(ptr, sz);
 
     if (res != NULL) {
-        ctx->nallocated += malloc_usable_size(res);
+        if (n < nctxes) {
+            memdebug_ctx_t *ctx;
+            ctx = memdebug_ctxes + n;
+            ctx->nallocated += malloc_usable_size(res);
+        }
     }
 
     return res;
@@ -116,13 +122,12 @@ memdebug_reallocf(int n, void * ptr, size_t sz)
 void
 memdebug_free(int n, void *ptr)
 {
-    memdebug_ctx_t *ctx;
-
-    assert(n < nctxes);
-    ctx = memdebug_ctxes + n;
-
     if (ptr != NULL) {
-        ctx->nallocated -= malloc_usable_size(ptr);
+        if (n < nctxes) {
+            memdebug_ctx_t *ctx;
+            ctx = memdebug_ctxes + n;
+            ctx->nallocated -= malloc_usable_size(ptr);
+        }
     }
 
     free(ptr);
@@ -132,15 +137,15 @@ char *
 memdebug_strdup(int n, const char *str)
 {
     char *res;
-    memdebug_ctx_t *ctx;
-
-    assert(n < nctxes);
-    ctx = memdebug_ctxes + n;
 
     res = strdup(str);
 
     if (res != NULL) {
-        ctx->nallocated += malloc_usable_size(res);
+        if (n < nctxes) {
+            memdebug_ctx_t *ctx;
+            ctx = memdebug_ctxes + n;
+            ctx->nallocated += malloc_usable_size(str);
+        }
     }
 
     return res;
@@ -150,15 +155,15 @@ char *
 memdebug_strndup(int n, const char *str, size_t len)
 {
     char *res;
-    memdebug_ctx_t *ctx;
-
-    assert(n < nctxes);
-    ctx = memdebug_ctxes + n;
 
     res = strndup(str, len);
 
     if (res != NULL) {
-        ctx->nallocated += malloc_usable_size(res);
+        if (n < nctxes) {
+            memdebug_ctx_t *ctx;
+            ctx = memdebug_ctxes + n;
+            ctx->nallocated += malloc_usable_size(str);
+        }
     }
 
     return res;
