@@ -27,7 +27,7 @@ trie_node_dump(trie_node_t *n)
 }
 
 int
-trie_node_dump_cb(trie_node_t *n, void *arg)
+trie_node_dump_cb(trie_node_t *n, UNUSED uint64_t key, void *arg)
 {
     int indent, selector;
     int flags = (intptr_t)arg;
@@ -208,6 +208,7 @@ trie_node_traverse(trie_node_t *n,
 {
     int res;
 
+    //TRACE("key=%016lx", key);
     if (n == NULL) {
         return 0;
     }
@@ -215,16 +216,19 @@ trie_node_traverse(trie_node_t *n,
     idx = idx ? (idx - 1) : 0;
 
     if (n->child[0] != NULL) {
+        //TRACE("child[0]");
         if ((res = trie_node_traverse(n->child[0], idx, key, cb, udata)) != 0) {
             return res;
         }
     }
 
+    //TRACE("me");
     if ((res = cb(n, key, udata)) != 0) {
         return res;
     }
 
     if (n->child[1] != NULL) {
+        //TRACE("child[1]");
         if ((res = trie_node_traverse(n->child[1], idx, key | (1ul << idx), cb, udata)) != 0) {
             return res;
         }
@@ -239,7 +243,7 @@ trie_traverse(trie_t *tr, int (*cb)(trie_node_t *, uint64_t, void *), void *udat
     int res;
     unsigned i;
 
-    for (i = 0; i < (countof(tr->roots) - 1); ++i) {
+    for (i = 0; i < (countof(tr->roots) - 0); ++i) {
         uint64_t key;
 
         if (i == 0) {

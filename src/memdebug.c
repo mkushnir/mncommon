@@ -144,7 +144,7 @@ memdebug_strdup(int n, const char *str)
         if (n < nctxes) {
             memdebug_ctx_t *ctx;
             ctx = memdebug_ctxes + n;
-            ctx->nallocated += malloc_usable_size(str);
+            ctx->nallocated += malloc_usable_size(res);
         }
     }
 
@@ -162,7 +162,7 @@ memdebug_strndup(int n, const char *str, size_t len)
         if (n < nctxes) {
             memdebug_ctx_t *ctx;
             ctx = memdebug_ctxes + n;
-            ctx->nallocated += malloc_usable_size(str);
+            ctx->nallocated += malloc_usable_size(res);
         }
     }
 

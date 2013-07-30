@@ -26,7 +26,7 @@ typedef struct _test_data {
 } test_data_t;
 
 void trie_node_dump(trie_node_t *);
-int trie_node_dump_cb(trie_node_t *, void *);
+int trie_node_dump_cb(trie_node_t *, uint64_t, void *);
 void trie_init(trie_t *);
 void trie_fini(trie_t *);
 typedef int (*trie_traverser_t)(trie_node_t *, uint64_t, void *);

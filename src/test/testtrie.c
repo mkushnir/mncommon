@@ -28,7 +28,7 @@ test0(void)
         n->value = d;
     }
 
-    //trie_traverse(&tr, trie_node_dump_cb, NULL);
+    trie_traverse(&tr, trie_node_dump_cb, NULL);
 
     for (i = 0; i < countof(values1); ++i) {
         //TRACE("querying: %x", values1[i]);
@@ -122,10 +122,60 @@ test1(void)
     trie_fini(&tr);
 }
 
+UNUSED static void
+test2(void)
+{
+    uint64_t keys[] = {
+        0xffffffffffffffff,
+        0x7fffffffffffffff,
+        0x3fffffffffffffff,
+        0x1fffffffffffffff,
+        0x0ffffffffffffffe,
+    };
+    unsigned i;
+    trie_t tr;
+    trie_node_t *n;
+
+    trie_init(&tr);
+
+    for (i = 0; i < countof(keys); ++i) {
+        test_data_t *d;
+
+        n = trie_add_node(&tr, keys[i]);
+        d = malloc(sizeof(test_data_t));
+        d->key = keys[i];
+        n->value = d;
+    }
+
+    //trie_traverse(&tr, trie_node_dump_cb, NULL);
+
+    for (i = 0; i < countof(keys); ++i) {
+        TRACE("querying: %016lx", keys[i]);
+        n = trie_find_exact(&tr, keys[i]);
+        //trie_node_dump_cb(n, keys[i], NULL);
+        n = trie_find_closest(&tr, keys[i], 0);
+        //trie_node_dump_cb(n, keys[i], NULL);
+        n = trie_find_closest(&tr, keys[i], 1);
+        //trie_node_dump_cb(n, keys[i], NULL);
+    }
+
+    for (i = 0; i < countof(keys); ++i) {
+        TRACE("removing: %016lx", keys[i]);
+        n = trie_find_exact(&tr, keys[i]);
+        if (n != NULL) {
+            trie_remove_node(&tr, n);
+        }
+    }
+
+    //trie_traverse(&tr, trie_node_dump_cb, NULL);
+    trie_fini(&tr);
+}
+
 int
 main(void)
 {
     test0();
     test1();
+    test2();
     return 0;
 }
