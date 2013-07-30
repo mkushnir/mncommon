@@ -209,7 +209,7 @@ O(1) "insertions after" the given element in the middle, and O(1)
 deletions from head (_dequeue_). "Insertions before" and removals of any
 given element to/from the middle are O(n). This is a simpler and more
 limited implementation of singly-linked tail queue comparing to STAILQ from
-<sys/queue.h>. It can be best used when you only need enqueue/dequeue
+\<sys/queue.h\>. It can be best used when you only need enqueue/dequeue
 operaions.
 
 mrkcommon/dtqueue.h
@@ -218,7 +218,7 @@ Doubly-linked tail queue with O(1) additions at queue's tail, _enqueue_,
 O(1) removals from head, _dequeue_, as well as O(1) additions before/after
 and removals of any given element to/from the middle. This is a simpler and more
 limited implementation of doubly-linked tail queue comparing to TAILQ from
-<sys/queue.h>. It can be best used when you only need enqueue operations
+\<sys/queue.h\>. It can be best used when you only need enqueue operations
 combined with either dequeue or removals from the middle.
 
 mrkcommon/memdebug.h
