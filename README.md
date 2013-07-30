@@ -210,7 +210,7 @@ deletions from head (_dequeue_). "Insertions before" and removals of any
 given element to/from the middle are O(n). This is a simpler and more
 limited implementation of singly-linked tail queue comparing to STAILQ from
 \<sys/queue.h\>. It can be best used when you only need enqueue/dequeue
-operaions.
+operations.
 
 mrkcommon/dtqueue.h
 ===================
