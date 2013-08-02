@@ -34,6 +34,8 @@ struct { \
         (e)->link.next = NULL; \
     } while (0)
 
+#define STQUEUE_ENTRY_FINI STQUEUE_ENTRY_INIT
+
 #define STQUEUE_ENQUEUE(q, link, entry) \
     do { \
         if ((q)->tail == NULL) { \

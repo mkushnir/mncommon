@@ -100,25 +100,26 @@ struct { \
 
 #define DTQUEUE_REMOVE(q, link, e) \
     do { \
-        if ((e)->link.prev != NULL) { \
-            ((e)->link.prev)->link.next = (e)->link.next; \
-            (e)->link.prev = NULL; \
-        } else { \
-            (q)->head = (e)->link.next; \
-            if ((q)->head != NULL) { \
-                (q)->head->link.prev = NULL; \
+        if ((q)->head != NULL && (q)->tail != NULL) { \
+            if ((e)->link.prev != NULL) { \
+                if ((e)->link.next != NULL) { \
+                    ((e)->link.prev)->link.next = (e)->link.next; \
+                    ((e)->link.next)->link.prev = (e)->link.prev; \
+                } else { \
+                    (q)->tail = (e)->link.prev; \
+                    (q)->tail->link.next = NULL; \
+                } \
+            } else { \
+                if ((e)->link.next != NULL) { \
+                    (q)->head = (e)->link.next; \
+                    (q)->head->link.prev = NULL; \
+                } else { \
+                    (q)->tail = NULL; \
+                    (q)->head = NULL; \
+                } \
             } \
+            --((q)->nelems); \
         } \
-        if ((e)->link.next != NULL) { \
-            ((e)->link.next)->link.prev = (e)->link.prev; \
-            (e)->link.next = NULL; \
-        } else { \
-            (q)->tail = (e)->link.prev; \
-            if ((q)->tail != NULL) { \
-                (q)->tail->link.next = NULL; \
-            } \
-        } \
-        --((q)->nelems); \
     } while (0)
 
 #define DTQUEUE_ORPHAN(q, link, e) (((q)->head != (e)) && ((e)->link.prev == NULL) && ((e)->link.next == NULL))
