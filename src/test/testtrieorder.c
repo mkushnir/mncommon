@@ -77,7 +77,7 @@ test0(void)
 
         n = trie_add_node(&tr, keys[i].key);
         n->value = (void *)(uintptr_t)keys[i].key;
-        TRACE("key=%ld", (uintptr_t)n->value);
+        TRACE("key=%016lx", (uintptr_t)n->value);
 
         assert(n != NULL);
     }

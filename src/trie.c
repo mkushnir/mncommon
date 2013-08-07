@@ -102,7 +102,7 @@ trie_init(trie_t *tr)
         trie_node_init(&tr->roots[i], NULL, -1, NULL);
     }
     tr->volume = 0;
-    tr->nelems = 0;
+    tr->nvals = 0;
 }
 
 static void
@@ -294,7 +294,7 @@ trie_add_node(trie_t *tr, uintptr_t key)
         ++i;
     } while (--idx);
 
-    ++(tr->nelems);
+    ++(tr->nvals);
     return cur;
 }
 
@@ -327,7 +327,7 @@ trie_find_exact(trie_t *tr, uintptr_t key)
  * Walk down the tree until we find a node with value.
  *
  */
-static trie_node_t *
+UNUSED static trie_node_t *
 trie_descend(trie_node_t *n, int bias)
 {
     trie_node_t *res;
@@ -350,6 +350,38 @@ trie_descend(trie_node_t *n, int bias)
     }
 
     /* couldn't descend further, return what we were passed in */
+    return n;
+}
+
+
+/**
+ * An iterative version of trie_descend()
+ *
+ */
+static trie_node_t *
+trie_find_value(trie_node_t *n, int bias)
+{
+    assert(bias == 0 || bias == 1);
+    assert(n != NULL);
+
+    while (1) {
+        if (n->child[bias] != NULL) {
+            n = n->child[bias];
+            continue;
+        }
+        if (n->value != NULL) {
+            break;
+        }
+        if (n->child[bias ^ 1] != NULL) {
+            n = n->child[bias ^ 1];
+            continue;
+        }
+        if (n->value != NULL) {
+            break;
+        }
+        break;
+    }
+
     return n;
 }
 
@@ -396,7 +428,7 @@ find_closest_partial(trie_node_t *node, int idx, uintptr_t key, int direction)
             /* 1. first descend the other child if applicable */
             //TRACE("child_idx ^ direction = %d", child_idx ^ direction);
             if (child_idx ^ direction) {
-                res = trie_descend(node, 1 ^ direction);
+                res = trie_find_value(node, 1 ^ direction);
                 if (res->value != NULL) {
                     return res;
                 }
@@ -430,7 +462,7 @@ find_closest_partial(trie_node_t *node, int idx, uintptr_t key, int direction)
                 }
 
                 /* 2b. descend(bro, 1 ^ dir) */
-                res = trie_descend(bro, 1 ^ direction);
+                res = trie_find_value(bro, 1 ^ direction);
 
                 if (res->value != NULL) {
                     return res;
@@ -566,7 +598,7 @@ trie_remove_node(trie_t *tr, trie_node_t *n)
     trie_node_fini(tr, n);
     free(n);
     --(tr->volume);
-    --(tr->nelems);
+    --(tr->nvals);
     cleanup_orphans(tr, parent);
     return 0;
 }
@@ -578,9 +610,9 @@ trie_get_volume(trie_t *tr)
 }
 
 size_t
-trie_get_nelems(trie_t *tr)
+trie_get_nvals(trie_t *tr)
 {
-    return tr->nelems;
+    return tr->nvals;
 }
 
 
