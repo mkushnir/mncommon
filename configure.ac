@@ -1,10 +1,29 @@
 AC_INIT(mrkcommon, 0.1, markiyan.kushnir@gmail.com)
-if test -z "$USE_GCC"
+if test -n "$USE_GCC"
 then
-    CC="clang -Qunused-arguments -fcolor-diagnostics"
-    CXX="clang++ -Qunused-arguments -fcolor-diagnostics"
-    CPP="clang -E"
-    AC_SUBST(CLANG_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])
+    CC="cc"
+    CXX="c++"
+    CPP="cpp"
+else
+    if which clang >/dev/null
+    then
+        CC="clang -Qunused-arguments -fcolor-diagnostics"
+        CXX="clang++ -Qunused-arguments -fcolor-diagnostics"
+        CPP="clang-cpp"
+        clang_version=`clang --version | grep version | awk '{print $4;}'`
+        clang_version_mjr=`echo $clang_version | awk -F. '{print $1;}'`
+        clang_version_mnr=`echo $clang_version | awk -F. '{print $2;}'`
+        if test "$clang_version_mjr" = "3" -a "$clang_version_mnr" -lt 3
+        then
+            AC_SUBST(CLANG_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])
+        else
+            AC_SUBST(CLANG_DEBUG, ['-ftrapv -fsanitize=undefined-trap -fsanitize-undefined-trap-on-error'])
+        fi
+    else
+        CC="cc"
+        CXX="c++"
+        CPP="cpp"
+    fi
 fi
 
 AC_CONFIG_MACRO_DIR([m4])
