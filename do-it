@@ -41,7 +41,7 @@ then
     fi
     for i in *.tar.gz
     do
-        cp -v $i /usr/data/distfiles/
+        cp -v $i /data0/mkushnir/distfiles/
         if test -f port/distinfo
         then
             /sbin/sha256 $i >port/distinfo
