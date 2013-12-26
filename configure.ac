@@ -1,9 +1,22 @@
 AC_INIT(mrkcommon, 0.1, markiyan.kushnir@gmail.com)
 if test -n "$USE_GCC"
 then
-    CC="cc"
-    CXX="c++"
-    CPP="cpp"
+    if test "$USE_GCC" = "46" && which gcc46
+    then
+        CC="gcc46"
+        CXX="c++46"
+        CPP="cpp"
+    else
+        if which gcc
+        then
+            CC="gcc"
+            CXX="g++"
+            CPP="cpp"
+        else
+            echo "Cannot find gcc"
+            exit 1
+        fi
+    fi
 else
     if which clang >/dev/null
     then
@@ -17,7 +30,8 @@ else
         then
             AC_SUBST(CLANG_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])
         else
-            AC_SUBST(CLANG_DEBUG, ['-ftrapv -fsanitize=undefined-trap -fsanitize-undefined-trap-on-error'])
+            # we assume all others are 3.3+
+            AC_SUBST(CLANG_DEBUG, ['-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error'])
         fi
     else
         CC="cc"
