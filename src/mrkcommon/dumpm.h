@@ -79,6 +79,7 @@ void dumpm(const void * m, size_t n, size_t l);
 #define FGREEN(s)   FCOLOR("0", "2", s)
 #define FYELLOW(s)  FCOLOR("0", "3", s)
 #define FBLUE(s)    FCOLOR("0", "4", s)
+#define FWHITE(s)   FCOLOR("0", "0", s)
 #define FBRED(s)    FCOLOR("1", "1", s)
 #define FBGREEN(s)  FCOLOR("1", "2", s)
 #define FBYELLOW(s) FCOLOR("1", "3", s)
