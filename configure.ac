@@ -31,7 +31,7 @@ else
             AC_SUBST(CLANG_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])
         else
             # we assume all others are 3.3+
-            AC_SUBST(CLANG_DEBUG, ['-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error'])
+            AC_SUBST(CLANG_DEBUG, ['-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error -fno-sanitize=alignment'])
         fi
     else
         CC="cc"

@@ -3,6 +3,7 @@
 
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/list.h"
+#include "mrkcommon/util.h"
 #include "diag.h"
 
 #ifndef NDEBUG

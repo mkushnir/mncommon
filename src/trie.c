@@ -287,7 +287,7 @@ trie_add_node(trie_t *tr, uintptr_t key)
             if ((*n = malloc(sizeof(trie_node_t))) == NULL) {
                 FAIL("malloc");
             }
-            trie_node_init(*n, cur, i | (sel << CHILD_SELECTOR_SHIFT), NULL);
+            trie_node_init(*n, cur, (int)((unsigned)i | ((unsigned)sel << CHILD_SELECTOR_SHIFT)), NULL);
             ++(tr->volume);
         }
         cur = *n;

@@ -75,16 +75,22 @@ void dumpm(const void * m, size_t n, size_t l);
 #else
 #   define FCOLOR(b, c, s) s
 #endif
-#define FRED(s)     FCOLOR("0", "1", s)
-#define FGREEN(s)   FCOLOR("0", "2", s)
-#define FYELLOW(s)  FCOLOR("0", "3", s)
-#define FBLUE(s)    FCOLOR("0", "4", s)
-#define FWHITE(s)   FCOLOR("0", "0", s)
-#define FBRED(s)    FCOLOR("1", "1", s)
-#define FBGREEN(s)  FCOLOR("1", "2", s)
-#define FBYELLOW(s) FCOLOR("1", "3", s)
-#define FBBLUE(s)   FCOLOR("1", "4", s)
-#define FBWHITE(s)  FCOLOR("1", "0", s)
+#define FRED(s)         FCOLOR("0", "1", s)
+#define FGREEN(s)       FCOLOR("0", "2", s)
+#define FYELLOW(s)      FCOLOR("0", "3", s)
+#define FBLUE(s)        FCOLOR("0", "4", s)
+#define FMAGENTA(s)     FCOLOR("0", "5", s)
+#define FCYAN(s)        FCOLOR("0", "6", s)
+#define FWHITE(s)       FCOLOR("0", "7", s)
+#define FBLACK(s)       FCOLOR("0", "0", s)
+#define FBRED(s)        FCOLOR("1", "1", s)
+#define FBGREEN(s)      FCOLOR("1", "2", s)
+#define FBYELLOW(s)     FCOLOR("1", "3", s)
+#define FBBLUE(s)       FCOLOR("1", "4", s)
+#define FBMAGENTA(s)    FCOLOR("1", "5", s)
+#define FBCYAN(s)       FCOLOR("1", "6", s)
+#define FBWHITE(s)      FCOLOR("1", "7", s)
+#define FBBLACK(s)      FCOLOR("1", "0", s)
 
 #ifdef __cplusplus
 }

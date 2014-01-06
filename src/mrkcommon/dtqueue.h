@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <stddef.h>
 
+#include "util.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -65,7 +67,9 @@ struct { \
 #define DTQUEUE_DEQUEUE(q, link) \
     do { \
         if ((q)->head != NULL) { \
+            PASTEURIZE_ADDR((q)->head); \
             (q)->head = (q)->head->link.next; \
+            PASTEURIZE_ADDR((q)->head); \
             if ((q)->head == NULL) { \
                 (q)->tail = NULL; \
             } else { \
@@ -98,7 +102,7 @@ struct { \
         --((q)->nelems); \
     } while (0)
 
-#define DTQUEUE_REMOVE(q, link, e) \
+#define DTQUEUE_REMOVE_DIRTY(q, link, e) \
     do { \
         if ((q)->head != NULL && (q)->tail != NULL) { \
             if ((e)->link.prev != NULL) { \
@@ -121,6 +125,9 @@ struct { \
             --((q)->nelems); \
         } \
     } while (0)
+
+#define DTQUEUE_REMOVE(q, link, e) \
+    DTQUEUE_REMOVE_DIRTY(q, link, e); DTQUEUE_ENTRY_FINI(link, e)
 
 #define DTQUEUE_ORPHAN(q, link, e) (((q)->head != (e)) && ((e)->link.prev == NULL) && ((e)->link.next == NULL))
 

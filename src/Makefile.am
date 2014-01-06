@@ -114,7 +114,7 @@ libmrkcommon_la_LDFLAGS = -version-info 0:0:0
 SUBDIRS = . test
 
 diag.c diag.h: diag.txt
-	sh ./gen-diag
+	sh ./gen-diag mrkcommon
 
 run: all
 	for i in $(bin_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;
