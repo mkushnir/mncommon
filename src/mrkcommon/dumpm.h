@@ -38,7 +38,7 @@ extern "C" {
 # define LTRACEN(lvl, s, ...) (syslog(LOG_DEBUG,  "%*c"            s,      DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__))
 #else
 # define TRACEN(s, ...) (fprintf(stderr, "[%5d] %s:%d:%s() " s, getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
-# define TRACEC(s, ...) (fprintf(stderr, s "\n", ##__VA_ARGS__))
+# define TRACEC(s, ...) (fprintf(stderr, s, ##__VA_ARGS__))
 # define TRACE(s, ...) (fprintf(stderr, "[%5d] %s:%d:%s() " s "\n", getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define DEBUG   TRACE
 # define INFO    TRACE

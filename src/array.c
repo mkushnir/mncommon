@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
+//#define TRRET_DEBUG_VERBOSE
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/array.h"
 #include "mrkcommon/util.h"

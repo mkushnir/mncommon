@@ -24,6 +24,7 @@ const profile_t *profile_register(const char *);
 void profile_start(const profile_t *);
 uint64_t profile_stop(const profile_t *);
 void profile_report(void);
+void profile_report_sec(void);
 
 #ifndef NO_PROFILE
 #   define PROFILE_INIT_MODULE() profile_init_module()

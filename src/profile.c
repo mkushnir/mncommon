@@ -14,11 +14,13 @@ static uint64_t tsc_freq;
 static inline uint64_t
 rdtsc(void)
 {
-  uint32_t lo, hi;
-
-  //__asm __volatile ("" ::: "memory");
-  __asm __volatile ("rdtsc" : "=a"(lo), "=d"(hi));
-  return (uint64_t) hi << 32 | lo;
+  uint64_t res;
+  __asm __volatile ("rdtsc; shl $32,%%rdx; or %%rdx,%%rax"
+                    : "=a"(res)
+                    :
+                    : "%rcx", "%rdx"
+                   );
+  return res;
 }
 
 static int
@@ -38,7 +40,16 @@ profile_init(profile_t *p)
 static int
 profile_dump(profile_t *p, UNUSED void *udata)
 {
-    TRACE("profile: %s n=%ld min=%ld avg=%Lf max=%ld total=%Lf", p->name, p->n, p->min, p->avg, p->max, p->n * p->avg);
+    printf("%s: n=%ld min=%ld avg=%Lf max=%ld total=%Lf\n", p->name, p->n, p->min, p->avg, p->max, p->n * p->avg);
+    return 0;
+}
+
+static int
+profile_dump_sec(profile_t *p, UNUSED void *udata)
+{
+    printf("%s: n=%ld min=%Lf avg=%Lf max=%Lf total=%Lf\n", p->name, p->n,
+          (long double)(p->min) / (long double)tsc_freq,
+          p->avg / (long double)tsc_freq, (long double)(p->max) / (long double)tsc_freq, p->n * ((long double)(p->avg) / (long double)tsc_freq));
     return 0;
 }
 
@@ -115,6 +126,12 @@ void
 profile_report(void)
 {
     list_traverse(&profiles, (list_traverser_t)profile_dump, NULL);
+}
+
+void
+profile_report_sec(void)
+{
+    list_traverse(&profiles, (list_traverser_t)profile_dump_sec, NULL);
 }
 
 
