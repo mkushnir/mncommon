@@ -116,6 +116,13 @@ AC_ARG_ENABLE(dict,
               [AM_CONDITIONAL([DICT], [enable_dict=yes])],
              )
 
+AC_ARG_ENABLE(fasthash,
+              AC_HELP_STRING([--enable-fasthash],
+                             [Enable fasthash (default=yes)]),
+              [AM_CONDITIONAL([FASTHASH], [test "$enable_fasthash" = "yes"])],
+              [AM_CONDITIONAL([FASTHASH], [enable_fasthash=yes])],
+             )
+
 AC_ARG_ENABLE(logging,
               AC_HELP_STRING([--enable-logging],
                              [Enable logging (default=yes)]),
