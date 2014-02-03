@@ -6,6 +6,9 @@ noinst_PROGRAMS = testfoo
 if DICT
 noinst_PROGRAMS += testdict
 endif
+if FASTHASH
+noinst_PROGRAMS += testfasthash
+endif
 if LOGGING
 noinst_PROGRAMS += testlogging
 endif
@@ -53,9 +56,13 @@ testfoo_SOURCES =  testfoo.c
 testfoo_CFLAGS =
 testfoo_LDFLAGS =
 
-testdicr_SOURCES = ../dict.c testdict.c
-testdicr_CFLAGS =
-testdicr_LDFLAGS =
+testdict_SOURCES = ../dict.c testdict.c
+testdict_CFLAGS =
+testdict_LDFLAGS =
+
+testfasthash_SOURCES = ../fasthash.c testfasthash.c
+testfasthash_CFLAGS =
+testfasthash_LDFLAGS =
 
 testlogging_SOURCES = ../logging.c testlogging.c
 testlogging_CFLAGS =

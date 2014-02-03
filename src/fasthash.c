@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <mrkapp.h>
+#include <mrkcommon/fasthash.h>
 #include <mrkcommon/dumpm.h>
 
 static inline uint64_t
