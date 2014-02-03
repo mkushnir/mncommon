@@ -3,6 +3,9 @@ CLEANFILES = *.core
 #CLEANFILES += *.in
 
 noinst_PROGRAMS = testfoo
+if DICT
+noinst_PROGRAMS += testdict
+endif
 if LOGGING
 noinst_PROGRAMS += testlogging
 endif
@@ -49,6 +52,10 @@ LDFLAGS += -L../.libs -lmrkcommon
 testfoo_SOURCES =  testfoo.c
 testfoo_CFLAGS =
 testfoo_LDFLAGS =
+
+testdicr_SOURCES = ../dict.c testdict.c
+testdicr_CFLAGS =
+testdicr_LDFLAGS =
 
 testlogging_SOURCES = ../logging.c testlogging.c
 testlogging_CFLAGS =

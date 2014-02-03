@@ -93,6 +93,7 @@ AC_ARG_ENABLE(debug,
               [AM_CONDITIONAL([DEBUG], [enable_debug=yes])],
               [AM_CONDITIONAL([DEBUG], [test "$enable_debug" = "yes"])]
              )
+
 AC_ARG_ENABLE(array,
               AC_HELP_STRING([--enable-array],
                              [Enable resizable realloc(3)-based array
@@ -100,18 +101,28 @@ AC_ARG_ENABLE(array,
               [AM_CONDITIONAL([ARRAY], [test "$enable_array" = "yes"])],
               [AM_CONDITIONAL([ARRAY], [enable_array=yes])],
              )
+
 AC_ARG_ENABLE(list,
               AC_HELP_STRING([--enable-list],
                              [Enable linked list (default=yes)]),
               [AM_CONDITIONAL([LIST], [test "$enable_list" = "yes"])],
               [AM_CONDITIONAL([LIST], [enable_list=yes])],
              )
+
+AC_ARG_ENABLE(dict,
+              AC_HELP_STRING([--enable-dict],
+                             [Enable simple dictionary (default=yes)]),
+              [AM_CONDITIONAL([DICT], [test "$enable_dict" = "yes"])],
+              [AM_CONDITIONAL([DICT], [enable_dict=yes])],
+             )
+
 AC_ARG_ENABLE(logging,
               AC_HELP_STRING([--enable-logging],
                              [Enable logging (default=yes)]),
               [AM_CONDITIONAL([LOGGING], [test "$enable_logging" = "yes"])],
               [AM_CONDITIONAL([LOGGING], [enable_logging=yes])],
              )
+
 AC_ARG_ENABLE(profile,
               AC_HELP_STRING([--enable-profile],
                              [Enable profile (default=yes). Requires --enable-list]),

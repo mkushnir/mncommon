@@ -19,51 +19,68 @@ if ARRAY
 array_sources = array.c
 array_include_headers = mrkcommon/array.h
 endif
+
 if LIST
 list_sources = list.c
 list_include_headers = mrkcommon/list.h
 endif
+
+if DICT
+dict_sources = dict.c
+dict_include_headers = mrkcommon/dict.h
+endif
+
 if LOGGING
 logging_sources = logging.c
 logging_include_headers = mrkcommon/logging.h
 endif
+
 if PROFILE
 profile_sources = profile.c
 profile_include_headers = mrkcommon/profile.h
 endif
+
 if CONF
 conf_sources = conf.c
 conf_include_headers = mrkcommon/conf.h
 dist_HEADERS += conf_private.h
 endif
+
 if TRIE
 trie_sources = trie.c
 trie_include_headers = mrkcommon/trie.h
 endif
+
 if RBT
 rbt_sources = rbt.c
 rbt_include_headers = mrkcommon/rbt.h
 endif
+
 if TRAVERSEDIR
 traversedir_sources = traversedir.c
 traversedir_include_headers = mrkcommon/traversedir.h
 endif
+
 if BYTESTREAM
 bytestream_sources = bytestream.c
 bytestream_include_headers = mrkcommon/bytestream.h
 endif
+
 if JSON
 json_sources = json.c
 json_include_headers = mrkcommon/json.h
 endif
+
 if STQUEUE
 stqueue_sources =
 stqueue_include_headers = mrkcommon/stqueue.h
 endif
+
 if DTQUEUE
 dtqueue_sources =
 dtqueue_include_headers = mrkcommon/dtqueue.h
 endif
+
 if MEMDEBUG
 memdebug_sources = memdebug.c
 memdebug_include_headers = mrkcommon/memdebug.h
@@ -73,6 +90,7 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(util_include_headers) \
 			 $(array_include_headers) \
 			 $(list_include_headers) \
+			 $(dict_include_headers) \
 			 $(logging_include_headers) \
 			 $(profile_include_headers) \
 			 $(conf_include_headers) \
@@ -88,6 +106,7 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(array_sources) \
 			  $(list_sources) \
+			  $(dict_sources) \
 			  $(logging_sources) \
 			  $(profile_sources) \
 			  $(conf_sources) \
