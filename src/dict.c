@@ -45,6 +45,10 @@ dict_set_item(dict_t *dict, void *key, void *value)
     uint64_t idx;
     dict_item_t **pdit, *dit;
 
+    if (value == NULL) {
+        return;
+    }
+
     idx = dict->hashfn(key) % dict->sz;
     if ((pdit = array_get(&dict->table, idx)) == NULL) {
         FAIL("array_get");
@@ -141,9 +145,10 @@ dict_remove_item(dict_t *dict, void *key)
     return value;
 }
 
-void
+int
 dict_traverse(dict_t *dict, dict_traverser_t cb, void *udata)
 {
+    int res;
     dict_item_t **pdit;
     array_iter_t it;
 
@@ -151,17 +156,19 @@ dict_traverse(dict_t *dict, dict_traverser_t cb, void *udata)
          pdit != NULL;
          pdit = array_next(&dict->table, &it)) {
 
+        //TRACE("table[%d]", it.iter);
 
         if (*pdit != NULL) {
             dict_item_t *dit;
 
             for (dit = *pdit; dit != NULL; dit = dit->next) {
-                if (cb(dit->key, dit->value, udata) != 0) {
-                    return;
+                if ((res = cb(dit->key, dit->value, udata)) != 0) {
+                    return res;
                 }
             }
         }
     }
+    return 0;
 }
 
 

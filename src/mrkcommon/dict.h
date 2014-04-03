@@ -35,7 +35,7 @@ typedef struct _dict {
 void dict_set_item(dict_t *, void *, void *);
 void *dict_get_item(dict_t *, void *);
 void *dict_remove_item(dict_t *, void *);
-void dict_traverse(dict_t *, dict_traverser_t, void *);
+int dict_traverse(dict_t *, dict_traverser_t, void *);
 
 void dict_init(dict_t *,
                size_t,

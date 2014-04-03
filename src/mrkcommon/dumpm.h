@@ -50,15 +50,18 @@ extern "C" {
 #endif
 
 #ifdef TRRET_DEBUG_VERBOSE
+#   define TR(n) do { TRACE("%s", diag_str((n))); } while (0)
 #   define TRRET(n) do { TRACE("%s", diag_str((n))); return (n); } while (0)
 #   define TRRETNULL(n) do { TRACE("%s", diag_str((n))); return (NULL); } while (0)
 #   define TRRETVOID(n) do { TRACE("%s", diag_str((n))); return; } while (0)
 #else
 #   ifdef TRRET_DEBUG
+#       define TR(n) do { if (n) { TRACE("%s", diag_str((n))); } } while (0)
 #       define TRRET(n) do { if (n) { TRACE("%s", diag_str((n))); } return (n); } while (0)
 #       define TRRETNULL(n) do { if(n) { TRACE("%s", diag_str((n))); } return (NULL); } while (0)
 #       define TRRETVOID(n) do { if(n) { TRACE("%s", diag_str((n))); } return; } while (0)
 #   else
+#       define TR(n)
 #       define TRRET(n) return (n)
 #       define TRRETNULL(n) return (NULL)
 #       define TRRETVOID(n) return

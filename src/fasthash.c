@@ -5,12 +5,22 @@
 static inline uint64_t
 rotl64(uint64_t n, int b)
 {
+#ifndef NDEBUG
+    if (b == 0) {
+        return n;
+    }
+#endif
     return (n << b) | (n >> (64 - b));
 }
 
 static inline uint64_t
 rotr64(uint64_t n, int b)
 {
+#ifndef NDEBUG
+    if (b == 0) {
+        return n;
+    }
+#endif
     return (n >> b) | (n << (64 - b));
 }
 

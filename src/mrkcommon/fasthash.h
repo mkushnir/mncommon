@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdlib.h>
 
 uint64_t fasthash(uint64_t, const unsigned char *, size_t);
 
