@@ -46,6 +46,7 @@ typedef struct _bytestream {
 #define SAVAIL(stream) (SEOD(stream) - SPOS(stream))
 #define SADVANCEEOD(stream, n) (stream)->eod += (n)
 #define SINCR(stream) ++((stream)->pos)
+#define SDECR(stream) --((stream)->pos)
 #define SADVANCEPOS(stream, n) (stream)->pos += (n)
 
 int bytestream_init(bytestream_t *);

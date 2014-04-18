@@ -161,12 +161,14 @@ int
 array_fini (array_t *ar)
 {
     unsigned i;
-    if (ar->fini != NULL) {
-        for (i = 0; i < ar->elnum; ++i) {
-            ar->fini(ar->data + (i * ar->elsz));
+    if (ar->data != NULL) {
+        if (ar->fini != NULL) {
+            for (i = 0; i < ar->elnum; ++i) {
+                ar->fini(ar->data + (i * ar->elsz));
+            }
         }
+        free(ar->data);
     }
-    free(ar->data);
     ar->data = NULL;
     ar->init = NULL;
     ar->fini = NULL;
