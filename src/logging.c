@@ -12,7 +12,7 @@ static int mylogopt;
 static char *myident = NULL;
 static size_t myident_sz = 0;
 
-void (*logging_log)(int, const char *, ...) __printflike(2, 3) = NULL;
+void (*logging_log)(int, const char *, ...) PRINTFLIKE(2, 3) = NULL;
 
 static void
 do_log (UNUSED int level, const char *fmt, ...)

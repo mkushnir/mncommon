@@ -134,7 +134,7 @@ else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
 
-libmrkcommon_la_CFLAGS = $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99
+libmrkcommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99
 libmrkcommon_la_LDFLAGS = -version-info 0:0:0
 
 SUBDIRS = . test

@@ -1,8 +1,27 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
 #include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <strings.h>
-#include <sys/limits.h>
+#ifdef HAVE_LIMITS_H
+#       include <limits.h>
+#else
+#   ifdef HAVE_SYS_LIMITS_H
+#       include <sys/limits.h>
+#   else
+#       error "Neither limits.h nor sys/limits.h found."
+#   endif
+#endif
+
+#ifndef HAVE_FLSL
+#ifdef __GNUC__
+#define flsl(v) ((v != 0L) ? (__builtin_clzl(v) + 1) : 0)
+#else
+#error "Could not find/define flsl."
+#endif
+#endif
 
 #include "diag.h"
 #include "mrkcommon/dumpm.h"

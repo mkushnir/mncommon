@@ -4,6 +4,8 @@
 #include <syslog.h>
 #include <stdio.h>
 
+#include <mrkcommon/util.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,7 +16,7 @@ typedef struct _logmodule {
     int level;
 } logmodule_t;
 
-extern void (*logging_log)(int, const char *, ...) __printflike(2, 3);
+extern void (*logging_log)(int, const char *, ...) PRINTFLIKE(2, 3);
 
 #define LOG_TRACE (LOG_DEBUG + 1)
 

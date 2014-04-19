@@ -1,5 +1,12 @@
 #!/bin/sh
 
+uname_s=`uname -s`
+
+if test "$uname_s" = "Linux"
+then
+    linux_exclusions='--enable-profile=no --enable-conf=no --enable-traversedir=no'
+fi
+
 if test "$1" = "init"
 then
     export LDFLAGS=-L$HOME/lib
@@ -12,14 +19,14 @@ then
     libtoolize
     make distclean
     autoreconf
-    ./configure --prefix=$HOME --enable-debug
+    ./configure --prefix=$HOME --enable-debug $linux_exclusions
     make
 elif test "$1" = "dev"
 then
     export LDFLAGS=-L$HOME/lib
     export CFLAGS=-I$HOME/include
     autoreconf
-    ./configure --prefix=$HOME --enable-debug
+    ./configure --prefix=$HOME --enable-debug $linux_exclusions
     make
 elif test "$1" = "dev-ndebug"
 then
@@ -33,7 +40,7 @@ then
     unset LDFLAGS
     unset CFLAGS
     autoreconf
-    ./configure
+    ./configure --enable-profile=no $linux_exclusions
     make dist
     if test -f port/distinfo
     then

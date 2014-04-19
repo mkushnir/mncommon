@@ -9,7 +9,7 @@ extern "C" {
 
 struct _read_ctx {
     const char *buf;
-    int pos;
+    off_t pos;
     int sz;
 };
 

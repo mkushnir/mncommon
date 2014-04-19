@@ -66,7 +66,7 @@ UNUSED static void
 test_rb(void)
 {
     unsigned i;
-    struct _rb_node *res, UNUSED *dup;
+    struct _rb_node UNUSED *res, UNUSED *dup;
     struct _rb_node *n;
     struct _rb_node find;
 

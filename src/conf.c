@@ -385,8 +385,8 @@ conf_read_buf(void *cookie, char *out, int sz)
     return sz;
 }
 
-static fpos_t
-conf_seek_buf(void *cookie, fpos_t offset, int whence)
+static off_t
+conf_seek_buf(void *cookie, off_t offset, int whence)
 {
     struct _read_ctx *ctx = (struct _read_ctx *)cookie;
 

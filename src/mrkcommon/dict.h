@@ -2,6 +2,7 @@
 #define MRKCOMMON_DICT_H
 
 #include <assert.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 #include "mrkcommon/array.h"

@@ -40,6 +40,12 @@ else
     fi
 fi
 
+uname_s=`uname -s`
+if test "$uname_s" = "Linux"
+then
+    AC_SUBST(_GNU_SOURCE_MACRO, ['-D_GNU_SOURCE'])
+fi
+
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_LANG(C)
@@ -63,6 +69,12 @@ AC_CHECK_HEADERS([stddef.h])
 AC_CHECK_HEADERS([sys/socket.h])
 AC_CHECK_HEADERS([sys/param.h])
 AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([limits.h])
+AC_CHECK_HEADERS([sys/limits.h])
+AC_CHECK_HEADERS([malloc_np.h])
+# FreeBSD
+AC_CHECK_HEADERS([sys/tree.h])
+
 
 AC_C_CONST
 AC_C_INLINE
@@ -82,6 +94,11 @@ AC_CHECK_FUNCS([strndup])
 AC_CHECK_FUNCS([memmove])
 AC_CHECK_FUNCS([memset])
 AC_CHECK_FUNCS([strtol])
+AC_CHECK_FUNCS([flsl])
+AC_CHECK_FUNCS([malloc_usable_size])
+# FreeBSD specific
+AC_CHECK_FUNCS([reallocf])
+AC_CHECK_FUNCS([sysctlbyname])
 
 
 

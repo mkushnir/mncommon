@@ -247,7 +247,14 @@ bytestream_rewind(bytestream_t *stream)
 off_t
 bytestream_recycle(bytestream_t *stream, off_t from)
 {
-    from -= (from % PAGE_SIZE);
+    int pgsz;
+
+#ifdef PAGE_SIZE
+    pgsz = PAGE_SIZE;
+#else
+    pgsz = getpagesize();
+#endif
+    from -= (from % pgsz);
 
     if (from > (BLOCKSZ * MAXBUFBLK)) {
         memmove(stream->buf.data,

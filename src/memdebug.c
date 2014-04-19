@@ -1,7 +1,26 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef HAVE_MALLOC_NP_H
 #include <malloc_np.h>
+#else
+#include <malloc.h>
+#endif
+
+#ifndef HAVE_REALLOCF
+void *
+reallocf(void *ptr, size_t sz)
+{
+    void *tmp = realloc(ptr, sz);
+    if (tmp == NULL)
+        free(ptr);
+    return tmp;
+}
+#endif
 
 #include "mrkcommon/dumpm.h"
 

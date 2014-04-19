@@ -56,10 +56,15 @@ profile_dump_sec(profile_t *p, UNUSED void *udata)
 void
 profile_init_module(void)
 {
+#ifdef HAVE_SYSCTLBYNAME
     size_t sz = sizeof(tsc_freq);
     if (sysctlbyname("machdep.tsc_freq", &tsc_freq, &sz, NULL, 0) != 0) {
         FAIL("sysctlbyname");
     }
+#else
+    /* fake */
+    tsc_freq = 3600096762;
+#endif
 
     if (list_init(&profiles, sizeof(profile_t), 0,
                    (list_initializer_t)profile_init,

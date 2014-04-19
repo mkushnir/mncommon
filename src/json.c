@@ -2,8 +2,9 @@
 #include <string.h>
 
 //#define TRRET_DEBUG_VERBOSE
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/json.h"
+#include <mrkcommon/dumpm.h>
+#include <mrkcommon/json.h>
+#include <mrkcommon/util.h>
 
 #include "diag.h"
 
@@ -343,7 +344,10 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
         } else if (ctx->st & (JPS_EVALUE)) {
 
             if (ch == '{') {
-                char *tmp;
+#ifdef __GNUC__
+                UNUSED
+#endif
+                    char *tmp;
 
                 ctx->st = JPS_OSTART;
                 ctx->ty = JSON_OBJECT;
@@ -371,6 +375,9 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
                 }
 
             } else if (ch == '[') {
+#ifdef __GNUC__
+                UNUSED
+#endif
                 char *tmp;
 
                 ctx->st = JPS_ASTART;
@@ -590,6 +597,9 @@ json_parse_array(json_ctx_t *ctx, char *in, size_t sz)
                 break;
 
             } else if (ch == '[') {
+#ifdef __GNUC__
+                UNUSED
+#endif
                 char *tmp;
 
                 ctx->st = JPS_ASTART;
@@ -618,6 +628,9 @@ json_parse_array(json_ctx_t *ctx, char *in, size_t sz)
                 }
 
             } else if (ch == '{') {
+#ifdef __GNUC__
+                UNUSED
+#endif
                 char *tmp;
 
                 ctx->st = JPS_OSTART;
@@ -785,6 +798,9 @@ json_parse(json_ctx_t *ctx, char *in, size_t sz)
         }
         if (ctx->st == JPS_START) {
             if (ch == '{') {
+#ifdef __GNUC__
+                UNUSED
+#endif
                 char *tmp;
 
                 ctx->st = JPS_OSTART;
@@ -806,6 +822,9 @@ json_parse(json_ctx_t *ctx, char *in, size_t sz)
                 }
 
             } else if (ch == '[') {
+#ifdef __GNUC__
+                UNUSED
+#endif
                 char *tmp;
 
                 ctx->st = JPS_ASTART;

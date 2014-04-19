@@ -1,6 +1,8 @@
 #ifndef MRKCOMMON_UTIL_H
 #define MRKCOMMON_UTIL_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
