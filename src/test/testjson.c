@@ -68,7 +68,7 @@ UNUSED static void
 test0(void)
 {
     json_ctx_t ctx;
-    int res;
+    UNUSED int res;
 
     struct {
         long rnd;

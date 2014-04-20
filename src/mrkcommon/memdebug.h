@@ -70,7 +70,13 @@ _DECLARE_NALLOCATED(n);
 #define realloc __memdebug_realloc
 #define reallocf __memdebug_reallocf
 #define free __memdebug_free
+#ifdef strdup
+#undef strdup
+#endif
 #define strdup __memdebug_strdup
+#ifdef strndup
+#undef strndup
+#endif
 #define strndup __memdebug_strndup
 #define memdebug_nallocated __memdebug_nallocated
 

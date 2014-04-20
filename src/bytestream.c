@@ -136,7 +136,7 @@ bytestream_stderr_write(bytestream_t *stream, int fd, size_t sz)
     nwritten = write(fd, stream->buf.data + stream->pos, sz);
     stream->pos += nwritten;
 
-    write(fd, "\n", 1);
+    if (write(fd, "\n", 1)) {;}
 
     return (nwritten);
 }

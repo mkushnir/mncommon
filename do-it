@@ -2,9 +2,11 @@
 
 uname_s=`uname -s`
 
+sha256_cmd=/sbin/sha256
 if test "$uname_s" = "Linux"
 then
-    linux_exclusions='--enable-profile=no --enable-conf=no --enable-traversedir=no'
+    linux_exclusions='--enable-conf=no --enable-traversedir=no'
+    sha256_cmd=/usr/bin/sha256sum
 fi
 
 if test "$1" = "init"
@@ -33,7 +35,7 @@ then
     export LDFLAGS=-L$HOME/lib
     export CFLAGS=-I$HOME/include
     autoreconf
-    ./configure --prefix=$HOME
+    ./configure --prefix=$HOME $linux_exclusions
     make
 elif test "$1" = "dist"
 then
@@ -51,7 +53,7 @@ then
         cp -v $i /data2/mkushnir/distfiles/
         if test -f port/distinfo
         then
-            /sbin/sha256 $i >port/distinfo
+            $sha256_cmd $i >port/distinfo
             echo "SIZE ($i) = `stat -f%z $i`" >>port/distinfo
         fi
     done
