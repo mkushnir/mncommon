@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 //#define TRRET_DEBUG_VERBOSE
 #include "mrkcommon/dumpm.h"
@@ -148,6 +149,17 @@ array_index(const array_t *ar, void *item)
     }
     return -1;
 }
+
+
+void
+array_copy(array_t *dst, const array_t *src)
+{
+    size_t sz;
+    sz = dst->elnum * dst->elsz;
+    assert(sz == src->elnum * src->elsz);
+    memcpy(dst->data, src->data, sz);
+}
+
 
 void *
 array_get_iter(const array_t *ar, array_iter_t *it)

@@ -29,6 +29,14 @@ const char *mrkcommon_diag_str(int);
 #   define PASTEURIZE_ADDR(a)
 #endif
 
+#ifndef IN
+#   define IN
+#endif
+
+#ifndef OUT
+#   define OUT
+#endif
+
 #ifdef __cplusplus
 }
 #endif
