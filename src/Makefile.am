@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = foreign subdir-objects
 
 distdir = ../$(PACKAGE)-$(VERSION)/src
 dist_HEADERS =
