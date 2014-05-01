@@ -4,16 +4,21 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "diag.h"
-#include "unittest.h"
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/trie.h>
 #include <mrkcommon/util.h>
 #include <mrkcommon/fasthash.h>
 
+#include "diag.h"
+#include "unittest.h"
+
+#include "zltan-fasthash.h"
+
 #ifndef NDEBUG
 const char *_malloc_options = "AJ";
 #endif
+
+//#define fasthash(seed, s, sz) fasthash64((const void *)(s), sz, seed)
 
 static int
 trie_node_fini(trie_node_t *trn, UNUSED uint64_t key, UNUSED void *udata)

@@ -60,7 +60,7 @@ testdict_SOURCES = ../dict.c testdict.c
 testdict_CFLAGS =
 testdict_LDFLAGS =
 
-testfasthash_SOURCES = ../fasthash.c testfasthash.c
+testfasthash_SOURCES = ../fasthash.c zltan-fasthash.c testfasthash.c
 testfasthash_CFLAGS =
 testfasthash_LDFLAGS =
 
