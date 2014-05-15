@@ -134,10 +134,10 @@ processors or parsers:
     void
     init(void)
     {
-        if (bytestream_init(&in) != 0) {
+        if (bytestream_init(&in, 4096) != 0) {
             FAIL("bytestream_init");
         }
-        if (bytestream_init(&out) != 0) {
+        if (bytestream_init(&out, 4096) != 0) {
             FAIL("bytestream_init");
         }
         in.read_more = bytestream_recv_more;

@@ -45,10 +45,6 @@ dict_set_item(dict_t *dict, void *key, void *value)
     uint64_t idx;
     dict_item_t **pdit, *dit;
 
-    if (value == NULL) {
-        return;
-    }
-
     idx = dict->hashfn(key) % dict->sz;
     if ((pdit = array_get(&dict->table, idx)) == NULL) {
         FAIL("array_get");
@@ -80,7 +76,7 @@ dict_set_item(dict_t *dict, void *key, void *value)
     }
 }
 
-void *
+dict_item_t *
 dict_get_item(dict_t *dict, void *key)
 {
     uint64_t idx;
@@ -98,7 +94,7 @@ dict_get_item(dict_t *dict, void *key)
 
     for (dit = *pdit; dit != NULL; dit = dit->next) {
         if (dict->cmp(key, dit->key) == 0) {
-            return dit->value;
+            return dit;
         }
     }
     return NULL;

@@ -25,6 +25,7 @@ typedef struct _bytestream {
         char *data;
         ssize_t sz;
     } buf;
+    ssize_t growsz;
     off_t eod;
     off_t pos;
     ssize_t (*read_more)(struct _bytestream *, int, ssize_t);
@@ -49,7 +50,7 @@ typedef struct _bytestream {
 #define SDECR(stream) --((stream)->pos)
 #define SADVANCEPOS(stream, n) (stream)->pos += (n)
 
-int bytestream_init(bytestream_t *);
+int bytestream_init(bytestream_t *, ssize_t);
 void bytestream_fini(bytestream_t *);
 
 int bytestream_grow(bytestream_t *, size_t);

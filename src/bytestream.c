@@ -27,9 +27,10 @@ bytestream_dump(bytestream_t *stream)
 }
 
 int
-bytestream_init(bytestream_t *stream)
+bytestream_init(bytestream_t *stream, ssize_t growsz)
 {
-    stream->buf.sz = BLOCKSZ;
+    stream->buf.sz = growsz;
+    stream->growsz = growsz;
     if ((stream->buf.data = malloc(stream->buf.sz)) == NULL) {
         TRRET(BYTESTREAM_INIT + 1);
     }
@@ -66,7 +67,7 @@ bytestream_read_more(bytestream_t *stream, int fd, ssize_t sz)
 
     if (need > 0) {
         //TRACE("need more: %ld", need);
-        if (bytestream_grow(stream, (need < BLOCKSZ) ? BLOCKSZ : need) != 0) {
+        if (bytestream_grow(stream, (need < stream->growsz) ? stream->growsz : need) != 0) {
             return (-1);
         }
     }
@@ -90,7 +91,7 @@ bytestream_recv_more(bytestream_t *stream, int fd, ssize_t sz)
     //TRACE("need=%ld", need);
 
     if (need > 0) {
-        if (bytestream_grow(stream, (need < BLOCKSZ) ? BLOCKSZ : need) != 0) {
+        if (bytestream_grow(stream, (need < stream->growsz) ? stream->growsz : need) != 0) {
             return (-1);
         }
     }
@@ -165,7 +166,7 @@ bytestream_consume_data(bytestream_t *stream, int fd)
 
     assert(stream->read_more != NULL);
 
-    need = (stream->pos + BLOCKSZ) - stream->eod;
+    need = (stream->pos + stream->growsz) - stream->eod;
     nread = stream->read_more(stream, fd, need);
 
     if (nread == 0) {
@@ -203,7 +204,7 @@ bytestream_nprintf(bytestream_t *stream, size_t sz,
 
     if (need > 0) {
         //TRACE("need more: %ld", need);
-        if (bytestream_grow(stream, (need < BLOCKSZ) ? BLOCKSZ : need) != 0) {
+        if (bytestream_grow(stream, (need < stream->growsz) ? stream->growsz : need) != 0) {
             TRRET(BYTESTREAM_NPRINTF + 1);
         }
     }
@@ -226,7 +227,7 @@ bytestream_cat(bytestream_t *stream, size_t sz, const char *data)
 
     if (need > 0) {
         //TRACE("need more: %ld", need);
-        if (bytestream_grow(stream, (need < BLOCKSZ) ? BLOCKSZ : need) != 0) {
+        if (bytestream_grow(stream, (need < stream->growsz) ? stream->growsz : need) != 0) {
             TRRET(BYTESTREAM_CAT + 1);
         }
     }
@@ -256,7 +257,7 @@ bytestream_recycle(bytestream_t *stream, off_t from)
 #endif
     from -= (from % pgsz);
 
-    if (from > (BLOCKSZ * MAXBUFBLK)) {
+    if (from > (stream->growsz * MAXBUFBLK)) {
         memmove(stream->buf.data,
                 stream->buf.data + from,
                 stream->eod - from);

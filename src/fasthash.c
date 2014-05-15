@@ -1,8 +1,13 @@
 #include <stdlib.h>
 #include <mrkcommon/fasthash.h>
 #include <mrkcommon/dumpm.h>
+#include <mrkcommon/util.h>
 
-static inline uint64_t
+/**
+ * http://www.cse.yorku.ca/~oz/hash.html
+ *
+ */
+UNUSED static inline uint64_t
 rotl64(uint64_t n, int b)
 {
 #ifndef NDEBUG
@@ -13,7 +18,7 @@ rotl64(uint64_t n, int b)
     return (n << b) | (n >> (64 - b));
 }
 
-static inline uint64_t
+UNUSED static inline uint64_t
 rotr64(uint64_t n, int b)
 {
 #ifndef NDEBUG
@@ -28,16 +33,40 @@ uint64_t
 fasthash(uint64_t n, const unsigned char *s, size_t sz)
 {
     size_t mod = sz % sizeof(uint64_t);
-    size_t i, j, sz1;
+    size_t i, sz1;
+    uint64_t *si;
 
+    si = (uint64_t *)s;
     sz1 = sz - mod;
+    n ^= sz;
+
+    /* modified DJB2 */
+
+#define DJB2(c) n = ((n << 5) + n) + (c);
+#define DJB2XOR(c) n = ((n << 5) + n) ^ (c);
+
+#define LOOP(A) \
+    for (i = 0; i < (sz1 / 8); ++i) {       \
+        A(si[i]); \
+    }                                       \
+    if (mod) {                              \
+        union {                             \
+            uint64_t u64;                   \
+            char  c[sizeof(uint64_t)];      \
+        } ss;                               \
+        ss.u64 = 0UL;                       \
+        for (i = 0; i < mod; ++i) {         \
+            ss.c[i] = s[sz - 1 - i];        \
+        }                                   \
+        A(ss.u64);                          \
+    }
+
 
 #define C(f) \
-    for (i = 0, j = 0;                      \
-         j < sz1;                           \
-         ++i, j += sizeof(uint64_t)) {      \
-        n += *((uint64_t *)(s + j));        \
-        n = f(n, (s[j] + i) % 8);           \
+    for (i = 0; i < (sz1 / 8); ++i) {       \
+        n += *((si + i));                   \
+        n = f(n, (si[i] + i) %              \
+                 (sizeof(uint64_t) * 8));   \
     }                                       \
     if (mod) {                              \
         union {                             \
@@ -49,14 +78,18 @@ fasthash(uint64_t n, const unsigned char *s, size_t sz)
             ss.c[i] = s[sz - 1 - i];        \
         }                                   \
         n += ss.u64;                        \
-        n = f(n, (ss.c[0] + i) % 8);        \
+        n = f(n, (ss.c[0] + i) %            \
+                 (sizeof(uint64_t) * 8));   \
     }
 
-    if (sz < sizeof(uint64_t) * 2) {
-        C(rotl64);
-    } else {
-        C(rotr64);
-    }
+    //C(rotr64);
+    LOOP(DJB2XOR);
+
+    //if (sz < sizeof(uint64_t) * 2) {
+    //    C(rotl64);
+    //} else {
+    //    C(rotr64);
+    //}
     return n;
 }
 
