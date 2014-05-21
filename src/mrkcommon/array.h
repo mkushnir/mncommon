@@ -35,7 +35,7 @@ int array_init(array_t *, size_t, size_t,
 #define ARRAY_FLAG_SAVE 0x01
 int array_ensure_len(array_t *, size_t, unsigned int);
 void *array_get(const array_t *, unsigned);
-#define ARRAY_GET(ty, a, i) (((ty *)((a)->data))[i])
+#define ARRAY_GET(ty, a, i) (((ty *)((a)->data)) + i)
 int array_index(const array_t *, void *);
 void array_copy(array_t *, const array_t *);
 void *array_get_iter(const array_t *, array_iter_t *);
