@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = foreign subdir-objects
 CLEANFILES = *.core
 #CLEANFILES += *.in
 
@@ -96,9 +96,9 @@ testrborder_SOURCES = rb.c testrborder.c
 testrborder_CFLAGS =
 testrborder_LDFLAGS =
 
-testtrieoeder_SOURCES = ../trie.c testtrieoeder.c
-testtrieoeder_CFLAGS =
-testtrieoeder_LDFLAGS =
+testtrieorder_SOURCES = ../trie.c testtrieorder.c
+testtrieorder_CFLAGS =
+testtrieorder_LDFLAGS =
 
 testtraversedir_SOURCES = ../traversedir.c testtraversedir.c
 testtraversedir_CFLAGS =
