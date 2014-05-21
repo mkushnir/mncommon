@@ -61,7 +61,7 @@ AM_INIT_AUTOMAKE
 
 dnl AM_MAINTAINER_MODE
 
-AC_CONFIG_FILES([Makefile src/Makefile src/test/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile])
 AC_CONFIG_HEADERS(config.h)
 
 AC_CHECK_HEADERS([syslog.h])
