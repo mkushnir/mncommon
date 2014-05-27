@@ -64,7 +64,7 @@ ssize_t bytestream_send(bytestream_t *, int, size_t);
 int bytestream_consume_data(bytestream_t *, int);
 int bytestream_produce_data(bytestream_t *, int);
 void bytestream_rewind(bytestream_t *);
-off_t bytestream_recycle(bytestream_t *, off_t);
+off_t bytestream_recycle(bytestream_t *, int, off_t);
 int bytestream_nprintf(bytestream_t *, size_t, const char *, ...);
 int bytestream_cat(bytestream_t *, size_t, const char *);
 int bytestream_dump(bytestream_t *);

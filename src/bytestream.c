@@ -13,9 +13,6 @@
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/bytestream.h"
 
-#define BLOCKSZ (1024 * 4)
-#define MAXBUFBLK 512
-
 int
 bytestream_dump(bytestream_t *stream)
 {
@@ -246,7 +243,7 @@ bytestream_rewind(bytestream_t *stream)
 }
 
 off_t
-bytestream_recycle(bytestream_t *stream, off_t from)
+bytestream_recycle(bytestream_t *stream, int ngrowsz, off_t from)
 {
     int pgsz;
 
@@ -257,7 +254,7 @@ bytestream_recycle(bytestream_t *stream, off_t from)
 #endif
     from -= (from % pgsz);
 
-    if (from > (stream->growsz * MAXBUFBLK)) {
+    if (from > (stream->growsz * ngrowsz)) {
         memmove(stream->buf.data,
                 stream->buf.data + from,
                 stream->eod - from);

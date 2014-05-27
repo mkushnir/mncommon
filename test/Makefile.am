@@ -37,7 +37,7 @@ if MEMDEBUG
 noinst_PROGRAMS += testmemdebug
 endif
 
-distdir = ../../$(PACKAGE)-$(VERSION)/test
+distdir = ../$(PACKAGE)-$(VERSION)/test
 dist_HEADERS = unittest.h rb.h zltan-fasthash.h
 
 BUILT_SOURCES = ../src/diag.c ../src/diag.h
