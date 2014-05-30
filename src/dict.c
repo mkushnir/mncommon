@@ -162,6 +162,9 @@ dict_delete_pair(dict_item_t *dit)
     }
     if (dit->next != NULL) {
         dit->next->prev = dit->prev;
+        if (dit->prev == NULL) {
+            dit->next->bucket = dit->bucket;
+        }
     }
     if (dit->dict->fini != NULL) {
         dit->dict->fini(dit->key, dit->value);
