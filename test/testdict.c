@@ -69,7 +69,7 @@ test0(void)
     v1 = dict_get_item(&dict, (void *)1);
     TRACE("v1=%p", v1->value);
 
-    v2 = dict_remove_item(&dict, (void *)1);
+    v2 = dict_remove_key(&dict, (void *)1);
     dict_traverse(&dict, mycb, NULL);
     TRACE("v2=%p", v2->value);
     v2 = dict_get_item(&dict, (void *)1);

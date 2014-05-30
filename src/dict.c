@@ -54,8 +54,10 @@ dict_set_item(dict_t *dict, void *key, void *value)
         if ((dit = malloc(sizeof(dict_item_t))) == NULL) {
             FAIL("malloc");
         }
-        dit->next = NULL;
         dit->dict = dict;
+        dit->bucket = pdit;
+        dit->prev = NULL;
+        dit->next = NULL;
         dit->key = key;
         dit->value = value;
         *pdit = dit;
@@ -69,8 +71,10 @@ dict_set_item(dict_t *dict, void *key, void *value)
         if ((dit->next = malloc(sizeof(dict_item_t))) == NULL) {
             FAIL("malloc");
         }
-        dit->next->next = NULL;
         dit->next->dict = dict;
+        dit->bucket = NULL;
+        dit->next->prev = dit;
+        dit->next->next = NULL;
         dit->next->key = key;
         dit->next->value = value;
     }
@@ -101,7 +105,7 @@ dict_get_item(dict_t *dict, void *key)
 }
 
 void *
-dict_remove_item(dict_t *dict, void *key)
+dict_remove_key(dict_t *dict, void *key)
 {
     uint64_t idx;
     dict_item_t **pdit, *dit;
@@ -120,6 +124,7 @@ dict_remove_item(dict_t *dict, void *key)
     dit = *pdit;
 
     if (dict->cmp(key, dit->key) == 0) {
+        dit->next->prev = NULL;
         *pdit = dit->next;
         value = dit->value;
         free(dit);
@@ -127,19 +132,37 @@ dict_remove_item(dict_t *dict, void *key)
     }
 
     while (dit->next != NULL) {
-        if (dict->cmp(key, dit->next->key) == 0) {
-            dict_item_t *nxt;
-
-            nxt = dit->next->next;
-            value = dit->next->value;
-            free(dit->next);
-            dit->next = nxt;
+        dit = dit->next;
+        if (dict->cmp(key, dit->key) == 0) {
+            dit->prev->next = dit->next;
+            if (dit->next != NULL) {
+                dit->next->prev = dit->prev;
+            }
+            value = dit->value;
+            free(dit);
             return value;
         }
     }
 
     return value;
 }
+
+
+void
+dict_remove_item(dict_item_t *dit)
+{
+    if (dit->prev != NULL) {
+        dit->prev->next = dit->next;
+    } else {
+        assert(dit->bucket != NULL);
+        *(dit->bucket) = dit->next;
+    }
+    if (dit->next != NULL) {
+        dit->next->prev = dit->prev;
+    }
+    free(dit);
+}
+
 
 int
 dict_traverse(dict_t *dict, dict_traverser_t cb, void *udata)
@@ -152,15 +175,36 @@ dict_traverse(dict_t *dict, dict_traverser_t cb, void *udata)
          pdit != NULL;
          pdit = array_next(&dict->table, &it)) {
 
-        //TRACE("table[%d]", it.iter);
+        dict_item_t *dit, *next;
 
-        if (*pdit != NULL) {
-            dict_item_t *dit;
+        for (dit = *pdit; dit != NULL; dit = next) {
+            next = dit->next;
+            if ((res = cb(dit->key, dit->value, udata)) != 0) {
+                return res;
+            }
+        }
+    }
+    return 0;
+}
 
-            for (dit = *pdit; dit != NULL; dit = dit->next) {
-                if ((res = cb(dit->key, dit->value, udata)) != 0) {
-                    return res;
-                }
+
+int
+dict_traverse_item(dict_t *dict, dict_traverser_item_t cb, void *udata)
+{
+    int res;
+    dict_item_t **pdit;
+    array_iter_t it;
+
+    for (pdit = array_first(&dict->table, &it);
+         pdit != NULL;
+         pdit = array_next(&dict->table, &it)) {
+
+        dict_item_t *dit, *next;
+
+        for (dit = *pdit; dit != NULL; dit = next) {
+            next = dit->next;
+            if ((res = cb(dit, udata)) != 0) {
+                return res;
             }
         }
     }
