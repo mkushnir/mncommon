@@ -38,8 +38,8 @@ typedef struct _dict {
 
 void dict_set_item(dict_t *, void *, void *);
 dict_item_t *dict_get_item(dict_t *, void *);
-void *dict_remove_key(dict_t *, void *);
-void dict_remove_item(dict_item_t *);
+void *dict_remove_item(dict_t *, void *);
+void dict_delete_pair(dict_item_t *);
 int dict_traverse(dict_t *, dict_traverser_t, void *);
 int dict_traverse_item(dict_t *, dict_traverser_item_t, void *);
 

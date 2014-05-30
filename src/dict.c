@@ -105,7 +105,7 @@ dict_get_item(dict_t *dict, void *key)
 }
 
 void *
-dict_remove_key(dict_t *dict, void *key)
+dict_remove_item(dict_t *dict, void *key)
 {
     uint64_t idx;
     dict_item_t **pdit, *dit;
@@ -152,7 +152,7 @@ dict_remove_key(dict_t *dict, void *key)
 
 
 void
-dict_remove_item(dict_item_t *dit)
+dict_delete_pair(dict_item_t *dit)
 {
     if (dit->prev != NULL) {
         dit->prev->next = dit->next;
@@ -162,6 +162,9 @@ dict_remove_item(dict_item_t *dit)
     }
     if (dit->next != NULL) {
         dit->next->prev = dit->prev;
+    }
+    if (dit->dict->fini != NULL) {
+        dit->dict->fini(dit->key, dit->value);
     }
     free(dit);
 }
