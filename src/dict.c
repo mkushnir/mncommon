@@ -109,7 +109,6 @@ dict_remove_key(dict_t *dict, void *key)
 {
     uint64_t idx;
     dict_item_t **pdit, *dit;
-    void *value = NULL;
 
     idx = dict->hashfn(key) % dict->sz;
 
@@ -124,6 +123,8 @@ dict_remove_key(dict_t *dict, void *key)
     dit = *pdit;
 
     if (dict->cmp(key, dit->key) == 0) {
+        void *value;
+
         dit->next->prev = NULL;
         *pdit = dit->next;
         value = dit->value;
@@ -134,6 +135,8 @@ dict_remove_key(dict_t *dict, void *key)
     while (dit->next != NULL) {
         dit = dit->next;
         if (dict->cmp(key, dit->key) == 0) {
+            void *value;
+
             dit->prev->next = dit->next;
             if (dit->next != NULL) {
                 dit->next->prev = dit->prev;
@@ -144,7 +147,7 @@ dict_remove_key(dict_t *dict, void *key)
         }
     }
 
-    return value;
+    return NULL;
 }
 
 

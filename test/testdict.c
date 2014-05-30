@@ -45,7 +45,8 @@ test0(void)
         {0, 0, 0},
     };
     dict_t dict;
-    dict_item_t *v1, *v2;
+    dict_item_t *v1;
+    void *v2;
 
 
     UNITTEST_PROLOG_RAND;
@@ -71,7 +72,7 @@ test0(void)
 
     v2 = dict_remove_key(&dict, (void *)1);
     dict_traverse(&dict, mycb, NULL);
-    TRACE("v2=%p", v2->value);
+    TRACE("v2=%p", v2);
     v2 = dict_get_item(&dict, (void *)1);
     TRACE("v2=%p", v2);
 
