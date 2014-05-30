@@ -72,7 +72,7 @@ dict_set_item(dict_t *dict, void *key, void *value)
             FAIL("malloc");
         }
         dit->next->dict = dict;
-        dit->bucket = NULL;
+        dit->next->bucket = NULL;
         dit->next->prev = dit;
         dit->next->next = NULL;
         dit->next->key = key;
