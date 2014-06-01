@@ -84,10 +84,126 @@ test0(void)
     dict_fini(&dict);
 }
 
+
+typedef struct _my_item {
+    uint64_t hash;
+    uint64_t value;
+} my_item_t;
+
+
+static my_item_t*
+my_item_new(uint64_t hash, uint64_t value)
+{
+    my_item_t *res;
+    res = malloc(sizeof(my_item_t));
+    res->hash = hash;
+    res->value = value;
+    return res;
+}
+
+static void
+my_item_destroy(my_item_t **it)
+{
+    if (*it != NULL) {
+        free(*it);
+        *it = NULL;
+    }
+}
+
+static void
+my_item_fini(my_item_t *key, my_item_t *value)
+{
+    my_item_destroy(&key);
+    my_item_destroy(&value);
+}
+
+static uint64_t
+my_item_hash(my_item_t *it)
+{
+    return it->hash;
+}
+
+static int
+my_item_cmp(my_item_t *a , my_item_t *b)
+{
+    return (int)((int64_t)a->value - (int64_t)b->value);
+}
+
+static int
+my_item_print(dict_item_t *dit, UNUSED void *udata)
+{
+    my_item_t *key;
+
+    key = dit->key;
+    TRACE("<h=%ld v=%ld>", key->hash, key->value);
+    return 0;
+}
+
+
+static int
+my_item_delete(dict_item_t *dit, void *udata)
+{
+    my_item_t *key;
+    union {
+        void *v;
+        int i;
+    } u;
+
+    u.v = udata;
+
+    key = dit->key;
+    if (key->value % u.i == 0) {
+        TRACE("deleting %ld ...", key->value);
+        dict_delete_pair(dit);
+    } else {
+        TRACE("keeping %ld ...", key->value);
+    }
+    return 0;
+}
+
+
+static void
+test1(void)
+{
+    dict_t dict;
+
+    dict_init(&dict, 3, (dict_hashfn_t)my_item_hash, (dict_item_comparator_t)my_item_cmp, (dict_item_finalizer_t)my_item_fini);
+    dict_set_item(&dict, my_item_new(1,1), NULL);
+    dict_set_item(&dict, my_item_new(1,2), NULL);
+    dict_set_item(&dict, my_item_new(1,3), NULL);
+    dict_set_item(&dict, my_item_new(1,4), NULL);
+    dict_set_item(&dict, my_item_new(1,5), NULL);
+    dict_set_item(&dict, my_item_new(1,6), NULL);
+    dict_set_item(&dict, my_item_new(1,7), NULL);
+    dict_set_item(&dict, my_item_new(1,8), NULL);
+    dict_set_item(&dict, my_item_new(1,9), NULL);
+    dict_set_item(&dict, my_item_new(1,10), NULL);
+    dict_set_item(&dict, my_item_new(1,11), NULL);
+    dict_set_item(&dict, my_item_new(1,12), NULL);
+    dict_set_item(&dict, my_item_new(1,13), NULL);
+    dict_set_item(&dict, my_item_new(1,14), NULL);
+    dict_set_item(&dict, my_item_new(1,15), NULL);
+    dict_set_item(&dict, my_item_new(2,80), NULL);
+    dict_set_item(&dict, my_item_new(0,81), NULL);
+
+    TRACE();
+    dict_traverse_item(&dict, my_item_print, NULL);
+    TRACE();
+    dict_traverse_item(&dict, my_item_delete, (void *)5);
+    TRACE();
+    dict_traverse_item(&dict, my_item_delete, (void *)4);
+    TRACE();
+    dict_traverse_item(&dict, my_item_print, NULL);
+    TRACE();
+    dict_fini(&dict);
+}
+
+
 int
 main(void)
 {
     test0();
+    test1();
     return 0;
 }
 
