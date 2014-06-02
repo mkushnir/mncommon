@@ -12,7 +12,6 @@ extern "C" {
 #endif
 
 typedef struct _dict_item {
-    struct _dict *dict;
     struct _dict_item **bucket;
     struct _dict_item *prev;
     struct _dict_item *next;
@@ -24,8 +23,6 @@ typedef uint64_t (*dict_hashfn_t)(void *);
 typedef int (*dict_item_comparator_t)(void *, void *);
 typedef int (*dict_item_finalizer_t)(void *, void *);
 typedef int (*dict_traverser_t)(void *, void *, void *);
-typedef int (*dict_traverser_item_t)(dict_item_t *, void *);
-
 typedef struct _dict {
     size_t sz;
     dict_hashfn_t hashfn;
@@ -39,8 +36,10 @@ typedef struct _dict {
 void dict_set_item(dict_t *, void *, void *);
 dict_item_t *dict_get_item(dict_t *, void *);
 void *dict_remove_item(dict_t *, void *);
-void dict_delete_pair(dict_item_t *);
+void dict_delete_pair(dict_t *, dict_item_t *);
 int dict_traverse(dict_t *, dict_traverser_t, void *);
+typedef int (*dict_traverser_item_t)(dict_t *, dict_item_t *, void *);
+
 int dict_traverse_item(dict_t *, dict_traverser_item_t, void *);
 
 void dict_init(dict_t *,

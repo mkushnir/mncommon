@@ -19,26 +19,6 @@ null_init(void **v)
     return 0;
 }
 
-static int
-dict_item_fini(dict_item_t **pdit)
-{
-
-    if (*pdit != NULL) {
-        dict_item_t *dit = *pdit;
-        if (dit->next != NULL) {
-            dict_item_fini(&dit->next);
-        }
-
-        if (dit->dict->fini != NULL) {
-            dit->dict->fini(dit->key, dit->value);
-        }
-
-        free(dit);
-        *pdit = NULL;
-    }
-    return 0;
-}
-
 void
 dict_set_item(dict_t *dict, void *key, void *value)
 {
@@ -54,7 +34,6 @@ dict_set_item(dict_t *dict, void *key, void *value)
         if ((dit = malloc(sizeof(dict_item_t))) == NULL) {
             FAIL("malloc");
         }
-        dit->dict = dict;
         dit->bucket = pdit;
         dit->prev = NULL;
         dit->next = NULL;
@@ -71,7 +50,6 @@ dict_set_item(dict_t *dict, void *key, void *value)
         if ((dit->next = malloc(sizeof(dict_item_t))) == NULL) {
             FAIL("malloc");
         }
-        dit->next->dict = dict;
         dit->next->bucket = NULL;
         dit->next->prev = dit;
         dit->next->next = NULL;
@@ -152,7 +130,7 @@ dict_remove_item(dict_t *dict, void *key)
 
 
 void
-dict_delete_pair(dict_item_t *dit)
+dict_delete_pair(dict_t *dict, dict_item_t *dit)
 {
     if (dit->prev != NULL) {
         dit->prev->next = dit->next;
@@ -166,8 +144,8 @@ dict_delete_pair(dict_item_t *dit)
             dit->next->bucket = dit->bucket;
         }
     }
-    if (dit->dict->fini != NULL) {
-        dit->dict->fini(dit->key, dit->value);
+    if (dict->fini != NULL) {
+        dict->fini(dit->key, dit->value);
     }
     free(dit);
 }
@@ -212,7 +190,7 @@ dict_traverse_item(dict_t *dict, dict_traverser_item_t cb, void *udata)
 
         for (dit = *pdit; dit != NULL; dit = next) {
             next = dit->next;
-            if ((res = cb(dit, udata)) != 0) {
+            if ((res = cb(dict, dit, udata)) != 0) {
                 return res;
             }
         }
@@ -236,11 +214,40 @@ dict_init(dict_t *dict,
     dict->fini = fini;
     array_init(&dict->table, sizeof(dict_item_t *), sz,
                (array_initializer_t)null_init,
-               (array_finalizer_t)dict_item_fini);
+               NULL);
 }
 
 void
 dict_fini(dict_t *dict)
 {
+
+    if (dict->fini != NULL) {
+        size_t i;
+
+        for (i = 0; i < dict->table.elnum; ++i) {
+            dict_item_t **pdit, *dit, *next;
+
+            pdit = ARRAY_GET(dict_item_t *, &dict->table, i);
+            for (dit = *pdit; dit != NULL; dit = next) {
+                next = dit->next;
+                if (dict->fini(dit->key, dit->value) != 0) {
+                    break;
+                }
+                free(dit);
+            }
+        }
+    } else {
+        size_t i;
+
+        for (i = 0; i < dict->table.elnum; ++i) {
+            dict_item_t **pdit, *dit, *next;
+
+            pdit = ARRAY_GET(dict_item_t *, &dict->table, i);
+            for (dit = *pdit; dit != NULL; dit = next) {
+                next = dit->next;
+                free(dit);
+            }
+        }
+    }
     array_fini(&dict->table);
 }

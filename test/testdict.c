@@ -141,7 +141,7 @@ my_item_print(dict_item_t *dit, UNUSED void *udata)
 
 
 static int
-my_item_delete(dict_item_t *dit, void *udata)
+my_item_delete(dict_t *dict, dict_item_t *dit, void *udata)
 {
     my_item_t *key;
     union {
@@ -154,7 +154,7 @@ my_item_delete(dict_item_t *dit, void *udata)
     key = dit->key;
     if (key->value % u.i == 0) {
         TRACE("deleting %ld ...", key->value);
-        dict_delete_pair(dit);
+        dict_delete_pair(dict, dit);
     } else {
         TRACE("keeping %ld ...", key->value);
     }
