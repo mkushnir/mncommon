@@ -130,7 +130,7 @@ my_item_cmp(my_item_t *a , my_item_t *b)
 }
 
 static int
-my_item_print(dict_item_t *dit, UNUSED void *udata)
+my_item_print(UNUSED dict_t *dict, dict_item_t *dit, UNUSED void *udata)
 {
     my_item_t *key;
 
