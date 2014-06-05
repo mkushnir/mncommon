@@ -3,6 +3,10 @@
 
 #include <dirent.h>
 
+#ifndef _D_EXACT_NAMLEN
+#   define _D_EXACT_NAMLEN(d) ((d)->d_namlen)
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
