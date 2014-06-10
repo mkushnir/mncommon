@@ -20,9 +20,9 @@ MEMDEBUG_DECLARE(array);
  *
  */
 int
-array_init (array_t *ar, size_t elsz, size_t elnum,
-            array_initializer_t init,
-            array_finalizer_t fini)
+array_init(array_t *ar, size_t elsz, size_t elnum,
+           array_initializer_t init,
+           array_finalizer_t fini)
 {
     unsigned i;
 
