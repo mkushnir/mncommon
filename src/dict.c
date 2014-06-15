@@ -217,10 +217,10 @@ dict_init(dict_t *dict,
                NULL);
 }
 
-void
-dict_fini(dict_t *dict)
-{
 
+void
+dict_cleanup(dict_t *dict)
+{
     if (dict->fini != NULL) {
         size_t i;
 
@@ -249,5 +249,12 @@ dict_fini(dict_t *dict)
             }
         }
     }
+}
+
+
+void
+dict_fini(dict_t *dict)
+{
+    dict_cleanup(dict);
     array_fini(&dict->table);
 }

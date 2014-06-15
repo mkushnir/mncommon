@@ -47,6 +47,7 @@ void dict_init(dict_t *,
                dict_hashfn_t,
                dict_item_comparator_t,
                dict_item_finalizer_t);
+void dict_cleanup(dict_t *);
 void dict_fini(dict_t *);
 
 #ifdef __cplusplus
