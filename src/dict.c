@@ -235,6 +235,7 @@ dict_cleanup(dict_t *dict)
                 }
                 free(dit);
             }
+            *pdit = NULL;
         }
     } else {
         size_t i;
@@ -247,6 +248,7 @@ dict_cleanup(dict_t *dict)
                 next = dit->next;
                 free(dit);
             }
+            *pdit = NULL;
         }
     }
 }
