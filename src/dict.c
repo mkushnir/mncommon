@@ -199,6 +199,25 @@ dict_traverse_item(dict_t *dict, dict_traverser_item_t cb, void *udata)
 }
 
 
+int
+dict_is_empty(dict_t *dict)
+{
+    dict_item_t **pdit;
+    array_iter_t it;
+
+    for (pdit = array_first(&dict->table, &it);
+         pdit != NULL;
+         pdit = array_next(&dict->table, &it)) {
+
+        dict_item_t *dit;
+
+        for (dit = *pdit; dit != NULL; dit = dit->next) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void
 dict_init(dict_t *dict,
           size_t sz,

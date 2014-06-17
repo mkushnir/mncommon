@@ -41,6 +41,7 @@ int dict_traverse(dict_t *, dict_traverser_t, void *);
 typedef int (*dict_traverser_item_t)(dict_t *, dict_item_t *, void *);
 
 int dict_traverse_item(dict_t *, dict_traverser_item_t, void *);
+int dict_is_empty(dict_t *);
 
 void dict_init(dict_t *,
                size_t,
