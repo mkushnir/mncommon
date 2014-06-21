@@ -61,6 +61,7 @@ array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
 {
 #define _malloc(sz) mpool_malloc(mpool, (sz))
     ARRAY_INIT_BODY(_malloc);
+#undef _malloc
 }
 
 
@@ -139,6 +140,8 @@ array_ensure_len_mpool(mpool_ctx_t *mpool, array_t *ar, size_t newelnum, unsigne
 #define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
 #define _free(p) mpool_free(mpool, (p))
     ARRAY_ENSURE_LEN_BODY(_realloc, _free);
+#undef _realloc
+#undef _free
 }
 
 int

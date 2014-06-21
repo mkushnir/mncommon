@@ -34,6 +34,11 @@ int array_init(array_t *, size_t, size_t,
                array_initializer_t,
                array_finalizer_t);
 
+int array_init_mpool(mpool_ctx_t *,
+                     array_t *, size_t, size_t,
+                     array_initializer_t,
+                     array_finalizer_t);
+
 #define ARRAY_FLAG_SAVE 0x01
 int array_ensure_len(array_t *, size_t, unsigned int);
 int array_ensure_len_mpool(mpool_ctx_t *, array_t *, size_t, unsigned int);

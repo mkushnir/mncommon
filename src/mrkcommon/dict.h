@@ -5,7 +5,8 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include "mrkcommon/array.h"
+#include <mrkcommon/array.h>
+#include <mrkcommon/mpool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,9 +35,12 @@ typedef struct _dict {
 
 
 void dict_set_item(dict_t *, void *, void *);
+void dict_set_item_mpool(mpool_ctx_t *, dict_t *, void *, void *);
 dict_item_t *dict_get_item(dict_t *, void *);
 void *dict_remove_item(dict_t *, void *);
+void *dict_remove_item_mpool(mpool_ctx_t *, dict_t *, void *);
 void dict_delete_pair(dict_t *, dict_item_t *);
+void dict_delete_pair_mpool(mpool_ctx_t *, dict_t *, dict_item_t *);
 int dict_traverse(dict_t *, dict_traverser_t, void *);
 typedef int (*dict_traverser_item_t)(dict_t *, dict_item_t *, void *);
 
@@ -48,8 +52,16 @@ void dict_init(dict_t *,
                dict_hashfn_t,
                dict_item_comparator_t,
                dict_item_finalizer_t);
+void dict_init_mpool(mpool_ctx_t *,
+                     dict_t *,
+                     size_t,
+                     dict_hashfn_t,
+                     dict_item_comparator_t,
+                     dict_item_finalizer_t);
 void dict_cleanup(dict_t *);
+void dict_cleanup_mpool(mpool_ctx_t *, dict_t *);
 void dict_fini(dict_t *);
+void dict_fini_mpool(mpool_ctx_t *, dict_t *);
 
 #ifdef __cplusplus
 }
