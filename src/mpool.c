@@ -86,13 +86,17 @@ mpool_realloc(mpool_ctx_t *mpool, void *p, size_t sz)
 {
     struct _mpool_item *mpi;
 
-    mpi = DATA_TO_MPOOL_ITEM(p);
-    if (mpi->sz < sz) {
-        void *pp;
+    if (p == NULL) {
+        p = mpool_malloc(mpool, sz);
+    } else {
+        mpi = DATA_TO_MPOOL_ITEM(p);
+        if (mpi->sz < sz) {
+            void *pp;
 
-        pp = mpool_malloc(mpool, sz);
-        memcpy(pp, p, mpi->sz);
-        p = pp;
+            pp = mpool_malloc(mpool, sz);
+            memcpy(pp, p, mpi->sz);
+            p = pp;
+        }
     }
     return p;
 }
