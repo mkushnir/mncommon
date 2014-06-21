@@ -36,6 +36,9 @@ endif
 if MEMDEBUG
 noinst_PROGRAMS += testmemdebug
 endif
+if MPOOL
+noinst_PROGRAMS += testmpool
+endif
 
 distdir = ../$(PACKAGE)-$(VERSION)/test
 dist_HEADERS = unittest.h rb.h zltan-fasthash.h
@@ -119,6 +122,10 @@ testdtqueue_LDFLAGS =
 testmemdebug_SOURCES = ../src/memdebug.c testmemdebug.c
 testmemdebug_CFLAGS =
 testmemdebug_LDFLAGS =
+
+testmpool_SOURCES = ../src/mpool.c testmpool.c
+testmpool_CFLAGS =
+testmpool_LDFLAGS =
 
 ../src/diag.c ../src/diag.h: ../src/diag.txt
 	sh ../gen-diag mrkcommon
