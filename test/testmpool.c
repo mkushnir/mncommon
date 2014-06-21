@@ -7,6 +7,7 @@
 #include <mrkcommon/util.h>
 #include <mrkcommon/mpool.h>
 
+#define MAXITEM (1024)
 mpool_ctx_t mpool;
 
 UNUSED static void
@@ -76,12 +77,39 @@ run_std_malloc(void)
 }
 
 
+UNUSED static void *
+run_mpool_realloc(void)
+{
+    void *p = NULL;
+    int i;
+
+    for (i = 0; i < 1024 * 1024; ++i) {
+        size_t sz;
+
+        sz = random() % MAXITEM;
+
+        if (sz > 0) {
+            p = mpool_malloc(&mpool, sz);
+            sz = random() % MAXITEM;
+
+            p = mpool_realloc(&mpool, p, sz);
+
+            //if (p == NULL) {
+            //    break;
+            //}
+        }
+    }
+    //TRACE("i=%d p=%p", i, p);
+    return p;
+}
+
+
 static void
 test1(void)
 {
     void *p;
 
-#define f run_mpool_malloc
+#define f run_mpool_realloc
     mpool_ctx_reset(&mpool);
     p = f();
     TRACE("p=%p", p);
