@@ -217,6 +217,13 @@ AC_ARG_ENABLE(memdebug,
               [AM_CONDITIONAL([MEMDEBUG], [enable_memdebug=yes])],
              )
 
+AC_ARG_ENABLE(mpool,
+              AC_HELP_STRING([--enable-mpool],
+                             [Enable mpool (default=yes)]),
+              [AM_CONDITIONAL([MPOOL], [test "$enable_mpool" = "yes"])],
+              [AM_CONDITIONAL([MPOOL], [enable_mpool=yes])],
+             )
+
 if test "$enable_profile" = "yes" -a "$enable_list" != "yes"
 then
     echo "ERROR: cannot disable the list feature because the profile feature requires it."
