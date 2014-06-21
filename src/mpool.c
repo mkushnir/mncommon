@@ -1,8 +1,10 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <mrkcommon/mpool.h>
 #include <mrkcommon/dumpm.h>
+#include <mrkcommon/util.h>
 
 #include "diag.h"
 
@@ -15,16 +17,21 @@ mpool_ctx_reset(mpool_ctx_t *mpool)
 }
 
 
-static char **
-new_chunk(mpool_ctx_t *mpool)
+static void **
+new_chunk(mpool_ctx_t *mpool, size_t sz)
 {
-    char **chunk;
+    void **chunk;
 
-    chunk = array_incr(&mpool->chunks);
-    assert(chunk != NULL);
-    *chunk = malloc(mpool->chunksz);
-    assert(*chunk != NULL);
     ++mpool->current_chunk;
+    if (mpool->current_chunk * sizeof(void *) == mpool->arenasz) {
+        mpool->arenasz *= 2;
+        mpool->arena = realloc(mpool->arena, mpool->arenasz);
+        assert(mpool->arena != NULL);
+    }
+
+    chunk = mpool->arena + mpool->current_chunk;
+    *chunk = malloc(sz);
+    assert(*chunk != NULL);
     mpool->current_pos = 0;
     return chunk;
 }
@@ -32,68 +39,71 @@ new_chunk(mpool_ctx_t *mpool)
 void *
 mpool_malloc(mpool_ctx_t *mpool, size_t sz)
 {
-    void *res;
+    size_t sz1;
+    struct _mpool_item *res;
 
     sz = sz + 8 - (sz % 8);
-    assert(sz != 0);
+    sz1 = sz + sizeof(struct _mpool_item);
 
-    if (sz > mpool->chunksz) {
-        char **chunk;
+    if (sz1 > mpool->chunksz) {
+        void **chunk;
 
         /* new "big" chunk */
-        chunk = array_incr(&mpool->chunks);
-        assert(chunk != NULL);
-        *chunk = malloc(sz);
-        assert(*chunk != NULL);
-        ++mpool->current_chunk;
-        mpool->current_pos = mpool->chunksz;
-
-        res = *chunk;
+        chunk = new_chunk(mpool, sz1);
+        res = (struct _mpool_item *)*chunk;
+        res->sz = sz;
 
     } else {
-        char **chunk;
+        void **chunk;
         size_t nleft;
 
         nleft = mpool->chunksz - mpool->current_pos;
-        if (nleft < sz) {
-            chunk = new_chunk(mpool);
+        if (nleft < sz1) {
+            chunk = new_chunk(mpool, mpool->chunksz);
         } else {
-            chunk = array_get(&mpool->chunks, mpool->current_chunk);
-            assert(chunk != NULL);
+            chunk = mpool->arena + mpool->current_chunk;
         }
-        res = (*chunk) + mpool->current_pos;
-        mpool->current_pos += sz;
+        res = (struct _mpool_item *)(*chunk + mpool->current_pos);
+        res->sz = sz;
+        mpool->current_pos += sz1;
     }
 
-    return res;
+    return res->data;
 }
 
+#define DATA_TO_MPOOL_ITEM(d) ((struct _mpool_item *)(((char *)(d)) - sizeof(size_t)))
 
-static int
-chunk_fini(void **v)
+void *
+mpool_realloc(mpool_ctx_t *mpool, void *p, size_t sz)
 {
-    if (*v != NULL) {
-        free(*v);
-        *v = NULL;
+    struct _mpool_item *mpi;
+
+    mpi = DATA_TO_MPOOL_ITEM(p);
+    if (mpi->sz < sz) {
+        void *pp;
+
+        pp = mpool_malloc(mpool, sz);
+        memcpy(pp, p, mpi->sz);
+        p = pp;
     }
-    return 0;
+    return p;
 }
 
+
+void
+mpool_free(UNUSED mpool_ctx_t *mpool, UNUSED void *o)
+{
+}
 
 int
 mpool_init_ctx(mpool_ctx_t *mpool, size_t chunksz)
 {
-
     mpool->chunksz = chunksz;
     mpool->current_chunk = 0;
     mpool->current_pos = 0;
-    if (array_init(&mpool->chunks,
-                   sizeof(char *),
-                   0,
-                   NULL,
-                   (array_finalizer_t)chunk_fini) != 0) {
-        FAIL("array_init");
-    }
+    mpool->arenasz = sizeof(void *);
+    mpool->arena = malloc(mpool->arenasz);
+    assert(mpool->arena != NULL);
     return 0;
 }
 
@@ -101,7 +111,16 @@ mpool_init_ctx(mpool_ctx_t *mpool, size_t chunksz)
 int
 mpool_ctx_fini(mpool_ctx_t *mpool)
 {
-    array_fini(&mpool->chunks);
+    int i;
+
+    for (i = mpool->current_chunk; i >= 0; --i) {
+        void *chunk;
+        chunk = mpool->arena[i];
+        assert(chunk != NULL);
+        free(chunk);
+    }
+    free(mpool->arena);
+    mpool->arena = NULL;
     return 0;
 }
 
