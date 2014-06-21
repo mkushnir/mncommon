@@ -7,10 +7,10 @@
 #include "mrkcommon/util.h"
 #include "diag.h"
 
-#ifndef NDEBUG
-#include "mrkcommon/memdebug.h"
-MEMDEBUG_DECLARE(dict);
-#endif
+//#ifndef NDEBUG
+//#include "mrkcommon/memdebug.h"
+//MEMDEBUG_DECLARE(dict);
+//#endif
 
 static int
 null_init(void **v)
