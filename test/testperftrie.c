@@ -129,9 +129,9 @@ test0(void)
 int
 main(void)
 {
-    MEMDEBUG_REGISTER(testperftrie);
 #ifndef NDEBUG
-    MEMDEBUG_REGISTER(trie);
+    MEMDEBUG_REGISTER(testperftrie);
+    //MEMDEBUG_REGISTER(trie);
 #endif
 
     profile_init_module();
