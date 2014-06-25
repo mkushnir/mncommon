@@ -8,6 +8,7 @@
 #include "mrkcommon/util.h"
 
 /* Code profiling */
+static int initialized = 0;
 static list_t profiles;
 static uint64_t tsc_freq;
 
@@ -66,17 +67,26 @@ profile_init_module(void)
     tsc_freq = 3600096762;
 #endif
 
+    if (initialized) {
+        return;
+    }
+
     if (list_init(&profiles, sizeof(profile_t), 0,
                    (list_initializer_t)profile_init,
                    NULL) != 0) {
         FAIL("list_init");
     }
+    initialized = 1;
 }
 
 void
 profile_fini_module(void)
 {
+    if (!initialized) {
+        return;
+    }
     list_fini(&profiles);
+    initialized = 0;
 }
 
 

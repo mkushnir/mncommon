@@ -123,6 +123,17 @@ mpool_ctx_init(mpool_ctx_t *mpool, size_t chunksz)
 }
 
 
+void
+mpool_ctx_dump_info(mpool_ctx_t *mpool)
+{
+    TRACE("%ld chunks of %ld bytes chrrent %d/%ld",
+          mpool->arenasz / sizeof(void *),
+          mpool->chunksz,
+          mpool->current_chunk,
+          mpool->current_pos);
+}
+
+
 int
 mpool_ctx_fini(mpool_ctx_t *mpool)
 {
