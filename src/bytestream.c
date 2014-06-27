@@ -12,6 +12,7 @@
 //#define TRRET_DEBUG
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/bytestream.h"
+#include <mrkcommon/mpool.h>
 
 int
 bytestream_dump(bytestream_t *stream)
@@ -23,22 +24,37 @@ bytestream_dump(bytestream_t *stream)
     return (0);
 }
 
+
+#define BYTESTREAM_INIT_BODY(mallocfn) \
+    stream->buf.sz = growsz; \
+    stream->growsz = growsz; \
+    if ((stream->buf.data = mallocfn(stream->buf.sz)) == NULL) { \
+        TRRET(BYTESTREAM_INIT + 1); \
+    } \
+ \
+    stream->eod = 0; \
+    stream->pos = 0; \
+    stream->read_more = NULL; \
+    stream->write = NULL; \
+    stream->udata = NULL; \
+    return (0);
+
+
 int
 bytestream_init(bytestream_t *stream, ssize_t growsz)
 {
-    stream->buf.sz = growsz;
-    stream->growsz = growsz;
-    if ((stream->buf.data = malloc(stream->buf.sz)) == NULL) {
-        TRRET(BYTESTREAM_INIT + 1);
-    }
-
-    stream->eod = 0;
-    stream->pos = 0;
-    stream->read_more = NULL;
-    stream->write = NULL;
-    stream->udata = NULL;
-    return (0);
+    BYTESTREAM_INIT_BODY(malloc);
 }
+
+
+int
+bytestream_init_mpool(mpool_ctx_t *mpool, bytestream_t *stream, ssize_t growsz)
+{
+#define _malloc(sz) mpool_malloc(mpool, (sz))
+    BYTESTREAM_INIT_BODY(_malloc);
+#undef _malloc
+}
+
 
 int
 bytestream_grow(bytestream_t *stream, size_t incr)
@@ -267,15 +283,28 @@ bytestream_recycle(bytestream_t *stream, int ngrowsz, off_t from)
 }
 
 
+#define BYTESTREAM_FINI_BODY(freefn) \
+    if (stream->buf.data != NULL) { \
+        freefn(stream->buf.data); \
+        stream->buf.data = NULL; \
+    } \
+    stream->read_more = NULL; \
+    stream->write = NULL; \
+    stream->udata = NULL;
+
+
 void
 bytestream_fini(bytestream_t *stream)
 {
-    if (stream->buf.data != NULL) {
-        free(stream->buf.data);
-        stream->buf.data = NULL;
-    }
-    stream->read_more = NULL;
-    stream->write = NULL;
-    stream->udata = NULL;
+    BYTESTREAM_FINI_BODY(free);
+}
+
+
+void
+bytestream_fini_mpool(mpool_ctx_t *mpool, bytestream_t *stream)
+{
+#define _free(ptr) mpool_free(mpool, (ptr))
+    BYTESTREAM_FINI_BODY(_free);
+#undef _free
 }
 

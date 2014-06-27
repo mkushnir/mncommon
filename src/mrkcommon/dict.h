@@ -47,6 +47,15 @@ typedef int (*dict_traverser_item_t)(dict_t *, dict_item_t *, void *);
 int dict_traverse_item(dict_t *, dict_traverser_item_t, void *);
 int dict_is_empty(dict_t *);
 
+dict_t *dict_new(size_t,
+                 dict_hashfn_t,
+                 dict_item_comparator_t,
+                 dict_item_finalizer_t);
+dict_t *dict_new_mpool(mpool_ctx_t *,
+                       size_t,
+                       dict_hashfn_t,
+                       dict_item_comparator_t,
+                       dict_item_finalizer_t);
 void dict_init(dict_t *,
                size_t,
                dict_hashfn_t,

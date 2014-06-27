@@ -313,6 +313,45 @@ dict_init_mpool(mpool_ctx_t *mpool,
         } \
     }
 
+
+
+dict_t *
+dict_new(size_t sz,
+         dict_hashfn_t hashfn,
+         dict_item_comparator_t cmp,
+         dict_item_finalizer_t fini)
+{
+    dict_t *dict;
+
+    if ((dict = malloc(sizeof(dict_t))) == NULL) {
+        FAIL("malloc");
+    }
+    DICT_INIT_BODY(array_init);
+
+    return dict;
+}
+
+
+dict_t *
+dict_new_mpool(mpool_ctx_t *mpool,
+               size_t sz,
+               dict_hashfn_t hashfn,
+               dict_item_comparator_t cmp,
+               dict_item_finalizer_t fini)
+{
+    dict_t *dict;
+
+    if ((dict = mpool_malloc(mpool, sizeof(dict_t))) == NULL) {
+        FAIL("malloc");
+    }
+#define _array_init(ar, elsz, elnum, init, fini) array_init_mpool(mpool, (ar), (elsz), (elnum), (init), (fini))
+    DICT_INIT_BODY(_array_init);
+#undef _array_init
+
+    return dict;
+}
+
+
 void
 dict_cleanup(dict_t *dict)
 {
