@@ -8,6 +8,7 @@
 
 #include "diag.h"
 
+//#define MPOOL_USE_STD_MALLOC
 
 void
 mpool_ctx_reset(mpool_ctx_t *mpool)
@@ -18,6 +19,9 @@ mpool_ctx_reset(mpool_ctx_t *mpool)
 }
 
 
+#ifdef MPOOL_USE_STD_MALLOC
+UNUSED
+#endif
 static void **
 new_chunk(mpool_ctx_t *mpool, size_t sz)
 {
@@ -43,8 +47,11 @@ new_chunk(mpool_ctx_t *mpool, size_t sz)
 }
 
 void *
-mpool_malloc(mpool_ctx_t *mpool, size_t sz)
+mpool_malloc(UNUSED mpool_ctx_t *mpool, size_t sz)
 {
+#ifdef MPOOL_USE_STD_MALLOC
+    return malloc(sz);
+#else
     size_t sz1;
     struct _mpool_item *res;
 
@@ -58,6 +65,7 @@ mpool_malloc(mpool_ctx_t *mpool, size_t sz)
         chunk = new_chunk(mpool, sz1);
         res = (struct _mpool_item *)*chunk;
         res->sz = sz;
+        (void)new_chunk(mpool, mpool->chunksz);
 
     } else {
         void **chunk;
@@ -75,15 +83,26 @@ mpool_malloc(mpool_ctx_t *mpool, size_t sz)
         res->sz = sz;
         mpool->current_pos += sz1;
     }
-
+//#ifndef NDEBUG
+//    memset(res->data, 0xa5, res->sz);
+//#endif
+    //TRACE("m>>> %p sz=%ld in chunk %d pool %p",
+    //      res->data,
+    //      res->sz,
+    //      mpool->current_chunk,
+    //      mpool);
     return res->data;
+#endif
 }
 
 #define DATA_TO_MPOOL_ITEM(d) ((struct _mpool_item *)(((char *)(d)) - sizeof(size_t)))
 
 void *
-mpool_realloc(mpool_ctx_t *mpool, void *p, size_t sz)
+mpool_realloc(UNUSED mpool_ctx_t *mpool, void *p, size_t sz)
 {
+#ifdef MPOOL_USE_STD_MALLOC
+    return realloc(p, sz);
+#else
     struct _mpool_item *mpi;
 
     if (p == NULL) {
@@ -96,15 +115,31 @@ mpool_realloc(mpool_ctx_t *mpool, void *p, size_t sz)
             pp = mpool_malloc(mpool, sz);
             memcpy(pp, p, mpi->sz);
             p = pp;
+        } else {
+#ifndef NDEBUG
+            memset(mpi->data + sz, 0x5a, mpi->sz - sz);
+#endif
         }
     }
     return p;
+#endif
 }
 
 
 void
 mpool_free(UNUSED mpool_ctx_t *mpool, UNUSED void *o)
 {
+#ifdef MPOOL_USE_STD_MALLOC
+    free(o);
+#else
+    struct _mpool_item *mpi;
+
+    mpi = DATA_TO_MPOOL_ITEM(o);
+#ifndef NDEBUG
+    memset(mpi->data, 0x5a, mpi->sz);
+    //TRACE("f<<< %p", o);
+#endif
+#endif
 }
 
 int
@@ -126,11 +161,12 @@ mpool_ctx_init(mpool_ctx_t *mpool, size_t chunksz)
 void
 mpool_ctx_dump_info(mpool_ctx_t *mpool)
 {
-    TRACE("%ld chunks of %ld bytes chrrent %d/%ld",
+    TRACE("%ld chunks of %ld bytes chrrent %d/%ld last %d",
           mpool->arenasz / sizeof(void *),
           mpool->chunksz,
           mpool->current_chunk,
-          mpool->current_pos);
+          mpool->current_pos,
+          mpool->last_chunk);
 }
 
 

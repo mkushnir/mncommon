@@ -58,6 +58,7 @@ void bytestream_fini(bytestream_t *);
 void bytestream_fini_mpool(mpool_ctx_t *, bytestream_t *);
 
 int bytestream_grow(bytestream_t *, size_t);
+int bytestream_grow_mpool(mpool_ctx_t *, bytestream_t *, size_t);
 
 ssize_t bytestream_read_more(bytestream_t *, int, ssize_t);
 ssize_t bytestream_recv_more(bytestream_t *, int, ssize_t);
@@ -70,7 +71,15 @@ int bytestream_produce_data(bytestream_t *, int);
 void bytestream_rewind(bytestream_t *);
 off_t bytestream_recycle(bytestream_t *, int, off_t);
 int bytestream_nprintf(bytestream_t *, size_t, const char *, ...);
+int bytestream_nprintf_mpool(mpool_ctx_t *,
+                             bytestream_t *,
+                             size_t,
+                             const char *, ...);
 int bytestream_cat(bytestream_t *, size_t, const char *);
+int bytestream_cat_mpool(mpool_ctx_t *,
+                         bytestream_t *,
+                         size_t,
+                         const char *);
 int bytestream_dump(bytestream_t *);
 
 #ifdef __cplusplus
