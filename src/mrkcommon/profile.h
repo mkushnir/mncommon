@@ -29,17 +29,19 @@ void profile_report_sec(void);
 #ifndef NO_PROFILE
 #   define PROFILE_INIT_MODULE() profile_init_module()
 #   define PROFILE_FINI_MODULE() profile_fini_module()
-#   define PROFILE_REGISTER(id, name) profile_register((id), (name))
+#   define PROFILE_REGISTER(name) profile_register((name))
 #   define PROFILE_START(id) profile_start((id))
 #   define PROFILE_STOP(id) profile_stop((id))
 #   define PROFILE_REPORT() profile_report()
+#   define PROFILE_REPORT_SEC() profile_report_sec()
 #else
 #   define PROFILE_INIT_MODULE()
 #   define PROFILE_FINI_MODULE()
-#   define PROFILE_REGISTER(id, name)
+#   define PROFILE_REGISTER(name) profile_register((name))
 #   define PROFILE_START(id)
 #   define PROFILE_STOP(id)
 #   define PROFILE_REPORT()
+#   define PROFILE_REPORT_SEC()
 #endif
 
 #ifdef __cplusplus
