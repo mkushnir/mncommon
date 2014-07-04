@@ -132,7 +132,7 @@ mpool_free(UNUSED mpool_ctx_t *mpool, UNUSED void *o)
 #ifdef MPOOL_USE_STD_MALLOC
     free(o);
 #else
-    struct _mpool_item *mpi;
+    UNUSED struct _mpool_item *mpi;
 
     mpi = DATA_TO_MPOOL_ITEM(o);
 #ifndef NDEBUG
