@@ -70,6 +70,8 @@ int bytestream_consume_data(bytestream_t *, int);
 int bytestream_produce_data(bytestream_t *, int);
 void bytestream_rewind(bytestream_t *);
 off_t bytestream_recycle(bytestream_t *, int, off_t);
+#define BYTESTREAM_NPRINTF_ERROR (-129)
+#define BYTESTREAM_NPRINTF_NEEDNORE (-130)
 int bytestream_nprintf(bytestream_t *, size_t, const char *, ...);
 int bytestream_nprintf_mpool(mpool_ctx_t *,
                              bytestream_t *,

@@ -256,14 +256,17 @@ bytestream_produce_data(bytestream_t *stream, int fd)
                    (need < stream->growsz) ? \
                    stream->growsz : \
                    need) != 0) { \
-            TRRET(BYTESTREAM_NPRINTF + 1); \
+            TRRET(BYTESTREAM_NPRINTF_ERROR); \
         } \
     } \
     va_start(ap, fmt); \
     nused = vsnprintf(SDATA(stream, stream->eod), sz, fmt, ap); \
     va_end(ap); \
+    if (nused > ((ssize_t)sz - 1)) { \
+        TRRET(BYTESTREAM_NPRINTF_NEEDNORE); \
+    } \
     stream->eod += nused; \
-    return 0;
+    return nused;
 
 
 int PRINTFLIKE(3, 4)
@@ -295,12 +298,12 @@ bytestream_nprintf_mpool(mpool_ctx_t *mpool,
                    (need < stream->growsz) ? \
                    stream->growsz : \
                    need) != 0) { \
-            TRRET(BYTESTREAM_CAT + 1); \
+            TRRET(-127); \
         } \
     } \
     memcpy(SDATA(stream, stream->eod), data, sz); \
     stream->eod += sz; \
-    return 0;
+    return (int)sz;
 
 
 int
