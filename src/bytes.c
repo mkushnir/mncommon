@@ -34,6 +34,50 @@ strrstr(const char *big, const char *little)
 }
 
 
+int
+bytes_startswith(const bytes_t *big, const bytes_t *small)
+{
+    int res;
+
+    res = 0;
+    if (big->sz >= small->sz) {
+        size_t i;
+
+        for (i = 0; i < small->sz; ++i) {
+            if (big->data[i] != small->data[i]) {
+                goto end;
+            }
+        }
+        res = 1;
+    }
+
+end:
+    return res;
+}
+
+
+int
+bytes_endswith(const bytes_t *big, const bytes_t *small)
+{
+    int res;
+
+    res = 0;
+    if (big->sz >= small->sz) {
+        ssize_t i;
+
+        for (i = (ssize_t)small->sz - 1; i >= 0; --i) {
+            if (big->data[i] != small->data[i]) {
+                goto end;
+            }
+        }
+        res = 1;
+    }
+
+end:
+    return res;
+}
+
+
 bytes_t *
 bytes_json_escape(bytes_t *src)
 {

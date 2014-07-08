@@ -65,6 +65,8 @@ void bytes_copy(bytes_t *, bytes_t *, size_t);
 void bytes_brushdown(bytes_t *);
 void bytes_urldecode(bytes_t *);
 bytes_t *bytes_json_escape(bytes_t *);
+int bytes_startswith(const bytes_t *, const bytes_t *);
+int bytes_endswith(const bytes_t *, const bytes_t *);
 
 #ifdef __cplusplus
 }
