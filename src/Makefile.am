@@ -96,6 +96,11 @@ mpool_sources = mpool.c
 mpool_include_headers = mrkcommon/mpool.h
 endif
 
+if BYTES
+bytes_sources = bytes.c
+bytes_include_headers = mrkcommon/bytes.h
+endif
+
 nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(util_include_headers) \
 			 $(array_include_headers) \
@@ -113,7 +118,8 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(stqueue_include_headers) \
 			 $(dtqueue_include_headers) \
 			 $(memdebug_include_headers) \
-			 $(mpool_include_headers)
+			 $(mpool_include_headers) \
+			 $(bytes_include_headers)
 
 libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(array_sources) \
@@ -131,7 +137,8 @@ libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(stqueue_sources) \
 			  $(dtqueue_sources) \
 			  $(memdebug_sources) \
-			  $(mpool_sources)
+			  $(mpool_sources) \
+			  $(bytes_sources)
 
 nodist_libmrkcommon_la_SOURCES = diag.c
 

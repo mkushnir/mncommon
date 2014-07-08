@@ -224,6 +224,13 @@ AC_ARG_ENABLE(mpool,
               [AM_CONDITIONAL([MPOOL], [enable_mpool=yes])],
              )
 
+AC_ARG_ENABLE(bytes,
+              AC_HELP_STRING([--enable-bytes],
+                             [Enable bytes (default=yes)]),
+              [AM_CONDITIONAL([BYTES], [test "$enable_bytes" = "yes"])],
+              [AM_CONDITIONAL([BYTES], [enable_bytes=yes])],
+             )
+
 if test "$enable_profile" = "yes" -a "$enable_list" != "yes"
 then
     echo "ERROR: cannot disable the list feature because the profile feature requires it."
