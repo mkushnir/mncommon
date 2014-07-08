@@ -105,10 +105,61 @@ test1(void)
 
 }
 
+
+static void
+test2(void)
+{
+    struct {
+        long rnd;
+        const char *in1;
+        const char *in2;
+        int expected;
+    } data[] = {
+        {0, "This is the test", "This", 1},
+        {0, "This is the test", "ThiS", 0},
+        {0, "This is the test", "This is the test", 1},
+        {0, "This is the test", "This is the test?", 0},
+        {0, "This is the test", "", 1},
+    };
+    UNITTEST_PROLOG;
+
+    FOREACHDATA {
+        TRACE("startswith '%s', '%s'   expected=%d", CDATA.in1, CDATA.in2, CDATA.expected);
+        assert(bytes_startswith(bytes_new_from_str(CDATA.in1), bytes_new_from_str(CDATA.in2)) == CDATA.expected);
+    }
+}
+
+
+static void
+test3(void)
+{
+    struct {
+        long rnd;
+        const char *in1;
+        const char *in2;
+        int expected;
+    } data[] = {
+        {0, "This is the test", "test", 1},
+        {0, "This is the test", "tesT", 0},
+        {0, "This is the test", "This is the test", 1},
+        {0, "This is the test", "This is the test?", 0},
+        {0, "This is the test", "", 1},
+    };
+    UNITTEST_PROLOG;
+
+    FOREACHDATA {
+        TRACE("startswith '%s', '%s'   expected=%d", CDATA.in1, CDATA.in2, CDATA.expected);
+        assert(bytes_endswith(bytes_new_from_str(CDATA.in1), bytes_new_from_str(CDATA.in2)) == CDATA.expected);
+    }
+}
+
+
 int
 main(void)
 {
     test0();
     test1();
+    test2();
+    test3();
     return 0;
 }

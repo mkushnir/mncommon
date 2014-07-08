@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <mrkcommon/bytes.h>
+#include <mrkcommon/dumpm.h>
 #include <mrkcommon/fasthash.h>
 #include <mrkcommon/mpool.h>
 #include <mrkcommon/util.h>
@@ -43,7 +44,7 @@ bytes_startswith(const bytes_t *big, const bytes_t *small)
     if (big->sz >= small->sz) {
         size_t i;
 
-        for (i = 0; i < small->sz; ++i) {
+        for (i = 0; i < small->sz && small->data[i] != '\0'; ++i) {
             if (big->data[i] != small->data[i]) {
                 goto end;
             }
@@ -63,10 +64,12 @@ bytes_endswith(const bytes_t *big, const bytes_t *small)
 
     res = 0;
     if (big->sz >= small->sz) {
-        ssize_t i;
+        ssize_t i, j;
 
-        for (i = (ssize_t)small->sz - 1; i >= 0; --i) {
-            if (big->data[i] != small->data[i]) {
+        for (i = (ssize_t)small->sz - 2, j = (ssize_t)big->sz - 2;
+             i >= 0;
+             --i, --j) {
+            if (big->data[j] != small->data[i]) {
                 goto end;
             }
         }
@@ -273,7 +276,7 @@ bytes_urldecode(bytes_t *str)
                 *dst = (*src - '7') << 4;
                 //TRACE("*dst='%02hhd'", *dst);
             } else if (*src >= 'a' && *src <= 'f') {
-                *dst = (*src - 'w') << 4;
+                *dst = (*src - 'W') << 4;
                 //TRACE("*dst='%02hhd'", *dst);
             } else {
                 /* ignore invalid sequence */
@@ -286,7 +289,7 @@ bytes_urldecode(bytes_t *str)
                 *dst |= (*src - '7');
                 //TRACE("*dst='%02hhd'", *dst);
             } else if (*src >= 'a' && *src <= 'f') {
-                *dst |= (*src - 'w');
+                *dst |= (*src - 'W');
                 //TRACE("*dst='%02hhd'", *dst);
             } else {
                 /* ignore invalid sequence */
@@ -326,7 +329,7 @@ bytes_brushdown(bytes_t *str)
                 *dst = (*src - '7') << 4;
                 //TRACE("*dst='%02hhd'", *dst);
             } else if (*src >= 'a' && *src <= 'f') {
-                *dst = (*src - 'w') << 4;
+                *dst = (*src - 'W') << 4;
                 //TRACE("*dst='%02hhd'", *dst);
             } else {
                 /* ignore invalid sequence */
@@ -339,7 +342,7 @@ bytes_brushdown(bytes_t *str)
                 *dst |= (*src - '7');
                 //TRACE("*dst='%02hhd'", *dst);
             } else if (*src >= 'a' && *src <= 'f') {
-                *dst |= (*src - 'w');
+                *dst |= (*src - 'W');
                 //TRACE("*dst='%02hhd'", *dst);
             } else {
                 /* ignore invalid sequence */
