@@ -3,8 +3,6 @@
 
 #include <sys/types.h>
 
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/fasthash.h>
 #include <mrkcommon/mpool.h>
 
 #ifdef __cplusplus
