@@ -53,6 +53,7 @@ void *array_incr_mpool(mpool_ctx_t *, array_t *);
 void *array_incr_iter(array_t *, array_iter_t *);
 void *array_incr_iter_mpool(mpool_ctx_t *, array_t *, array_iter_t *);
 int array_decr(array_t *);
+int array_decr_fast(array_t *);
 int array_decr_mpool(mpool_ctx_t *, array_t *);
 int array_fini(array_t *);
 int array_fini_mpool(mpool_ctx_t *mpool, array_t *);

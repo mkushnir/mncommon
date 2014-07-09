@@ -81,6 +81,13 @@ end:
 }
 
 
+int
+bytes_isempty(const bytes_t *s)
+{
+    return s == NULL || (s->sz == 1 && *s->data == '\0') || s->sz == 0;
+}
+
+
 bytes_t *
 bytes_json_escape(bytes_t *src)
 {

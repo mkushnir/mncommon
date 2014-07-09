@@ -319,6 +319,19 @@ array_incr_iter_mpool(mpool_ctx_t *mpool, array_t *ar, array_iter_t *it)
 }
 
 int
+array_decr_fast(array_t *ar)
+{
+    if (!ar->elnum) {
+        TRRET(ARRAY_DECR_FAST + 1);
+    }
+    --ar->elnum;
+    if (ar->fini != NULL) {
+        (void)ar->fini(ar->data + ar->elnum * ar->elsz);
+    }
+    return 0;
+}
+
+int
 array_decr(array_t *ar)
 {
     if (array_ensure_len(ar, ar->elnum - 1, ARRAY_FLAG_SAVE) != 0) {
