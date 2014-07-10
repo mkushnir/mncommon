@@ -82,7 +82,7 @@ end:
 
 
 int
-bytes_isempty(const bytes_t *s)
+bytes_is_null_or_empty(const bytes_t *s)
 {
     return s == NULL || (s->sz == 1 && *s->data == '\0') || s->sz == 0;
 }
