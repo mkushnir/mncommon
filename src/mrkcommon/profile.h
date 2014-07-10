@@ -37,7 +37,7 @@ void profile_report_sec(void);
 #else
 #   define PROFILE_INIT_MODULE()
 #   define PROFILE_FINI_MODULE()
-#   define PROFILE_REGISTER(name) profile_register((name))
+#   define PROFILE_REGISTER(name) (NULL)
 #   define PROFILE_START(id)
 #   define PROFILE_STOP(id)
 #   define PROFILE_REPORT()
