@@ -1,6 +1,7 @@
 #ifndef MRKCOMMON_BYTES_H_DEFINED
 #define MRKCOMMON_BYTES_H_DEFINED
 
+#include <stdint.h>
 #include <sys/types.h>
 
 #include <mrkcommon/mpool.h>
