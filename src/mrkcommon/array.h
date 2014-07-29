@@ -44,6 +44,8 @@ int array_ensure_len(array_t *, size_t, unsigned int);
 int array_ensure_len_mpool(mpool_ctx_t *, array_t *, size_t, unsigned int);
 void *array_get(const array_t *, unsigned);
 #define ARRAY_GET(ty, a, i) (((ty *)((a)->data)) + i)
+void *array_get_safe(array_t *, unsigned);
+void *array_get_safe_mpool(mpool_ctx_t *, array_t *, unsigned);
 int array_index(const array_t *, void *);
 void array_copy(array_t *, const array_t *);
 void *array_get_iter(const array_t *, array_iter_t *);

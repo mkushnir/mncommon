@@ -166,6 +166,35 @@ array_get(const array_t *ar, unsigned idx)
     return NULL;
 }
 
+void *
+array_get_safe(array_t *ar, unsigned idx)
+{
+    if (idx < ar->elnum) {
+        return ar->data + ar->elsz * idx;
+    }
+    array_ensure_len(ar,
+                     ar->elnum ? ar->elnum * 2 : 1,
+                     ARRAY_FLAG_SAVE);
+    assert(idx < ar->elnum);
+    return ar->data + ar->elsz * idx;
+}
+
+
+void *
+array_get_safe_mpool(mpool_ctx_t *mpool, array_t *ar, unsigned idx)
+{
+    if (idx < ar->elnum) {
+        return ar->data + ar->elsz * idx;
+    }
+    array_ensure_len_mpool(mpool,
+                           ar,
+                           ar->elnum ? ar->elnum * 2 : 1,
+                           ARRAY_FLAG_SAVE);
+    assert(idx < ar->elnum);
+    return ar->data + ar->elsz * idx;
+}
+
+
 int
 array_index(const array_t *ar, void *item)
 {
