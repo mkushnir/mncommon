@@ -20,6 +20,7 @@ typedef struct _array {
     size_t elsz;
     size_t elnum;
     void *data;
+    size_t datasz;
     array_initializer_t init;
     array_finalizer_t fini;
     array_compar_t compar;
@@ -42,6 +43,8 @@ int array_init_mpool(mpool_ctx_t *,
 #define ARRAY_FLAG_SAVE 0x01
 int array_ensure_len(array_t *, size_t, unsigned int);
 int array_ensure_len_mpool(mpool_ctx_t *, array_t *, size_t, unsigned int);
+void array_ensure_datasz(array_t *, size_t, unsigned int);
+void array_ensure_datasz_mpool(mpool_ctx_t *, array_t *, size_t, unsigned int);
 void *array_get(const array_t *, unsigned);
 #define ARRAY_GET(ty, a, i) (((ty *)((a)->data)) + i)
 void *array_get_safe(array_t *, unsigned);
