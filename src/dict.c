@@ -27,33 +27,22 @@ null_init(void **v)
     if ((pdit = array_get(&dict->table, idx)) == NULL) { \
         FAIL("array_get"); \
     } \
+    if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) { \
+        FAIL("malloc_fn"); \
+    } \
+    dit->bucket = pdit; \
+    dit->prev = NULL; \
     if (*pdit == NULL) { \
-        if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) { \
-            FAIL("malloc_fn"); \
-        } \
-        dit->bucket = pdit; \
-        dit->prev = NULL; \
         dit->next = NULL; \
-        dit->key = key; \
-        dit->value = value; \
-        *pdit = dit; \
     } else { \
-        dit = *pdit; \
-        /* move to last */ \
-        while (dit->next != NULL) { \
-            dit = dit->next; \
-        } \
-        if ((dit->next = malloc_fn(sizeof(dict_item_t))) == NULL) { \
-            FAIL("malloc_fn"); \
-        } \
-        dit->next->bucket = NULL; \
-        dit->next->prev = dit; \
-        dit->next->next = NULL; \
-        dit->next->key = key; \
-        dit->next->value = value; \
-    }
-
-
+        /* insert before the first */ \
+        dit->next = *pdit; \
+        (*pdit)->prev = dit; \
+        (*pdit)->bucket = NULL; \
+    } \
+    dit->key = key; \
+    dit->value = value; \
+    *pdit = dit;
 
 void
 dict_set_item(dict_t *dict, void *key, void *value)
@@ -66,6 +55,74 @@ dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
 {
 #define _malloc(sz) mpool_malloc(mpool, (sz))
     DICT_SET_ITEM_BODY(_malloc);
+#undef _malloc
+}
+
+#define DICT_SET_ITEM_UNIQ_BODY(malloc_fn) \
+    uint64_t idx; \
+    assert(oldkey != NULL); \
+    assert(oldvalue != NULL); \
+    dict_item_t **pdit, *dit; \
+    idx = dict->hashfn(key) % dict->sz; \
+    if ((pdit = array_get(&dict->table, idx)) == NULL) { \
+        FAIL("array_get"); \
+    } \
+    if (*pdit == NULL) { \
+        if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) { \
+            FAIL("malloc_fn"); \
+        } \
+        dit->bucket = pdit; \
+        dit->prev = NULL; \
+        dit->next = NULL; \
+        dit->key = key; \
+        dit->value = value; \
+        *pdit = dit; \
+    } else { \
+        for (dit = *pdit; dit != NULL; dit = dit->next) { \
+            if (dict->cmp(key, dit->key) == 0) { \
+                if (dict->fini != NULL) { \
+                    dict->fini(dit->key, dit->value); \
+                } \
+                *oldkey = dit->key; \
+                dit->key = key; \
+                *oldvalue = dit->value; \
+                dit->value = value; \
+                return; \
+            } \
+        } \
+        if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) { \
+            FAIL("malloc_fn"); \
+        } \
+        dit->next = *pdit; \
+        (*pdit)->prev = dit; \
+        (*pdit)->bucket = NULL; \
+        dit->key = key; \
+        dit->value = value; \
+        *pdit = dit; \
+    } \
+    *oldkey = NULL; \
+    *oldvalue = NULL; \
+
+void
+dict_set_item_uniq(dict_t *dict,
+                   void *key,
+                   void *value,
+                   void **oldkey,
+                   void **oldvalue)
+{
+    DICT_SET_ITEM_UNIQ_BODY(malloc);
+}
+
+void
+dict_set_item_uniq_mpool(mpool_ctx_t *mpool,
+                         dict_t *dict,
+                         void *key,
+                         void *value,
+                         void **oldkey,
+                         void **oldvalue)
+{
+#define _malloc(sz) mpool_malloc(mpool, (sz))
+    DICT_SET_ITEM_UNIQ_BODY(_malloc);
 #undef _malloc
 }
 
@@ -238,9 +295,7 @@ dict_is_empty(dict_t *dict)
          pdit != NULL;
          pdit = array_next(&dict->table, &it)) {
 
-        dict_item_t *dit;
-
-        for (dit = *pdit; dit != NULL; dit = dit->next) {
+        if (*pdit != NULL) {
             return 0;
         }
     }

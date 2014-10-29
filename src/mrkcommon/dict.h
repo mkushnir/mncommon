@@ -36,6 +36,17 @@ typedef struct _dict {
 
 void dict_set_item(dict_t *, void *, void *);
 void dict_set_item_mpool(mpool_ctx_t *, dict_t *, void *, void *);
+void dict_set_item_uniq(dict_t *dict,
+                        void *key,
+                        void *value,
+                        void **oldkey,
+                        void **oldvalue);
+void dict_set_item_uniq_mpool(mpool_ctx_t *mpool,
+                              dict_t *dict,
+                              void *key,
+                              void *value,
+                              void **oldkey,
+                              void **oldvalue);
 dict_item_t *dict_get_item(dict_t *, void *);
 void *dict_remove_item(dict_t *, void *);
 void *dict_remove_item_mpool(mpool_ctx_t *, dict_t *, void *);
