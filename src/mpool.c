@@ -117,7 +117,7 @@ mpool_realloc(UNUSED mpool_ctx_t *mpool, void *p, size_t sz)
             p = pp;
         } else {
 #ifndef NDEBUG
-            memset(mpi->data + sz, 0x5a, mpi->sz - sz);
+            memset(mpi->data + sz, 0xa5, mpi->sz - sz);
 #endif
         }
     }
@@ -158,15 +158,43 @@ mpool_ctx_init(mpool_ctx_t *mpool, size_t chunksz)
 }
 
 
+static void
+mpool_ctx_chunk_dump_info(mpool_ctx_t *mpool)
+{
+    size_t i;
+
+    for (i = 0; i < (mpool->arenasz / sizeof(void *)); ++i) {
+        char *chunk;
+        size_t j;
+
+        TRACE(" chunk %ld", i);
+        chunk = mpool->arena[i];
+
+        for (j = 0; j < mpool->chunksz;) {
+            struct _mpool_item *mpi;
+            size_t sz0, sz1;
+
+            mpi = (struct _mpool_item *)(chunk + j);
+            TRACE("  item %p sz %ld", mpi, mpi->sz);
+            sz0 = mpi->sz + 8 - (mpi->sz % 8);
+            sz1 = sz0 + sizeof(struct _mpool_item);
+            j += sz1;
+        }
+
+    }
+}
+
+
 void
 mpool_ctx_dump_info(mpool_ctx_t *mpool)
 {
-    TRACE("%ld chunks of %ld bytes chrrent %d/%ld last %d",
+    TRACE("%ld chunks of %ld bytes current %d/%ld last %d",
           mpool->arenasz / sizeof(void *),
           mpool->chunksz,
           mpool->current_chunk,
           mpool->current_pos,
           mpool->last_chunk);
+    mpool_ctx_chunk_dump_info(mpool);
 }
 
 
