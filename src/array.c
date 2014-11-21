@@ -270,31 +270,44 @@ array_get(const array_t *ar, unsigned idx)
 void *
 array_get_safe(array_t *ar, unsigned idx)
 {
+    size_t datasz;
+
     if (idx < ar->elnum) {
         return ar->data + ar->elsz * idx;
     }
-    array_ensure_datasz(ar,
-                        ar->elnum ? ar->elnum * 2 : 1,
-                        ARRAY_FLAG_SAVE);
-    ar->elnum = idx + 1;
+
+    datasz = ar->elsz * idx;
+
+    if (datasz < ar->datasz) {
+        array_ensure_datasz(ar,
+                            ar->elnum ? ar->elnum * 2 : 1,
+                            ARRAY_FLAG_SAVE);
+    }
     assert((ar->elsz * idx) < ar->datasz);
-    return ar->data + ar->elsz * idx;
+    ar->elnum = idx + 1;
+    return ar->data + datasz;
 }
 
 
 void *
 array_get_safe_mpool(mpool_ctx_t *mpool, array_t *ar, unsigned idx)
 {
+    size_t datasz;
+
     if (idx < ar->elnum) {
         return ar->data + ar->elsz * idx;
     }
-    array_ensure_datasz_mpool(mpool,
-                              ar,
-                              ar->elnum ? ar->elnum * 2 : 1,
-                              ARRAY_FLAG_SAVE);
-    ar->elnum = idx + 1;
+
+    datasz = ar->elsz * idx;
+    if (datasz < ar->datasz) {
+        array_ensure_datasz_mpool(mpool,
+                                  ar,
+                                  ar->elnum ? ar->elnum * 2 : 1,
+                                  ARRAY_FLAG_SAVE);
+    }
     assert((ar->elsz * idx) < ar->datasz);
-    return ar->data + ar->elsz * idx;
+    ar->elnum = idx + 1;
+    return ar->data + datasz;
 }
 
 
