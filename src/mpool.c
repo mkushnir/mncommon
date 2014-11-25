@@ -132,13 +132,15 @@ mpool_free(UNUSED mpool_ctx_t *mpool, UNUSED void *o)
 #ifdef MPOOL_USE_STD_MALLOC
     free(o);
 #else
-    UNUSED struct _mpool_item *mpi;
-
-    mpi = DATA_TO_MPOOL_ITEM(o);
 #ifndef NDEBUG
-    memset(mpi->data, 0x5a, mpi->sz);
-    //TRACE("f<<< %p", o);
+    if (o != NULL) {
+        UNUSED struct _mpool_item *mpi;
+
+        mpi = DATA_TO_MPOOL_ITEM(o);
+        memset(mpi->data, 0x5a, mpi->sz);
+        //TRACE("f<<< %p", o);
 #endif
+    }
 #endif
 }
 
