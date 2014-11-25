@@ -27,3 +27,5 @@ stamp-h1
 *.[ao]
 *.core
 diag.[ch]
+compile
+src/.dirstamp
