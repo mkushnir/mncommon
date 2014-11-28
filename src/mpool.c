@@ -139,9 +139,9 @@ mpool_free(UNUSED mpool_ctx_t *mpool, UNUSED void *o)
         mpi = DATA_TO_MPOOL_ITEM(o);
         memset(mpi->data, 0x5a, mpi->sz);
         //TRACE("f<<< %p", o);
-#endif
     }
-#endif
+#endif /* NDEBUG */
+#endif /* MPOOL_USE_STD_MALLOC */
 }
 
 int
