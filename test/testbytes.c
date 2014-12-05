@@ -163,11 +163,40 @@ test4(void)
         int expected;
     } data[] = {
         {0, "This is the test", 1},
+        {0, "This is another the test", 1},
+        {0, "This is another the test1", 1},
+        {0, "This is another the test12", 1},
+        {0, "This is another the test123", 1},
+        {0, "This is another the test1234", 1},
+        {0, "This is another the test12345", 1},
+        {0, "This is another the test123456", 1},
+        {0, "This is another the test1234567", 1},
+        {0, "This is another the test12345678", 1},
+        {0, "This is another the \x81 test12345678", 0},
+        {0, "This is another the test\x91", 0},
+        {0, "This is another the test1\x91", 0},
+        {0, "This is another the test12\x91", 0},
+        {0, "This is another the test123\x91", 0},
+        {0, "This is another the test1234\x91", 0},
+        {0, "This is another the test12345\x91", 0},
+        {0, "This is another the test123456\x91", 0},
+        {0, "This is another the test1234567\x91", 0},
+        {0, "This is another the test12345678\x91", 0},
+        {0, "This is another the test\x91................", 0},
+        {0, "This is another the test1\x91................", 0},
+        {0, "This is another the test12\x91................", 0},
+        {0, "This is another the test123\x91................", 0},
+        {0, "This is another the test1234\x91................", 0},
+        {0, "This is another the test12345\x91................", 0},
+        {0, "This is another the test123456\x91................", 0},
+        {0, "This is another the test1234567\x91................", 0},
+        {0, "This is another the test12345678\x91................", 0},
     };
     UNITTEST_PROLOG;
 
     FOREACHDATA {
-        assert(bytes_is_ascii(bytes_new_from_str(CDATA.in)) == CDATA.expected)
+        TRACE("testing %s", CDATA.in);
+        assert(bytes_is_ascii(bytes_new_from_str(CDATA.in)) == CDATA.expected);
     }
 }
 

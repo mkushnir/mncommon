@@ -68,7 +68,7 @@ testdict_LDFLAGS =
 
 testfasthash_SOURCES = ../src/fasthash.c zltan-fasthash.c testfasthash.c
 testfasthash_CFLAGS =
-testfasthash_LDFLAGS =
+testfasthash_LDFLAGS = -lz
 
 testlogging_SOURCES = ../src/logging.c testlogging.c
 testlogging_CFLAGS =

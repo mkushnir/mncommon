@@ -139,16 +139,15 @@ bytes_is_ascii(bytes_t *s)
         uint64_t *n;
 
         n = (uint64_t *)(s->data + i);
-        if (n & 0x8080808080808080) {
+        if (*n & 0x8080808080808080) {
             return 0;
         }
     }
 
-    while (mod > 0) {
-        if (s->data[i * sizeof(uint64_t) + mod] & 0x08) {
+    while (--mod >= 0) {
+        if (s->data[i + mod] & 0x80) {
             return 0;
         }
-        --mod;
     }
     return 1;
 }

@@ -5,8 +5,11 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <zlib.h>
+
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/trie.h>
+#include <mrkcommon/bytes.h>
 #include <mrkcommon/util.h>
 #include <mrkcommon/fasthash.h>
 
@@ -20,6 +23,7 @@ const char *_malloc_options = "AJ";
 #endif
 
 static uint64_t randmod = 0ul;
+static int genrandom = 0;
 
 //#define SEED (17337407878196250699ul)
 //#define SEED (0x2127599bf4325c37ULL)
@@ -27,6 +31,8 @@ static uint64_t randmod = 0ul;
 #define SEED (0)
 
 //#define fasthash(seed, s, sz) fasthash64((const void *)(s), sz, seed)
+//#define fasthash(seed, s, sz) (uint64_t)adler32((uLong)seed, (const Bytef *)(s), (uInt)sz)
+#define fasthash(seed, s, sz) (uint64_t)crc32((uLong)seed, (const Bytef *)(s), (uInt)sz)
 
 
 static int
@@ -83,10 +89,10 @@ test1(const char *fname)
 
         hash = fasthash(SEED, (unsigned char *)buf, sz);
         if (randmod) {
-            printf("%ld\n", hash % randmod);
+            //printf("%ld\n", hash % randmod);
             free(buf);
         } else {
-            printf("%016lx %s\n", hash, buf);
+            //printf("%016lx %s\n", hash, buf);
             if ((trn = trie_find_exact(&tr, hash)) != NULL) {
                 TRACE("collision: %016lx\n%s\n%s\n", hash, buf, (char *)(trn->value));
                 free(buf);
@@ -103,17 +109,114 @@ test1(const char *fname)
 
 }
 
+static void
+test_one_bytes(trie_t *tr, bytes_t *s)
+{
+    uint64_t hash;
+    trie_node_t *trn;
+
+    hash = fasthash(SEED, s->data, s->sz);
+    if (randmod) {
+        //printf("%ld\n", hash % randmod);
+    } else {
+        //printf("%016lx\n", hash);
+        if ((trn = trie_find_exact(tr, hash)) != NULL) {
+            UNUSED bytes_t *ss;
+
+            TRACE("collision: %016lx\n", hash);
+            //ss = trn->value;
+            //D32(ss->data, ss->sz);
+            //TRACE();
+            //D32(s->data, s->sz);
+
+        } else {
+            trn = trie_add_node(tr, hash);
+            trn->value = s;
+        }
+    }
+}
+
+UNUSED static void
+test_bytes(bytes_t **data, size_t sz)
+{
+    size_t i;
+    trie_t tr;
+
+    trie_init(&tr);
+
+    for (i = 0; i < sz; ++i) {
+        test_one_bytes(&tr, data[i]);
+    }
+
+    trie_fini(&tr);
+}
+
+
+#define N 200000
+#define MAXSZ 327680
+#define MINSZ 64
+static void
+test2(void)
+{
+    trie_t tr;
+    int i;
+    bytes_t *s;
+
+    trie_init(&tr);
+
+    srandom(time(NULL));
+
+    for (i = 0; i < N; ++i) {
+        size_t sz, j;
+
+        sz = (random() % (MAXSZ - MINSZ)) + MINSZ;
+        s = bytes_new(sz);
+
+        for (j = 0; j < sz; j += 4) {
+            uint32_t *n;
+
+            n = (uint32_t *)(s->data + j);
+            *n = (uint32_t)random();
+        }
+        //D8(s->data, s->sz);
+
+        test_one_bytes(&tr, s);
+
+        bytes_decref(&s);
+    }
+
+    //TRACE("bytes are now ready");
+    //test_bytes(data, N);
+    //TRACE("test finished");
+
+    //for (i = 0; i < N; ++i) {
+    //    if (data[i] != NULL) {
+    //        bytes_decref(&data[i]);
+    //    }
+    //}
+
+    //free(data);
+
+    trie_fini(&tr);
+}
+
+
 int
 main(int argc, char **argv)
 {
     char *fname = NULL;
     int ch;
 
-    while ((ch = getopt(argc, argv, "r:")) != -1) {
+    while ((ch = getopt(argc, argv, "r:R")) != -1) {
         switch (ch) {
         case 'r':
             randmod = strtol(optarg, NULL, 10);
             break;
+
+        case 'R':
+            genrandom = 1;
+            break;
+
         default:
             break;
         }
@@ -123,12 +226,16 @@ main(int argc, char **argv)
     argv += (optind);
     TRACE("optind=%d argc=%d", optind, argc);
 
-    if (argc >= 2) {
-        fname = argv[1];
+    if (argc >= 1) {
+        fname = argv[0];
     }
 
     if (fname == NULL) {
-        test0();
+        if (genrandom) {
+            test2();
+        } else {
+            test0();
+        }
     } else {
         test1(fname);
     }
