@@ -154,6 +154,24 @@ test3(void)
 }
 
 
+static void
+test4(void)
+{
+    struct {
+        long rnd;
+        const char *in;
+        int expected;
+    } data[] = {
+        {0, "This is the test", 1},
+    };
+    UNITTEST_PROLOG;
+
+    FOREACHDATA {
+        assert(bytes_is_ascii(bytes_new_from_str(CDATA.in)) == CDATA.expected)
+    }
+}
+
+
 int
 main(void)
 {
@@ -161,5 +179,6 @@ main(void)
     test1();
     test2();
     test3();
+    test4();
     return 0;
 }

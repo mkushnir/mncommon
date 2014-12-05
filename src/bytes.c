@@ -126,6 +126,34 @@ bytes_json_escape(bytes_t *src)
 }
 
 
+int
+bytes_is_ascii(bytes_t *s)
+{
+    size_t i, sz;
+    char mod;
+
+    mod = s->sz % sizeof(uint64_t);
+    sz = s->sz - mod;
+
+    for (i = 0; i < sz; i += sizeof(uint64_t)) {
+        uint64_t *n;
+
+        n = (uint64_t *)(s->data + i);
+        if (n & 0x8080808080808080) {
+            return 0;
+        }
+    }
+
+    while (mod > 0) {
+        if (s->data[i * sizeof(uint64_t) + mod] & 0x08) {
+            return 0;
+        }
+        --mod;
+    }
+    return 1;
+}
+
+
 uint64_t
 bytes_hash(bytes_t *bytes)
 {
