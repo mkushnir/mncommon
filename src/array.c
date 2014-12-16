@@ -276,16 +276,16 @@ array_get_safe(array_t *ar, unsigned idx)
         return ar->data + ar->elsz * idx;
     }
 
-    datasz = ar->elsz * idx;
+    datasz = ar->elsz * (idx + 1);
 
-    if (datasz < ar->datasz) {
+    if (datasz > ar->datasz) {
         array_ensure_datasz(ar,
                             ar->elnum ? ar->elnum * 2 : 1,
                             ARRAY_FLAG_SAVE);
     }
     assert((ar->elsz * idx) < ar->datasz);
     ar->elnum = idx + 1;
-    return ar->data + datasz;
+    return ar->data + ar->elsz * idx;
 }
 
 
@@ -298,8 +298,8 @@ array_get_safe_mpool(mpool_ctx_t *mpool, array_t *ar, unsigned idx)
         return ar->data + ar->elsz * idx;
     }
 
-    datasz = ar->elsz * idx;
-    if (datasz < ar->datasz) {
+    datasz = ar->elsz * (idx + 1);
+    if (datasz > ar->datasz) {
         array_ensure_datasz_mpool(mpool,
                                   ar,
                                   ar->elnum ? ar->elnum * 2 : 1,
@@ -307,7 +307,7 @@ array_get_safe_mpool(mpool_ctx_t *mpool, array_t *ar, unsigned idx)
     }
     assert((ar->elsz * idx) < ar->datasz);
     ar->elnum = idx + 1;
-    return ar->data + datasz;
+    return ar->data + ar->elsz * idx;
 }
 
 

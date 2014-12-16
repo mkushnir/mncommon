@@ -52,10 +52,12 @@ mpool_malloc(UNUSED mpool_ctx_t *mpool, size_t sz)
 #ifdef MPOOL_USE_STD_MALLOC
     return malloc(sz);
 #else
+    int mod;
     size_t sz1;
     struct _mpool_item *res;
 
-    sz = sz + 8 - (sz % 8);
+    mod = sz % 8;
+    sz += mod ? (8 - mod) : 0;
     sz1 = sz + sizeof(struct _mpool_item);
 
     if (sz1 > mpool->chunksz) {
@@ -83,9 +85,9 @@ mpool_malloc(UNUSED mpool_ctx_t *mpool, size_t sz)
         res->sz = sz;
         mpool->current_pos += sz1;
     }
-//#ifndef NDEBUG
-//    memset(res->data, 0xa5, res->sz);
-//#endif
+#ifndef NDEBUG
+    memset(res->data, 0xa5, res->sz);
+#endif
     //TRACE("m>>> %p sz=%ld in chunk %d pool %p",
     //      res->data,
     //      res->sz,
