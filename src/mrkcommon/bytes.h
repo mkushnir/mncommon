@@ -65,6 +65,7 @@ int bytes_cmp(bytes_t *, bytes_t *);
 void bytes_copy(bytes_t *, bytes_t *, size_t);
 void bytes_brushdown(bytes_t *);
 void bytes_urldecode(bytes_t *);
+bytes_t *bytes_set_lower(bytes_t *s);
 bytes_t *bytes_json_escape(bytes_t *);
 int bytes_is_ascii(bytes_t *);
 int bytes_startswith(const bytes_t *, const bytes_t *);

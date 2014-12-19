@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -152,6 +153,19 @@ bytes_is_ascii(bytes_t *s)
     return 1;
 }
 
+
+bytes_t *
+bytes_set_lower(bytes_t *s)
+{
+    ssize_t sz;
+
+    s->hash = 0;
+    sz = s->sz;
+    while (--sz >= 0) {
+        s->data[sz] = (unsigned char)tolower((int)s->data[sz]);
+    }
+    return s;
+}
 
 uint64_t
 bytes_hash(bytes_t *bytes)
