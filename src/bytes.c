@@ -306,6 +306,15 @@ bytes_copy(bytes_t *dst, bytes_t *src, size_t off)
 
 
 void
+bytes_copyz(bytes_t *dst, bytes_t *src, size_t off)
+{
+    assert((off + src->sz - 1) <= dst->sz);
+    memcpy(dst->data + off, src->data, src->sz - 1);
+    *(dst->data + off + src->sz - 1) = '\0';
+}
+
+
+void
 bytes_urldecode(bytes_t *str)
 {
     unsigned char *src, *dst;

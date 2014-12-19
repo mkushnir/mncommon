@@ -63,6 +63,7 @@ void bytes_decref_fast(bytes_t *);
 uint64_t bytes_hash(bytes_t *);
 int bytes_cmp(bytes_t *, bytes_t *);
 void bytes_copy(bytes_t *, bytes_t *, size_t);
+void bytes_copyz(bytes_t *, bytes_t *, size_t);
 void bytes_brushdown(bytes_t *);
 void bytes_urldecode(bytes_t *);
 bytes_t *bytes_set_lower(bytes_t *s);
