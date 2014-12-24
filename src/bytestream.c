@@ -262,7 +262,7 @@ bytestream_produce_data(bytestream_t *stream, int fd)
     va_start(ap, fmt); \
     nused = vsnprintf(SDATA(stream, stream->eod), sz, fmt, ap); \
     va_end(ap); \
-    if (nused > ((ssize_t)sz - 1)) { \
+    if (nused >= ((ssize_t)sz)) { \
         TRRET(BYTESTREAM_NPRINTF_NEEDNORE); \
     } \
     stream->eod += nused; \
