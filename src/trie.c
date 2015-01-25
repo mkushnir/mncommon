@@ -5,15 +5,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <strings.h>
-#ifdef HAVE_LIMITS_H
-#       include <limits.h>
-#else
-#   ifdef HAVE_SYS_LIMITS_H
-#       include <sys/limits.h>
-#   else
-#       error "Neither limits.h nor sys/limits.h found."
-#   endif
-#endif
+#include <limits.h>
 
 #ifndef HAVE_FLSL
 #   ifdef __GNUC__

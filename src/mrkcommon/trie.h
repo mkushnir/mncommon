@@ -1,19 +1,8 @@
 #ifndef MRKCOMMON_TRIE_H
 #define MRKCOMMON_TRIE_H
 
-#ifdef HAVE_CONFIG_H
-#   include <config.h>
-#endif
 #include <stdint.h>
-#ifdef HAVE_LIMITS_H
-#       include <limits.h>
-#else
-#   ifdef HAVE_SYS_LIMITS_H
-#       include <sys/limits.h>
-#   else
-#       error "Neither limits.h nor sys/limits.h found."
-#   endif
-#endif
+#include <limits.h>
 
 #include <mrkcommon/mpool.h>
 
