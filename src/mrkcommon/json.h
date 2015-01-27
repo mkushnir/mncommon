@@ -32,6 +32,8 @@ struct _json_ctx;
 typedef int (*json_cb) (struct _json_ctx *, const char *, void *);
 
 typedef struct _json_ctx {
+    const char *in;
+    size_t sz;
 #   define JPS_START    (1<<0)
 #   define JPS_OSTART   (1<<1)
 #   define JPS_OEND     (1<<2)
@@ -88,7 +90,11 @@ typedef struct _json_ctx {
     union {
         long i;
         double f;
-        char *s;
+        struct {
+            size_t start;
+            size_t end;
+        } s;
+        //char *s;
         char b:1;
     } v;
 
@@ -124,12 +130,12 @@ void json_set_item_cb(json_ctx_t *, json_cb, void *);
 int json_fini(json_ctx_t *);
 void json_dump(json_ctx_t *);
 #define JSON_PARSE_NEEDMORE (-2)
-int json_parse(json_ctx_t *, char *, size_t);
-int json_parse_obj(json_ctx_t *, char *, size_t);
-int json_parse_array(json_ctx_t *, char *, size_t);
-int json_parse_str(json_ctx_t *, char *, size_t);
-int json_parse_num(json_ctx_t *, char *, size_t);
-int json_parse_tok(json_ctx_t *, char *, size_t);
+int json_parse(json_ctx_t *, const char *, size_t);
+int json_parse_obj(json_ctx_t *);
+int json_parse_array(json_ctx_t *);
+int json_parse_str(json_ctx_t *);
+int json_parse_num(json_ctx_t *);
+int json_parse_tok(json_ctx_t *);
 
 #ifdef __cplusplus
 }

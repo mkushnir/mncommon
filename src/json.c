@@ -14,6 +14,8 @@
 int
 json_init(json_ctx_t *ctx, json_cb cb, void *udata)
 {
+    ctx->in = NULL;
+    ctx->sz = 0;
     ctx->cb = cb;
     ctx->udata = udata;
     ctx->ostart_cb = cb;
@@ -93,7 +95,16 @@ json_dump(json_ctx_t *ctx)
 {
     TRACEN("idx=%ld st=%s", ctx->idx, JPS_TOSTR(ctx->st));
     if (ctx->ty == JSON_STRING) {
-        TRACEC("\t\"%s\"%s", ctx->v.s, (ctx->st & JPS_KEYOUT ? ":" : ""));
+        char *tmp;
+        size_t sz = ctx->v.s.end - ctx->v.s.start;
+
+        if ((tmp = malloc(sz + 1)) == NULL) {
+            FAIL("malloc");
+        }
+        memcpy(tmp, &ctx->in[ctx->v.s.start], sz);
+        tmp[sz] = '\0';
+        TRACEC("\t\"%s\"%s", tmp, (ctx->st & JPS_KEYOUT ? ":" : ""));
+        free(tmp);
     } else if (ctx->ty == JSON_INT) {
         TRACEC("\t%ld", ctx->v.i);
     } else if (ctx->ty == JSON_FLOAT) {
@@ -121,18 +132,20 @@ json_fini(json_ctx_t *ctx)
         free(ctx->buf);
         ctx->buf = NULL;
     }
+    ctx->in = NULL;
+    ctx->sz = 0;
     return 0;
 }
 
 inline int
-json_parse_str(json_ctx_t *ctx, char *in, size_t sz)
+json_parse_str(json_ctx_t *ctx)
 {
     ctx->flags &= ~JPS_FNEEDUNESCAPE;
 
-    for (; ctx->idx < sz; ++(ctx->idx)) {
+    for (; ctx->idx < ctx->sz; ++(ctx->idx)) {
         char ch;
 
-        ch = in[ctx->idx];
+        ch = ctx->in[ctx->idx];
         //TRACE("ch='%c'", ch);
 
         if (ctx->st == JPS_STRIN) {
@@ -172,14 +185,14 @@ json_parse_str(json_ctx_t *ctx, char *in, size_t sz)
 }
 
 inline int
-json_parse_num(json_ctx_t *ctx, char *in, size_t sz)
+json_parse_num(json_ctx_t *ctx)
 {
     ctx->flags &= ~(JPS_FFLOAT | JPS_FSCIENTIFIC);
 
-    for (; ctx->idx < sz; ++(ctx->idx)) {
+    for (; ctx->idx < ctx->sz; ++(ctx->idx)) {
         char ch;
 
-        ch = in[ctx->idx];
+        ch = ctx->in[ctx->idx];
         //TRACE("idx=%ld ch='%c'", ctx->idx, ch);
 
         if (ctx->st == JPS_NUMIN) {
@@ -226,12 +239,12 @@ json_parse_num(json_ctx_t *ctx, char *in, size_t sz)
 }
 
 inline int
-json_parse_tok(json_ctx_t *ctx, char *in, size_t sz)
+json_parse_tok(json_ctx_t *ctx)
 {
-    for (; ctx->idx < sz; ++(ctx->idx)) {
+    for (; ctx->idx < ctx->sz; ++(ctx->idx)) {
         char ch;
 
-        ch = in[ctx->idx];
+        ch = ctx->in[ctx->idx];
         //TRACE("ch='%c'", ch);
 
         if (ctx->st == JPS_TOKIN) {
@@ -267,16 +280,16 @@ json_parse_tok(json_ctx_t *ctx, char *in, size_t sz)
 }
 
 int
-json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
+json_parse_obj(json_ctx_t *ctx)
 {
     int res;
 
     ++ctx->obj_level;
 
-    for (; ctx->idx < sz; ++(ctx->idx)) {
+    for (; ctx->idx < ctx->sz; ++(ctx->idx)) {
         char ch;
 
-        ch = in[ctx->idx];
+        ch = ctx->in[ctx->idx];
 
         //TRACE("idx=%ld ch='%c'", ctx->idx, ch);
 
@@ -290,7 +303,7 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->oend_cb != NULL &&
-                    ctx->oend_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->oend_cb(ctx, ctx->in, ctx->oend_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -299,23 +312,20 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
                 break;
 
             } else if (ch == '"') {
-                char *tmp;
-
                 ctx->st = JPS_STRIN;
                 ++ctx->idx;
-                tmp = in + ctx->idx;
+                ctx->v.s.start = ctx->idx;
 
-                if ((res = json_parse_str(ctx, in, sz)) != 0) {
+                if ((res = json_parse_str(ctx)) != 0) {
                     --ctx->obj_level;
                     TRRET(res);
                 }
 
                 ctx->st = JPS_KEYOUT;
-                in[ctx->idx] = '\0';
-                ctx->v.s = tmp;
+                ctx->v.s.end = ctx->idx;
 
                 if (ctx->key_cb != NULL &&
-                    ctx->key_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->key_cb(ctx, ctx->in, ctx->key_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -344,96 +354,81 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
         } else if (ctx->st & (JPS_EVALUE)) {
 
             if (ch == '{') {
-#ifdef __GNUC__
-                UNUSED
-#endif
-                    char *tmp;
-
                 ctx->st = JPS_OSTART;
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
                 if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->ostart_cb(ctx, ctx->in, ctx->ostart_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
                 ++ctx->idx;
-                tmp = in + ctx->idx;
 
-                if ((res = json_parse_obj(ctx, in, sz)) != 0) {
+                if ((res = json_parse_obj(ctx)) != 0) {
                     --ctx->obj_level;
                     TRRET(res);
                 }
 
             } else if (ch == '[') {
-#ifdef __GNUC__
-                UNUSED
-#endif
-                char *tmp;
-
                 ctx->st = JPS_ASTART;
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
                 if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->astart_cb(ctx, ctx->in, ctx->astart_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
                 ++ctx->idx;
-                tmp = in + ctx->idx;
 
-                if ((res = json_parse_array(ctx, in, sz)) != 0) {
+                if ((res = json_parse_array(ctx)) != 0) {
                     --ctx->obj_level;
                     TRRET(res);
                 }
 
             } else if (ch == '"') {
-                char *tmp;
-
                 ctx->st = JPS_STRIN;
                 ++ctx->idx;
-                tmp = in + ctx->idx;
+                ctx->v.s.start = ctx->idx;
 
-                if ((res = json_parse_str(ctx, in, sz)) != 0) {
+                if ((res = json_parse_str(ctx)) != 0) {
                     --ctx->obj_level;
                     TRRET(res);
                 }
 
-                in[ctx->idx] = '\0';
-                ctx->v.s = tmp;
+                ctx->v.s.end = ctx->idx;
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
             } else if (JSN_ISDIGIT(ch) || ch == '-') {
-                char *tmp;
+                const char *tmp;
 
                 ctx->st = JPS_NUMIN;
-                tmp = in + ctx->idx;
+                tmp = ctx->in + ctx->idx;
 
-                if ((res = json_parse_num(ctx, in, sz)) != 0) {
+                if ((res = json_parse_num(ctx)) != 0) {
                     --ctx->obj_level;
                     TRRET(res);
                 }
@@ -448,25 +443,25 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
                 }
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
             } else if (JSN_ISALPHA(ch)) {
-                char *tmp;
+                const char *tmp;
                 size_t toklen;
 
                 ctx->st = JPS_TOKIN;
-                tmp = in + ctx->idx;
+                tmp = ctx->in + ctx->idx;
 
-                if ((res = json_parse_tok(ctx, in, sz)) != 0) {
+                if ((res = json_parse_tok(ctx)) != 0) {
                     --ctx->obj_level;
                     TRRET(res);
                 }
 
-                toklen = in + ctx->idx - tmp + 1;
+                toklen = ctx->in + ctx->idx - tmp + 1;
 
                 if (toklen == 4 && memcmp(tmp, "true", 4) == 0) {
                     ctx->ty = JSON_BOOLEAN;
@@ -479,7 +474,7 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
                 }
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -503,7 +498,7 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->oend_cb != NULL &&
-                    ctx->oend_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->oend_cb(ctx, ctx->in, ctx->oend_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -522,23 +517,20 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
 
         } else if (ctx->st == JPS_ENEXT) {
             if (ch == '"') {
-                char *tmp;
-
                 ctx->st = JPS_STRIN;
                 ++ctx->idx;
-                tmp = in + ctx->idx;
+                ctx->v.s.start = ctx->idx;
 
-                if ((res = json_parse_str(ctx, in, sz)) != 0)  {
+                if ((res = json_parse_str(ctx)) != 0)  {
                     --ctx->obj_level;
                     TRRET(res);
                 }
 
                 ctx->st = JPS_KEYOUT;
-                in[ctx->idx] = '\0';
-                ctx->v.s = tmp;
+                ctx->v.s.end = ctx->idx;
 
                 if (ctx->key_cb != NULL &&
-                    ctx->key_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->key_cb(ctx, ctx->in, ctx->key_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -565,16 +557,16 @@ json_parse_obj(json_ctx_t *ctx, char *in, size_t sz)
 }
 
 int
-json_parse_array(json_ctx_t *ctx, char *in, size_t sz)
+json_parse_array(json_ctx_t *ctx)
 {
     int res;
 
     ++ctx->array_level;
 
-    for (; ctx->idx < sz; ++(ctx->idx)) {
+    for (; ctx->idx < ctx->sz; ++(ctx->idx)) {
         char ch;
 
-        ch = in[ctx->idx];
+        ch = ctx->in[ctx->idx];
 
         //TRACE("idx=%ld ch='%c'", ctx->idx, ch);
 
@@ -588,7 +580,7 @@ json_parse_array(json_ctx_t *ctx, char *in, size_t sz)
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->aend_cb != NULL &&
-                    ctx->aend_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->aend_cb(ctx, ctx->in, ctx->aend_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -597,96 +589,80 @@ json_parse_array(json_ctx_t *ctx, char *in, size_t sz)
                 break;
 
             } else if (ch == '[') {
-#ifdef __GNUC__
-                UNUSED
-#endif
-                char *tmp;
-
                 ctx->st = JPS_ASTART;
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
                 }
 
                 if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->astart_cb(ctx, ctx->in, ctx->astart_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
                 }
 
                 ++ctx->idx;
-                tmp = in + ctx->idx;
 
-                if ((res = json_parse_array(ctx, in, sz)) != 0) {
+                if ((res = json_parse_array(ctx)) != 0) {
                     --ctx->array_level;
                     TRRET(JSON_PARSE_ARRAY + 1);
                 }
 
             } else if (ch == '{') {
-#ifdef __GNUC__
-                UNUSED
-#endif
-                char *tmp;
-
                 ctx->st = JPS_OSTART;
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
                 }
 
                 if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->ostart_cb(ctx, ctx->in, ctx->ostart_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
                 }
 
                 ++ctx->idx;
-                tmp = in + ctx->idx;
 
-                if ((res = json_parse_obj(ctx, in, sz)) != 0) {
+                if ((res = json_parse_obj(ctx)) != 0) {
                     --ctx->array_level;
                     TRRET(res);
                 }
 
             } else if (ch == '"') {
-                char *tmp;
-
-                ctx->st = JPS_STRIN;
                 ++ctx->idx;
-                tmp = in + ctx->idx;
+                ctx->v.s.start = ctx->idx;
 
-                if ((res = json_parse_str(ctx, in, sz)) != 0) {
+                if ((res = json_parse_str(ctx)) != 0) {
                     --ctx->array_level;
                     TRRET(res);
                 }
 
-                in[ctx->idx] = '\0';
-                ctx->v.s = tmp;
+                ctx->v.s.end = ctx->idx;
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
                 }
 
             } else if (JSN_ISDIGIT(ch) || ch == '-') {
-                char *tmp;
+                const char *tmp;
 
                 ctx->st = JPS_NUMIN;
-                tmp = in + ctx->idx;
+                tmp = ctx->in + ctx->idx;
 
-                if ((res = json_parse_num(ctx, in, sz)) != 0) {
+                if ((res = json_parse_num(ctx)) != 0) {
                     --ctx->array_level;
                     TRRET(res);
                 }
@@ -701,25 +677,25 @@ json_parse_array(json_ctx_t *ctx, char *in, size_t sz)
                 }
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
                 }
 
             } else if (JSN_ISALPHA(ch)) {
-                char *tmp;
+                const char *tmp;
                 size_t toklen;
 
                 ctx->st = JPS_TOKIN;
-                tmp = in + ctx->idx;
+                tmp = ctx->in + ctx->idx;
 
-                if ((res = json_parse_tok(ctx, in, sz)) != 0) {
+                if ((res = json_parse_tok(ctx)) != 0) {
                     --ctx->array_level;
                     TRRET(res);
                 }
 
-                toklen = in + ctx->idx - tmp + 1;
+                toklen = ctx->in + ctx->idx - tmp + 1;
 
                 if (toklen == 4 && memcmp(tmp, "true", 4) == 0) {
                     ctx->ty = JSON_BOOLEAN;
@@ -732,7 +708,7 @@ json_parse_array(json_ctx_t *ctx, char *in, size_t sz)
                 }
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -756,7 +732,7 @@ json_parse_array(json_ctx_t *ctx, char *in, size_t sz)
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->aend_cb != NULL &&
-                    ctx->aend_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->aend_cb(ctx, ctx->in, ctx->aend_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -782,9 +758,12 @@ json_parse_array(json_ctx_t *ctx, char *in, size_t sz)
 }
 
 int
-json_parse(json_ctx_t *ctx, char *in, size_t sz)
+json_parse(json_ctx_t *ctx, const char *in, size_t sz)
 {
     int res;
+
+    ctx->in = in;
+    ctx->sz = sz;
 
     for (; ctx->idx < sz; ++(ctx->idx)) {
         char ch;
@@ -798,49 +777,37 @@ json_parse(json_ctx_t *ctx, char *in, size_t sz)
         }
         if (ctx->st == JPS_START) {
             if (ch == '{') {
-#ifdef __GNUC__
-                UNUSED
-#endif
-                char *tmp;
-
                 ctx->st = JPS_OSTART;
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->ostart_cb(ctx, in, ctx->ostart_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
                 ++ctx->idx;
-                tmp = in + ctx->idx;
 
-                if ((res = json_parse_obj(ctx, in, sz)) != 0) {
+                if ((res = json_parse_obj(ctx)) != 0) {
                     --ctx->obj_level;
                     TRRET(res);
                 }
 
             } else if (ch == '[') {
-#ifdef __GNUC__
-                UNUSED
-#endif
-                char *tmp;
-
                 ctx->st = JPS_ASTART;
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, in, ctx->udata) != 0) {
+                    ctx->astart_cb(ctx, in, ctx->astart_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
                 ++ctx->idx;
-                tmp = in + ctx->idx;
 
-                if ((res = json_parse_array(ctx, in, sz)) != 0) {
+                if ((res = json_parse_array(ctx)) != 0) {
                     --ctx->obj_level;
                     TRRET(res);
                 }
