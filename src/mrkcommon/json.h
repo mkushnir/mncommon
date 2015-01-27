@@ -29,7 +29,7 @@ typedef enum _json_type {
 )
 
 struct _json_ctx;
-typedef int (*json_cb) (struct _json_ctx *, const char *, void *);
+typedef int (*json_cb) (struct _json_ctx *, void *);
 
 typedef struct _json_ctx {
     const char *in;

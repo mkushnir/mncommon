@@ -303,7 +303,7 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->oend_cb != NULL &&
-                    ctx->oend_cb(ctx, ctx->in, ctx->oend_udata) != 0) {
+                    ctx->oend_cb(ctx, ctx->oend_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -325,7 +325,7 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->v.s.end = ctx->idx;
 
                 if (ctx->key_cb != NULL &&
-                    ctx->key_cb(ctx, ctx->in, ctx->key_udata) != 0) {
+                    ctx->key_cb(ctx, ctx->key_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -358,14 +358,14 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
+                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
                 if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, ctx->in, ctx->ostart_udata) != 0) {
+                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -383,14 +383,14 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
+                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
                 }
 
                 if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, ctx->in, ctx->astart_udata) != 0) {
+                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -416,7 +416,7 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->v.s.end = ctx->idx;
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
+                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -443,7 +443,7 @@ json_parse_obj(json_ctx_t *ctx)
                 }
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
+                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -474,7 +474,7 @@ json_parse_obj(json_ctx_t *ctx)
                 }
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->in, ctx->value_udata) != 0) {
+                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -498,7 +498,7 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->oend_cb != NULL &&
-                    ctx->oend_cb(ctx, ctx->in, ctx->oend_udata) != 0) {
+                    ctx->oend_cb(ctx, ctx->oend_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -530,7 +530,7 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->v.s.end = ctx->idx;
 
                 if (ctx->key_cb != NULL &&
-                    ctx->key_cb(ctx, ctx->in, ctx->key_udata) != 0) {
+                    ctx->key_cb(ctx, ctx->key_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -546,7 +546,7 @@ json_parse_obj(json_ctx_t *ctx)
 
 
         } else {
-            TRACE("st=%s", JPS_TOSTR(ctx->st));
+            //TRACE("st=%s", JPS_TOSTR(ctx->st));
             --ctx->obj_level;
             TRRET(JSON_PARSE_OBJ + 7);
         }
@@ -568,7 +568,7 @@ json_parse_array(json_ctx_t *ctx)
 
         ch = ctx->in[ctx->idx];
 
-        //TRACE("idx=%ld ch='%c'", ctx->idx, ch);
+        //TRACE("idx=%ld ch='%c' st=%s", ctx->idx, ch, JPS_TOSTR(ctx->st));
 
         if (ch == '\0') {
             break;
@@ -580,7 +580,7 @@ json_parse_array(json_ctx_t *ctx)
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->aend_cb != NULL &&
-                    ctx->aend_cb(ctx, ctx->in, ctx->aend_udata) != 0) {
+                    ctx->aend_cb(ctx, ctx->aend_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -593,14 +593,14 @@ json_parse_array(json_ctx_t *ctx)
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
+                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
                 }
 
                 if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, ctx->in, ctx->astart_udata) != 0) {
+                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -618,14 +618,14 @@ json_parse_array(json_ctx_t *ctx)
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
+                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
                 }
 
                 if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, ctx->in, ctx->ostart_udata) != 0) {
+                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -639,6 +639,7 @@ json_parse_array(json_ctx_t *ctx)
                 }
 
             } else if (ch == '"') {
+                ctx->st = JPS_STRIN;
                 ++ctx->idx;
                 ctx->v.s.start = ctx->idx;
 
@@ -647,10 +648,11 @@ json_parse_array(json_ctx_t *ctx)
                     TRRET(res);
                 }
 
+
                 ctx->v.s.end = ctx->idx;
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
+                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -677,7 +679,7 @@ json_parse_array(json_ctx_t *ctx)
                 }
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
+                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -708,7 +710,7 @@ json_parse_array(json_ctx_t *ctx)
                 }
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, ctx->in, ctx->item_udata) != 0) {
+                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -732,7 +734,7 @@ json_parse_array(json_ctx_t *ctx)
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->aend_cb != NULL &&
-                    ctx->aend_cb(ctx, ctx->in, ctx->aend_udata) != 0) {
+                    ctx->aend_cb(ctx, ctx->aend_udata) != 0) {
 
                     --ctx->array_level;
                     TRRET(-1);
@@ -749,7 +751,7 @@ json_parse_array(json_ctx_t *ctx)
             }
 
         } else {
-            TRACE("st=%s", JPS_TOSTR(ctx->st));
+            //TRACE("st=%s", JPS_TOSTR(ctx->st));
             --ctx->array_level;
             TRRET(JSON_PARSE_ARRAY + 5);
         }
@@ -781,7 +783,7 @@ json_parse(json_ctx_t *ctx, const char *in, size_t sz)
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, in, ctx->ostart_udata) != 0) {
+                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
@@ -799,7 +801,7 @@ json_parse(json_ctx_t *ctx, const char *in, size_t sz)
                 ctx->ty = JSON_ARRAY;
 
                 if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, in, ctx->astart_udata) != 0) {
+                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
 
                     --ctx->obj_level;
                     TRRET(-1);
