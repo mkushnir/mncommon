@@ -103,6 +103,9 @@ bytes_json_escape(bytes_t *src)
         ch = src->data[i];
         if (ch == '\\' || ch == '"') {
             dest->data[j++] = '\\';
+        } else if (ch == '\a') {
+            ch = 'a';
+            dest->data[j++] = '\\';
         } else if (ch == '\b') {
             ch = 'b';
             dest->data[j++] = '\\';
@@ -117,6 +120,9 @@ bytes_json_escape(bytes_t *src)
             dest->data[j++] = '\\';
         } else if (ch == '\t') {
             ch = 't';
+            dest->data[j++] = '\\';
+        } else if (ch == '\v') {
+            ch = 'v';
             dest->data[j++] = '\\';
         }
         dest->data[j] = ch;
