@@ -101,11 +101,11 @@ bytes_json_escape(bytes_t *src)
         unsigned char ch;
 
         ch = src->data[i];
-        if (ch == '\\' || ch == '"') {
+        if (ch == '\\' || ch == '"' || ch == '/') {
             dest->data[j++] = '\\';
-        } else if (ch == '\a') {
-            ch = 'a';
-            dest->data[j++] = '\\';
+        //} else if (ch == '\a') {
+        //    ch = 'a';
+        //    dest->data[j++] = '\\';
         } else if (ch == '\b') {
             ch = 'b';
             dest->data[j++] = '\\';
@@ -121,9 +121,9 @@ bytes_json_escape(bytes_t *src)
         } else if (ch == '\t') {
             ch = 't';
             dest->data[j++] = '\\';
-        } else if (ch == '\v') {
-            ch = 'v';
-            dest->data[j++] = '\\';
+        //} else if (ch == '\v') {
+        //    ch = 'v';
+        //    dest->data[j++] = '\\';
         }
         dest->data[j] = ch;
     }
