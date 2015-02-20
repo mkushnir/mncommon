@@ -9,56 +9,56 @@
 #include "mrkcommon/json.h"
 
 UNUSED static int
-mycb(json_ctx_t *ctx, UNUSED const char *in, UNUSED void *udata)
+mycb(json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
 }
 
 UNUSED static int
-ostartcb(UNUSED json_ctx_t *ctx, UNUSED const char *in, UNUSED void *udata)
+ostartcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
 }
 
 UNUSED static int
-oendcb(UNUSED json_ctx_t *ctx, UNUSED const char *in, UNUSED void *udata)
+oendcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
 }
 
 UNUSED static int
-astartcb(UNUSED json_ctx_t *ctx, UNUSED const char *in, UNUSED void *udata)
+astartcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
 }
 
 UNUSED static int
-aendcb(UNUSED json_ctx_t *ctx, UNUSED const char *in, UNUSED void *udata)
+aendcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
 }
 
 UNUSED static int
-keycb(UNUSED json_ctx_t *ctx, UNUSED const char *in, UNUSED void *udata)
+keycb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
 }
 
 UNUSED static int
-valuecb(UNUSED json_ctx_t *ctx, UNUSED const char *in, UNUSED void *udata)
+valuecb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
 }
 
 UNUSED static int
-itemcb(UNUSED json_ctx_t *ctx, UNUSED const char *in, UNUSED void *udata)
+itemcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
