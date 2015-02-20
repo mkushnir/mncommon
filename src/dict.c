@@ -436,3 +436,24 @@ dict_fini_mpool(mpool_ctx_t *mpool, dict_t *dict)
     dict_cleanup_mpool(mpool, dict);
     array_fini_mpool(mpool, &dict->table);
 }
+
+
+void
+dict_dump_stats(dict_t *dict)
+{
+    array_iter_t it;
+    dict_item_t **pdit;
+
+    for (pdit = array_first(&dict->table, &it);
+         pdit != NULL;
+         pdit = array_next(&dict->table, &it)) {
+
+        dict_item_t *dit;
+        size_t sz;
+
+        for (dit = *pdit, sz = 0; dit != NULL; dit = dit->next, ++sz) {
+        }
+        TRACE("bucket %d sz %ld", it.iter, sz);
+    }
+}
+

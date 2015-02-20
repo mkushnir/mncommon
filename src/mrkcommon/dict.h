@@ -83,6 +83,8 @@ void dict_cleanup_mpool(mpool_ctx_t *, dict_t *);
 void dict_fini(dict_t *);
 void dict_fini_mpool(mpool_ctx_t *, dict_t *);
 
+void dict_dump_stats(dict_t *);
+
 #ifdef __cplusplus
 }
 #endif
