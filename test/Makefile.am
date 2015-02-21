@@ -43,7 +43,7 @@ if BYTES
 noinst_PROGRAMS += testbytes
 endif
 
-distdir = ../$(PACKAGE)-$(VERSION)/test
+distdir = $(top_srcdir)/$(PACKAGE)-$(VERSION)/test
 dist_HEADERS = unittest.h rb.h zltan-fasthash.h
 
 BUILT_SOURCES = ../src/diag.c ../src/diag.h

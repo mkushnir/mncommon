@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-distdir = ../$(PACKAGE)-$(VERSION)/src
+distdir = $(top_srcdir)/$(PACKAGE)-$(VERSION)/src
 dist_HEADERS =
 
 BUILT_SOURCES = diag.c diag.h

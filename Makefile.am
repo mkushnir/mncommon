@@ -1,4 +1,4 @@
-distdir = $(PACKAGE)-$(VERSION)
+distdir = $(top_srcdir)/$(PACKAGE)-$(VERSION)
 SUBDIRS = src man test
 #CLEANFILES = *.in *.m4 *.log *.scan configure
 
