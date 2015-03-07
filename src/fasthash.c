@@ -45,41 +45,41 @@ fasthash(uint64_t n, const unsigned char *s, size_t sz)
 #define DJB2(c) n = ((n << 5) + n) + (c);
 #define DJB2XOR(c) n = ((n << 5) + n) ^ (c);
 
-#define LOOP(A) \
-    for (i = 0; i < (sz1 / 8); ++i) {       \
-        A(si[i]); \
-    }                                       \
-    if (mod) {                              \
-        union {                             \
-            uint64_t u64;                   \
-            char  c[sizeof(uint64_t)];      \
-        } ss;                               \
-        ss.u64 = 0UL;                       \
-        for (i = 0; i < mod; ++i) {         \
-            ss.c[i] = s[sz - 1 - i];        \
-        }                                   \
-        A(ss.u64);                          \
+#define LOOP(A)                        \
+    for (i = 0; i < (sz1 / 8); ++i) {  \
+        A(si[i]);                      \
+    }                                  \
+    if (mod) {                         \
+        union {                        \
+            uint64_t u64;              \
+            char  c[sizeof(uint64_t)]; \
+        } ss;                          \
+        ss.u64 = 0UL;                  \
+        for (i = 0; i < mod; ++i) {    \
+            ss.c[i] = s[sz - 1 - i];   \
+        }                              \
+        A(ss.u64);                     \
     }
 
 
-#define C(f) \
-    for (i = 0; i < (sz1 / 8); ++i) {       \
-        n += *((si + i));                   \
-        n = f(n, (si[i] + i) %              \
-                 (sizeof(uint64_t) * 8));   \
-    }                                       \
-    if (mod) {                              \
-        union {                             \
-            uint64_t u64;                   \
-            char  c[sizeof(uint64_t)];      \
-        } ss;                               \
-        ss.u64 = 0UL;                       \
-        for (i = 0; i < mod; ++i) {         \
-            ss.c[i] = s[sz - 1 - i];        \
-        }                                   \
-        n += ss.u64;                        \
-        n = f(n, (ss.c[0] + i) %            \
-                 (sizeof(uint64_t) * 8));   \
+#define C(f)                                   \
+    for (i = 0; i < (sz1 / 8); ++i) {          \
+        n += *((si + i));                      \
+        n = f(n, (si[i] + i) %                 \
+                 (sizeof(uint64_t) * 8));      \
+    }                                          \
+    if (mod) {                                 \
+        union {                                \
+            uint64_t u64;                      \
+            char  c[sizeof(uint64_t)];         \
+        } ss;                                  \
+        ss.u64 = 0UL;                          \
+        for (i = 0; i < mod; ++i) {            \
+            ss.c[i] = s[sz - 1 - i];           \
+        }                                      \
+        n += ss.u64;                           \
+        n = f(n, (ss.c[0] + i) %               \
+                 (sizeof(uint64_t) * 8));      \
     }
 
     //C(rotr64);

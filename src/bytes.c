@@ -202,44 +202,44 @@ bytes_cmp(bytes_t *a, bytes_t *b)
 }
 
 
-#define BYTES_NEW_BODY(malloc_fn) \
-    size_t mod, msz; \
-    bytes_t *res; \
-    assert(sz > 0); \
-    msz = sz; \
-    mod = sz % 8; \
-    if (mod) { \
-        msz += (8 - mod); \
-    } else { \
-        msz += 8; \
-    } \
-    if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) { \
-        FAIL("malloc"); \
-    } \
-    res->nref = 0; \
-    res->sz = sz; \
-    res->hash = 0; \
+#define BYTES_NEW_BODY(malloc_fn)                              \
+    size_t mod, msz;                                           \
+    bytes_t *res;                                              \
+    assert(sz > 0);                                            \
+    msz = sz;                                                  \
+    mod = sz % 8;                                              \
+    if (mod) {                                                 \
+        msz += (8 - mod);                                      \
+    } else {                                                   \
+        msz += 8;                                              \
+    }                                                          \
+    if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) {    \
+        FAIL("malloc");                                        \
+    }                                                          \
+    res->nref = 0;                                             \
+    res->sz = sz;                                              \
+    res->hash = 0;                                             \
     return res
 
-#define BYTES_NEW_FROM_STR_BODY(malloc_fn) \
-    bytes_t *res; \
-    size_t mod, msz; \
-    size_t sz; \
-    sz = strlen(s) + 1; \
-    msz = sz; \
-    mod = sz % 8; \
-    if (mod) { \
-        msz += (8 - mod); \
-    } else { \
-        msz += 8; \
-    } \
-    if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) { \
-        FAIL("malloc"); \
-    } \
-    memcpy(res->data, s, sz); \
-    res->nref = 0; \
-    res->sz = sz; \
-    res->hash = 0; \
+#define BYTES_NEW_FROM_STR_BODY(malloc_fn)                     \
+    bytes_t *res;                                              \
+    size_t mod, msz;                                           \
+    size_t sz;                                                 \
+    sz = strlen(s) + 1;                                        \
+    msz = sz;                                                  \
+    mod = sz % 8;                                              \
+    if (mod) {                                                 \
+        msz += (8 - mod);                                      \
+    } else {                                                   \
+        msz += 8;                                              \
+    }                                                          \
+    if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) {    \
+        FAIL("malloc");                                        \
+    }                                                          \
+    memcpy(res->data, s, sz);                                  \
+    res->nref = 0;                                             \
+    res->sz = sz;                                              \
+    res->hash = 0;                                             \
     return res
 
 
@@ -257,23 +257,23 @@ bytes_new_from_str(const char *s)
 }
 
 
-#define BYTES_NEW_FROM_BYTES_BODY(malloc_fn) \
-    bytes_t *res; \
-    size_t mod, msz; \
-    msz = s->sz; \
-    mod = s->sz % 8; \
-    if (mod) { \
-        msz += (8 - mod); \
-    } else { \
-        msz += 8; \
-    } \
-    if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) { \
-        FAIL("malloc"); \
-    } \
-    memcpy(res->data, s->data, s->sz); \
-    res->nref = 0; \
-    res->sz = s->sz; \
-    res->hash = 0; \
+#define BYTES_NEW_FROM_BYTES_BODY(malloc_fn)                   \
+    bytes_t *res;                                              \
+    size_t mod, msz;                                           \
+    msz = s->sz;                                               \
+    mod = s->sz % 8;                                           \
+    if (mod) {                                                 \
+        msz += (8 - mod);                                      \
+    } else {                                                   \
+        msz += 8;                                              \
+    }                                                          \
+    if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) {    \
+        FAIL("malloc");                                        \
+    }                                                          \
+    memcpy(res->data, s->data, s->sz);                         \
+    res->nref = 0;                                             \
+    res->sz = s->sz;                                           \
+    res->hash = 0;                                             \
     return res
 
 

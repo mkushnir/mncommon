@@ -25,18 +25,17 @@ bytestream_dump(bytestream_t *stream)
 }
 
 
-#define BYTESTREAM_INIT_BODY(mallocfn) \
-    stream->buf.sz = growsz; \
-    stream->growsz = growsz; \
-    if ((stream->buf.data = mallocfn(stream->buf.sz)) == NULL) { \
-        TRRET(BYTESTREAM_INIT + 1); \
-    } \
- \
-    stream->eod = 0; \
-    stream->pos = 0; \
-    stream->read_more = NULL; \
-    stream->write = NULL; \
-    stream->udata = NULL; \
+#define BYTESTREAM_INIT_BODY(mallocfn)                                 \
+    stream->buf.sz = growsz;                                           \
+    stream->growsz = growsz;                                           \
+    if ((stream->buf.data = mallocfn(stream->buf.sz)) == NULL) {       \
+        TRRET(BYTESTREAM_INIT + 1);                                    \
+    }                                                                  \
+    stream->eod = 0;                                                   \
+    stream->pos = 0;                                                   \
+    stream->read_more = NULL;                                          \
+    stream->write = NULL;                                              \
+    stream->udata = NULL;                                              \
     return (0);
 
 
@@ -56,14 +55,14 @@ bytestream_init_mpool(mpool_ctx_t *mpool, bytestream_t *stream, ssize_t growsz)
 }
 
 
-#define BYTESTREAM_GROW_BODY(reallocfn) \
-    char *tmp; \
-    if ((tmp = reallocfn(stream->buf.data, \
-                         stream->buf.sz + incr)) == NULL) { \
-        TRRET(BYTESTREAM_GROW + 1); \
-    } \
-    stream->buf.data = tmp; \
-    stream->buf.sz += incr; \
+#define BYTESTREAM_GROW_BODY(reallocfn)                        \
+    char *tmp;                                                 \
+    if ((tmp = reallocfn(stream->buf.data,                     \
+                         stream->buf.sz + incr)) == NULL) {    \
+        TRRET(BYTESTREAM_GROW + 1);                            \
+    }                                                          \
+    stream->buf.data = tmp;                                    \
+    stream->buf.sz += incr;                                    \
     return 0;
 
 int
@@ -82,21 +81,21 @@ bytestream_grow_mpool(mpool_ctx_t *mpool, bytestream_t *stream, size_t incr)
 }
 
 
-#define BYTESTREAM_READ_MODE_BODY(growfn) \
-    ssize_t nread; \
-    ssize_t need; \
-    need = (stream->eod + sz) - stream->buf.sz; \
-    if (need > 0) { \
-        if (growfn(stream, \
-                   (need < stream->growsz) ? \
-                   stream->growsz : \
-                   need) != 0) { \
-            return -1; \
-        } \
-    } \
+#define BYTESTREAM_READ_MODE_BODY(growfn)                              \
+    ssize_t nread;                                                     \
+    ssize_t need;                                                      \
+    need = (stream->eod + sz) - stream->buf.sz;                        \
+    if (need > 0) {                                                    \
+        if (growfn(stream,                                             \
+                   (need < stream->growsz) ?                           \
+                   stream->growsz :                                    \
+                   need) != 0) {                                       \
+            return -1;                                                 \
+        }                                                              \
+    }                                                                  \
     if ((nread = read(fd, stream->buf.data + stream->eod, sz)) >= 0) { \
-        stream->eod += nread; \
-    } \
+        stream->eod += nread;                                          \
+    }                                                                  \
     return nread;
 
 
@@ -119,24 +118,24 @@ bytestream_read_more_mpool(mpool_ctx_t *mpool,
 }
 
 
-#define BYTESTREAM_RECV_MODE_BODY(growfn) \
-    ssize_t nrecv; \
-    ssize_t need; \
-    need = (stream->eod + sz) - stream->buf.sz; \
-    if (need > 0) { \
-        if (growfn(stream, \
-                   (need < stream->growsz) ? \
-                    stream->growsz : \
-                    need) != 0) { \
-            return -1; \
-        } \
-    } \
-    if ((nrecv = recv(fd, \
-                      stream->buf.data + stream->eod, \
-                      (size_t)sz, \
-                      0)) >= 0) { \
-        stream->eod += nrecv; \
-    } \
+#define BYTESTREAM_RECV_MODE_BODY(growfn)              \
+    ssize_t nrecv;                                     \
+    ssize_t need;                                      \
+    need = (stream->eod + sz) - stream->buf.sz;        \
+    if (need > 0) {                                    \
+        if (growfn(stream,                             \
+                   (need < stream->growsz) ?           \
+                    stream->growsz :                   \
+                    need) != 0) {                      \
+            return -1;                                 \
+        }                                              \
+    }                                                  \
+    if ((nrecv = recv(fd,                              \
+                      stream->buf.data + stream->eod,  \
+                      (size_t)sz,                      \
+                      0)) >= 0) {                      \
+        stream->eod += nrecv;                          \
+    }                                                  \
     return nrecv;
 
 
@@ -246,26 +245,26 @@ bytestream_produce_data(bytestream_t *stream, int fd)
 }
 
 
-#define BYTESTREAM_NPRINTF_BODY(growfn) \
-    int nused; \
-    ssize_t need; \
-    va_list ap; \
-    need = (stream->eod + sz) - stream->buf.sz; \
-    if (need > 0) { \
-        if (growfn(stream, \
-                   (need < stream->growsz) ? \
-                   stream->growsz : \
-                   need) != 0) { \
-            TRRET(BYTESTREAM_NPRINTF_ERROR); \
-        } \
-    } \
-    va_start(ap, fmt); \
-    nused = vsnprintf(SDATA(stream, stream->eod), sz, fmt, ap); \
-    va_end(ap); \
-    if (nused >= ((ssize_t)sz)) { \
-        TRRET(BYTESTREAM_NPRINTF_NEEDNORE); \
-    } \
-    stream->eod += nused; \
+#define BYTESTREAM_NPRINTF_BODY(growfn)                        \
+    int nused;                                                 \
+    ssize_t need;                                              \
+    va_list ap;                                                \
+    need = (stream->eod + sz) - stream->buf.sz;                \
+    if (need > 0) {                                            \
+        if (growfn(stream,                                     \
+                   (need < stream->growsz) ?                   \
+                   stream->growsz :                            \
+                   need) != 0) {                               \
+            TRRET(BYTESTREAM_NPRINTF_ERROR);                   \
+        }                                                      \
+    }                                                          \
+    va_start(ap, fmt);                                         \
+    nused = vsnprintf(SDATA(stream, stream->eod), sz, fmt, ap);\
+    va_end(ap);                                                \
+    if (nused >= ((ssize_t)sz)) {                              \
+        TRRET(BYTESTREAM_NPRINTF_NEEDNORE);                    \
+    }                                                          \
+    stream->eod += nused;                                      \
     return nused;
 
 
@@ -290,19 +289,19 @@ bytestream_nprintf_mpool(mpool_ctx_t *mpool,
 }
 
 
-#define BYTESTREAM_CAT_BODY(growfn) \
-    ssize_t need; \
-    need = (stream->eod + sz) - stream->buf.sz; \
-    if (need > 0) { \
-        if (growfn(stream, \
-                   (need < stream->growsz) ? \
-                   stream->growsz : \
-                   need) != 0) { \
-            TRRET(-127); \
-        } \
-    } \
-    memcpy(SDATA(stream, stream->eod), data, sz); \
-    stream->eod += sz; \
+#define BYTESTREAM_CAT_BODY(growfn)                    \
+    ssize_t need;                                      \
+    need = (stream->eod + sz) - stream->buf.sz;        \
+    if (need > 0) {                                    \
+        if (growfn(stream,                             \
+                   (need < stream->growsz) ?           \
+                   stream->growsz :                    \
+                   need) != 0) {                       \
+            TRRET(-127);                               \
+        }                                              \
+    }                                                  \
+    memcpy(SDATA(stream, stream->eod), data, sz);      \
+    stream->eod += sz;                                 \
     return (int)sz;
 
 
@@ -357,13 +356,13 @@ bytestream_recycle(bytestream_t *stream, int ngrowsz, off_t from)
 }
 
 
-#define BYTESTREAM_FINI_BODY(freefn) \
-    if (stream->buf.data != NULL) { \
-        freefn(stream->buf.data); \
-        stream->buf.data = NULL; \
-    } \
-    stream->read_more = NULL; \
-    stream->write = NULL; \
+#define BYTESTREAM_FINI_BODY(freefn)   \
+    if (stream->buf.data != NULL) {    \
+        freefn(stream->buf.data);      \
+        stream->buf.data = NULL;       \
+    }                                  \
+    stream->read_more = NULL;          \
+    stream->write = NULL;              \
     stream->udata = NULL;
 
 

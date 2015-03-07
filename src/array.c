@@ -21,29 +21,29 @@
  *
  */
 
-#define ARRAY_INIT_BODY(malloc_fn) \
-    unsigned i; \
-    assert(elsz > 0); \
-    ar->elsz = elsz; \
-    ar->elnum = elnum; \
-    ar->init = init; \
-    ar->fini = fini; \
-    ar->compar = NULL; \
-    ar->datasz = elsz * elnum; \
-    if (elnum > 0) { \
-        if ((ar->data = malloc_fn(elsz * elnum)) == NULL) { \
-            TRRET(ARRAY_INIT + 1); \
-        } \
-        if (ar->init != NULL) { \
-            for (i = 0; i < elnum; ++i) { \
-                if (ar->init(ar->data + (i * ar->elsz)) != 0) { \
-                    TRRET(ARRAY_INIT + 2); \
-                } \
-            } \
-        } \
-    } else { \
-        ar->data = NULL; \
-    } \
+#define ARRAY_INIT_BODY(malloc_fn)                             \
+    unsigned i;                                                \
+    assert(elsz > 0);                                          \
+    ar->elsz = elsz;                                           \
+    ar->elnum = elnum;                                         \
+    ar->init = init;                                           \
+    ar->fini = fini;                                           \
+    ar->compar = NULL;                                         \
+    ar->datasz = elsz * elnum;                                 \
+    if (elnum > 0) {                                           \
+        if ((ar->data = malloc_fn(elsz * elnum)) == NULL) {    \
+            TRRET(ARRAY_INIT + 1);                             \
+        }                                                      \
+        if (ar->init != NULL) {                                \
+            for (i = 0; i < elnum; ++i) {                      \
+                if (ar->init(ar->data + (i * ar->elsz)) != 0) {\
+                    TRRET(ARRAY_INIT + 2);                     \
+                }                                              \
+            }                                                  \
+        }                                                      \
+    } else {                                                   \
+        ar->data = NULL;                                       \
+    }                                                          \
     return 0;
 
 
@@ -70,71 +70,71 @@ array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
  * Make sure array is at least newelnum long.
  */
 
-#define ARRAY_ENSURE_LEN_BODY(realloc_fn, free_fn)\
-    void *newdata; \
-    unsigned i; \
-    if (!(flags & ARRAY_FLAG_SAVE)) { \
-        if (ar->fini != NULL) { \
-            for (i = 0; i < ar->elnum; ++i) { \
-                ar->fini(ar->data + i * ar->elsz); \
-            } \
-        } \
-        if (newelnum > 0) { \
-            if (ar->datasz < ar->elsz * newelnum) { \
-                ar->datasz = ar->elsz * newelnum; \
-                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) { \
-                    TRRET(ARRAY_ENSURE_LEN + 1); \
-                } \
-            } else { \
-                newdata = ar->data; \
-            } \
-        } else { \
-            ar->datasz = 0; \
-            free_fn(ar->data); \
-            newdata = NULL; \
-        } \
-        if (ar->init != NULL) { \
-            for (i = 0; i < newelnum; ++i) { \
-                ar->init(newdata + i * ar->elsz); \
-            } \
-        } \
-    } else { \
-        if (newelnum > ar->elnum) { \
-            if (ar->datasz < ar->elsz * newelnum) { \
-                ar->datasz = ar->elsz * newelnum; \
-                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) { \
-                    TRRET(ARRAY_ENSURE_LEN + 2); \
-                } \
-            } else { \
-                newdata = ar->data; \
-            } \
-            if (ar->init != NULL) { \
-                for (i = ar->elnum; i < newelnum; ++i) { \
-                    ar->init(newdata + i * ar->elsz); \
-                } \
-            } \
-        } else if (newelnum < ar->elnum) { \
-            if (ar->fini != NULL) { \
-                for (i = newelnum; i < ar->elnum; ++i) { \
-                    ar->fini(ar->data + i * ar->elsz); \
-                } \
-            } \
-            if (newelnum > 0) { \
-                ar->datasz = ar->elsz * newelnum; \
-                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) { \
-                    TRRET(ARRAY_ENSURE_LEN + 3); \
-                } \
-            } else { \
-                ar->datasz = 0; \
-                free_fn(ar->data); \
-                newdata = NULL; \
-            } \
-        } else { \
-            newdata = ar->data; \
-        } \
-    } \
-    ar->data = newdata; \
-    ar->elnum = newelnum; \
+#define ARRAY_ENSURE_LEN_BODY(realloc_fn, free_fn)                             \
+    void *newdata;                                                             \
+    unsigned i;                                                                \
+    if (!(flags & ARRAY_FLAG_SAVE)) {                                          \
+        if (ar->fini != NULL) {                                                \
+            for (i = 0; i < ar->elnum; ++i) {                                  \
+                ar->fini(ar->data + i * ar->elsz);                             \
+            }                                                                  \
+        }                                                                      \
+        if (newelnum > 0) {                                                    \
+            if (ar->datasz < ar->elsz * newelnum) {                            \
+                ar->datasz = ar->elsz * newelnum;                              \
+                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
+                    TRRET(ARRAY_ENSURE_LEN + 1);                               \
+                }                                                              \
+            } else {                                                           \
+                newdata = ar->data;                                            \
+            }                                                                  \
+        } else {                                                               \
+            ar->datasz = 0;                                                    \
+            free_fn(ar->data);                                                 \
+            newdata = NULL;                                                    \
+        }                                                                      \
+        if (ar->init != NULL) {                                                \
+            for (i = 0; i < newelnum; ++i) {                                   \
+                ar->init(newdata + i * ar->elsz);                              \
+            }                                                                  \
+        }                                                                      \
+    } else {                                                                   \
+        if (newelnum > ar->elnum) {                                            \
+            if (ar->datasz < ar->elsz * newelnum) {                            \
+                ar->datasz = ar->elsz * newelnum;                              \
+                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
+                    TRRET(ARRAY_ENSURE_LEN + 2);                               \
+                }                                                              \
+            } else {                                                           \
+                newdata = ar->data;                                            \
+            }                                                                  \
+            if (ar->init != NULL) {                                            \
+                for (i = ar->elnum; i < newelnum; ++i) {                       \
+                    ar->init(newdata + i * ar->elsz);                          \
+                }                                                              \
+            }                                                                  \
+        } else if (newelnum < ar->elnum) {                                     \
+            if (ar->fini != NULL) {                                            \
+                for (i = newelnum; i < ar->elnum; ++i) {                       \
+                    ar->fini(ar->data + i * ar->elsz);                         \
+                }                                                              \
+            }                                                                  \
+            if (newelnum > 0) {                                                \
+                ar->datasz = ar->elsz * newelnum;                              \
+                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
+                    TRRET(ARRAY_ENSURE_LEN + 3);                               \
+                }                                                              \
+            } else {                                                           \
+                ar->datasz = 0;                                                \
+                free_fn(ar->data);                                             \
+                newdata = NULL;                                                \
+            }                                                                  \
+        } else {                                                               \
+            newdata = ar->data;                                                \
+        }                                                                      \
+    }                                                                          \
+    ar->data = newdata;                                                        \
+    ar->elnum = newelnum;                                                      \
     return 0;
 
 
@@ -157,69 +157,69 @@ array_ensure_len_mpool(mpool_ctx_t *mpool, array_t *ar, size_t newelnum, unsigne
 }
 
 
-#define ARRAY_ENSURE_DATASZ_BODY(realloc_fn, free_fn)\
-    void *newdata; \
-    unsigned i; \
-    if (!(flags & ARRAY_FLAG_SAVE)) { \
-        if (ar->fini != NULL) { \
-            for (i = 0; i < ar->elnum; ++i) { \
-                ar->fini(ar->data + i * ar->elsz); \
-            } \
-        } \
-        if (newelnum > 0) { \
-            if (ar->datasz < ar->elsz * newelnum) { \
-                ar->datasz = ar->elsz * newelnum; \
-                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) { \
-                    FAIL("realloc"); \
-                } \
-            } else { \
-                newdata = ar->data; \
-            } \
-        } else { \
-            free_fn(ar->data); \
-            ar->datasz = 0; \
-            newdata = NULL; \
-        } \
-        if (ar->init != NULL) { \
-            for (i = 0; i < newelnum; ++i) { \
-                ar->init(newdata + i * ar->elsz); \
-            } \
-        } \
-    } else { \
-        if (newelnum > ar->elnum) { \
-            if (ar->datasz < ar->elsz * newelnum) { \
-                ar->datasz = ar->elsz * newelnum; \
-                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) { \
-                    FAIL("realloc"); \
-                } \
-            } else { \
-                newdata = ar->data; \
-            } \
-            if (ar->init != NULL) { \
-                for (i = ar->elnum; i < newelnum; ++i) { \
-                    ar->init(newdata + i * ar->elsz); \
-                } \
-            } \
-        } else if (newelnum < ar->elnum) { \
-            if (ar->fini != NULL) { \
-                for (i = newelnum; i < ar->elnum; ++i) { \
-                    ar->fini(ar->data + i * ar->elsz); \
-                } \
-            } \
-            if (newelnum > 0) { \
-                ar->datasz = ar->elsz * newelnum; \
-                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) { \
-                    FAIL("realloc"); \
-                } \
-            } else { \
-                free_fn(ar->data); \
-                ar->datasz = 0; \
-                newdata = NULL; \
-            } \
-        } else { \
-            newdata = ar->data; \
-        } \
-    } \
+#define ARRAY_ENSURE_DATASZ_BODY(realloc_fn, free_fn)                          \
+    void *newdata;                                                             \
+    unsigned i;                                                                \
+    if (!(flags & ARRAY_FLAG_SAVE)) {                                          \
+        if (ar->fini != NULL) {                                                \
+            for (i = 0; i < ar->elnum; ++i) {                                  \
+                ar->fini(ar->data + i * ar->elsz);                             \
+            }                                                                  \
+        }                                                                      \
+        if (newelnum > 0) {                                                    \
+            if (ar->datasz < ar->elsz * newelnum) {                            \
+                ar->datasz = ar->elsz * newelnum;                              \
+                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
+                    FAIL("realloc");                                           \
+                }                                                              \
+            } else {                                                           \
+                newdata = ar->data;                                            \
+            }                                                                  \
+        } else {                                                               \
+            free_fn(ar->data);                                                 \
+            ar->datasz = 0;                                                    \
+            newdata = NULL;                                                    \
+        }                                                                      \
+        if (ar->init != NULL) {                                                \
+            for (i = 0; i < newelnum; ++i) {                                   \
+                ar->init(newdata + i * ar->elsz);                              \
+            }                                                                  \
+        }                                                                      \
+    } else {                                                                   \
+        if (newelnum > ar->elnum) {                                            \
+            if (ar->datasz < ar->elsz * newelnum) {                            \
+                ar->datasz = ar->elsz * newelnum;                              \
+                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
+                    FAIL("realloc");                                           \
+                }                                                              \
+            } else {                                                           \
+                newdata = ar->data;                                            \
+            }                                                                  \
+            if (ar->init != NULL) {                                            \
+                for (i = ar->elnum; i < newelnum; ++i) {                       \
+                    ar->init(newdata + i * ar->elsz);                          \
+                }                                                              \
+            }                                                                  \
+        } else if (newelnum < ar->elnum) {                                     \
+            if (ar->fini != NULL) {                                            \
+                for (i = newelnum; i < ar->elnum; ++i) {                       \
+                    ar->fini(ar->data + i * ar->elsz);                         \
+                }                                                              \
+            }                                                                  \
+            if (newelnum > 0) {                                                \
+                ar->datasz = ar->elsz * newelnum;                              \
+                if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
+                    FAIL("realloc");                                           \
+                }                                                              \
+            } else {                                                           \
+                free_fn(ar->data);                                             \
+                ar->datasz = 0;                                                \
+                newdata = NULL;                                                \
+            }                                                                  \
+        } else {                                                               \
+            newdata = ar->data;                                                \
+        }                                                                      \
+    }                                                                          \
     ar->data = newdata;
 
 

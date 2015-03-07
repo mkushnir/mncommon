@@ -20,28 +20,28 @@ null_init(void **v)
     return 0;
 }
 
-#define DICT_SET_ITEM_BODY(malloc_fn) \
-    uint64_t idx; \
-    dict_item_t **pdit, *dit; \
-    idx = dict->hashfn(key) % dict->sz; \
-    if ((pdit = array_get(&dict->table, idx)) == NULL) { \
-        FAIL("array_get"); \
-    } \
-    if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) { \
-        FAIL("malloc_fn"); \
-    } \
-    dit->bucket = pdit; \
-    dit->prev = NULL; \
-    if (*pdit == NULL) { \
-        dit->next = NULL; \
-    } else { \
-        /* insert before the first */ \
-        dit->next = *pdit; \
-        (*pdit)->prev = dit; \
-        (*pdit)->bucket = NULL; \
-    } \
-    dit->key = key; \
-    dit->value = value; \
+#define DICT_SET_ITEM_BODY(malloc_fn)                          \
+    uint64_t idx;                                              \
+    dict_item_t **pdit, *dit;                                  \
+    idx = dict->hashfn(key) % dict->sz;                        \
+    if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
+        FAIL("array_get");                                     \
+    }                                                          \
+    if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) {      \
+        FAIL("malloc_fn");                                     \
+    }                                                          \
+    dit->bucket = pdit;                                        \
+    dit->prev = NULL;                                          \
+    if (*pdit == NULL) {                                       \
+        dit->next = NULL;                                      \
+    } else {                                                   \
+        /* insert before the first */                          \
+        dit->next = *pdit;                                     \
+        (*pdit)->prev = dit;                                   \
+        (*pdit)->bucket = NULL;                                \
+    }                                                          \
+    dit->key = key;                                            \
+    dit->value = value;                                        \
     *pdit = dit;
 
 void
@@ -58,50 +58,50 @@ dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
 #undef _malloc
 }
 
-#define DICT_SET_ITEM_UNIQ_BODY(malloc_fn) \
-    uint64_t idx; \
-    assert(oldkey != NULL); \
-    assert(oldvalue != NULL); \
-    dict_item_t **pdit, *dit; \
-    idx = dict->hashfn(key) % dict->sz; \
-    if ((pdit = array_get(&dict->table, idx)) == NULL) { \
-        FAIL("array_get"); \
-    } \
-    if (*pdit == NULL) { \
-        if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) { \
-            FAIL("malloc_fn"); \
-        } \
-        dit->bucket = pdit; \
-        dit->prev = NULL; \
-        dit->next = NULL; \
-        dit->key = key; \
-        dit->value = value; \
-        *pdit = dit; \
-    } else { \
-        for (dit = *pdit; dit != NULL; dit = dit->next) { \
-            if (dict->cmp(key, dit->key) == 0) { \
-                if (dict->fini != NULL) { \
-                    dict->fini(dit->key, dit->value); \
-                } \
-                *oldkey = dit->key; \
-                dit->key = key; \
-                *oldvalue = dit->value; \
-                dit->value = value; \
-                return; \
-            } \
-        } \
-        if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) { \
-            FAIL("malloc_fn"); \
-        } \
-        dit->next = *pdit; \
-        (*pdit)->prev = dit; \
-        (*pdit)->bucket = NULL; \
-        dit->key = key; \
-        dit->value = value; \
-        *pdit = dit; \
-    } \
-    *oldkey = NULL; \
-    *oldvalue = NULL; \
+#define DICT_SET_ITEM_UNIQ_BODY(malloc_fn)                     \
+    uint64_t idx;                                              \
+    assert(oldkey != NULL);                                    \
+    assert(oldvalue != NULL);                                  \
+    dict_item_t **pdit, *dit;                                  \
+    idx = dict->hashfn(key) % dict->sz;                        \
+    if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
+        FAIL("array_get");                                     \
+    }                                                          \
+    if (*pdit == NULL) {                                       \
+        if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) {  \
+            FAIL("malloc_fn");                                 \
+        }                                                      \
+        dit->bucket = pdit;                                    \
+        dit->prev = NULL;                                      \
+        dit->next = NULL;                                      \
+        dit->key = key;                                        \
+        dit->value = value;                                    \
+        *pdit = dit;                                           \
+    } else {                                                   \
+        for (dit = *pdit; dit != NULL; dit = dit->next) {      \
+            if (dict->cmp(key, dit->key) == 0) {               \
+                if (dict->fini != NULL) {                      \
+                    dict->fini(dit->key, dit->value);          \
+                }                                              \
+                *oldkey = dit->key;                            \
+                dit->key = key;                                \
+                *oldvalue = dit->value;                        \
+                dit->value = value;                            \
+                return;                                        \
+            }                                                  \
+        }                                                      \
+        if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) {  \
+            FAIL("malloc_fn");                                 \
+        }                                                      \
+        dit->next = *pdit;                                     \
+        (*pdit)->prev = dit;                                   \
+        (*pdit)->bucket = NULL;                                \
+        dit->key = key;                                        \
+        dit->value = value;                                    \
+        *pdit = dit;                                           \
+    }                                                          \
+    *oldkey = NULL;                                            \
+    *oldvalue = NULL;
 
 void
 dict_set_item_uniq(dict_t *dict,
@@ -151,38 +151,38 @@ dict_get_item(dict_t *dict, void *key)
 }
 
 
-#define DICT_REMOVE_ITEM_BODY(free_fn) \
-    uint64_t idx; \
-    dict_item_t **pdit, *dit; \
-    idx = dict->hashfn(key) % dict->sz; \
-    if ((pdit = array_get(&dict->table, idx)) == NULL) { \
-        FAIL("array_get"); \
-    } \
-    if (*pdit == NULL) { \
-        return NULL; \
-    } \
-    dit = *pdit; \
-    if (dict->cmp(key, dit->key) == 0) { \
-        void *value; \
-        dit->next->prev = NULL; \
-        *pdit = dit->next; \
-        value = dit->value; \
-        free_fn(dit); \
-        return value; \
-    } \
-    while (dit->next != NULL) { \
-        dit = dit->next; \
-        if (dict->cmp(key, dit->key) == 0) { \
-            void *value; \
-            dit->prev->next = dit->next; \
-            if (dit->next != NULL) { \
-                dit->next->prev = dit->prev; \
-            } \
-            value = dit->value; \
-            free_fn(dit); \
-            return value; \
-        } \
-    } \
+#define DICT_REMOVE_ITEM_BODY(free_fn)                         \
+    uint64_t idx;                                              \
+    dict_item_t **pdit, *dit;                                  \
+    idx = dict->hashfn(key) % dict->sz;                        \
+    if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
+        FAIL("array_get");                                     \
+    }                                                          \
+    if (*pdit == NULL) {                                       \
+        return NULL;                                           \
+    }                                                          \
+    dit = *pdit;                                               \
+    if (dict->cmp(key, dit->key) == 0) {                       \
+        void *value;                                           \
+        dit->next->prev = NULL;                                \
+        *pdit = dit->next;                                     \
+        value = dit->value;                                    \
+        free_fn(dit);                                          \
+        return value;                                          \
+    }                                                          \
+    while (dit->next != NULL) {                                \
+        dit = dit->next;                                       \
+        if (dict->cmp(key, dit->key) == 0) {                   \
+            void *value;                                       \
+            dit->prev->next = dit->next;                       \
+            if (dit->next != NULL) {                           \
+                dit->next->prev = dit->prev;                   \
+            }                                                  \
+            value = dit->value;                                \
+            free_fn(dit);                                      \
+            return value;                                      \
+        }                                                      \
+    }                                                          \
     return NULL
 
 void *
@@ -201,22 +201,22 @@ dict_remove_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key)
 }
 
 
-#define DICT_DELETE_PAIR_BODY(free_fn) \
-    if (dit->prev != NULL) { \
-        dit->prev->next = dit->next; \
-    } else { \
-        assert(dit->bucket != NULL); \
-        *(dit->bucket) = dit->next; \
-    } \
-    if (dit->next != NULL) { \
-        dit->next->prev = dit->prev; \
-        if (dit->prev == NULL) { \
-            dit->next->bucket = dit->bucket; \
-        } \
-    } \
-    if (dict->fini != NULL) { \
-        dict->fini(dit->key, dit->value); \
-    } \
+#define DICT_DELETE_PAIR_BODY(free_fn)         \
+    if (dit->prev != NULL) {                   \
+        dit->prev->next = dit->next;           \
+    } else {                                   \
+        assert(dit->bucket != NULL);           \
+        *(dit->bucket) = dit->next;            \
+    }                                          \
+    if (dit->next != NULL) {                   \
+        dit->next->prev = dit->prev;           \
+        if (dit->prev == NULL) {               \
+            dit->next->bucket = dit->bucket;   \
+        }                                      \
+    }                                          \
+    if (dict->fini != NULL) {                  \
+        dict->fini(dit->key, dit->value);      \
+    }                                          \
     free_fn(dit)
 
 
@@ -303,15 +303,15 @@ dict_is_empty(dict_t *dict)
 }
 
 
-#define DICT_INIT_BODY(array_init_fn) \
-    dict->sz = sz; \
-    assert(hashfn != NULL); \
-    dict->hashfn = hashfn; \
-    assert(cmp != NULL); \
-    dict->cmp = cmp; \
-    dict->fini = fini; \
-    array_init_fn(&dict->table, sizeof(dict_item_t *), sz, \
-               (array_initializer_t)null_init, \
+#define DICT_INIT_BODY(array_init_fn)                          \
+    dict->sz = sz;                                             \
+    assert(hashfn != NULL);                                    \
+    dict->hashfn = hashfn;                                     \
+    assert(cmp != NULL);                                       \
+    dict->cmp = cmp;                                           \
+    dict->fini = fini;                                         \
+    array_init_fn(&dict->table, sizeof(dict_item_t *), sz,     \
+               (array_initializer_t)null_init,                 \
                NULL)
 
 
@@ -340,32 +340,32 @@ dict_init_mpool(mpool_ctx_t *mpool,
 }
 
 
-#define DICT_CLEANUP_BODY(free_fn) \
-    if (dict->fini != NULL) { \
-        size_t i; \
-        for (i = 0; i < dict->table.elnum; ++i) { \
-            dict_item_t **pdit, *dit, *next; \
-            pdit = ARRAY_GET(dict_item_t *, &dict->table, i); \
-            for (dit = *pdit; dit != NULL; dit = next) { \
-                next = dit->next; \
-                if (dict->fini(dit->key, dit->value) != 0) { \
-                    break; \
-                } \
-                free_fn(dit); \
-            } \
-            *pdit = NULL; \
-        } \
-    } else { \
-        size_t i; \
-        for (i = 0; i < dict->table.elnum; ++i) { \
-            dict_item_t **pdit, *dit, *next; \
-            pdit = ARRAY_GET(dict_item_t *, &dict->table, i); \
-            for (dit = *pdit; dit != NULL; dit = next) { \
-                next = dit->next; \
-                free_fn(dit); \
-            } \
-            *pdit = NULL; \
-        } \
+#define DICT_CLEANUP_BODY(free_fn)                             \
+    if (dict->fini != NULL) {                                  \
+        size_t i;                                              \
+        for (i = 0; i < dict->table.elnum; ++i) {              \
+            dict_item_t **pdit, *dit, *next;                   \
+            pdit = ARRAY_GET(dict_item_t *, &dict->table, i);  \
+            for (dit = *pdit; dit != NULL; dit = next) {       \
+                next = dit->next;                              \
+                if (dict->fini(dit->key, dit->value) != 0) {   \
+                    break;                                     \
+                }                                              \
+                free_fn(dit);                                  \
+            }                                                  \
+            *pdit = NULL;                                      \
+        }                                                      \
+    } else {                                                   \
+        size_t i;                                              \
+        for (i = 0; i < dict->table.elnum; ++i) {              \
+            dict_item_t **pdit, *dit, *next;                   \
+            pdit = ARRAY_GET(dict_item_t *, &dict->table, i);  \
+            for (dit = *pdit; dit != NULL; dit = next) {       \
+                next = dit->next;                              \
+                free_fn(dit);                                  \
+            }                                                  \
+            *pdit = NULL;                                      \
+        }                                                      \
     }
 
 
