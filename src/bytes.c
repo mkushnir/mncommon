@@ -260,6 +260,7 @@ bytes_new_from_str(const char *s)
 #define BYTES_NEW_FROM_BYTES_BODY(malloc_fn)                   \
     bytes_t *res;                                              \
     size_t mod, msz;                                           \
+    assert(s->sz > 0);                                         \
     msz = s->sz;                                               \
     mod = s->sz % 8;                                           \
     if (mod) {                                                 \
