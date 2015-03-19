@@ -70,20 +70,14 @@ array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
  * Make sure array is at least newelnum long.
  */
 
-#define ARRAY_ENSURE_LEN_BODY(realloc_fn, free_fn)                             \
+#define ARRAY_ENSURE_DIRTY_BODY(realloc_fn, free_fn, __a)                      \
     void *newdata;                                                             \
-    unsigned i;                                                                \
     if (!(flags & ARRAY_FLAG_SAVE)) {                                          \
-        if (ar->fini != NULL) {                                                \
-            for (i = 0; i < ar->elnum; ++i) {                                  \
-                ar->fini(ar->data + i * ar->elsz);                             \
-            }                                                                  \
-        }                                                                      \
         if (newelnum > 0) {                                                    \
             if (ar->datasz < ar->elsz * newelnum) {                            \
                 ar->datasz = ar->elsz * newelnum;                              \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
-                    TRRET(ARRAY_ENSURE_LEN + 1);                               \
+                    FAIL("realloc");                                           \
                 }                                                              \
             } else {                                                           \
                 newdata = ar->data;                                            \
@@ -93,36 +87,21 @@ array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
             free_fn(ar->data);                                                 \
             newdata = NULL;                                                    \
         }                                                                      \
-        if (ar->init != NULL) {                                                \
-            for (i = 0; i < newelnum; ++i) {                                   \
-                ar->init(newdata + i * ar->elsz);                              \
-            }                                                                  \
-        }                                                                      \
     } else {                                                                   \
         if (newelnum > ar->elnum) {                                            \
             if (ar->datasz < ar->elsz * newelnum) {                            \
                 ar->datasz = ar->elsz * newelnum;                              \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
-                    TRRET(ARRAY_ENSURE_LEN + 2);                               \
+                    FAIL("realloc");                                           \
                 }                                                              \
             } else {                                                           \
                 newdata = ar->data;                                            \
             }                                                                  \
-            if (ar->init != NULL) {                                            \
-                for (i = ar->elnum; i < newelnum; ++i) {                       \
-                    ar->init(newdata + i * ar->elsz);                          \
-                }                                                              \
-            }                                                                  \
         } else if (newelnum < ar->elnum) {                                     \
-            if (ar->fini != NULL) {                                            \
-                for (i = newelnum; i < ar->elnum; ++i) {                       \
-                    ar->fini(ar->data + i * ar->elsz);                         \
-                }                                                              \
-            }                                                                  \
             if (newelnum > 0) {                                                \
                 ar->datasz = ar->elsz * newelnum;                              \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
-                    TRRET(ARRAY_ENSURE_LEN + 3);                               \
+                    FAIL("realloc");                                           \
                 }                                                              \
             } else {                                                           \
                 ar->datasz = 0;                                                \
@@ -134,30 +113,59 @@ array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
         }                                                                      \
     }                                                                          \
     ar->data = newdata;                                                        \
-    ar->elnum = newelnum;                                                      \
-    return 0;
+    __a;                                                                       \
 
 
 
 int
-array_ensure_len(array_t *ar, size_t newelnum, unsigned int flags)
+array_ensure_len_dirty(array_t *ar, size_t newelnum, unsigned int flags)
 {
-    ARRAY_ENSURE_LEN_BODY(realloc, free);
+    ARRAY_ENSURE_DIRTY_BODY(realloc, free,
+            ar->elnum = newelnum;
+            return 0;
+    )
 }
 
 
 int
-array_ensure_len_mpool(mpool_ctx_t *mpool, array_t *ar, size_t newelnum, unsigned int flags)
+array_ensure_len_dirty_mpool(mpool_ctx_t *mpool,
+                             array_t *ar,
+                             size_t newelnum,
+                             unsigned int flags)
 {
 #define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
 #define _free(p) mpool_free(mpool, (p))
-    ARRAY_ENSURE_LEN_BODY(_realloc, _free);
+    ARRAY_ENSURE_DIRTY_BODY(_realloc, _free,
+            ar->elnum = newelnum;
+            return 0;
+    )
 #undef _realloc
 #undef _free
 }
 
 
-#define ARRAY_ENSURE_DATASZ_BODY(realloc_fn, free_fn)                          \
+void
+array_ensure_datasz_dirty(array_t *ar, size_t newelnum, unsigned int flags)
+{
+    ARRAY_ENSURE_DIRTY_BODY(realloc, free,)
+}
+
+
+void
+array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
+                                array_t *ar,
+                                size_t newelnum,
+                                unsigned int flags)
+{
+#define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
+#define _free(p) mpool_free(mpool, (p))
+    ARRAY_ENSURE_DIRTY_BODY(_realloc, _free,)
+#undef _realloc
+#undef _free
+}
+
+
+#define ARRAY_ENSURE_BODY(realloc_fn, free_fn, __a)                            \
     void *newdata;                                                             \
     unsigned i;                                                                \
     if (!(flags & ARRAY_FLAG_SAVE)) {                                          \
@@ -176,8 +184,8 @@ array_ensure_len_mpool(mpool_ctx_t *mpool, array_t *ar, size_t newelnum, unsigne
                 newdata = ar->data;                                            \
             }                                                                  \
         } else {                                                               \
-            free_fn(ar->data);                                                 \
             ar->datasz = 0;                                                    \
+            free_fn(ar->data);                                                 \
             newdata = NULL;                                                    \
         }                                                                      \
         if (ar->init != NULL) {                                                \
@@ -212,22 +220,51 @@ array_ensure_len_mpool(mpool_ctx_t *mpool, array_t *ar, size_t newelnum, unsigne
                     FAIL("realloc");                                           \
                 }                                                              \
             } else {                                                           \
-                free_fn(ar->data);                                             \
                 ar->datasz = 0;                                                \
+                free_fn(ar->data);                                             \
                 newdata = NULL;                                                \
             }                                                                  \
         } else {                                                               \
             newdata = ar->data;                                                \
         }                                                                      \
     }                                                                          \
-    ar->data = newdata;
+    ar->data = newdata;                                                        \
+    __a;                                                                       \
 
+
+
+
+int
+array_ensure_len(array_t *ar, size_t newelnum, unsigned int flags)
+{
+    ARRAY_ENSURE_BODY(realloc, free,
+            ar->elnum = newelnum;
+            return 0;
+    )
+}
+
+
+int
+array_ensure_len_mpool(mpool_ctx_t *mpool,
+                       array_t *ar,
+                       size_t newelnum,
+                       unsigned int flags)
+{
+#define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
+#define _free(p) mpool_free(mpool, (p))
+    ARRAY_ENSURE_BODY(_realloc, _free,
+            ar->elnum = newelnum;
+            return 0;
+    )
+#undef _realloc
+#undef _free
+}
 
 
 void
 array_ensure_datasz(array_t *ar, size_t newelnum, unsigned int flags)
 {
-    ARRAY_ENSURE_DATASZ_BODY(realloc, free);
+    ARRAY_ENSURE_BODY(realloc, free,)
 }
 
 
@@ -239,7 +276,7 @@ array_ensure_datasz_mpool(mpool_ctx_t *mpool,
 {
 #define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
 #define _free(p) mpool_free(mpool, (p))
-    ARRAY_ENSURE_DATASZ_BODY(_realloc, _free);
+    ARRAY_ENSURE_BODY(_realloc, _free,)
 #undef _realloc
 #undef _free
 }
