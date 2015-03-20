@@ -46,6 +46,7 @@ int array_ensure_len_dirty(array_t *, size_t, unsigned int);
 int array_ensure_len_mpool(mpool_ctx_t *, array_t *, size_t, unsigned int);
 int array_ensure_len_dirty_mpool(mpool_ctx_t *, array_t *, size_t, unsigned int);
 void array_ensure_datasz(array_t *, size_t, unsigned int);
+void array_ensure_datasz_mpool(mpool_ctx_t *, array_t *, size_t, unsigned int);
 void array_ensure_datasz_dirty(array_t *, size_t, unsigned int);
 void array_ensure_datasz_dirty_mpool(mpool_ctx_t *, array_t *, size_t, unsigned int);
 void *array_get(const array_t *, unsigned);
