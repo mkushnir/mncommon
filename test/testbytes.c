@@ -249,6 +249,27 @@ test4(void)
 }
 
 
+static void
+test5(void)
+{
+    struct {
+        long rnd;
+        int in;
+        int expected;
+    } data[] = {
+        {0, 0, 0},
+    };
+    bytes_t *b;
+    UNITTEST_PROLOG_RAND;
+
+    b = bytes_printf("%d:%d:%d:%s:%lld", 1,2,3, "tis is", 0x12345678912345ll);
+    TRACE("res=%s", b->data);
+    D8(b->data, b->sz);
+    BYTES_DECREF(&b);
+
+}
+
+
 int
 main(void)
 {
@@ -257,5 +278,6 @@ main(void)
     test2();
     test3();
     test4();
+    test5();
     return 0;
 }

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -303,6 +304,28 @@ bytes_new_from_bytes_mpool(mpool_ctx_t *mpool, const bytes_t *s)
 }
 #undef _malloc
 
+
+bytes_t * PRINTFLIKE(1, 2)
+bytes_printf(const char *fmt, ...)
+{
+    int nused;
+    char x;
+    bytes_t *res;
+    va_list ap0, ap1;
+
+    va_start(ap0, fmt);
+    va_copy(ap1, ap0);
+    nused = vsnprintf(&x, 0, fmt, ap0);
+    va_end(ap0);
+
+    res = bytes_new(nused + 1);
+
+    nused = vsnprintf((char *)res->data, res->sz, fmt, ap1);
+    va_end(ap1);
+    assert((size_t)nused < res->sz);
+
+    return res;
+}
 
 void
 bytes_copy(bytes_t *dst, bytes_t *src, size_t off)

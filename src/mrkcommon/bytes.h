@@ -5,6 +5,7 @@
 #include <sys/types.h>
 
 #include <mrkcommon/mpool.h>
+#include <mrkcommon/util.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +58,7 @@ bytes_t *bytes_new_from_str(const char *);
 bytes_t *bytes_new_from_str_mpool(mpool_ctx_t *, const char *);
 bytes_t *bytes_new_from_bytes(const bytes_t *);
 bytes_t *bytes_new_from_bytes_mpool(mpool_ctx_t *, const bytes_t *);
+bytes_t * PRINTFLIKE(1, 2) bytes_printf(const char *, ...);
 void bytes_incref(bytes_t *);
 void bytes_decref(bytes_t **);
 void bytes_decref_fast(bytes_t *);
