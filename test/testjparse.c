@@ -129,7 +129,7 @@ oint(jparse_ctx_t *jctx)
     TRACE("qwe=%ld", val.v.i);
 
 end:
-    if (res == -1) {
+    if (res == JPARSE_EOS) {
         res = 0;
     } else {
         TR(res);
@@ -165,7 +165,7 @@ ofloat(jparse_ctx_t *jctx)
     TRACE("qwe=%lf", val.v.f);
 
 end:
-    if (res == -1) {
+    if (res == JPARSE_EOS) {
         res = 0;
     }
     return res;
@@ -192,7 +192,7 @@ ostr(jparse_ctx_t *jctx)
     TRACE("qwe=%s", val.v.s != NULL ? (char *)val.v.s->data : "<null>");
 
 end:
-    if (res == -1) {
+    if (res == JPARSE_EOS) {
         res = 0;
     }
     return res;
@@ -226,7 +226,7 @@ obool(jparse_ctx_t *jctx)
     TRACE("asd=%s", val.v.b ? "#t" : "#f");
 
 end:
-    if (res == -1) {
+    if (res == JPARSE_EOS) {
         res = 0;
     }
     return res;
@@ -256,7 +256,7 @@ oarray(jparse_ctx_t *jctx)
     bytes_decref(&key);
 
 end:
-    if (res == -1) {
+    if (res == JPARSE_EOS) {
         res = 0;
     }
     return res;

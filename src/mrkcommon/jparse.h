@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#define JPARSE_EOS (-1)
+
 typedef struct _jparse_value {
     json_type_t ty;
     union {
