@@ -72,8 +72,8 @@ bytestream_include_headers = mrkcommon/bytestream.h
 endif
 
 if JSON
-json_sources = json.c
-json_include_headers = mrkcommon/json.h
+json_sources = json.c jparse.c
+json_include_headers = mrkcommon/json.h mrkcommon/jparse.h
 endif
 
 if STQUEUE

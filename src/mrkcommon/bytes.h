@@ -70,6 +70,7 @@ void bytes_brushdown(bytes_t *);
 void bytes_urldecode(bytes_t *);
 bytes_t *bytes_set_lower(bytes_t *s);
 bytes_t *bytes_json_escape(bytes_t *);
+void bytes_json_unescape(bytes_t *);
 int bytes_is_ascii(bytes_t *);
 int bytes_startswith(const bytes_t *, const bytes_t *);
 int bytes_endswith(const bytes_t *, const bytes_t *);

@@ -25,7 +25,7 @@ if TRAVERSEDIR
 noinst_PROGRAMS += testtraversedir
 endif
 if JSON
-noinst_PROGRAMS += testjson
+noinst_PROGRAMS += testjson testjparse
 endif
 if STQUEUE
 noinst_PROGRAMS += teststqueue
@@ -113,6 +113,10 @@ testtraversedir_LDFLAGS =
 testjson_SOURCES = ../src/json.c testjson.c
 testjson_CFLAGS =
 testjson_LDFLAGS =
+
+testjparse_SOURCES = ../src/jparse.c testjparse.c
+testjparse_CFLAGS =
+testjparse_LDFLAGS =
 
 teststqueue_SOURCES = teststqueue.c
 teststqueue_CFLAGS =

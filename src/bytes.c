@@ -134,6 +134,45 @@ bytes_json_escape(bytes_t *src)
 }
 
 
+void
+bytes_json_unescape(bytes_t *src)
+{
+    size_t i, j;
+    bytes_t *dest;
+
+    /* partial json string support */
+    dest = src;
+    for (i = 0, j = 0; i < src->sz; ++i, ++j) {
+        unsigned char ch;
+
+        ch = src->data[i];
+        if (ch == '\\') {
+            ++i;
+            if (i < src->sz) {
+                ch = src->data[i];
+                if (ch == 'b') {
+                    ch = '\b';
+                } else if (ch == 'f') {
+                    ch = '\f';
+                } else if (ch == 'n') {
+                    ch = '\n';
+                } else if (ch == 'r') {
+                    ch = '\r';
+                } else if (ch == 't') {
+                    ch = '\t';
+                } else {
+                }
+            } else {
+                break;
+            }
+        }
+        dest->data[j] = ch;
+    }
+    dest->data[j - 1] = '\0';
+    dest->sz = j;
+}
+
+
 int
 bytes_is_ascii(bytes_t *s)
 {
