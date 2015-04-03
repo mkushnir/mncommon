@@ -201,7 +201,7 @@ jparse_expect_maybe_null(jparse_ctx_t *jctx)
         }
     }
     SPOS(&jctx->bs) = spos;
-    return -1;
+    return -2;
 }
 
 
@@ -483,7 +483,7 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val)
         }                                      \
     }                                          \
     if (reach_comma(jctx) != 0) {              \
-        res = -1;                              \
+        res = JPARSE_EOS;                      \
     }                                          \
     return res;                                \
 
@@ -604,7 +604,7 @@ jparse_expect_array(jparse_ctx_t *jctx, jparse_expect_cb_t cb)
         }                                      \
     }                                          \
     if (reach_comma(jctx) != 0) {              \
-        res = -1;                              \
+        res = JPARSE_EOS;                      \
     }                                          \
     return res;                                \
 
