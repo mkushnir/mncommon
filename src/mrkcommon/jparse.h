@@ -18,7 +18,7 @@ typedef struct _jparse_value {
         long i;
         double f;
         bytes_t *s;
-        char b:1;
+        char b;
     } v;
 } jparse_value_t;
 
@@ -36,7 +36,7 @@ typedef int (*jparse_expect_cb_t)(jparse_ctx_t *);
 
 int jparse_expect_any(jparse_ctx_t *, jparse_value_t *);
 int jparse_expect_tok(jparse_ctx_t *, bytes_t **);
-int jparse_expect_null(jparse_ctx_t *);
+int jparse_expect_maybe_null(jparse_ctx_t *);
 int jparse_expect_int(jparse_ctx_t *, long *);
 int jparse_expect_float(jparse_ctx_t *, double *);
 int jparse_expect_str(jparse_ctx_t *, bytes_t **);

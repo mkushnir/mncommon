@@ -158,6 +158,7 @@ jparse_expect_tok(jparse_ctx_t *jctx, bytes_t **val)
     if (reach_nonblank(jctx) != 0) {
         TRRET(JPARSE_EXPECT_TOK + 1);
     }
+    res = 0;
     start = SPOS(&jctx->bs);
     while (1) {
         char ch;
@@ -188,13 +189,13 @@ jparse_expect_tok(jparse_ctx_t *jctx, bytes_t **val)
 
 
 int
-jparse_expect_null(jparse_ctx_t *jctx)
+jparse_expect_maybe_null(jparse_ctx_t *jctx)
 {
     bytes_t *v;
     off_t spos;
 
     spos = SPOS(&jctx->bs);
-    if (jparse_expect_tok(jctx, &v)) {
+    if (jparse_expect_tok(jctx, &v) == 0) {
         if (bytes_cmp(v, jctx->_null) == 0) {
             return 0;
         }
@@ -444,10 +445,10 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val)
     bytes_t *v;
 
     if (jparse_expect_tok(jctx, &v) == 0) {
-        if (bytes_cmp(v, jctx->_true)) {
+        if (bytes_cmp(v, jctx->_true) == 0) {
             *val = 1;
             return 0;
-        } else if (bytes_cmp(v, jctx->_false)) {
+        } else if (bytes_cmp(v, jctx->_false) == 0) {
             *val = 0;
             return 0;
         } else {
@@ -474,7 +475,7 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val)
     if (reach_colon(jctx) != 0) {              \
         TRRET(msg + 3);                        \
     }                                          \
-    if (jparse_expect_null(jctx) == 0) {       \
+    if (jparse_expect_maybe_null(jctx) == 0) { \
         __a1;                                  \
     } else {                                   \
         if (expect_fn(jctx, val) != 0) {       \
@@ -493,7 +494,7 @@ jparse_expect_kvp_int(jparse_ctx_t *jctx,
                       long *val)
 {
     EXPECT_KVP_BODY(jparse_expect_int,
-                    *val = 0,
+                    /* *val = 0 */,
                     JPARSE_EXPECT_KVP_INT)
 }
 
@@ -504,7 +505,7 @@ jparse_expect_kvp_float(jparse_ctx_t *jctx,
                       double *val)
 {
     EXPECT_KVP_BODY(jparse_expect_float,
-                    *val = .0,
+                    /* *val = .0 */,
                     JPARSE_EXPECT_KVP_FLOAT)
 }
 
@@ -515,7 +516,7 @@ jparse_expect_kvp_str(jparse_ctx_t *jctx,
                       bytes_t **val)
 {
     EXPECT_KVP_BODY(jparse_expect_str,
-                    *val = NULL,
+                    /* *val = NULL */,
                     JPARSE_EXPECT_KVP_STR)
 }
 
@@ -526,7 +527,7 @@ jparse_expect_kvp_bool(jparse_ctx_t *jctx,
                       char *val)
 {
     EXPECT_KVP_BODY(jparse_expect_bool,
-                    *val = 0,
+                    /* *val = 0 */,
                     JPARSE_EXPECT_KVP_BOOL)
 }
 
@@ -595,7 +596,7 @@ jparse_expect_array(jparse_ctx_t *jctx, jparse_expect_cb_t cb)
 #define EXPECT_ITEM_BODY(expect_fn, __a1, msg) \
     int res;                                   \
     res = 0;                                   \
-    if (jparse_expect_null(jctx) == 0) {       \
+    if (jparse_expect_maybe_null(jctx) == 0) { \
         __a1;                                  \
     } else {                                   \
         if (expect_fn(jctx, val) != 0) {       \
@@ -612,7 +613,7 @@ int
 jparse_expect_item_int(jparse_ctx_t *jctx, long *val)
 {
     EXPECT_ITEM_BODY(jparse_expect_int,
-                     *val = 0,
+                     /* *val = 0 */,
                      JPARSE_EXPECT_ITEM_INT)
 }
 
@@ -621,7 +622,7 @@ int
 jparse_expect_item_float(jparse_ctx_t *jctx, double *val)
 {
     EXPECT_ITEM_BODY(jparse_expect_float,
-                     *val = .0,
+                     /* *val = .0 */,
                      JPARSE_EXPECT_ITEM_FLOAT)
 }
 
@@ -630,7 +631,7 @@ int
 jparse_expect_item_str(jparse_ctx_t *jctx, bytes_t **val)
 {
     EXPECT_ITEM_BODY(jparse_expect_str,
-                     *val = NULL,
+                     /* *val = NULL */,
                      JPARSE_EXPECT_ITEM_STR)
 }
 
@@ -639,7 +640,7 @@ int
 jparse_expect_item_bool(jparse_ctx_t *jctx, char *val)
 {
     EXPECT_ITEM_BODY(jparse_expect_bool,
-                     *val = 0,
+                     /* *val = 0 */,
                      JPARSE_EXPECT_ITEM_BOOL)
 }
 
