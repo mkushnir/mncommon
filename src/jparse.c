@@ -63,6 +63,7 @@ reach_blank(jparse_ctx_t *jctx)
 
 
 #define REACH_BODY(delim, msg)                                                 \
+    off_t spos = SPOS(&jctx->bs);                                              \
     int res = 0;                                                               \
     while (1) {                                                                \
         char ch;                                                               \
@@ -81,11 +82,13 @@ reach_blank(jparse_ctx_t *jctx)
         } else if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n') {      \
             SINCR(&jctx->bs);                                                  \
         } else {                                                               \
+            /* TRACE("failing %c at %ld", ch, SPOS(&jctx->bs)); */             \
+            SPOS(&jctx->bs) = spos;                                            \
             res = msg + 2;                                                     \
             break;                                                             \
         }                                                                      \
     }                                                                          \
-    return res;                                                                \
+    TRRET(res);                                                                \
 
 
 static int
@@ -208,8 +211,10 @@ jparse_expect_maybe_null(jparse_ctx_t *jctx)
 int
 jparse_expect_int(jparse_ctx_t *jctx, long *val)
 {
+    off_t spos;
     int st, res, sign;
 
+    spos = SPOS(&jctx->bs);
     if (reach_nonblank(jctx) != 0) {
         TRRET(JPARSE_EXPECT_INT + 1);
     }
@@ -241,6 +246,7 @@ jparse_expect_int(jparse_ctx_t *jctx, long *val)
                 st = JPS_NUM;
             } else {
                 res = JPARSE_EXPECT_INT + 1;
+                SPOS(&jctx->bs) = spos;
                 break;
             }
 
@@ -253,6 +259,7 @@ jparse_expect_int(jparse_ctx_t *jctx, long *val)
             }
         } else {
             res = JPARSE_EXPECT_INT + 2;
+            SPOS(&jctx->bs) = spos;
             break;
         }
         SINCR(&jctx->bs);
@@ -273,9 +280,10 @@ int
 jparse_expect_float(jparse_ctx_t *jctx, double *val)
 {
     int st, res;
-    off_t start, stop;
+    off_t start, stop, spos;
     char *endptr;
 
+    spos = SPOS(&jctx->bs);
     if (reach_nonblank(jctx) != 0) {
         TRRET(JPARSE_EXPECT_FLOAT + 1);
     }
@@ -349,6 +357,7 @@ jparse_expect_float(jparse_ctx_t *jctx, double *val)
 
         } else {
             res = JPARSE_EXPECT_INT + 2;
+            SPOS(&jctx->bs) = spos;
             break;
         }
         SINCR(&jctx->bs);
@@ -357,13 +366,13 @@ jparse_expect_float(jparse_ctx_t *jctx, double *val)
 
     *val = strtod(SDATA(&jctx->bs, start), &endptr);
 
-    if (endptr > SDATA(&jctx->bs, stop)) {
-        TRACE("%p/%p", endptr, SDATA(&jctx->bs, stop));
-        D8(SDATA(&jctx->bs, start), stop - start);
-        D8(SDATA(&jctx->bs, start),
-                 (endptr - SDATA(&jctx->bs, start)) - start);
-        FAIL("jparse_expect_float");
-    }
+    //if (endptr > SDATA(&jctx->bs, stop)) {
+    //    TRACE("%p/%p", endptr, SDATA(&jctx->bs, stop));
+    //    D8(SDATA(&jctx->bs, start), stop - start);
+    //    D8(SDATA(&jctx->bs, start),
+    //             (endptr - SDATA(&jctx->bs, start)) - start);
+    //    FAIL("jparse_expect_float");
+    //}
 
     return res;
 }
@@ -373,10 +382,12 @@ int
 jparse_expect_str(jparse_ctx_t *jctx, bytes_t **val)
 {
     int st, flags, res;
-    off_t start, stop;
+    off_t start, stop, spos;
     size_t sz;
 
+    spos = SPOS(&jctx->bs);
     if (reach_dquote(jctx) != 0) {
+        SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_STR + 1);
     }
 
@@ -421,6 +432,7 @@ jparse_expect_str(jparse_ctx_t *jctx, bytes_t **val)
             }
         } else {
             res = JPARSE_EXPECT_STR + 3;
+            SPOS(&jctx->bs) = spos;
             break;
         }
         SINCR(&jctx->bs);
@@ -442,8 +454,10 @@ jparse_expect_str(jparse_ctx_t *jctx, bytes_t **val)
 int
 jparse_expect_bool(jparse_ctx_t *jctx, char *val)
 {
+    off_t spos;
     bytes_t *v;
 
+    spos = SPOS(&jctx->bs);
     if (jparse_expect_tok(jctx, &v) == 0) {
         if (bytes_cmp(v, jctx->_true) == 0) {
             *val = 1;
@@ -452,9 +466,11 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val)
             *val = 0;
             return 0;
         } else {
+            SPOS(&jctx->bs) = spos;
             TRRET(JPARSE_EXPECT_BOOL + 1);
         }
     }
+    SPOS(&jctx->bs) = spos;
     TRRET(JPARSE_EXPECT_BOOL + 2);
 }
 
@@ -557,15 +573,20 @@ jparse_expect_kvp_object(jparse_ctx_t *jctx,
 int
 jparse_expect_object(jparse_ctx_t *jctx, jparse_expect_cb_t cb)
 {
+    off_t spos;
     int res;
 
+    spos = SPOS(&jctx->bs);
     if (reach_ostart(jctx) != 0) {
+        SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_OBJECT + 1);
     }
     if ((res = cb(jctx)) != 0) {
+        SPOS(&jctx->bs) = spos;
         return res;
     }
     if (reach_oend(jctx) != 0) {
+        SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_OBJECT + 2);
     }
     return res;
@@ -578,15 +599,20 @@ jparse_expect_object(jparse_ctx_t *jctx, jparse_expect_cb_t cb)
 int
 jparse_expect_array(jparse_ctx_t *jctx, jparse_expect_cb_t cb)
 {
+    off_t spos;
     int res;
 
+    spos = SPOS(&jctx->bs);
     if (reach_astart(jctx) != 0) {
+        SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_ARRAY + 1);
     }
     if ((res = cb(jctx)) != 0) {
+        SPOS(&jctx->bs) = spos;
         return res;
     }
     if (reach_aend(jctx) != 0) {
+        SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_ARRAY + 2);
     }
     return res;
@@ -594,12 +620,15 @@ jparse_expect_array(jparse_ctx_t *jctx, jparse_expect_cb_t cb)
 
 
 #define EXPECT_ITEM_BODY(expect_fn, __a1, msg) \
+    off_t spos;                                \
     int res;                                   \
     res = 0;                                   \
+    spos = SPOS(&jctx->bs);                    \
     if (jparse_expect_maybe_null(jctx) == 0) { \
         __a1;                                  \
     } else {                                   \
         if (expect_fn(jctx, val) != 0) {       \
+            SPOS(&jctx->bs) = spos;            \
             TRRET(msg + 4);                    \
         }                                      \
     }                                          \
