@@ -2,7 +2,7 @@
 #include <fcntl.h>
 
 #include <mrkcommon/jparse.h>
-#define TRRET_DEBUG
+//#define TRRET_DEBUG
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/util.h>
 #include "diag.h"
