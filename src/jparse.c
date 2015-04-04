@@ -280,7 +280,8 @@ int
 jparse_expect_float(jparse_ctx_t *jctx, double *val)
 {
     int st, res;
-    off_t start, stop, spos;
+    off_t start, spos;
+    UNUSED off_t stop;
     char *endptr;
 
     spos = SPOS(&jctx->bs);
