@@ -44,21 +44,27 @@ int jparse_expect_float(jparse_ctx_t *, double *);
 int jparse_expect_str(jparse_ctx_t *, bytes_t **);
 int jparse_expect_bool(jparse_ctx_t *, char *);
 
-int jparse_expect_object(jparse_ctx_t *, jparse_expect_cb_t);
 int jparse_expect_kvp_int(jparse_ctx_t *, bytes_t **, long *);
+int jparse_expect_skvp_int(jparse_ctx_t *, const char *, long *);
 int jparse_expect_kvp_float(jparse_ctx_t *, bytes_t **, double *);
+int jparse_expect_skvp_float(jparse_ctx_t *, const char *, double *);
 int jparse_expect_kvp_str(jparse_ctx_t *, bytes_t **, bytes_t **);
+int jparse_expect_skvp_str(jparse_ctx_t *, const char *, bytes_t **);
 int jparse_expect_kvp_bool(jparse_ctx_t *, bytes_t **, char *);
+int jparse_expect_skvp_bool(jparse_ctx_t *, const char *, char *);
 int jparse_expect_kvp_array(jparse_ctx_t *, bytes_t **, jparse_expect_cb_t);
+int jparse_expect_skvp_array(jparse_ctx_t *, const char *, jparse_expect_cb_t);
 int jparse_expect_kvp_object(jparse_ctx_t *, bytes_t **, jparse_expect_cb_t);
+int jparse_expect_skvp_object(jparse_ctx_t *, const char *, jparse_expect_cb_t);
+int jparse_expect_object(jparse_ctx_t *, jparse_expect_cb_t);
 
-int jparse_expect_array(jparse_ctx_t *, jparse_expect_cb_t);
 int jparse_expect_item_int(jparse_ctx_t *, long *);
 int jparse_expect_item_float(jparse_ctx_t *, double *);
 int jparse_expect_item_str(jparse_ctx_t *, bytes_t **);
 int jparse_expect_item_bool(jparse_ctx_t *, char *);
 int jparse_expect_item_array(jparse_ctx_t *, jparse_expect_cb_t);
 int jparse_expect_item_object(jparse_ctx_t *, jparse_expect_cb_t);
+int jparse_expect_array(jparse_ctx_t *, jparse_expect_cb_t);
 
 #define REF_JPARSE_ARRAY_ITERATOR(it) _jparse_array_iterator_##it
 

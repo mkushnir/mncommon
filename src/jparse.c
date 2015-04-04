@@ -504,6 +504,15 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val)
     return res;                                \
 
 
+#define EXPECT_SKVP_BODY(expect_fn)    \
+    int res;                           \
+    bytes_t *k;                        \
+    k = bytes_new_from_str(key);       \
+    res = expect_fn(jctx, &k, val);    \
+    bytes_decref(&k);                  \
+    return res;                        \
+
+
 int
 jparse_expect_kvp_int(jparse_ctx_t *jctx,
                       bytes_t **key,
@@ -512,6 +521,15 @@ jparse_expect_kvp_int(jparse_ctx_t *jctx,
     EXPECT_KVP_BODY(jparse_expect_int,
                     /* *val = 0 */,
                     JPARSE_EXPECT_KVP_INT)
+}
+
+
+int
+jparse_expect_skvp_int(jparse_ctx_t *jctx,
+                       const char *key,
+                       long *val)
+{
+    EXPECT_SKVP_BODY(jparse_expect_kvp_int)
 }
 
 
@@ -527,6 +545,15 @@ jparse_expect_kvp_float(jparse_ctx_t *jctx,
 
 
 int
+jparse_expect_skvp_float(jparse_ctx_t *jctx,
+                         const char *key,
+                         double *val)
+{
+    EXPECT_SKVP_BODY(jparse_expect_kvp_float)
+}
+
+
+int
 jparse_expect_kvp_str(jparse_ctx_t *jctx,
                       bytes_t **key,
                       bytes_t **val)
@@ -534,6 +561,15 @@ jparse_expect_kvp_str(jparse_ctx_t *jctx,
     EXPECT_KVP_BODY(jparse_expect_str,
                     /* *val = NULL */,
                     JPARSE_EXPECT_KVP_STR)
+}
+
+
+int
+jparse_expect_skvp_str(jparse_ctx_t *jctx,
+                       const char *key,
+                       bytes_t **val)
+{
+    EXPECT_SKVP_BODY(jparse_expect_kvp_str)
 }
 
 
@@ -549,6 +585,15 @@ jparse_expect_kvp_bool(jparse_ctx_t *jctx,
 
 
 int
+jparse_expect_skvp_bool(jparse_ctx_t *jctx,
+                        const char *key,
+                        char *val)
+{
+    EXPECT_SKVP_BODY(jparse_expect_kvp_bool)
+}
+
+
+int
 jparse_expect_kvp_array(jparse_ctx_t *jctx,
                       bytes_t **key,
                       jparse_expect_cb_t val)
@@ -560,6 +605,15 @@ jparse_expect_kvp_array(jparse_ctx_t *jctx,
 
 
 int
+jparse_expect_skvp_array(jparse_ctx_t *jctx,
+                         const char *key,
+                         jparse_expect_cb_t val)
+{
+    EXPECT_SKVP_BODY(jparse_expect_kvp_array)
+}
+
+
+int
 jparse_expect_kvp_object(jparse_ctx_t *jctx,
                       bytes_t **key,
                       jparse_expect_cb_t val)
@@ -567,6 +621,15 @@ jparse_expect_kvp_object(jparse_ctx_t *jctx,
     EXPECT_KVP_BODY(jparse_expect_object,
                     ,
                     JPARSE_EXPECT_KVP_OBJECT)
+}
+
+
+int
+jparse_expect_skvp_object(jparse_ctx_t *jctx,
+                          const char *key,
+                          jparse_expect_cb_t val)
+{
+    EXPECT_SKVP_BODY(jparse_expect_kvp_object)
 }
 
 
