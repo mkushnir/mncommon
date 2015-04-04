@@ -60,6 +60,31 @@ int jparse_expect_item_bool(jparse_ctx_t *, char *);
 int jparse_expect_item_array(jparse_ctx_t *, jparse_expect_cb_t);
 int jparse_expect_item_object(jparse_ctx_t *, jparse_expect_cb_t);
 
+#define REF_JPARSE_ARRAY_ITERATOR(it) _jparse_array_iterator_##it
+
+
+#define DECL_JPARSE_ARRAY_ITERATOR(it)                         \
+static int REF_JPARSE_ARRAY_ITERATOR(it)(jparse_ctx_t *jctx)   \
+
+
+#define JPARSE_ARRAY_ITERATOR_BODY(it, cb)                                     \
+    off_t spos;                                                                \
+    int res;                                                                   \
+    spos = SPOS(&jctx->bs);                                                    \
+    for (res = 0; res == 0; res = jparse_expect_item_object(jctx, cb)) {       \
+    }                                                                          \
+    if (res == JPARSE_EOS || (res != 0 && spos == SPOS(&jctx->bs))) {          \
+        res = 0;                                                               \
+    }                                                                          \
+    return res;                                                                \
+
+
+#define DEF_JPARSE_ARRAY_ITERATOR(it, cb)  DECL_JPARSE_ARRAY_ITERATOR(it)      \
+{                                                                              \
+    JPARSE_ARRAY_ITERATOR_BODY(it, cb)                                         \
+}                                                                              \
+
+
 jparse_ctx_t *jparse_ctx_new(size_t, size_t);
 void jparse_ctx_destroy(jparse_ctx_t **);
 int jparse_ctx_parse(jparse_ctx_t *, const char *, jparse_expect_cb_t, void *);
