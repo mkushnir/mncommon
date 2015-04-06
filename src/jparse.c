@@ -479,30 +479,30 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val)
 /*
  * object
  */
-#define EXPECT_KVP_BODY(expect_fn, __a1, msg)  \
-    int res;                                   \
-    bytes_t *v;                                \
-    res = 0;                                   \
-    if (jparse_expect_str(jctx, &v) != 0) {    \
-        TRRET(msg + 1);                        \
-    }                                          \
-    if (bytes_cmp(v, *key) != 0) {             \
-        TRRET(msg + 2);                        \
-    }                                          \
-    if (reach_colon(jctx) != 0) {              \
-        TRRET(msg + 3);                        \
-    }                                          \
-    if (jparse_expect_maybe_null(jctx) == 0) { \
-        __a1;                                  \
-    } else {                                   \
-        if (expect_fn(jctx, val) != 0) {       \
-            TRRET(msg + 4);                    \
-        }                                      \
-    }                                          \
-    if (reach_comma(jctx) != 0) {              \
-        res = JPARSE_EOS;                      \
-    }                                          \
-    return res;                                \
+#define EXPECT_KVP_BODY(expect_fn, __a1, msg)          \
+    int res;                                           \
+    bytes_t *v;                                        \
+    res = 0;                                           \
+    if (jparse_expect_str(jctx, &v) != 0) {            \
+        TRRET(msg + 1);                                \
+    }                                                  \
+    if (bytes_cmp(v, *key) != 0) {                     \
+        TRRET(msg + 2);                                \
+    }                                                  \
+    if (reach_colon(jctx) != 0) {                      \
+        TRRET(msg + 3);                                \
+    }                                                  \
+    if (jparse_expect_maybe_null(jctx) == 0) {         \
+        __a1;                                          \
+    } else {                                           \
+        if ((res = expect_fn(jctx, val)) != 0) {       \
+            TRRET(res);                                \
+        }                                              \
+    }                                                  \
+    if (reach_comma(jctx) != 0) {                      \
+        res = JPARSE_EOS;                              \
+    }                                                  \
+    return res;                                        \
 
 
 #define EXPECT_SKVP_BODY(expect_fn)    \
@@ -683,23 +683,23 @@ jparse_expect_array(jparse_ctx_t *jctx, jparse_expect_cb_t cb)
 }
 
 
-#define EXPECT_ITEM_BODY(expect_fn, __a1, msg) \
-    off_t spos;                                \
-    int res;                                   \
-    res = 0;                                   \
-    spos = SPOS(&jctx->bs);                    \
-    if (jparse_expect_maybe_null(jctx) == 0) { \
-        __a1;                                  \
-    } else {                                   \
-        if (expect_fn(jctx, val) != 0) {       \
-            SPOS(&jctx->bs) = spos;            \
-            TRRET(msg + 4);                    \
-        }                                      \
-    }                                          \
-    if (reach_comma(jctx) != 0) {              \
-        res = JPARSE_EOS;                      \
-    }                                          \
-    return res;                                \
+#define EXPECT_ITEM_BODY(expect_fn, __a1, msg)         \
+    off_t spos;                                        \
+    int res;                                           \
+    res = 0;                                           \
+    spos = SPOS(&jctx->bs);                            \
+    if (jparse_expect_maybe_null(jctx) == 0) {         \
+        __a1;                                          \
+    } else {                                           \
+        if ((res = expect_fn(jctx, val)) != 0) {       \
+            SPOS(&jctx->bs) = spos;                    \
+            TRRET(res);                                \
+        }                                              \
+    }                                                  \
+    if (reach_comma(jctx) != 0) {                      \
+        res = JPARSE_EOS;                              \
+    }                                                  \
+    return res;                                        \
 
 
 int
