@@ -337,10 +337,86 @@ test0(void)
 }
 
 
+static int
+mycb100(jparse_ctx_t *jctx)
+{
+    int res;
+    jparse_value_t v;
+
+    res = jparse_expect_ignore(jctx, &v);
+    jparse_dump_value(&v);
+    return res;
+}
+
+
+DEF_JPARSE_OBJECT_ITERATOR(mycb200, jparse_expect_anykvp_any);
+
+static int
+mycb200(jparse_ctx_t *jctx)
+{
+    int res;
+    jparse_value_t v;
+    v.cb = REF_JPARSE_OBJECT_ITERATOR(mycb200);
+
+    res = jparse_expect_any(jctx, &v);
+    jparse_dump_value(&v);
+    TR(res);
+    return 0;
+}
+
+
+DEF_JPARSE_ARRAY_ITERATOR(mycb201, jparse_expect_item_any);
+
+static int
+mycb201(jparse_ctx_t *jctx)
+{
+    int res;
+    jparse_value_t v;
+    v.cb = REF_JPARSE_ARRAY_ITERATOR(mycb201);
+
+    res = jparse_expect_any(jctx, &v);
+    jparse_dump_value(&v);
+    TR(res);
+    return 0;
+}
+
+
+void
+test1(void)
+{
+    jparse_ctx_t *jctx;
+    UNUSED int res;
+
+    struct {
+        long rnd;
+        const char *in;
+        jparse_expect_cb_t cb;
+    } data[] = {
+        {0, "data/testjparse/object-int-01", mycb100},
+        {0, "data/testjparse/array-int-01", mycb100},
+        {0, "data/testjparse/object-int-01", mycb200},
+        {0, "data/testjparse/array-int-01", mycb201},
+
+    };
+    UNITTEST_PROLOG;
+
+    FOREACHDATA {
+        TRACE("in=%s", CDATA.in);
+        jctx = jparse_ctx_new(4096, 4096);
+        jctx->default_cb = mycb200;
+        res = jparse_ctx_parse(jctx, CDATA.in, CDATA.cb, NULL);
+        jparse_ctx_destroy(&jctx);
+        assert(res == 0);
+    }
+}
+
+
+
 int
 main(void)
 {
-    test0();
+    //test0();
+    test1();
     return 0;
 }
 

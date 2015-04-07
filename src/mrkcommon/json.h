@@ -17,7 +17,7 @@ typedef enum _json_type {
     JSON_NULL,
 } json_type_t;
 
-#define JSON_TYPESTR(ty) ( \
+#define JSON_TYPE_STR(ty) ( \
     (ty) == JSON_OBJECT ? "OBJECT" : \
     (ty) == JSON_ARRAY ? "ARRAY" : \
     (ty) == JSON_STRING ? "STRING" : \
