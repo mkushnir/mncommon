@@ -164,7 +164,9 @@ dict_get_item(dict_t *dict, void *key)
     dit = *pdit;                                               \
     if (dict->cmp(key, dit->key) == 0) {                       \
         void *value;                                           \
-        dit->next->prev = NULL;                                \
+        if (dit->next != NULL) {                               \
+            dit->next->prev = NULL;                            \
+        }                                                      \
         *pdit = dit->next;                                     \
         value = dit->value;                                    \
         free_fn(dit);                                          \
@@ -183,7 +185,8 @@ dict_get_item(dict_t *dict, void *key)
             return value;                                      \
         }                                                      \
     }                                                          \
-    return NULL
+    return NULL                                                \
+
 
 void *
 dict_remove_item(dict_t *dict, void *key)
