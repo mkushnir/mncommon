@@ -25,7 +25,6 @@ typedef int (*dict_item_comparator_t)(void *, void *);
 typedef int (*dict_item_finalizer_t)(void *, void *);
 typedef int (*dict_traverser_t)(void *, void *, void *);
 typedef struct _dict {
-    size_t sz;
     dict_hashfn_t hashfn;
     dict_item_comparator_t cmp;
     dict_item_finalizer_t fini;

@@ -23,7 +23,7 @@ null_init(void **v)
 #define DICT_SET_ITEM_BODY(malloc_fn)                          \
     uint64_t idx;                                              \
     dict_item_t **pdit, *dit;                                  \
-    idx = dict->hashfn(key) % dict->sz;                        \
+    idx = dict->hashfn(key) % dict->table.elnum;               \
     if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
     }                                                          \
@@ -63,7 +63,7 @@ dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
     assert(oldkey != NULL);                                    \
     assert(oldvalue != NULL);                                  \
     dict_item_t **pdit, *dit;                                  \
-    idx = dict->hashfn(key) % dict->sz;                        \
+    idx = dict->hashfn(key) % dict->table.elnum;               \
     if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
     }                                                          \
@@ -132,7 +132,7 @@ dict_get_item(dict_t *dict, void *key)
     uint64_t idx;
     dict_item_t **pdit, *dit;
 
-    idx = dict->hashfn(key) % dict->sz;
+    idx = dict->hashfn(key) % dict->table.elnum;
 
     if ((pdit = array_get(&dict->table, idx)) == NULL) {
         FAIL("array_get");
@@ -154,7 +154,7 @@ dict_get_item(dict_t *dict, void *key)
 #define DICT_REMOVE_ITEM_BODY(free_fn)                         \
     uint64_t idx;                                              \
     dict_item_t **pdit, *dit;                                  \
-    idx = dict->hashfn(key) % dict->sz;                        \
+    idx = dict->hashfn(key) % dict->table.elnum;               \
     if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
     }                                                          \
@@ -304,7 +304,6 @@ dict_is_empty(dict_t *dict)
 
 
 #define DICT_INIT_BODY(array_init_fn)                          \
-    dict->sz = sz;                                             \
     assert(hashfn != NULL);                                    \
     dict->hashfn = hashfn;                                     \
     assert(cmp != NULL);                                       \
