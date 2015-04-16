@@ -182,40 +182,7 @@ pqueue_fini(pqueue_t *pq)
 }
 
 
-UNUSED static int
-pqueue_mingen(pqueue_item_t *it, UNUSED void *value, void *udata)
-{
-    struct {
-        pqueue_t *pq;
-        double weight;
-        pqueue_item_t *it;
-    } *params;
-    uint64_t myage;
-    double myweight;
-
-    params = udata;
-    myage = params->pq->c - it->_gen;
-    /* actually weighted age */
-    //myweight = 1.0 - (double)myage/(double)params->pq->c;
-    myweight = 1.0 / (double)myage;
-
-    /*
-     * XXX find a good function of (myweight, myprop)
-     */
-    myweight *= (double)it->prop;
-    //TRACE("%p myweight=%lf", it, myweight);
-    /*
-     * reduce to the least weighting item
-     */
-    if (myweight < params->weight) {
-        params->weight = myweight;
-        params->it = it;
-    }
-    return 0;
-}
-
-
-UNUSED static int
+static int
 pqueue_mingen_fast(pqueue_item_t *it, UNUSED void *value, void *udata)
 {
     struct {

@@ -43,7 +43,6 @@ typedef struct _pqueue {
 typedef struct _pqueue_item {
     uint64_t _gen;
     void *v;
-    uint64_t prop;
     CMTY cmprop;
 } pqueue_item_t;
 

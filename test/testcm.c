@@ -291,7 +291,6 @@ pqueue_item_new(char *s)
         FAIL("malloc");
     }
     it->v = bytes_new_from_str(s);
-    it->prop = 0ul;
 
     return it;
 }
@@ -306,7 +305,7 @@ mycb(pqueue_item_t *it, UNUSED void *v, void *udata)
     s = it->v;
     aggr = udata;
     *aggr += it->cmprop;
-    TRACE("prop %03ld/%03ld %s", it->prop, it->cmprop, s->data);
+    TRACE("%03ld %s", it->cmprop, s->data);
     return 0;
 }
 
@@ -349,7 +348,6 @@ test2(char *fname)
         free(s);
 
         if ((it1 = pqueue_peek(&pq, it0)) == NULL) {
-            ++it0->prop;
             if ((it1 = pqueue_push(&pq, it0)) != NULL) {
                 bytes_t *s;
 
@@ -360,7 +358,6 @@ test2(char *fname)
         } else {
             bytes_t *s;
 
-            ++it1->prop;
             s = it0->v;
             //TRACE("deleting dup %s", s->data);
             pqueue_item_fini(it0);
@@ -442,7 +439,6 @@ test3(char *fname)
         pqueue_item_add_to_cm(it0, &cm);
 
         if ((it1 = pqueue_peek(&pq, it0)) == NULL) {
-            ++it0->prop;
             if ((it1 = pqueue_push(&pq, it0)) != NULL) {
                 UNUSED bytes_t *s;
 
@@ -453,7 +449,6 @@ test3(char *fname)
         } else {
             UNUSED bytes_t *s;
 
-            ++it1->prop;
             pqueue_item_update_at_cm(it1, &cm);
             //s = it0->v;
             //TRACE("deleting dup %s", s->data);
