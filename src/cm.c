@@ -152,9 +152,11 @@ wheel_2x3_find_prime(size_t n)
     size_t p;
 
     for (i = 1, p = 5; p < n; ++i) {
-        p = 6 * i + 5;
+        if (i % 5) {
+            p = 6 * i + 5;
+        }
+        //TRACE("p=%ld", p);
     }
-    //TRACE("p=%ld", p);
     return p;
 }
 
