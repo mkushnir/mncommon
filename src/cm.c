@@ -216,7 +216,7 @@ pqueue_peek(pqueue_t *pq, pqueue_item_t *it)
 pqueue_item_t *
 pqueue_pop(pqueue_t *pq)
 {
-    pqueue_item_t *res, it0 = {0, NULL, 0xffffffffffffffff, CMMAX};
+    pqueue_item_t *res, it0 = {0, NULL, CMMAX};
     struct {
         pqueue_t *pq;
         double weight;
