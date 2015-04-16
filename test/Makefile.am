@@ -42,6 +42,9 @@ endif
 if BYTES
 noinst_PROGRAMS += testbytes
 endif
+if CM
+noinst_PROGRAMS += testcm
+endif
 
 distdir = $(top_srcdir)/$(PACKAGE)-$(VERSION)/test
 dist_HEADERS = unittest.h rb.h zltan-fasthash.h
@@ -137,6 +140,10 @@ testmpool_LDFLAGS =
 testbytes_SOURCES = ../src/bytes.c testbytes.c
 testbytes_CFLAGS =
 testbytes_LDFLAGS =
+
+testcm_SOURCES = ../src/cm.c testcm.c
+testcm_CFLAGS =
+testcm_LDFLAGS =
 
 ../src/diag.c ../src/diag.h: ../src/diag.txt
 	sh ../gen-diag mrkcommon

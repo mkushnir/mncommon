@@ -232,6 +232,13 @@ AC_ARG_ENABLE(bytes,
               [AM_CONDITIONAL([BYTES], [enable_bytes=yes])],
              )
 
+AC_ARG_ENABLE(cm,
+              AC_HELP_STRING([--enable-cm],
+                             [Enable count-min (default=yes)]),
+              [AM_CONDITIONAL([CM], [test "$enable_cm" = "yes"])],
+              [AM_CONDITIONAL([CM], [enable_cm=yes])],
+             )
+
 if test "$enable_profile" = "yes" -a "$enable_list" != "yes"
 then
     echo "ERROR: cannot disable the list feature because the profile feature requires it."
@@ -241,6 +248,12 @@ fi
 if test "$enable_conf" = "yes" -a "$enable_array" != "yes"
 then
     echo "ERROR: cannot disable the array feature because the conf feature requires it."
+    exit 1
+fi
+
+if test "$enable_cm" = "yes" -a \( "$enable_dict" != "yes" -o "$enable_fasthash" != "yes" \)
+then
+    echo "ERROR: cannot disable the dict feature because the cm feature requires it."
     exit 1
 fi
 
