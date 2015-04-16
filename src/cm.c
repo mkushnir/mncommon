@@ -138,7 +138,7 @@ cmhash_dump(cmhash_t *cmh)
 
 
 /*
- * pqueue_t
+ * pset_t
  */
 
 
@@ -162,33 +162,34 @@ wheel_2x3_find_prime(size_t n)
 
 
 void
-pqueue_init(pqueue_t *pq,
+pset_init(pset_t *pset,
             ssize_t thresh,
             dict_hashfn_t hash,
             dict_item_comparator_t cmp,
-            dict_item_finalizer_t fini)
+            dict_item_finalizer_t fini,
+            CMTY minthresh)
 {
-    pq->c = 0ul;
-    pq->nleft = thresh;
-    dict_init(&pq->d, wheel_2x3_find_prime(thresh), hash, cmp, fini);
-    pq->fast_pop_thresh = CMMIN;
+    pset->nleft = thresh;
+    dict_init(&pset->d, wheel_2x3_find_prime(thresh), hash, cmp, fini);
+    pset->minthresh = minthresh;
+    pset->fast_pop_thresh = minthresh;
 }
 
 
 void
-pqueue_fini(pqueue_t *pq)
+pset_fini(pset_t *pset)
 {
-    dict_fini(&pq->d);
+    dict_fini(&pset->d);
 }
 
 
 static int
-pqueue_mingen_fast(pqueue_item_t *it, UNUSED void *value, void *udata)
+pset_mingen_fast(pset_item_t *it, UNUSED void *value, void *udata)
 {
     struct {
-        pqueue_t *pq;
+        pset_t *pset;
         double weight;
-        pqueue_item_t *it;
+        pset_item_t *it;
     } *params;
 
     params = udata;
@@ -199,12 +200,12 @@ pqueue_mingen_fast(pqueue_item_t *it, UNUSED void *value, void *udata)
 }
 
 
-pqueue_item_t *
-pqueue_peek(pqueue_t *pq, pqueue_item_t *it)
+pset_item_t *
+pset_peek(pset_t *pset, pset_item_t *it)
 {
-    pqueue_item_t *res;
+    pset_item_t *res;
     dict_item_t *dit;
-    if ((dit = dict_get_item(&pq->d, it)) == NULL) {
+    if ((dit = dict_get_item(&pset->d, it)) == NULL) {
         res = NULL;
     } else {
         res = dit->key;
@@ -213,31 +214,31 @@ pqueue_peek(pqueue_t *pq, pqueue_item_t *it)
 }
 
 
-pqueue_item_t *
-pqueue_pop(pqueue_t *pq)
+pset_item_t *
+pset_pop(pset_t *pset)
 {
-    pqueue_item_t *res, it0 = {0, NULL, CMMAX};
+    pset_item_t *res, it0 = {NULL, CMMAX};
     struct {
-        pqueue_t *pq;
+        pset_t *pset;
         double weight;
-        pqueue_item_t *it;
+        pset_item_t *it;
     } params;
 
     res = NULL;
-    params.pq = pq;
+    params.pset = pset;
     params.weight = 1.0;
     params.it = &it0;
-    (void)dict_traverse(&pq->d, (dict_traverser_t)pqueue_mingen_fast, &params);
+    (void)dict_traverse(&pset->d, (dict_traverser_t)pset_mingen_fast, &params);
     if (params.it != NULL) {
         //TRACE("removing %p cmprop=%ld", params.it, params.it->cmprop);
 
-        (void)dict_remove_item(&pq->d, params.it);
+        (void)dict_remove_item(&pset->d, params.it);
         res = params.it;
-        ++pq->nleft;
-        if (pq->nleft <= 0) {
-            pq->fast_pop_thresh = res->cmprop;
+        ++pset->nleft;
+        if (pset->nleft <= 0) {
+            pset->fast_pop_thresh = MAX(res->cmprop, pset->minthresh);
         } else {
-            pq->fast_pop_thresh = CMMIN;
+            pset->fast_pop_thresh = pset->minthresh;
         }
     }
 
@@ -245,26 +246,24 @@ pqueue_pop(pqueue_t *pq)
 }
 
 
-pqueue_item_t *
-pqueue_push(pqueue_t *pq, pqueue_item_t *it)
+pset_item_t *
+pset_push(pset_t *pset, pset_item_t *it)
 {
-    pqueue_item_t *res;
+    pset_item_t *res;
     dict_item_t *dit;
 
-    it->_gen = pq->c++;
-
-    if (it->cmprop <= pq->fast_pop_thresh) {
+    if (it->cmprop <= pset->fast_pop_thresh) {
         res = it;
     } else {
-        if ((dit = dict_get_item(&pq->d, it)) == NULL) {
-            dict_set_item(&pq->d, it, NULL);
-            --pq->nleft;
+        if ((dit = dict_get_item(&pset->d, it)) == NULL) {
+            dict_set_item(&pset->d, it, NULL);
+            --pset->nleft;
         } else {
             /* noop */
         }
 
-        if (pq->nleft < 0) {
-            res = pqueue_pop(pq);
+        if (pset->nleft < 0) {
+            res = pset_pop(pset);
         } else {
             res = NULL;
         }
@@ -276,7 +275,7 @@ pqueue_push(pqueue_t *pq, pqueue_item_t *it)
 
 
 int
-pqueue_traverse(pqueue_t *pq, dict_traverser_t cb, void *udata)
+pset_traverse(pset_t *pset, dict_traverser_t cb, void *udata)
 {
-    return dict_traverse(&pq->d, cb, udata);
+    return dict_traverse(&pset->d, cb, udata);
 }

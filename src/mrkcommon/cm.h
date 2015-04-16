@@ -10,9 +10,9 @@
 extern "C" {
 #endif
 
-#define CMTY uint64_t
-#define CMMAX ((CMTY)UINT64_MAX)
-#define CMMIN ((CMTY)0lu)
+#define CMTY int64_t
+#define CMMAX ((CMTY)INT64_MAX)
+#define CMMIN ((CMTY)0l)
 
 typedef struct _cm {
     size_t w;
@@ -32,19 +32,18 @@ typedef struct _cmhash {
 } cmhash_t;
 
 
-typedef struct _pqueue {
-    uint64_t c;
+typedef struct _pset {
     ssize_t nleft;
     dict_t d;
+    CMTY minthresh;
     CMTY fast_pop_thresh;
-} pqueue_t;
+} pset_t;
 
 
-typedef struct _pqueue_item {
-    uint64_t _gen;
+typedef struct _pset_item {
     void *v;
     CMTY cmprop;
-} pqueue_item_t;
+} pset_item_t;
 
 
 
@@ -67,20 +66,21 @@ void cmhash_dump(cmhash_t *);
 
 
 /*
- * pqueue -- dict_t based priority queue
+ * pset -- dict_t based priority set
  */
-pqueue_item_t *pqueue_peek(pqueue_t *, pqueue_item_t *);
-pqueue_item_t *pqueue_pop(pqueue_t *);
-pqueue_item_t *pqueue_push(pqueue_t *, pqueue_item_t *);
-int pqueue_traverse(pqueue_t *, dict_traverser_t, void *);
+pset_item_t *pset_peek(pset_t *, pset_item_t *);
+pset_item_t *pset_pop(pset_t *);
+pset_item_t *pset_push(pset_t *, pset_item_t *);
+int pset_traverse(pset_t *, dict_traverser_t, void *);
 
-void pqueue_init(pqueue_t *,
+void pset_init(pset_t *,
                  ssize_t,
                  dict_hashfn_t,
                  dict_item_comparator_t,
-                 dict_item_finalizer_t);
+                 dict_item_finalizer_t,
+                 CMTY);
 
-void pqueue_fini(pqueue_t *);
+void pset_fini(pset_t *);
 
 #ifdef __cplusplus
 }

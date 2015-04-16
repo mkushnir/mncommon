@@ -29,6 +29,7 @@ typedef struct _dict {
     dict_item_comparator_t cmp;
     dict_item_finalizer_t fini;
     array_t table;
+    size_t elnum;
 } dict_t;
 
 
@@ -56,6 +57,7 @@ typedef int (*dict_traverser_item_t)(dict_t *, dict_item_t *, void *);
 
 int dict_traverse_item(dict_t *, dict_traverser_item_t, void *);
 int dict_is_empty(dict_t *);
+size_t dict_get_elnum(dict_t *);
 
 dict_t *dict_new(size_t,
                  dict_hashfn_t,

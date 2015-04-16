@@ -42,7 +42,8 @@ null_init(void **v)
     }                                                          \
     dit->key = key;                                            \
     dit->value = value;                                        \
-    *pdit = dit;
+    *pdit = dit;                                               \
+    ++dict->elnum;                                             \
 
 void
 dict_set_item(dict_t *dict, void *key, void *value)
@@ -77,6 +78,7 @@ dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
         dit->key = key;                                        \
         dit->value = value;                                    \
         *pdit = dit;                                           \
+        ++dict->elnum;                                         \
     } else {                                                   \
         for (dit = *pdit; dit != NULL; dit = dit->next) {      \
             if (dict->cmp(key, dit->key) == 0) {               \
@@ -99,6 +101,7 @@ dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
         dit->key = key;                                        \
         dit->value = value;                                    \
         *pdit = dit;                                           \
+        ++dict->elnum;                                         \
     }                                                          \
     *oldkey = NULL;                                            \
     *oldvalue = NULL;
@@ -131,6 +134,10 @@ dict_get_item(dict_t *dict, void *key)
 {
     uint64_t idx;
     dict_item_t **pdit, *dit;
+
+    if (dict->elnum == 0) {
+        return NULL;
+    }
 
     idx = dict->hashfn(key) % dict->table.elnum;
 
@@ -170,6 +177,7 @@ dict_get_item(dict_t *dict, void *key)
         *pdit = dit->next;                                     \
         value = dit->value;                                    \
         free_fn(dit);                                          \
+        --dict->elnum;                                         \
         return value;                                          \
     }                                                          \
     while (dit->next != NULL) {                                \
@@ -182,6 +190,7 @@ dict_get_item(dict_t *dict, void *key)
             }                                                  \
             value = dit->value;                                \
             free_fn(dit);                                      \
+            --dict->elnum;                                     \
             return value;                                      \
         }                                                      \
     }                                                          \
@@ -220,7 +229,8 @@ dict_remove_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key)
     if (dict->fini != NULL) {                  \
         dict->fini(dit->key, dit->value);      \
     }                                          \
-    free_fn(dit)
+    free_fn(dit);                              \
+    --dict->elnum;                             \
 
 
 
@@ -291,18 +301,26 @@ dict_traverse_item(dict_t *dict, dict_traverser_item_t cb, void *udata)
 int
 dict_is_empty(dict_t *dict)
 {
-    dict_item_t **pdit;
-    array_iter_t it;
+    UNUSED dict_item_t **pdit;
+    UNUSED array_iter_t it;
 
-    for (pdit = array_first(&dict->table, &it);
-         pdit != NULL;
-         pdit = array_next(&dict->table, &it)) {
+    return dict->elnum == 0;
 
-        if (*pdit != NULL) {
-            return 0;
-        }
-    }
-    return 1;
+    //for (pdit = array_first(&dict->table, &it);
+    //     pdit != NULL;
+    //     pdit = array_next(&dict->table, &it)) {
+
+    //    if (*pdit != NULL) {
+    //        return 0;
+    //    }
+    //}
+    //return 1;
+}
+
+size_t
+dict_get_elnum(dict_t *dict)
+{
+    return dict->elnum;
 }
 
 
@@ -314,7 +332,8 @@ dict_is_empty(dict_t *dict)
     dict->fini = fini;                                         \
     array_init_fn(&dict->table, sizeof(dict_item_t *), sz,     \
                (array_initializer_t)null_init,                 \
-               NULL)
+               NULL);                                          \
+    dict->elnum = 0;                                           \
 
 
 void
@@ -354,6 +373,7 @@ dict_init_mpool(mpool_ctx_t *mpool,
                     break;                                     \
                 }                                              \
                 free_fn(dit);                                  \
+                --dict->elnum;                                 \
             }                                                  \
             *pdit = NULL;                                      \
         }                                                      \
@@ -365,10 +385,11 @@ dict_init_mpool(mpool_ctx_t *mpool,
             for (dit = *pdit; dit != NULL; dit = next) {       \
                 next = dit->next;                              \
                 free_fn(dit);                                  \
+                --dict->elnum;                                 \
             }                                                  \
             *pdit = NULL;                                      \
         }                                                      \
-    }
+    }                                                          \
 
 
 

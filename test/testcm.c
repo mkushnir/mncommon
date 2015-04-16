@@ -250,7 +250,7 @@ sion
 
 
 static uint64_t
-pqueue_item_hash(pqueue_item_t *it)
+pset_item_hash(pset_item_t *it)
 {
     bytes_t *s;
     s = it->v;
@@ -259,7 +259,7 @@ pqueue_item_hash(pqueue_item_t *it)
 
 
 static int
-pqueue_item_cmp(pqueue_item_t *a, pqueue_item_t *b)
+pset_item_cmp(pset_item_t *a, pset_item_t *b)
 {
     bytes_t *sa, *sb;
     sa = a->v;
@@ -269,7 +269,7 @@ pqueue_item_cmp(pqueue_item_t *a, pqueue_item_t *b)
 
 
 static int
-pqueue_item_fini(pqueue_item_t *it)
+pset_item_fini(pset_item_t *it)
 {
     if (it != NULL) {
         bytes_t *s;
@@ -282,12 +282,12 @@ pqueue_item_fini(pqueue_item_t *it)
 }
 
 
-static pqueue_item_t *
-pqueue_item_new(char *s)
+static pset_item_t *
+pset_item_new(char *s)
 {
-    pqueue_item_t *it;
+    pset_item_t *it;
 
-    if ((it = malloc(sizeof(pqueue_item_t))) == NULL) {
+    if ((it = malloc(sizeof(pset_item_t))) == NULL) {
         FAIL("malloc");
     }
     it->v = bytes_new_from_str(s);
@@ -297,7 +297,7 @@ pqueue_item_new(char *s)
 
 
 int
-mycb(pqueue_item_t *it, UNUSED void *v, void *udata)
+mycb(pset_item_t *it, UNUSED void *v, void *udata)
 {
     CMTY *aggr;
     bytes_t *s;
@@ -318,24 +318,25 @@ test2(char *fname)
     size_t sz0;
     ssize_t sz1;
     size_t nlines;
-    pqueue_t pq;
+    pset_t pset;
     uint64_t aggr;
 
     if ((f = fopen(fname, "r")) == NULL) {
         FAIL("open");
     }
 
-    pqueue_init(&pq,
+    pset_init(&pset,
                 80,
-                (dict_hashfn_t)pqueue_item_hash,
-                (dict_item_comparator_t)pqueue_item_cmp,
-                (dict_item_finalizer_t)pqueue_item_fini);
+                (dict_hashfn_t)pset_item_hash,
+                (dict_item_comparator_t)pset_item_cmp,
+                (dict_item_finalizer_t)pset_item_fini,
+                1000);
 
     for (s = NULL, nlines = 0;
          (sz1 = getline(&s, &sz0, f)) > 0;
          s = NULL, sz0 = 0) {
 
-        pqueue_item_t *it0, *it1;
+        pset_item_t *it0, *it1;
 
         if (sz1 < 0) {
             free(s);
@@ -344,37 +345,37 @@ test2(char *fname)
         ++nlines;
         s[sz1 - 1] = '\0';
         //D8(s, sz1);
-        it0 = pqueue_item_new(s);
+        it0 = pset_item_new(s);
         free(s);
 
-        if ((it1 = pqueue_peek(&pq, it0)) == NULL) {
-            if ((it1 = pqueue_push(&pq, it0)) != NULL) {
+        if ((it1 = pset_peek(&pset, it0)) == NULL) {
+            if ((it1 = pset_push(&pset, it0)) != NULL) {
                 bytes_t *s;
 
                 s = it1->v;
                 //TRACE("deleting %s", s->data);
-                pqueue_item_fini(it1);
+                pset_item_fini(it1);
             }
         } else {
             bytes_t *s;
 
             s = it0->v;
             //TRACE("deleting dup %s", s->data);
-            pqueue_item_fini(it0);
+            pset_item_fini(it0);
         }
     }
 
     aggr = 0;
-    pqueue_traverse(&pq, (dict_traverser_t)mycb, &aggr);
+    pset_traverse(&pset, (dict_traverser_t)mycb, &aggr);
 
-    pqueue_fini(&pq);
+    pset_fini(&pset);
     fclose(f);
     TRACE("nlines=%ld aggr=%ld", nlines, aggr);
 }
 
 
 static void
-pqueue_item_add_to_cm(pqueue_item_t *it, cm_t *cm)
+pset_item_tell_cm(pset_item_t *it, cm_t *cm)
 {
     bytes_t *s;
 
@@ -386,7 +387,7 @@ pqueue_item_add_to_cm(pqueue_item_t *it, cm_t *cm)
 
 
 UNUSED static void
-pqueue_item_update_at_cm(pqueue_item_t *it, cm_t *cm)
+pset_item_ask_cm(pset_item_t *it, cm_t *cm)
 {
     bytes_t *s;
 
@@ -404,27 +405,26 @@ test3(char *fname)
     size_t sz0;
     ssize_t sz1;
     size_t nlines;
-    pqueue_t pq;
+    pset_t pset;
     cm_t cm;
     CMTY aggr;
-    CMTY cmthresh;
 
     if ((f = fopen(fname, "r")) == NULL) {
         FAIL("open");
     }
 
     cm_init(&cm, 4, 1031);
-    pqueue_init(&pq,
-                20,
-                (dict_hashfn_t)pqueue_item_hash,
-                (dict_item_comparator_t)pqueue_item_cmp,
-                (dict_item_finalizer_t)pqueue_item_fini);
+    pset_init(&pset,
+                10,
+                (dict_hashfn_t)pset_item_hash,
+                (dict_item_comparator_t)pset_item_cmp,
+                (dict_item_finalizer_t)pset_item_fini,
+                0);
 
-    cmthresh = 0;
     for (s = NULL, nlines = 0;
          (sz1 = getline(&s, &sz0, f)) > 0;
          s = NULL, sz0 = 0) {
-        pqueue_item_t *it0, *it1;
+        pset_item_t *it0, *it1;
 
         if (sz1 < 64) {
             free(s);
@@ -433,36 +433,33 @@ test3(char *fname)
         ++nlines;
         s[sz1 - 1] = '\0';
         //D8(s, sz1);
-        it0 = pqueue_item_new(s);
+        it0 = pset_item_new(s);
         free(s);
 
-        pqueue_item_add_to_cm(it0, &cm);
+        pset_item_tell_cm(it0, &cm);
 
-        if ((it1 = pqueue_peek(&pq, it0)) == NULL) {
-            if ((it1 = pqueue_push(&pq, it0)) != NULL) {
+        if ((it1 = pset_peek(&pset, it0)) == NULL) {
+            if ((it1 = pset_push(&pset, it0)) != NULL) {
                 UNUSED bytes_t *s;
 
                 //s = it1->v;
                 //TRACE("deleting %s", s->data);
-                pqueue_item_fini(it1);
+                pset_item_fini(it1);
             }
         } else {
             UNUSED bytes_t *s;
 
-            pqueue_item_update_at_cm(it1, &cm);
             //s = it0->v;
             //TRACE("deleting dup %s", s->data);
-            pqueue_item_fini(it0);
+            pset_item_ask_cm(it1, &cm);
+            pset_item_fini(it0);
         }
-
-        cmthresh = MAX(cmthresh, it0->cmprop);
-        //TRACE("cmprop=%ld cmthresh=%ld", it0->cmprop, cmthresh);
     }
 
     aggr = 0;
-    pqueue_traverse(&pq, (dict_traverser_t)mycb, &aggr);
+    pset_traverse(&pset, (dict_traverser_t)mycb, &aggr);
 
-    pqueue_fini(&pq);
+    pset_fini(&pset);
     cm_fini(&cm);
     fclose(f);
     TRACE("nlines=%ld aggr=%ld", nlines, aggr);
