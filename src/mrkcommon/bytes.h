@@ -23,32 +23,38 @@ typedef struct _bytes {
     unsigned char data[];
 } bytes_t;
 
-#define BYTES_INCREF(b) \
-do { \
-    (++(b)->nref); \
-    /* TRACE("B>>> %p %ld", (b), (b)->nref); */ \
-} while (0)
+#define BYTES_INCREF(b)                        \
+do {                                           \
+    (++(b)->nref);                             \
+    /* TRACE("B>>> %p %ld", (b), (b)->nref); */\
+} while (0)                                    \
 
-#define BYTES_DECREF(pb) \
-do { \
-    if (*(pb) != NULL) { \
-        --(*(pb))->nref; \
-        if ((*(pb))->nref <= 0) { \
-            /* TRACE("B<<< %p %ld '%s'", *(pb), (*(pb))->nref, (*(pb))->data); */ \
-            free(*(pb)); \
-        } \
-        *(pb) = NULL; \
-    } \
-} while (0)
 
-#define BYTES_DECREF_FAST(b) \
-do { \
-    --((b))->nref; \
-    if (((b))->nref <= 0) { \
-        /* TRACE("B<<< %p %ld '%s'", b, (b)->nref, (b)->data); */ \
-        free((b)); \
-    } \
-} while (0)
+#define BYTES_DECREF(pb)                                                       \
+do {                                                                           \
+    if (*(pb) != NULL) {                                                       \
+        --(*(pb))->nref;                                                       \
+        if ((*(pb))->nref <= 0) {                                              \
+/*                                                                             \
+            TRACE("B<<< %p %ld '%s'", *(pb), (*(pb))->nref, (*(pb))->data);    \
+ */                                                                            \
+            free(*(pb));                                                       \
+        }                                                                      \
+        *(pb) = NULL;                                                          \
+    }                                                                          \
+} while (0)                                                                    \
+
+
+#define BYTES_DECREF_FAST(b)                                   \
+do {                                                           \
+    --((b))->nref;                                             \
+    if (((b))->nref <= 0) {                                    \
+/*                                                             \
+        TRACE("B<<< %p %ld '%s'", b, (b)->nref, (b)->data);    \
+ */                                                            \
+        free((b));                                             \
+    }                                                          \
+} while (0)                                                    \
 
 char *strrstr(const char *, const char *);
 
