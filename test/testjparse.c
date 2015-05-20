@@ -11,7 +11,7 @@
 
 
 static int
-o1(UNUSED jparse_ctx_t *jctx)
+o1(UNUSED jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     return 0;
 }
@@ -20,19 +20,19 @@ o1(UNUSED jparse_ctx_t *jctx)
  * array
  */
 static int
-aempty(jparse_ctx_t *jctx)
+aempty(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     long v = 0;
 
-    res = jparse_expect_item_int(jctx, &v);
+    res = jparse_expect_item_int(jctx, &v, NULL);
     TRACE("res=%s", mrkcommon_diag_str(res));
     return 0;
 }
 
 
 static int
-aint(jparse_ctx_t *jctx)
+aint(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res, i;
     long v = 0;
@@ -40,7 +40,7 @@ aint(jparse_ctx_t *jctx)
     res = 0;
     i = 0;
     while (res == 0) {
-        res = jparse_expect_item_int(jctx, &v);
+        res = jparse_expect_item_int(jctx, &v, NULL);
         TRACE("res=%s val[%d]=%ld", mrkcommon_diag_str(res), i++, v);
     }
     return 0;
@@ -48,14 +48,14 @@ aint(jparse_ctx_t *jctx)
 
 
 static int
-aarray(jparse_ctx_t *jctx)
+aarray(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res, i;
 
     res = 0;
     i = 0;
     while (res == 0) {
-        res = jparse_expect_item_array(jctx, aint);
+        res = jparse_expect_item_array(jctx, aint, NULL, NULL);
         TRACE("res=%s [%d]", mrkcommon_diag_str(res), i++);
     }
     return 0;
@@ -63,23 +63,23 @@ aarray(jparse_ctx_t *jctx)
 
 
 static int
-mycb10(jparse_ctx_t *jctx)
+mycb10(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
-    return jparse_expect_array(jctx, aempty);
+    return jparse_expect_array(jctx, aempty, val, udata);
 }
 
 
 static int
-mycb11(jparse_ctx_t *jctx)
+mycb11(jparse_ctx_t *jctx, jparse_value_t *val,  void *udata)
 {
-    return jparse_expect_array(jctx, aint);
+    return jparse_expect_array(jctx, aint, val, udata);
 }
 
 
 static int
-mycb12(jparse_ctx_t *jctx)
+mycb12(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
-    return jparse_expect_array(jctx, aarray);
+    return jparse_expect_array(jctx, aarray, val, udata);
 }
 
 
@@ -87,44 +87,44 @@ mycb12(jparse_ctx_t *jctx)
  * object
  */
 static int
-mycb1(jparse_ctx_t *jctx)
+mycb1(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
     int res;
 
-    res = jparse_expect_object(jctx, o1);
+    res = jparse_expect_object(jctx, o1, val, udata);
     //TRACE("res=%s", mrkcommon_diag_str(res));
     return 0;
 }
 
 static int
-mycb2(jparse_ctx_t *jctx)
+mycb2(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
     int res;
 
-    res = jparse_expect_object(jctx, o1);
+    res = jparse_expect_object(jctx, o1, val, udata);
     //TRACE("res=%s", mrkcommon_diag_str(res));
-    res = jparse_expect_object(jctx, o1);
+    res = jparse_expect_object(jctx, o1, val, udata);
     //TRACE("res=%s", mrkcommon_diag_str(res));
     return 0;
 }
 
 
 static int
-oint(jparse_ctx_t *jctx)
+oint(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     bytes_t *key;
     jparse_value_t val = {.v.i = 0};
 
     key = bytes_new_from_str("abc");
-    res = jparse_expect_kvp_int(jctx, &key, &val.v.i);
+    res = jparse_expect_kvp_int(jctx, key, &val.v.i, NULL);
     bytes_decref(&key);
     TRACE("abc=%ld", val.v.i);
     if (res != 0) {
         goto end;
     }
     key = bytes_new_from_str("qwe");
-    res = jparse_expect_kvp_int(jctx, &key, &val.v.i);
+    res = jparse_expect_kvp_int(jctx, key, &val.v.i, NULL);
     bytes_decref(&key);
     TRACE("qwe=%ld", val.v.i);
 
@@ -139,28 +139,28 @@ end:
 
 
 static int
-mycb03(jparse_ctx_t *jctx)
+mycb03(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
-    return jparse_expect_object(jctx, oint);
+    return jparse_expect_object(jctx, oint, val, udata);
 }
 
 
 static int
-ofloat(jparse_ctx_t *jctx)
+ofloat(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     bytes_t *key;
     jparse_value_t val = { .v.f = .0};
 
     key = bytes_new_from_str("abc");
-    res = jparse_expect_kvp_float(jctx, &key, &val.v.f);
+    res = jparse_expect_kvp_float(jctx, key, &val.v.f, NULL);
     bytes_decref(&key);
     TRACE("abc=%lf", val.v.f);
     if (res != 0) {
         goto end;
     }
     key = bytes_new_from_str("qwe");
-    res = jparse_expect_kvp_float(jctx, &key, &val.v.f);
+    res = jparse_expect_kvp_float(jctx, key, &val.v.f, NULL);
     bytes_decref(&key);
     TRACE("qwe=%lf", val.v.f);
 
@@ -173,21 +173,21 @@ end:
 
 
 static int
-ostr(jparse_ctx_t *jctx)
+ostr(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     bytes_t *key;
     jparse_value_t val = { .v.s = NULL};
 
     key = bytes_new_from_str("abc");
-    res = jparse_expect_kvp_str(jctx, &key, &val.v.s);
+    res = jparse_expect_kvp_str(jctx, key, &val.v.s, NULL);
     bytes_decref(&key);
     TRACE("abc=%s", val.v.s != NULL ? (char *)val.v.s->data : "<null>");
     if (res != 0) {
         goto end;
     }
     key = bytes_new_from_str("qwe");
-    res = jparse_expect_kvp_str(jctx, &key, &val.v.s);
+    res = jparse_expect_kvp_str(jctx, key, &val.v.s, NULL);
     bytes_decref(&key);
     TRACE("qwe=%s", val.v.s != NULL ? (char *)val.v.s->data : "<null>");
 
@@ -200,28 +200,28 @@ end:
 
 
 static int
-obool(jparse_ctx_t *jctx)
+obool(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     bytes_t *key;
     jparse_value_t val = { .v.b = 0 };
 
     key = bytes_new_from_str("abc");
-    res = jparse_expect_kvp_bool(jctx, &key, &val.v.b);
+    res = jparse_expect_kvp_bool(jctx, key, &val.v.b, NULL);
     bytes_decref(&key);
     TRACE("abc=%s", val.v.b ? "#t" : "#f");
     if (res != 0) {
         goto end;
     }
     key = bytes_new_from_str("qwe");
-    res = jparse_expect_kvp_bool(jctx, &key, &val.v.b);
+    res = jparse_expect_kvp_bool(jctx, key, &val.v.b, NULL);
     bytes_decref(&key);
     TRACE("qwe=%s", val.v.b ? "#t" : "#f");
     if (res != 0) {
         goto end;
     }
     key = bytes_new_from_str("asd");
-    res = jparse_expect_kvp_bool(jctx, &key, &val.v.b);
+    res = jparse_expect_kvp_bool(jctx, key, &val.v.b, NULL);
     bytes_decref(&key);
     TRACE("asd=%s", val.v.b ? "#t" : "#f");
 
@@ -234,25 +234,25 @@ end:
 
 
 static int
-oarray(jparse_ctx_t *jctx)
+oarray(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     bytes_t *key;
 
     key = bytes_new_from_str("abc");
-    res = jparse_expect_kvp_array(jctx, &key, aint);
+    res = jparse_expect_kvp_array(jctx, key, aint, NULL, NULL);
     bytes_decref(&key);
     if (res != 0) {
         goto end;
     }
     key = bytes_new_from_str("qwe");
-    res = jparse_expect_kvp_array(jctx, &key, aint);
+    res = jparse_expect_kvp_array(jctx, key, aint, NULL, NULL);
     bytes_decref(&key);
     if (res != 0) {
         goto end;
     }
     key = bytes_new_from_str("asd");
-    res = jparse_expect_kvp_array(jctx, &key, aint);
+    res = jparse_expect_kvp_array(jctx, key, aint, NULL, NULL);
     bytes_decref(&key);
 
 end:
@@ -264,30 +264,30 @@ end:
 
 
 static int
-mycb04(jparse_ctx_t *jctx)
+mycb04(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
-    return jparse_expect_object(jctx, ofloat);
+    return jparse_expect_object(jctx, ofloat, val, udata);
 }
 
 
 static int
-mycb05(jparse_ctx_t *jctx)
+mycb05(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
-    return jparse_expect_object(jctx, ostr);
+    return jparse_expect_object(jctx, ostr, val, udata);
 }
 
 
 static int
-mycb06(jparse_ctx_t *jctx)
+mycb06(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
-    return jparse_expect_object(jctx, obool);
+    return jparse_expect_object(jctx, obool, val, udata);
 }
 
 
 static int
-mycb07(jparse_ctx_t *jctx)
+mycb07(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
-    return jparse_expect_object(jctx, oarray);
+    return jparse_expect_object(jctx, oarray, val, udata);
 }
 
 
@@ -330,7 +330,7 @@ test0(void)
     FOREACHDATA {
         TRACE("in=%s", CDATA.in);
         jctx = jparse_ctx_new(4096, 4096);
-        res = jparse_ctx_parse(jctx, CDATA.in, CDATA.cb, NULL);
+        res = jparse_ctx_parse(jctx, CDATA.in, CDATA.cb, NULL, NULL);
         jparse_ctx_destroy(&jctx);
         assert(res == 0);
     }
@@ -338,12 +338,12 @@ test0(void)
 
 
 static int
-mycb100(jparse_ctx_t *jctx)
+mycb100(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     jparse_value_t v;
 
-    res = jparse_expect_ignore(jctx, &v);
+    res = jparse_expect_ignore(jctx, &v, udata);
     jparse_dump_value(&v);
     return res;
 }
@@ -352,13 +352,13 @@ mycb100(jparse_ctx_t *jctx)
 DEF_JPARSE_OBJECT_ITERATOR(mycb200, jparse_expect_anykvp_any);
 
 static int
-mycb200(jparse_ctx_t *jctx)
+mycb200(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     jparse_value_t v;
     v.cb = REF_JPARSE_OBJECT_ITERATOR(mycb200);
 
-    res = jparse_expect_any(jctx, &v);
+    res = jparse_expect_any(jctx, &v, udata);
     jparse_dump_value(&v);
     TR(res);
     return 0;
@@ -368,13 +368,13 @@ mycb200(jparse_ctx_t *jctx)
 DEF_JPARSE_ARRAY_ITERATOR(mycb201, jparse_expect_item_any);
 
 static int
-mycb201(jparse_ctx_t *jctx)
+mycb201(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     jparse_value_t v;
     v.cb = REF_JPARSE_ARRAY_ITERATOR(mycb201);
 
-    res = jparse_expect_any(jctx, &v);
+    res = jparse_expect_any(jctx, &v, udata);
     jparse_dump_value(&v);
     TR(res);
     return 0;
@@ -404,7 +404,7 @@ test1(void)
         TRACE("in=%s", CDATA.in);
         jctx = jparse_ctx_new(4096, 4096);
         jctx->default_cb = mycb200;
-        res = jparse_ctx_parse(jctx, CDATA.in, CDATA.cb, NULL);
+        res = jparse_ctx_parse(jctx, CDATA.in, CDATA.cb, NULL, NULL);
         jparse_ctx_destroy(&jctx);
         assert(res == 0);
     }
