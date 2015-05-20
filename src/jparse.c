@@ -247,14 +247,18 @@ probe_colon(jparse_ctx_t *jctx)
  * scalar
  */
 static int
-_jparse_expect_object_ignore_cb(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
+_jparse_expect_object_ignore_cb(jparse_ctx_t *jctx,
+                                jparse_value_t *jval,
+                                void *udata)
 {
     return jparse_expect_anykvp_ignore(jctx, &jval->k, jval, udata);
 }
 
 
 static int
-_jparse_expect_array_ignore_cb(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
+_jparse_expect_array_ignore_cb(jparse_ctx_t *jctx,
+                               jparse_value_t *jval,
+                               void *udata)
 {
     return jparse_expect_item_ignore(jctx, jval, udata);
 }
@@ -267,7 +271,7 @@ jparse_expect_ignore(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
     off_t start;
 
     if (reach_nonblank(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_TOK + 1);
+        TRRET(JPARSE_EXPECT_IGNORE + 1);
     }
 
     start = SPOS(&jctx->bs);
@@ -326,7 +330,7 @@ jparse_expect_any(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
     off_t start;
 
     if (reach_nonblank(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_TOK + 1);
+        TRRET(JPARSE_EXPECT_ANY + 1);
     }
 
     start = SPOS(&jctx->bs);
@@ -365,7 +369,7 @@ jparse_expect_any(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
     }
 
     SPOS(&jctx->bs) = start;
-    res = JPARSE_EXPECT_ANY + 1;
+    res = JPARSE_EXPECT_ANY + 2;
 
 end:
     return res;
@@ -755,11 +759,11 @@ jparse_expect_anykvp_ignore(jparse_ctx_t *jctx,
     int res;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_IGNORE + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_IGNORE + 1);
     }
     val->k = *key;
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_IGNORE + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_IGNORE + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -783,11 +787,11 @@ jparse_expect_anykvp_any(jparse_ctx_t *jctx,
     int res;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_ANY + 1);
     }
     val->k = *key;
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_ANY + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -812,13 +816,13 @@ jparse_expect_kvp_int(jparse_ctx_t *jctx,
     bytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_KVP_INT + 1);
     }
     if (bytes_cmp(v, key) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 2);
+        TRRET(JPARSE_EXPECT_KVP_INT + 2);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_KVP_INT + 3);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -857,10 +861,10 @@ jparse_expect_anykvp_int(jparse_ctx_t *jctx,
     int res;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_INT + 1);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_INT + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -885,13 +889,13 @@ jparse_expect_kvp_float(jparse_ctx_t *jctx,
     bytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_KVP_FLOAT + 1);
     }
     if (bytes_cmp(v, key) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 2);
+        TRRET(JPARSE_EXPECT_KVP_FLOAT + 2);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_KVP_FLOAT + 3);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -931,10 +935,10 @@ jparse_expect_anykvp_float(jparse_ctx_t *jctx,
 
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_FLOAT + 1);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_FLOAT + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -959,13 +963,13 @@ jparse_expect_kvp_str(jparse_ctx_t *jctx,
     bytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_KVP_STR + 1);
     }
     if (bytes_cmp(v, key) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 2);
+        TRRET(JPARSE_EXPECT_KVP_STR + 2);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_KVP_STR + 3);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1005,10 +1009,10 @@ jparse_expect_anykvp_str(jparse_ctx_t *jctx,
 
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_STR + 1);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_STR + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1033,13 +1037,13 @@ jparse_expect_kvp_bool(jparse_ctx_t *jctx,
     bytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_KVP_BOOL + 1);
     }
     if (bytes_cmp(v, key) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 2);
+        TRRET(JPARSE_EXPECT_KVP_BOOL + 2);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_KVP_BOOL + 3);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1079,10 +1083,10 @@ jparse_expect_anykvp_bool(jparse_ctx_t *jctx,
 
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_BOOL + 1);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_BOOL + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1107,13 +1111,13 @@ jparse_expect_kvp_object(jparse_ctx_t *jctx,
     int res;
     res = 0;
     if (jparse_expect_str(jctx, &val->k, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_KVP_OBJECT + 1);
     }
     if (bytes_cmp(val->k, key) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 2);
+        TRRET(JPARSE_EXPECT_KVP_OBJECT + 2);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_KVP_OBJECT + 3);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1138,13 +1142,13 @@ jparse_expect_kvp_object_iter(jparse_ctx_t *jctx,
     int res;
     res = 0;
     if (jparse_expect_str(jctx, &val->k, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_KVP_OBJECT_ITER + 1);
     }
     if (bytes_cmp(val->k, key) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 2);
+        TRRET(JPARSE_EXPECT_KVP_OBJECT_ITER + 2);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_KVP_OBJECT_ITER + 3);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1187,10 +1191,10 @@ jparse_expect_anykvp_object(jparse_ctx_t *jctx,
 
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_OBJECT + 1);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_OBJECT + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1217,10 +1221,10 @@ jparse_expect_anykvp_object_iter(jparse_ctx_t *jctx,
 
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_OBJECT_ITER + 1);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_OBJECT_ITER + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1247,13 +1251,13 @@ jparse_expect_kvp_array(jparse_ctx_t *jctx,
     bytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_KVP_ARRAY + 1);
     }
     if (bytes_cmp(v, key) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 2);
+        TRRET(JPARSE_EXPECT_KVP_ARRAY + 2);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_KVP_ARRAY + 3);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1279,13 +1283,13 @@ jparse_expect_kvp_array_iter(jparse_ctx_t *jctx,
     bytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_KVP_ARRAY_ITER + 1);
     }
     if (bytes_cmp(v, key) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 2);
+        TRRET(JPARSE_EXPECT_KVP_ARRAY_ITER + 2);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_KVP_ARRAY_ITER + 3);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1328,10 +1332,10 @@ jparse_expect_anykvp_array(jparse_ctx_t *jctx,
 
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_ARRAY + 1);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_ARRAY + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1358,10 +1362,10 @@ jparse_expect_anykvp_array_iter(jparse_ctx_t *jctx,
 
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 1);
+        TRRET(JPARSE_EXPECT_ANYKVP_ARRAY_ITER + 1);
     }
     if (reach_colon(jctx) != 0) {
-        TRRET(JPARSE_EXPECT_KVP_ANY + 3);
+        TRRET(JPARSE_EXPECT_ANYKVP_ARRAY_ITER + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
@@ -1378,7 +1382,10 @@ jparse_expect_anykvp_array_iter(jparse_ctx_t *jctx,
 
 
 int
-jparse_expect_object(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *val, void *udata)
+jparse_expect_object(jparse_ctx_t *jctx,
+                     jparse_expect_cb_t cb,
+                     jparse_value_t *val,
+                     void *udata)
 {
     off_t spos;
     int res;
@@ -1401,7 +1408,10 @@ jparse_expect_object(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *
 
 
 int
-jparse_expect_object_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *val, void *udata)
+jparse_expect_object_iter(jparse_ctx_t *jctx,
+                          jparse_expect_cb_t cb,
+                          jparse_value_t *val,
+                          void *udata)
 {
     off_t spos;
     int res;
@@ -1409,7 +1419,7 @@ jparse_expect_object_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_valu
     spos = SPOS(&jctx->bs);
     if (reach_ostart(jctx) != 0) {
         SPOS(&jctx->bs) = spos;
-        TRRET(JPARSE_EXPECT_OBJECT + 1);
+        TRRET(JPARSE_EXPECT_OBJECT_ITER + 1);
     }
     spos = SPOS(&jctx->bs);
     for (res = cb(jctx, val, udata); res == 0; res = cb(jctx, val, udata)) {
@@ -1423,7 +1433,7 @@ jparse_expect_object_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_valu
     }
     if (reach_oend(jctx) != 0) {
         SPOS(&jctx->bs) = spos;
-        TRRET(JPARSE_EXPECT_OBJECT + 2);
+        TRRET(JPARSE_EXPECT_OBJECT_ITER + 2);
     }
     return res;
 }
@@ -1433,7 +1443,10 @@ jparse_expect_object_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_valu
  * array
  */
 int
-jparse_expect_array(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *val, void *udata)
+jparse_expect_array(jparse_ctx_t *jctx,
+                    jparse_expect_cb_t cb,
+                    jparse_value_t *val,
+                    void *udata)
 {
     off_t spos;
     int res;
@@ -1456,7 +1469,10 @@ jparse_expect_array(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *v
 
 
 int
-jparse_expect_array_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *val, void *udata)
+jparse_expect_array_iter(jparse_ctx_t *jctx,
+                         jparse_expect_cb_t cb,
+                         jparse_value_t *val,
+                         void *udata)
 {
     off_t spos;
     int res;
@@ -1464,7 +1480,7 @@ jparse_expect_array_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value
     spos = SPOS(&jctx->bs);
     if (reach_astart(jctx) != 0) {
         SPOS(&jctx->bs) = spos;
-        TRRET(JPARSE_EXPECT_ARRAY + 1);
+        TRRET(JPARSE_EXPECT_ARRAY_ITER + 1);
     }
 
     spos = SPOS(&jctx->bs);
@@ -1479,7 +1495,7 @@ jparse_expect_array_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value
     }
     if (reach_aend(jctx) != 0) {
         SPOS(&jctx->bs) = spos;
-        TRRET(JPARSE_EXPECT_ARRAY + 2);
+        TRRET(JPARSE_EXPECT_ARRAY_ITER + 2);
     }
     return res;
 }
@@ -1612,7 +1628,10 @@ jparse_expect_item_bool(jparse_ctx_t *jctx, char *val, void *udata)
 
 
 int
-jparse_expect_item_object(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *val, void *udata)
+jparse_expect_item_object(jparse_ctx_t *jctx,
+                          jparse_expect_cb_t cb,
+                          jparse_value_t *val,
+                          void *udata)
 {
     off_t spos;
     int res;
@@ -1633,7 +1652,10 @@ jparse_expect_item_object(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_valu
 
 
 int
-jparse_expect_item_object_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *val, void *udata)
+jparse_expect_item_object_iter(jparse_ctx_t *jctx,
+                               jparse_expect_cb_t cb,
+                               jparse_value_t *val,
+                               void *udata)
 {
     off_t spos;
     int res;
@@ -1654,7 +1676,10 @@ jparse_expect_item_object_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse
 
 
 int
-jparse_expect_item_array(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *val, void *udata)
+jparse_expect_item_array(jparse_ctx_t *jctx,
+                         jparse_expect_cb_t cb,
+                         jparse_value_t *val,
+                         void *udata)
 {
     off_t spos;
     int res;
@@ -1675,7 +1700,10 @@ jparse_expect_item_array(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value
 
 
 int
-jparse_expect_item_array_iter(jparse_ctx_t *jctx, jparse_expect_cb_t cb, jparse_value_t *val, void *udata)
+jparse_expect_item_array_iter(jparse_ctx_t *jctx,
+                              jparse_expect_cb_t cb,
+                              jparse_value_t *val,
+                              void *udata)
 {
     off_t spos;
     int res;
@@ -1727,7 +1755,9 @@ jparse_dump_value(jparse_value_t *val)
         break;
 
     case JSON_STRING:
-        TRACE("%s:%s", JSON_TYPE_STR(val->ty), val->v.s != NULL ? (char *)val->v.s->data : "<null>");
+        TRACE("%s:%s",
+              JSON_TYPE_STR(val->ty),
+              val->v.s != NULL ? (char *)val->v.s->data : "<null>");
         break;
 
     case JSON_BOOLEAN:
