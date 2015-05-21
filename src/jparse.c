@@ -108,7 +108,10 @@ reach_blank(jparse_ctx_t *jctx)
         } else if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n') {      \
             SINCR(&jctx->bs);                                                  \
         } else {                                                               \
-            /* TRACE("failing %c at %ld", ch, SPOS(&jctx->bs)); */             \
+/*                                                                             \
+            TRACE("failing %c at %ld", ch, SPOS(&jctx->bs));                   \
+            jparse_dump_current_pos(jctx, 16);                                 \
+ */                                                                            \
             SPOS(&jctx->bs) = spos;                                            \
             res = msg + 2;                                                     \
             break;                                                             \
@@ -1427,13 +1430,13 @@ jparse_expect_object_iter(jparse_ctx_t *jctx,
     }
     if (res == JPARSE_EOS || (res != 0 && spos == SPOS(&jctx->bs))) {
         res = 0;
+        if (reach_oend(jctx) != 0) {
+            SPOS(&jctx->bs) = spos;
+            TRRET(JPARSE_EXPECT_OBJECT_ITER + 2);
+        }
     } else {
         SPOS(&jctx->bs) = spos;
         return res;
-    }
-    if (reach_oend(jctx) != 0) {
-        SPOS(&jctx->bs) = spos;
-        TRRET(JPARSE_EXPECT_OBJECT_ITER + 2);
     }
     return res;
 }
@@ -1489,13 +1492,13 @@ jparse_expect_array_iter(jparse_ctx_t *jctx,
     }
     if (res == JPARSE_EOS || (res != 0 && spos == SPOS(&jctx->bs))) {
         res = 0;
+        if (reach_aend(jctx) != 0) {
+            SPOS(&jctx->bs) = spos;
+            TRRET(JPARSE_EXPECT_ARRAY_ITER + 2);
+        }
     } else {
         SPOS(&jctx->bs) = spos;
         return res;
-    }
-    if (reach_aend(jctx) != 0) {
-        SPOS(&jctx->bs) = spos;
-        TRRET(JPARSE_EXPECT_ARRAY_ITER + 2);
     }
     return res;
 }
@@ -1770,6 +1773,12 @@ jparse_dump_value(jparse_value_t *val)
     }
 }
 
+
+void
+jparse_dump_current_pos(jparse_ctx_t *jctx, ssize_t sz)
+{
+    D8(SPDATA(&jctx->bs), MIN(sz, SEOD(&jctx->bs) - SPOS(&jctx->bs)));
+}
 
 /*
  * context
