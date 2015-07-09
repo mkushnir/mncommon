@@ -81,6 +81,8 @@ int bytes_is_ascii(bytes_t *);
 int bytes_startswith(const bytes_t *, const bytes_t *);
 int bytes_endswith(const bytes_t *, const bytes_t *);
 int bytes_is_null_or_empty(const bytes_t *);
+typedef int (*bytes_split_cb)(bytes_t *, void *);
+int bytes_split_iter(bytes_t *, char *, bytes_split_cb, void *);
 
 #ifdef __cplusplus
 }

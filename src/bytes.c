@@ -487,6 +487,46 @@ bytes_brushdown(bytes_t *str)
 }
 
 
+int
+bytes_split_iter(bytes_t *str, char *delim, bytes_split_cb cb, void *udata)
+{
+    int res = 0;
+    bytes_t *tmp = NULL;
+
+    if (*delim != '\0') {
+        char *p0, *p1;
+        size_t sz;
+        size_t delimsz;
+
+        delimsz = strlen(delim);
+        tmp = bytes_new(str->sz);
+        for (p0 = (char *)str->data, p1 = strstr(p0, delim);
+             p1 != NULL;
+             p0 = p1 + delimsz, p1 = strstr(p0, delim)) {
+
+            sz = p1 - p0;
+            memcpy(tmp->data, p0, sz);
+            *(tmp->data + sz) = '\0';
+            tmp->sz = sz + 1;
+            if ((res = cb(tmp, udata)) != 0) {
+                goto end;
+            }
+        }
+        /* last */
+        p1 = (char *)str->data + str->sz - 1;
+        sz = p1 - p0;
+        memcpy(tmp->data, p0, sz);
+        *(tmp->data + sz) = '\0';
+        tmp->sz = sz + 1;
+        res = cb(tmp, udata);
+    }
+
+end:
+    bytes_decref(&tmp);
+    return res;
+}
+
+
 void
 bytes_decref(bytes_t **value)
 {
