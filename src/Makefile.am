@@ -69,6 +69,8 @@ endif
 if BYTESTREAM
 bytestream_sources = bytestream.c
 bytestream_include_headers = mrkcommon/bytestream.h
+vbytestream_sources = vbytestream.c
+vbytestream_include_headers = mrkcommon/vbytestream.h
 endif
 
 if JSON
@@ -106,6 +108,11 @@ cm_sources = cm.c
 cm_include_headers = mrkcommon/cm.h
 endif
 
+if HEAP
+heap_sources = heap.c
+heap_include_headers = mrkcommon/heap.h
+endif
+
 nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(util_include_headers) \
 			 $(array_include_headers) \
@@ -119,13 +126,15 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(rbt_include_headers) \
 			 $(traversedir_include_headers) \
 			 $(bytestream_include_headers) \
+			 $(vbytestream_include_headers) \
 			 $(json_include_headers) \
 			 $(stqueue_include_headers) \
 			 $(dtqueue_include_headers) \
 			 $(memdebug_include_headers) \
 			 $(mpool_include_headers) \
 			 $(bytes_include_headers) \
-			 $(cm_include_headers)
+			 $(cm_include_headers) \
+			 $(heap_include_headers)
 
 libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(array_sources) \
@@ -139,13 +148,15 @@ libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(rbt_sources) \
 			  $(traversedir_sources) \
 			  $(bytestream_sources) \
+			  $(vbytestream_sources) \
 			  $(json_sources) \
 			  $(stqueue_sources) \
 			  $(dtqueue_sources) \
 			  $(memdebug_sources) \
 			  $(mpool_sources) \
 			  $(bytes_sources) \
-			  $(cm_sources)
+			  $(cm_sources) \
+			  $(heap_sources)
 
 nodist_libmrkcommon_la_SOURCES = diag.c
 

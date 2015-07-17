@@ -9,7 +9,7 @@
 
 #ifndef HAVE_FLSL
 #   ifdef __GNUC__
-#       define flsl(v) ((v != 0L) ? (__builtin_clzl(v) + 1) : 0)
+#       define flsl(v) (((v) != 0L) ? (__builtin_clzl(v) + 1) : 0)
 #   else
 #       error "Could not find/define flsl."
 #   endif

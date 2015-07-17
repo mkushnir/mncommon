@@ -46,6 +46,10 @@ if CM
 noinst_PROGRAMS += testcm
 endif
 
+if HEAP
+noinst_PROGRAMS += testheap
+endif
+
 distdir = $(top_srcdir)/$(PACKAGE)-$(VERSION)/test
 dist_HEADERS = unittest.h rb.h zltan-fasthash.h
 
@@ -144,6 +148,10 @@ testbytes_LDFLAGS =
 testcm_SOURCES = ../src/cm.c testcm.c
 testcm_CFLAGS =
 testcm_LDFLAGS =
+
+testheap_SOURCES = ../src/heap.c testheap.c
+testheap_CFLAGS =
+testheap_LDFLAGS =
 
 ../src/diag.c ../src/diag.h: ../src/diag.txt
 	sh ../gen-diag mrkcommon

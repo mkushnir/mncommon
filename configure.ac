@@ -239,6 +239,13 @@ AC_ARG_ENABLE(cm,
               [AM_CONDITIONAL([CM], [enable_cm=yes])],
              )
 
+AC_ARG_ENABLE(heap,
+              AC_HELP_STRING([--enable-heap],
+                             [Enable heap (default=yes)]),
+              [AM_CONDITIONAL([HEAP], [test "$enable_heap" = "yes"])],
+              [AM_CONDITIONAL([HEAP], [enable_heap=yes])],
+             )
+
 if test "$enable_profile" = "yes" -a "$enable_list" != "yes"
 then
     echo "ERROR: cannot disable the list feature because the profile feature requires it."
