@@ -69,8 +69,6 @@ endif
 if BYTESTREAM
 bytestream_sources = bytestream.c
 bytestream_include_headers = mrkcommon/bytestream.h
-vbytestream_sources = vbytestream.c
-vbytestream_include_headers = mrkcommon/vbytestream.h
 endif
 
 if JSON
@@ -126,7 +124,6 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(rbt_include_headers) \
 			 $(traversedir_include_headers) \
 			 $(bytestream_include_headers) \
-			 $(vbytestream_include_headers) \
 			 $(json_include_headers) \
 			 $(stqueue_include_headers) \
 			 $(dtqueue_include_headers) \
@@ -148,7 +145,6 @@ libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(rbt_sources) \
 			  $(traversedir_sources) \
 			  $(bytestream_sources) \
-			  $(vbytestream_sources) \
 			  $(json_sources) \
 			  $(stqueue_sources) \
 			  $(dtqueue_sources) \
