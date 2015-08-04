@@ -16,6 +16,9 @@ typedef int (*array_compar_t) (const void *, const void *);
 
 /**/
 typedef struct _array {
+#ifdef DO_MEMDEBUG
+    uint64_t mdtag;
+#endif
     ssize_t nref;
     size_t elsz;
     size_t elnum;

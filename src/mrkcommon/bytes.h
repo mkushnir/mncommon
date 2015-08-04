@@ -11,15 +11,37 @@
 extern "C" {
 #endif
 
+#ifdef DO_MEMDEBUG
+#define MEMDEBUG_ENTER_BYTES(self)                             \
+{                                                              \
+    int mdtag;                                                 \
+    mdtag = memdebug_set_runtime_scope((int)(self)-> mdtag);   \
+
+
+#define MEMDEBUG_LEAVE_BYTES(self)             \
+    (void)memdebug_set_runtime_scope(mdtag);   \
+}                                              \
+
+
+#else
+#define MEMDEBUG_ENTER_BYTES(seld)
+#define MEMDEBUG_LEAVE_BYTES(seld)
+#endif
 /*
  * XXX check out compile_bytes_t(), lkit_compile_expr(), and ltype_compile()
  */
 typedef struct _bytes {
-    ssize_t nref;
+#ifdef DO_MEMDEBUG
+    uint64_t mdtag;
+#define BYTES_SZ_IDX 2
+#define BYTES_DATA_IDX 4
+#else
 #define BYTES_SZ_IDX 1
+#define BYTES_DATA_IDX 3
+#endif
+    ssize_t nref;
     size_t sz;
     uint64_t hash;
-#define BYTES_DATA_IDX 3
     unsigned char data[];
 } bytes_t;
 
@@ -38,7 +60,9 @@ do {                                                                           \
 /*                                                                             \
             TRACE("B<<< %p %ld '%s'", *(pb), (*(pb))->nref, (*(pb))->data);    \
  */                                                                            \
+            MEMDEBUG_ENTER_BYTES(*(pb));                                       \
             free(*(pb));                                                       \
+            MEMDEBUG_LEAVE_BYTES(*(pb));                                       \
         }                                                                      \
         *(pb) = NULL;                                                          \
     }                                                                          \
@@ -52,7 +76,9 @@ do {                                                           \
 /*                                                             \
         TRACE("B<<< %p %ld '%s'", b, (b)->nref, (b)->data);    \
  */                                                            \
+        MEMDEBUG_ENTER_BYTES(b);                               \
         free((b));                                             \
+        MEMDEBUG_LEAVE_BYTES(b);                               \
     }                                                          \
 } while (0)                                                    \
 

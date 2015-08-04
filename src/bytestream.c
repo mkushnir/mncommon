@@ -14,6 +14,27 @@
 #include "mrkcommon/bytestream.h"
 #include <mrkcommon/mpool.h>
 
+#ifdef DO_MEMDEBUG
+#include <mrkcommon/memdebug.h>
+MEMDEBUG_DECLARE(bytestream);
+
+#define MEMDEBUG_ENTER(self)                                   \
+{                                                              \
+    int mdtag;                                                 \
+    mdtag = memdebug_set_runtime_scope((int)(self)->mdtag);    \
+
+
+#define MEMDEBUG_LEAVE(self)                   \
+    (void)memdebug_set_runtime_scope(mdtag);   \
+}                                              \
+
+
+#else
+#define MEMDEBUG_INIT(self)
+#define MEMDEBUG_ENTER(self)
+#define MEMDEBUG_LEAVE(self)
+#endif
+
 int
 bytestream_dump(bytestream_t *stream)
 {
@@ -28,9 +49,11 @@ bytestream_dump(bytestream_t *stream)
 #define BYTESTREAM_INIT_BODY(mallocfn)                                 \
     stream->buf.sz = growsz;                                           \
     stream->growsz = growsz;                                           \
+    MEMDEBUG_ENTER(stream);                                            \
     if ((stream->buf.data = mallocfn(stream->buf.sz)) == NULL) {       \
         TRRET(BYTESTREAM_INIT + 1);                                    \
     }                                                                  \
+    MEMDEBUG_LEAVE(stream);                                            \
     stream->eod = 0;                                                   \
     stream->pos = 0;                                                   \
     stream->read_more = NULL;                                          \
@@ -57,10 +80,12 @@ bytestream_init_mpool(mpool_ctx_t *mpool, bytestream_t *stream, ssize_t growsz)
 
 #define BYTESTREAM_GROW_BODY(reallocfn)                        \
     char *tmp;                                                 \
+    MEMDEBUG_ENTER(stream);                                    \
     if ((tmp = reallocfn(stream->buf.data,                     \
                          stream->buf.sz + incr)) == NULL) {    \
         TRRET(BYTESTREAM_GROW + 1);                            \
     }                                                          \
+    MEMDEBUG_LEAVE(stream);                                    \
     stream->buf.data = tmp;                                    \
     stream->buf.sz += incr;                                    \
     return 0;
@@ -357,10 +382,12 @@ bytestream_recycle(bytestream_t *stream, int ngrowsz, off_t from)
 
 
 #define BYTESTREAM_FINI_BODY(freefn)   \
+    MEMDEBUG_ENTER(stream);            \
     if (stream->buf.data != NULL) {    \
         freefn(stream->buf.data);      \
         stream->buf.data = NULL;       \
     }                                  \
+    MEMDEBUG_LEAVE(stream);            \
     stream->read_more = NULL;          \
     stream->write = NULL;              \
     stream->udata = NULL;

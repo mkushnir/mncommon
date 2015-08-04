@@ -23,6 +23,9 @@ typedef struct _byterange {
 } byterange_t;
 
 typedef struct _bytestream {
+#ifdef DO_MEMDEBUG
+    uint64_t mdtag;
+#endif
     struct {
         char *data;
         ssize_t sz;

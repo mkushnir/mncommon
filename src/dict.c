@@ -8,10 +8,32 @@
 #include <mrkcommon/util.h>
 #include "diag.h"
 
-//#ifndef NDEBUG
-//#include "mrkcommon/memdebug.h"
-//MEMDEBUG_DECLARE(dict);
-//#endif
+#ifdef DO_MEMDEBUG
+#include <mrkcommon/memdebug.h>
+MEMDEBUG_DECLARE(dict);
+
+#define MEMDEBUG_INIT(self)                                    \
+do {                                                           \
+    (self)->mdtag = (uint64_t)memdebug_get_runtime_scope();    \
+} while (0)                                                    \
+
+
+#define MEMDEBUG_ENTER(self)                                   \
+{                                                              \
+    int mdtag;                                                 \
+    mdtag = memdebug_set_runtime_scope((int)(self)->mdtag);    \
+
+
+#define MEMDEBUG_LEAVE(self)                   \
+    (void)memdebug_set_runtime_scope(mdtag);   \
+}                                              \
+
+
+#else
+#define MEMDEBUG_INIT(self)
+#define MEMDEBUG_ENTER(self)
+#define MEMDEBUG_LEAVE(self)
+#endif
 
 static int
 null_init(void **v)
@@ -27,9 +49,11 @@ null_init(void **v)
     if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
     }                                                          \
+    MEMDEBUG_ENTER(dict);                                      \
     if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) {      \
         FAIL("malloc_fn");                                     \
     }                                                          \
+    MEMDEBUG_LEAVE(dict);                                      \
     dit->bucket = pdit;                                        \
     dit->prev = NULL;                                          \
     if (*pdit == NULL) {                                       \
@@ -69,9 +93,11 @@ dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
         FAIL("array_get");                                     \
     }                                                          \
     if (*pdit == NULL) {                                       \
+        MEMDEBUG_ENTER(dict);                                  \
         if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) {  \
             FAIL("malloc_fn");                                 \
         }                                                      \
+        MEMDEBUG_LEAVE(dict);                                  \
         dit->bucket = pdit;                                    \
         dit->prev = NULL;                                      \
         dit->next = NULL;                                      \
@@ -92,9 +118,11 @@ dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
                 return;                                        \
             }                                                  \
         }                                                      \
+        MEMDEBUG_ENTER(dict);                                  \
         if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) {  \
             FAIL("malloc_fn");                                 \
         }                                                      \
+        MEMDEBUG_LEAVE(dict);                                  \
         dit->next = *pdit;                                     \
         (*pdit)->prev = dit;                                   \
         (*pdit)->bucket = NULL;                                \
@@ -176,7 +204,9 @@ dict_get_item(dict_t *dict, void *key)
         }                                                      \
         *pdit = dit->next;                                     \
         value = dit->value;                                    \
+        MEMDEBUG_ENTER(dict);                                  \
         free_fn(dit);                                          \
+        MEMDEBUG_LEAVE(dict);                                  \
         --dict->elnum;                                         \
         return value;                                          \
     }                                                          \
@@ -189,7 +219,9 @@ dict_get_item(dict_t *dict, void *key)
                 dit->next->prev = dit->prev;                   \
             }                                                  \
             value = dit->value;                                \
+            MEMDEBUG_ENTER(dict);                              \
             free_fn(dit);                                      \
+            MEMDEBUG_LEAVE(dict);                              \
             --dict->elnum;                                     \
             return value;                                      \
         }                                                      \
@@ -229,7 +261,9 @@ dict_remove_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key)
     if (dict->fini != NULL) {                  \
         dict->fini(dit->key, dit->value);      \
     }                                          \
+    MEMDEBUG_ENTER(dict);                      \
     free_fn(dit);                              \
+    MEMDEBUG_LEAVE(dict);                      \
     --dict->elnum;                             \
 
 
@@ -372,7 +406,9 @@ dict_init_mpool(mpool_ctx_t *mpool,
                 if (dict->fini(dit->key, dit->value) != 0) {   \
                     break;                                     \
                 }                                              \
+                MEMDEBUG_ENTER(dict);                          \
                 free_fn(dit);                                  \
+                MEMDEBUG_LEAVE(dict);                          \
                 --dict->elnum;                                 \
             }                                                  \
             *pdit = NULL;                                      \
@@ -384,7 +420,9 @@ dict_init_mpool(mpool_ctx_t *mpool,
             pdit = ARRAY_GET(dict_item_t *, &dict->table, i);  \
             for (dit = *pdit; dit != NULL; dit = next) {       \
                 next = dit->next;                              \
+                MEMDEBUG_ENTER(dict);                          \
                 free_fn(dit);                                  \
+                MEMDEBUG_LEAVE(dict);                          \
                 --dict->elnum;                                 \
             }                                                  \
             *pdit = NULL;                                      \
@@ -404,7 +442,10 @@ dict_new(size_t sz,
     if ((dict = malloc(sizeof(dict_t))) == NULL) {
         FAIL("malloc");
     }
+    MEMDEBUG_INIT(dict);
+    MEMDEBUG_ENTER(dict);
     DICT_INIT_BODY(array_init);
+    MEMDEBUG_LEAVE(dict);
 
     return dict;
 }
@@ -423,8 +464,11 @@ dict_new_mpool(mpool_ctx_t *mpool,
         FAIL("malloc");
     }
 #define _array_init(ar, elsz, elnum, init, fini) array_init_mpool(mpool, (ar), (elsz), (elnum), (init), (fini))
+    MEMDEBUG_INIT(dict);
+    MEMDEBUG_ENTER(dict);
     DICT_INIT_BODY(_array_init);
 #undef _array_init
+    MEMDEBUG_LEAVE(dict);
 
     return dict;
 }

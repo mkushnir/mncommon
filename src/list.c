@@ -6,7 +6,7 @@
 #include "mrkcommon/util.h"
 #include "diag.h"
 
-#ifndef NDEBUG
+#ifdef DO_MEMDEBUG
 #include "mrkcommon/memdebug.h"
 MEMDEBUG_DECLARE(list);
 #endif

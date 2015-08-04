@@ -13,6 +13,33 @@
 
 #include "diag.h"
 
+#ifdef DO_MEMDEBUG
+#include <mrkcommon/memdebug.h>
+MEMDEBUG_DECLARE(bytes);
+
+#define MEMDEBUG_INIT(self)                                    \
+do {                                                           \
+    (self)->mdtag = (uint64_t)memdebug_get_runtime_scope();    \
+} while (0)                                                    \
+
+
+#define MEMDEBUG_ENTER(self)                                   \
+{                                                              \
+    int mdtag;                                                 \
+    mdtag = memdebug_set_runtime_scope((int)(self)->mdtag);    \
+
+
+#define MEMDEBUG_LEAVE(self)                   \
+    (void)memdebug_set_runtime_scope(mdtag);   \
+}                                              \
+
+
+#else
+#define MEMDEBUG_INIT(self)
+#define MEMDEBUG_ENTER(self)
+#define MEMDEBUG_LEAVE(self)
+#endif
+
 char *
 strrstr(const char *big, const char *little)
 {
@@ -256,6 +283,7 @@ bytes_cmp(bytes_t *a, bytes_t *b)
     if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) {    \
         FAIL("malloc");                                        \
     }                                                          \
+    MEMDEBUG_INIT(res);                                        \
     res->nref = 0;                                             \
     res->sz = sz;                                              \
     res->hash = 0;                                             \
@@ -276,6 +304,7 @@ bytes_cmp(bytes_t *a, bytes_t *b)
     if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) {    \
         FAIL("malloc");                                        \
     }                                                          \
+    MEMDEBUG_INIT(res);                                        \
     memcpy(res->data, s, sz);                                  \
     res->nref = 0;                                             \
     res->sz = sz;                                              \
@@ -311,6 +340,7 @@ bytes_new_from_str(const char *s)
     if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) {    \
         FAIL("malloc");                                        \
     }                                                          \
+    MEMDEBUG_INIT(res);                                        \
     memcpy(res->data, s->data, s->sz);                         \
     res->nref = 0;                                             \
     res->sz = s->sz;                                           \

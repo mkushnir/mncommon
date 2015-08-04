@@ -8,6 +8,12 @@
 
 #include "diag.h"
 
+#ifdef DO_MEMDEBUG
+#include <mrkcommon/memdebug.h>
+MEMDEBUG_DECLARE(mpool);
+#endif
+
+
 //#define MPOOL_USE_STD_MALLOC
 
 void
@@ -67,6 +73,9 @@ mpool_malloc(UNUSED mpool_ctx_t *mpool, size_t sz)
         chunk = new_chunk(mpool, sz1);
         res = (struct _mpool_item *)*chunk;
         res->sz = sz;
+#ifndef NDEBUG
+        res->flags = 1;
+#endif
         (void)new_chunk(mpool, mpool->chunksz);
 
     } else {
@@ -84,6 +93,15 @@ mpool_malloc(UNUSED mpool_ctx_t *mpool, size_t sz)
         res = (struct _mpool_item *)(*chunk + mpool->current_pos);
         res->sz = sz;
         mpool->current_pos += sz1;
+#ifndef NDEBUG
+
+        struct _mpool_item *tmp;
+        res->flags = 1;
+        if (mpool->current_pos + sizeof(struct _mpool_item) <= mpool->chunksz) {
+            tmp = (struct _mpool_item *)(*chunk + mpool->current_pos);
+            tmp->flags = 0;
+        }
+#endif
     }
 #ifndef NDEBUG
     memset(res->data, 0xa5, res->sz);
@@ -97,7 +115,11 @@ mpool_malloc(UNUSED mpool_ctx_t *mpool, size_t sz)
 #endif
 }
 
+#ifndef NDEBUG
+#define DATA_TO_MPOOL_ITEM(d) ((struct _mpool_item *)(((char *)(d)) - sizeof(uint64_t) - sizeof(size_t)))
+#else
 #define DATA_TO_MPOOL_ITEM(d) ((struct _mpool_item *)(((char *)(d)) - sizeof(size_t)))
+#endif
 
 void *
 mpool_realloc(UNUSED mpool_ctx_t *mpool, void *p, size_t sz)
@@ -179,6 +201,11 @@ mpool_ctx_chunk_dump_info(mpool_ctx_t *mpool)
             size_t sz0, sz1;
 
             mpi = (struct _mpool_item *)(chunk + j);
+#ifndef NDEBUG
+            if (mpi->flags == 0) {
+                break;
+            }
+#endif
             TRACE("  item %p sz %ld", mpi, mpi->sz);
             sz0 = mpi->sz + 8 - (mpi->sz % 8);
             sz1 = sz0 + sizeof(struct _mpool_item);

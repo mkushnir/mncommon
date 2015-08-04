@@ -21,10 +21,10 @@
 #include <mrkcommon/util.h>
 #include <mrkcommon/trie.h>
 
-//#ifndef NDEBUG
-//#include "mrkcommon/memdebug.h"
-//MEMDEBUG_DECLARE(trie);
-//#endif
+#ifdef DO_MEMDEBUG
+#include "mrkcommon/memdebug.h"
+MEMDEBUG_DECLARE(trie);
+#endif
 
 void
 trie_node_dump(trie_node_t *n)
