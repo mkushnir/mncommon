@@ -103,6 +103,9 @@ memdebug_set_runtime_scope(int n)
     int res;
 
     res = runtime_scope;
+    if (n < 0 || n >= nctxes) {
+        n = -1;
+    }
     runtime_scope = n;
     return res;
 }
