@@ -26,6 +26,36 @@ reallocf(void *ptr, size_t sz)
 #include "mrkcommon/dumpm.h"
 #include <mrkcommon/util.h>
 
+
+#define MEMDEBUG_BODY(ptr, op1, op2)                           \
+if ((ptr) != NULL) {                                           \
+    assert(n >= 0 && n < (int)countof(memdebug_ctxes));        \
+    if (n < nctxes) {                                          \
+        memdebug_ctx_t *ctx;                                   \
+        ctx = memdebug_ctxes + n;                              \
+        ctx->nallocated op1 malloc_usable_size(ptr);           \
+        op2 ctx->nitems;                                       \
+    }                                                          \
+    if (runtime_scope >= 0) {                                  \
+        assert(runtime_scope < (int)countof(memdebug_ctxes));  \
+        if (runtime_scope < nctxes) {                          \
+            memdebug_ctx_t *ctx;                               \
+            ctx = memdebug_ctxes + runtime_scope;              \
+            ctx->nallocated op1 malloc_usable_size(ptr);       \
+            op2 ctx->nitems;                                   \
+        }                                                      \
+    } else {                                                   \
+/*                                                             \
+        TRACE("problem runtime_scope: %d", runtime_scope);     \
+ */                                                            \
+    }                                                          \
+}                                                              \
+
+
+#define MEMDEBUG_BODY_INC(ptr) MEMDEBUG_BODY(ptr, +=, ++)
+#define MEMDEBUG_BODY_DEC(ptr) MEMDEBUG_BODY(ptr, -=, --)
+
+
 typedef struct _memdebug_ctx {
     const char *name;
     int id;
@@ -41,7 +71,7 @@ typedef struct _memdebug_stat {
     size_t nitems;
 } memdebug_stat_t;
 
-static memdebug_ctx_t *memdebug_ctxes = NULL;
+static memdebug_ctx_t memdebug_ctxes[256];
 static int nctxes = 0;
 static int runtime_scope = -1;
 
@@ -50,7 +80,7 @@ int
 memdebug_register(const char *name)
 {
     memdebug_ctx_t *ctx;
-    memdebug_ctxes = realloc(memdebug_ctxes, sizeof(memdebug_ctx_t) * (nctxes + 1));
+    assert(nctxes < (int)countof(memdebug_ctxes));
     ctx = memdebug_ctxes + nctxes;
     ctx->name = name;
     ctx->id = nctxes;
@@ -64,10 +94,6 @@ memdebug_register(const char *name)
 void
 memdebug_clear(void)
 {
-    if (memdebug_ctxes != NULL) {
-        free(memdebug_ctxes);
-        memdebug_ctxes = NULL;
-    }
 }
 
 
@@ -95,24 +121,7 @@ memdebug_malloc(int n, size_t sz)
     void *res;
     res = malloc(sz);
 
-    if (res != NULL) {
-        if (n < nctxes) {
-            memdebug_ctx_t *ctx;
-            ctx = memdebug_ctxes + n;
-            ctx->nallocated += malloc_usable_size(res);
-            ++ctx->nitems;
-        }
-        if (runtime_scope >= 0) {
-            if (runtime_scope < nctxes) {
-                memdebug_ctx_t *ctx;
-                ctx = memdebug_ctxes + runtime_scope;
-                ctx->nallocated += malloc_usable_size(res);
-                ++ctx->nitems;
-            }
-        } else {
-            //TRACE("problem runtime_scope: %d", runtime_scope);
-        }
-    }
+    MEMDEBUG_BODY_INC(res)
 
     return res;
 }
@@ -124,24 +133,7 @@ memdebug_calloc(int n, size_t e, size_t sz)
     void *res;
     res = calloc(e, sz);
 
-    if (res != NULL) {
-        if (n < nctxes) {
-            memdebug_ctx_t *ctx;
-            ctx = memdebug_ctxes + n;
-            ctx->nallocated += malloc_usable_size(res);
-            ++ctx->nitems;
-        }
-        if (runtime_scope >= 0) {
-            if (runtime_scope < nctxes) {
-                memdebug_ctx_t *ctx;
-                ctx = memdebug_ctxes + runtime_scope;
-                ctx->nallocated += malloc_usable_size(res);
-                ++ctx->nitems;
-            }
-        } else {
-            //TRACE("problem runtime_scope: %d", runtime_scope);
-        }
-    }
+    MEMDEBUG_BODY_INC(res)
 
     return res;
 }
@@ -152,47 +144,11 @@ memdebug_realloc(int n, void *ptr, size_t sz)
 {
     void *res;
 
-    if (ptr != NULL) {
-        if (n < nctxes) {
-            memdebug_ctx_t *ctx;
-            ctx = memdebug_ctxes + n;
-            ctx->nallocated -= malloc_usable_size(ptr);
-        }
-        if (runtime_scope >= 0) {
-            if (runtime_scope < nctxes) {
-                memdebug_ctx_t *ctx;
-                ctx = memdebug_ctxes + runtime_scope;
-                ctx->nallocated -= malloc_usable_size(ptr);
-            }
-        } else {
-            //TRACE("problem runtime_scope: %d", runtime_scope);
-        }
-    }
+    MEMDEBUG_BODY_DEC(ptr)
 
     res = realloc(ptr, sz);
 
-    if (res != NULL) {
-        if (n < nctxes) {
-            memdebug_ctx_t *ctx;
-            ctx = memdebug_ctxes + n;
-            ctx->nallocated += malloc_usable_size(res);
-            if (ptr == NULL) {
-                ++ctx->nitems;
-            }
-        }
-        if (runtime_scope >= 0) {
-            if (runtime_scope < nctxes) {
-                memdebug_ctx_t *ctx;
-                ctx = memdebug_ctxes + runtime_scope;
-                ctx->nallocated += malloc_usable_size(res);
-                if (ptr == NULL) {
-                    ++ctx->nitems;
-                }
-            }
-        } else {
-            //TRACE("problem runtime_scope: %d", runtime_scope);
-        }
-    }
+    MEMDEBUG_BODY_INC(res)
 
     return res;
 }
@@ -203,47 +159,11 @@ memdebug_reallocf(int n, void *ptr, size_t sz)
 {
     void *res;
 
-    if (ptr != NULL) {
-        if (n < nctxes) {
-            memdebug_ctx_t *ctx;
-            ctx = memdebug_ctxes + n;
-            ctx->nallocated -= malloc_usable_size(ptr);
-        }
-        if (runtime_scope >= 0) {
-            if (runtime_scope < nctxes) {
-                memdebug_ctx_t *ctx;
-                ctx = memdebug_ctxes + runtime_scope;
-                ctx->nallocated -= malloc_usable_size(ptr);
-            }
-        } else {
-            //TRACE("problem runtime_scope: %d", runtime_scope);
-        }
-    }
+    MEMDEBUG_BODY_DEC(ptr)
 
     res = reallocf(ptr, sz);
 
-    if (res != NULL) {
-        if (n < nctxes) {
-            memdebug_ctx_t *ctx;
-            ctx = memdebug_ctxes + n;
-            ctx->nallocated += malloc_usable_size(res);
-            if (ptr == NULL) {
-                ++ctx->nitems;
-            }
-        }
-        if (runtime_scope >= 0) {
-            if (runtime_scope < nctxes) {
-                memdebug_ctx_t *ctx;
-                ctx = memdebug_ctxes + runtime_scope;
-                ctx->nallocated += malloc_usable_size(res);
-                if (ptr == NULL) {
-                    ++ctx->nitems;
-                }
-            }
-        } else {
-            //TRACE("problem runtime_scope: %d", runtime_scope);
-        }
-    }
+    MEMDEBUG_BODY_INC(res)
 
     return res;
 }
@@ -252,24 +172,8 @@ memdebug_reallocf(int n, void *ptr, size_t sz)
 void
 memdebug_free(int n, void *ptr)
 {
-    if (ptr != NULL) {
-        if (n < nctxes) {
-            memdebug_ctx_t *ctx;
-            ctx = memdebug_ctxes + n;
-            ctx->nallocated -= malloc_usable_size(ptr);
-            --ctx->nitems;
-        }
-        if (runtime_scope >= 0) {
-            if (runtime_scope < nctxes) {
-                memdebug_ctx_t *ctx;
-                ctx = memdebug_ctxes + runtime_scope;
-                ctx->nallocated -= malloc_usable_size(ptr);
-                --ctx->nitems;
-            }
-        } else {
-            //TRACE("problem runtime_scope: %d", runtime_scope);
-        }
-    }
+
+    MEMDEBUG_BODY_DEC(ptr)
 
     free(ptr);
 }
@@ -282,24 +186,7 @@ memdebug_strdup(int n, const char *str)
 
     res = strdup(str);
 
-    if (res != NULL) {
-        if (n < nctxes) {
-            memdebug_ctx_t *ctx;
-            ctx = memdebug_ctxes + n;
-            ctx->nallocated += malloc_usable_size(res);
-            ++ctx->nitems;
-        }
-        if (runtime_scope >= 0) {
-            if (runtime_scope < nctxes) {
-                memdebug_ctx_t *ctx;
-                ctx = memdebug_ctxes + runtime_scope;
-                ctx->nallocated += malloc_usable_size(res);
-                ++ctx->nitems;
-            }
-        } else {
-            //TRACE("problem runtime_scope: %d", runtime_scope);
-        }
-    }
+    MEMDEBUG_BODY_INC(res)
 
     return res;
 }
@@ -312,25 +199,7 @@ memdebug_strndup(int n, const char *str, size_t len)
 
     res = strndup(str, len);
 
-    if (res != NULL) {
-        if (n < nctxes) {
-            memdebug_ctx_t *ctx;
-            ctx = memdebug_ctxes + n;
-            ctx->nallocated += malloc_usable_size(res);
-            ++ctx->nitems;
-        }
-        if (runtime_scope >= 0) {
-            if (runtime_scope < nctxes) {
-                memdebug_ctx_t *ctx;
-                ctx = memdebug_ctxes + runtime_scope;
-                ctx->nallocated += malloc_usable_size(res);
-                ctx->nallocated += malloc_usable_size(res);
-                ++ctx->nitems;
-            }
-        } else {
-            //TRACE("problem runtime_scope: %d", runtime_scope);
-        }
-    }
+    MEMDEBUG_BODY_INC(res)
 
     return res;
 }
