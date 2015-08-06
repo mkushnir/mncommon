@@ -4,8 +4,6 @@
 #include <stdarg.h>
 #include <sys/types.h>
 
-#include <mrkcommon/mpool.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -56,12 +54,9 @@ typedef struct _bytestream {
 #define SADVANCEPOS(stream, n) (stream)->pos += (n)
 
 int bytestream_init(bytestream_t *, ssize_t);
-int bytestream_init_mpool(mpool_ctx_t *, bytestream_t *, ssize_t);
 void bytestream_fini(bytestream_t *);
-void bytestream_fini_mpool(mpool_ctx_t *, bytestream_t *);
 
 int bytestream_grow(bytestream_t *, size_t);
-int bytestream_grow_mpool(mpool_ctx_t *, bytestream_t *, size_t);
 
 ssize_t bytestream_read_more(bytestream_t *, int, ssize_t);
 ssize_t bytestream_recv_more(bytestream_t *, int, ssize_t);
@@ -76,15 +71,7 @@ off_t bytestream_recycle(bytestream_t *, int, off_t);
 #define BYTESTREAM_NPRINTF_ERROR (-129)
 #define BYTESTREAM_NPRINTF_NEEDNORE (-130)
 int bytestream_nprintf(bytestream_t *, size_t, const char *, ...);
-int bytestream_nprintf_mpool(mpool_ctx_t *,
-                             bytestream_t *,
-                             size_t,
-                             const char *, ...);
 int bytestream_cat(bytestream_t *, size_t, const char *);
-int bytestream_cat_mpool(mpool_ctx_t *,
-                         bytestream_t *,
-                         size_t,
-                         const char *);
 int bytestream_dump(bytestream_t *);
 
 #ifdef __cplusplus
