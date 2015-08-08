@@ -2,6 +2,7 @@
 #define MRKCOMMON_MPOOL_H
 
 #include <stddef.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 #ifdef __cplusplus
