@@ -27,13 +27,16 @@ reallocf(void *ptr, size_t sz)
 #include <mrkcommon/util.h>
 
 
-#define MEMDEBUG_BODY(ptr, op1, op2)                           \
+#define MEMDEBUG_BODY(ptr, op1, op2, __a1)                     \
 if ((ptr) != NULL) {                                           \
+    size_t __sz;                                               \
     assert(n >= 0 && n < (int)countof(memdebug_ctxes));        \
+    __sz = malloc_usable_size(ptr);                            \
     if (n < nctxes) {                                          \
         memdebug_ctx_t *ctx;                                   \
         ctx = memdebug_ctxes + n;                              \
-        ctx->nallocated op1 malloc_usable_size(ptr);           \
+        ctx->nallocated op1 __sz;                              \
+        __a1;                                                  \
         op2 ctx->nitems;                                       \
     }                                                          \
     if (runtime_scope >= 0) {                                  \
@@ -41,7 +44,8 @@ if ((ptr) != NULL) {                                           \
         if (runtime_scope < nctxes) {                          \
             memdebug_ctx_t *ctx;                               \
             ctx = memdebug_ctxes + runtime_scope;              \
-            ctx->nallocated op1 malloc_usable_size(ptr);       \
+            ctx->nallocated op1 __sz;                          \
+            __a1;                                              \
             op2 ctx->nitems;                                   \
         }                                                      \
     } else {                                                   \
@@ -52,14 +56,16 @@ if ((ptr) != NULL) {                                           \
 }                                                              \
 
 
-#define MEMDEBUG_BODY_INC(ptr) MEMDEBUG_BODY(ptr, +=, ++)
-#define MEMDEBUG_BODY_DEC(ptr) MEMDEBUG_BODY(ptr, -=, --)
+#define MEMDEBUG_BODY_INC(ptr) MEMDEBUG_BODY(ptr, +=, ++, ctx->ncallocated += __sz)
+#define MEMDEBUG_BODY_DEC(ptr) MEMDEBUG_BODY(ptr, -=, --, ctx->ncfreed += __sz)
 
 
 typedef struct _memdebug_ctx {
     const char *name;
     int id;
     size_t nallocated;
+    size_t ncallocated;
+    size_t ncfreed;
     size_t nitems;
 } memdebug_ctx_t;
 
@@ -68,6 +74,8 @@ typedef struct _memdebug_ctx {
 typedef struct _memdebug_stat {
     const char *name;
     size_t nallocated;
+    size_t ncallocated;
+    size_t ncfreed;
     size_t nitems;
 } memdebug_stat_t;
 
@@ -85,6 +93,7 @@ memdebug_register(const char *name)
     ctx->name = name;
     ctx->id = nctxes;
     ctx->nallocated = 0;
+    ctx->ncfreed = 0;
     ctx->nitems = 0;
     ++nctxes;
     return ctx->id;
@@ -146,12 +155,22 @@ void *
 memdebug_realloc(int n, void *ptr, size_t sz)
 {
     void *res;
+    size_t sz0;
 
-    MEMDEBUG_BODY_DEC(ptr)
+    sz0 = malloc_usable_size(ptr);
+    //if (sz0 > sz) {
+    //    MEMDEBUG_BODY(ptr, -=, --, ctx->ncfreed += sz0 - sz)
+    //} else {
+    //}
+    MEMDEBUG_BODY(ptr, -=, --, )
 
     res = realloc(ptr, sz);
 
-    MEMDEBUG_BODY_INC(res)
+    if (sz0 > sz) {
+        MEMDEBUG_BODY(res, +=, ++,)
+    } else {
+        MEMDEBUG_BODY(res, +=, ++, ctx->ncallocated += sz - sz0)
+    }
 
     return res;
 }
@@ -222,6 +241,10 @@ memdebug_traverse_ctxes(int (*cb)(memdebug_stat_t *, void *), void *udata)
         ctx = memdebug_ctxes + i;
         st.name = ctx->name;
         st.nallocated = ctx->nallocated;
+        st.ncallocated = ctx->ncallocated;
+        ctx->ncallocated = 0;
+        st.ncfreed = ctx->ncfreed;
+        ctx->ncfreed = 0;
         st.nitems = ctx->nitems;
 
         if (cb(&st, udata) != 0) {
@@ -243,6 +266,10 @@ memdebug_stat(int n, memdebug_stat_t *st)
 
     st->name = ctx->name;
     st->nallocated = ctx->nallocated;
+    st->ncallocated = ctx->ncallocated;
+    ctx->ncallocated = 0;
+    st->ncfreed = ctx->ncfreed;
+    ctx->ncfreed = 0;
     st->nitems = ctx->nitems;
 }
 
@@ -252,13 +279,22 @@ my_memdebug_cb(memdebug_stat_t *st, void *udata)
 {
     struct {
         size_t nallocated_total;
+        size_t ncallocated_total;
+        size_t ncfreed_total;
         size_t nitems_total;
     } *params;
 
     params = udata;
 
-    TRACEC("%-16s % 12ld % 12ld\n", st->name, st->nallocated, st->nitems);
+    TRACEC("%-16s % 12ld % 12ld % 12ld % 12ld\n",
+           st->name,
+           st->nallocated,
+           st->ncallocated,
+           st->ncfreed,
+           st->nitems);
     params->nallocated_total += st->nallocated;
+    params->ncallocated_total += st->ncallocated;
+    params->ncfreed_total += st->ncfreed;
     params->nitems_total += st->nitems;
     return 0;
 }
@@ -269,12 +305,24 @@ memdebug_print_stats(void)
 {
     struct {
         size_t nallocated_total;
+        size_t ncallocated_total;
+        size_t ncfreed_total;
         size_t nitems_total;
-    } params = { 0, 0};
+    } params = { 0, 0, 0, 0 };
 
     memdebug_traverse_ctxes(my_memdebug_cb, &params);
-    TRACEC("%-16s %-12s %-12s\n", "----------------", "----------------", "------------");
-    TRACEC("%-16s % 12ld % 12ld\n", "Total", params.nallocated_total, params.nitems_total);
+    TRACEC("%-16s %-12s %-12s %-12s %-12s\n",
+           "----------------",
+           "------------",
+           "------------",
+           "------------",
+           "------------");
+    TRACEC("%-16s % 12ld % 12ld % 12ld % 12ld\n",
+           "Total",
+           params.nallocated_total,
+           params.ncallocated_total,
+           params.ncfreed_total,
+           params.nitems_total);
 }
 
 
@@ -283,13 +331,21 @@ my_memdebug_oneline_cb(memdebug_stat_t *st, UNUSED void *udata)
 {
     struct {
         size_t nallocated_total;
+        size_t ncallocated_total;
+        size_t ncfreed_total;
         size_t nitems_total;
     } *params;
 
     params = udata;
 
-    TRACEC("%s\t%ld\t", st->name, st->nallocated);
+    TRACEC("%s\t%ld\t%ld\t%ld\t",
+           st->name,
+           st->nallocated,
+           st->ncallocated,
+           st->ncfreed);
     params->nallocated_total += st->nallocated;
+    params->ncallocated_total += st->ncallocated;
+    params->ncfreed_total += st->ncfreed;
     params->nitems_total += st->nitems;
     return 0;
 }
@@ -300,11 +356,16 @@ memdebug_print_stats_oneline(void)
 {
     struct {
         size_t nallocated_total;
+        size_t ncallocated_total;
+        size_t ncfreed_total;
         size_t nitems_total;
-    } params = { 0, 0};
+    } params = { 0, 0, 0, 0 };
 
     TRACEC("memdebug\t%ld\t", time(NULL));
     memdebug_traverse_ctxes(my_memdebug_oneline_cb, &params);
-    TRACEC("total\t%ld\n", params.nallocated_total);
+    TRACEC("total\t%ld\t%ld\t%ld\n",
+           params.nallocated_total,
+           params.ncallocated_total,
+           params.ncfreed_total);
 }
 

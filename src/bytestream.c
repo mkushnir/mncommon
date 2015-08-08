@@ -17,6 +17,12 @@
 #include <mrkcommon/memdebug.h>
 MEMDEBUG_DECLARE(bytestream);
 
+#define MEMDEBUG_INIT(self)                                    \
+do {                                                           \
+    (self)->mdtag = (uint64_t)memdebug_get_runtime_scope();    \
+} while (0)                                                    \
+
+
 #define MEMDEBUG_ENTER(self)                                   \
 {                                                              \
     int mdtag;                                                 \
@@ -41,7 +47,7 @@ bytestream_dump(bytestream_t *stream)
           stream->pos, stream->eod, stream->buf.sz);
     TRACE("stream start");
     D16(stream->buf.data, MIN(stream->eod, 128));
-    return (0);
+    return 0;
 }
 
 
@@ -52,6 +58,7 @@ bytestream_init(bytestream_t *stream, ssize_t growsz)
 {
     stream->buf.sz = growsz;
     stream->growsz = growsz;
+    MEMDEBUG_INIT(stream);
     MEMDEBUG_ENTER(stream);
     if ((stream->buf.data = malloc(stream->buf.sz)) == NULL) {
         TRRET(BYTESTREAM_INIT + 1);
@@ -133,14 +140,14 @@ bytestream_write(bytestream_t *stream, int fd, size_t sz)
     ssize_t nwritten;
 
     if ((stream->pos + (ssize_t)sz) > stream->eod) {
-        return (-1);
+        return -1;
 
     }
 
     nwritten = write(fd, stream->buf.data + stream->pos, sz);
     stream->pos += nwritten;
 
-    return (nwritten);
+    return nwritten;
 }
 
 ssize_t
@@ -151,7 +158,7 @@ bytestream_stderr_write(bytestream_t *stream, int fd, size_t sz)
     fd = 2;
 
     if ((stream->pos + (ssize_t)sz) > stream->eod) {
-        return (-1);
+        return -1;
 
     }
 
@@ -160,7 +167,7 @@ bytestream_stderr_write(bytestream_t *stream, int fd, size_t sz)
 
     if (write(fd, "\n", 1)) {;}
 
-    return (nwritten);
+    return nwritten;
 }
 
 ssize_t
@@ -169,14 +176,14 @@ bytestream_send(bytestream_t *stream, int fd, size_t sz)
     ssize_t nwritten;
 
     if ((stream->pos + (ssize_t)sz) > stream->eod) {
-        return (-1);
+        return -1;
 
     }
 
     nwritten = send(fd, stream->buf.data + stream->pos, sz, 0);
     stream->pos += nwritten;
 
-    return (nwritten);
+    return nwritten;
 }
 
 int
@@ -198,7 +205,7 @@ bytestream_consume_data(bytestream_t *stream, int fd)
         TRRET(BYTESTREAM_CONSUME_DATA + 2);
     }
 
-    return (0);
+    return 0;
 }
 
 int
@@ -210,7 +217,7 @@ bytestream_produce_data(bytestream_t *stream, int fd)
         TRRET(BYTESTREAM_PRODUCE_DATA + 1);
     }
 
-    return (0);
+    return 0;
 }
 
 
