@@ -350,14 +350,14 @@ test2(char *fname)
 
         if ((it1 = pset_peek(&pset, it0)) == NULL) {
             if ((it1 = pset_push(&pset, it0)) != NULL) {
-                bytes_t *s;
+                UNUSED bytes_t *s;
 
                 s = it1->v;
                 //TRACE("deleting %s", s->data);
                 pset_item_fini(it1);
             }
         } else {
-            bytes_t *s;
+            UNUSED bytes_t *s;
 
             s = it0->v;
             //TRACE("deleting dup %s", s->data);

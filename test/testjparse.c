@@ -89,7 +89,7 @@ mycb12(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 static int
 mycb1(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
-    int res;
+    UNUSED int res;
 
     res = jparse_expect_object(jctx, o1, val, udata);
     //TRACE("res=%s", mrkcommon_diag_str(res));
@@ -99,7 +99,7 @@ mycb1(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 static int
 mycb2(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 {
-    int res;
+    UNUSED int res;
 
     res = jparse_expect_object(jctx, o1, val, udata);
     //TRACE("res=%s", mrkcommon_diag_str(res));
