@@ -88,6 +88,8 @@ struct { \
 
 #define STQUEUE_ORPHAN(q, link, e) (((q)->tail != (e)) && ((e)->link.next == NULL))
 
+#define STQUEUE_EMPTY(q) ((q)->head == NULL && (q)->tail == NULL)
+
 #define STQUEUE_INSERT_AFTER(q, link, a, e) \
     do { \
         assert((a) != NULL && (e) != NULL); \
@@ -101,10 +103,6 @@ struct { \
         } \
         ++((q)->nelems); \
     } while (0)
-
-#define STQUEUE_ORPHAN(q, link, e) (((q)->tail != (e)) && ((e)->link.next == NULL))
-
-#define STQUEUE_EMPTY(q) ((q)->tail == NULL)
 
 #ifdef __cplusplus
 }
