@@ -450,6 +450,8 @@ bytes_urldecode(bytes_t *str)
             } else {
                 /* ignore invalid sequence */
             }
+        } else if (*src == '+') {
+            *dst = ' ';
         } else {
             *dst = *src;
         }
