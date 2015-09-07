@@ -154,7 +154,7 @@ testheap_CFLAGS =
 testheap_LDFLAGS =
 
 ../src/diag.c ../src/diag.h: ../src/diag.txt
-	sh ../gen-diag mrkcommon
+	$(AM_V_GEN) /bin/sh ../gen-diag mrkcommon
 
 testrun: all
 	for i in $(noinst_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;
