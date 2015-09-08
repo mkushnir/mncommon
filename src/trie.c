@@ -9,7 +9,7 @@
 
 #ifndef HAVE_FLSL
 #   ifdef __GNUC__
-#       define flsl(v) (((v) != 0L) ? (__builtin_clzl(v) + 1) : 0)
+#       define flsl(v) (((v) != 0L) ? (64 - __builtin_clzl(v)) : 0)
 #   else
 #       error "Could not find/define flsl."
 #   endif
@@ -520,7 +520,9 @@ find_closest_partial(trie_node_t *node, int idx, uintptr_t key, int direction)
                         return NULL;
                     }
 
-                    node_idx = (((unsigned)(node->digit)) & (1 << CHILD_SELECTOR_SHIFT)) >> CHILD_SELECTOR_SHIFT;
+                    node_idx = (((unsigned)(node->digit)) &
+                                (1 << CHILD_SELECTOR_SHIFT)) >>
+                                    CHILD_SELECTOR_SHIFT;
 
                     //TRACE("node_idx=%d", node_idx);
 
@@ -566,7 +568,10 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
         if (idx == 0) {
             root = &tr->roots[idx];
             ++idx;
-            if ((res = find_closest_partial(root, idx, key, direction)) != NULL) {
+            if ((res = find_closest_partial(root,
+                                            idx,
+                                            key,
+                                            direction)) != NULL) {
                 return res;
             }
             assert(idx == 1);
@@ -574,7 +579,10 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
         }
         /* first, or second */
         root = &tr->roots[idx];
-        if ((res = find_closest_partial(root, idx, key, direction)) != NULL) {
+        if ((res = find_closest_partial(root,
+                                        idx,
+                                        key,
+                                        direction)) != NULL) {
             return res;
         }
         key = 0ul;
@@ -582,7 +590,10 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
         /* the rest */
         for (; idx <= TREE_DEPTH; ++idx) {
             root = &tr->roots[idx];
-            if ((res = find_closest_partial(root, idx, key, direction)) != NULL) {
+            if ((res = find_closest_partial(root,
+                                            idx,
+                                            key,
+                                            direction)) != NULL) {
                 return res;
             }
         }
@@ -590,13 +601,19 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
         if (idx == 0) {
             root = &tr->roots[idx];
             ++idx;
-            if ((res = find_closest_partial(root, idx, key, direction)) != NULL) {
+            if ((res = find_closest_partial(root,
+                                            idx,
+                                            key,
+                                            direction)) != NULL) {
                 return res;
             }
         } else {
             /* first */
             root = &tr->roots[idx];
-            if ((res = find_closest_partial(root, idx, key, direction)) != NULL) {
+            if ((res = find_closest_partial(root,
+                                            idx,
+                                            key,
+                                            direction)) != NULL) {
                 return res;
             }
             key = ULONG_MAX;
@@ -604,7 +621,10 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
             /* the rest */
             for (; idx > 0; --idx) {
                 root = &tr->roots[idx];
-                if ((res = find_closest_partial(root, idx, key, direction)) != NULL) {
+                if ((res = find_closest_partial(root,
+                                                idx,
+                                                key,
+                                                direction)) != NULL) {
                     return res;
                 }
             }
@@ -612,7 +632,10 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
             assert(idx == 0);
             root = &tr->roots[idx];
             ++idx;
-            if ((res = find_closest_partial(root, idx, key, direction)) != NULL) {
+            if ((res = find_closest_partial(root,
+                                            idx,
+                                            key,
+                                            direction)) != NULL) {
                 return res;
             }
         }
