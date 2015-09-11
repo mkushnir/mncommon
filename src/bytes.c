@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 #include <mrkcommon/bytes.h>
 #include <mrkcommon/dumpm.h>
@@ -266,6 +267,15 @@ bytes_cmp(bytes_t *a, bytes_t *b)
         }
     }
     return diff > 0 ? 1 : -1;
+}
+
+
+int
+bytes_cmpi(bytes_t *a, bytes_t *b)
+{
+    return strncasecmp((char *)a->data,
+                       (char *)b->data,
+                       MIN(a->sz, b->sz));
 }
 
 
