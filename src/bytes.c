@@ -279,6 +279,25 @@ bytes_cmpi(bytes_t *a, bytes_t *b)
 }
 
 
+int
+bytes_contains(bytes_t *a, bytes_t *b)
+{
+    return strnstr((char *)a->data,
+                   (char *)b->data,
+                   MIN(a->sz, b->sz)) != NULL;
+}
+
+
+int
+bytes_containsi(bytes_t *a, bytes_t *b)
+{
+    if (a->data[a->sz - 1] != '\0' || b->data[b->sz - 1] != '\0') {
+        return 0;
+    }
+    return strcasestr((char *)a->data, (char *)b->data) != NULL;
+}
+
+
 #define BYTES_NEW_BODY(malloc_fn)                              \
     size_t mod, msz;                                           \
     bytes_t *res;                                              \
