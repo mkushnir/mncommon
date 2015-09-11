@@ -282,9 +282,10 @@ bytes_cmpi(bytes_t *a, bytes_t *b)
 int
 bytes_contains(bytes_t *a, bytes_t *b)
 {
-    return strnstr((char *)a->data,
-                   (char *)b->data,
-                   MIN(a->sz, b->sz)) != NULL;
+    if (a->data[a->sz - 1] != '\0' || b->data[b->sz - 1] != '\0') {
+        return 0;
+    }
+    return strstr((char *)a->data, (char *)b->data) != NULL;
 }
 
 
