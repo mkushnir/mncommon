@@ -52,7 +52,7 @@ do {                                           \
 } while (0)                                    \
 
 
-#define BYTES_DECREF(pb)                                                       \
+#define _BYTES_DECREF(pb)                                                      \
 do {                                                                           \
     if (*(pb) != NULL) {                                                       \
         --(*(pb))->nref;                                                       \
@@ -69,7 +69,7 @@ do {                                                                           \
 } while (0)                                                                    \
 
 
-#define BYTES_DECREF_FAST(b)                                   \
+#define _BYTES_DECREF_FAST(b)                                  \
 do {                                                           \
     --((b))->nref;                                             \
     if (((b))->nref <= 0) {                                    \
@@ -81,6 +81,14 @@ do {                                                           \
         MEMDEBUG_LEAVE_BYTES(b);                               \
     }                                                          \
 } while (0)                                                    \
+
+#ifdef DO_MEMDEBUG
+#define BYTES_DECREF bytes_decref
+#define BYTES_DECREF_FAST bytes_decref_fast
+#else
+#define BYTES_DECREF _BYTES_DECREF
+#define BYTES_DECREF_FAST _BYTES_DECREF_FAST
+#endif
 
 char *strrstr(const char *, const char *);
 

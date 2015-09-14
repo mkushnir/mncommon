@@ -1,6 +1,8 @@
 #ifndef MRKCOMMON_MEMDEBUG_H
 #define MRKCOMMON_MEMDEBUG_H
 
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

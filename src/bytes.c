@@ -592,14 +592,14 @@ end:
 void
 bytes_decref(bytes_t **value)
 {
-    BYTES_DECREF(value);
+    _BYTES_DECREF(value);
 }
 
 
 void
 bytes_decref_fast(bytes_t *value)
 {
-    BYTES_DECREF_FAST(value);
+    _BYTES_DECREF_FAST(value);
 }
 
 
