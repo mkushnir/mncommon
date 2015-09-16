@@ -198,6 +198,7 @@ bytes_json_unescape(bytes_t *src)
     }
     dest->data[j - 1] = '\0';
     dest->sz = j;
+    dest->hash = 0;
 }
 
 
