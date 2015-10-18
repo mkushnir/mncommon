@@ -411,12 +411,53 @@ test1(void)
 }
 
 
+static int
+mycb300(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
+{
+    int res;
+    res = jparse_expect_any(jctx, jval, udata);
+    jparse_dump_value(jval);
+    TR(res);
+    return 0;
+}
+void
+test2(void)
+{
+    jparse_ctx_t *jctx;
+    UNUSED int res;
+
+    struct {
+        long rnd;
+        const char *in;
+        jparse_expect_cb_t cb;
+    } data[] = {
+        {0, "data/testjparse/mixed-01", mycb300},
+
+    };
+    UNITTEST_PROLOG;
+
+    FOREACHDATA {
+        jparse_value_t jval;
+
+        TRACE("in=%s", CDATA.in);
+        jctx = jparse_ctx_new(4096, 4096);
+        jctx->default_cb = mycb300;
+        jval.cb = mycb300;
+        jval.udata = NULL;
+        res = jparse_ctx_parse(jctx, CDATA.in, CDATA.cb, &jval, NULL);
+        jparse_ctx_destroy(&jctx);
+        assert(res == 0);
+    }
+
+}
+
 
 int
 main(void)
 {
     //test0();
-    test1();
+    //test1();
+    test2();
     return 0;
 }
 

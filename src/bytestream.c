@@ -60,8 +60,12 @@ bytestream_init(bytestream_t *stream, ssize_t growsz)
     stream->growsz = growsz;
     MEMDEBUG_INIT(stream);
     MEMDEBUG_ENTER(stream);
-    if ((stream->buf.data = malloc(stream->buf.sz)) == NULL) {
-        TRRET(BYTESTREAM_INIT + 1);
+    if (growsz > 0) {
+        if ((stream->buf.data = malloc(stream->buf.sz)) == NULL) {
+            TRRET(BYTESTREAM_INIT + 1);
+        }
+    } else {
+        stream->buf.data = NULL;
     }
     MEMDEBUG_LEAVE(stream);
     stream->eod = 0;
