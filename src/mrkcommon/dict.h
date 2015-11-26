@@ -55,6 +55,7 @@ void *dict_remove_item(dict_t *, void *);
 void *dict_remove_item_mpool(mpool_ctx_t *, dict_t *, void *);
 void dict_delete_pair(dict_t *, dict_item_t *);
 void dict_delete_pair_mpool(mpool_ctx_t *, dict_t *, dict_item_t *);
+void dict_delete_pair_no_fini_mpool(mpool_ctx_t *, dict_t *, dict_item_t *);
 int dict_traverse(dict_t *, dict_traverser_t, void *);
 typedef int (*dict_traverser_item_t)(dict_t *, dict_item_t *, void *);
 

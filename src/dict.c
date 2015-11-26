@@ -268,6 +268,26 @@ dict_remove_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key)
 
 
 
+#define DICT_DELETE_PAIR_NO_FINI_BODY(free_fn) \
+    if (dit->prev != NULL) {                   \
+        dit->prev->next = dit->next;           \
+    } else {                                   \
+        assert(dit->bucket != NULL);           \
+        *(dit->bucket) = dit->next;            \
+    }                                          \
+    if (dit->next != NULL) {                   \
+        dit->next->prev = dit->prev;           \
+        if (dit->prev == NULL) {               \
+            dit->next->bucket = dit->bucket;   \
+        }                                      \
+    }                                          \
+    MEMDEBUG_ENTER(dict);                      \
+    free_fn(dit);                              \
+    MEMDEBUG_LEAVE(dict);                      \
+    --dict->elnum;                             \
+
+
+
 void
 dict_delete_pair(dict_t *dict, dict_item_t *dit)
 {
@@ -280,6 +300,15 @@ dict_delete_pair_mpool(mpool_ctx_t *mpool, dict_t *dict, dict_item_t *dit)
 {
 #define _free(p) mpool_free(mpool, (p))
     DICT_DELETE_PAIR_BODY(_free);
+#undef _free
+}
+
+
+void
+dict_delete_pair_no_fini_mpool(mpool_ctx_t *mpool, dict_t *dict, dict_item_t *dit)
+{
+#define _free(p) mpool_free(mpool, (p))
+    DICT_DELETE_PAIR_NO_FINI_BODY(_free);
 #undef _free
 }
 
