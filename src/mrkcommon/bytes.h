@@ -49,7 +49,7 @@ typedef struct _bytes {
 #define BYTES_DECLARE_CONSTANT(n, ...) \
     {                                  \
         0,                             \
-        0x7fffffffffffffff,            \
+        0x40000000,                    \
         n,                             \
         0,                             \
         ##__VA_ARGS__                  \
@@ -58,7 +58,7 @@ typedef struct _bytes {
 #else
 #define BYTES_DECLARE_CONSTANT(n, ...) \
     {                                  \
-        0x7fffffffffffffff,            \
+        0x40000000,                    \
         n,                             \
         0,                             \
         ##__VA_ARGS__                  \
