@@ -45,6 +45,27 @@ typedef struct _bytes {
     unsigned char data[];
 } bytes_t;
 
+#ifdef DO_MEMDEBUG
+#define BYTES_DECLARE_CONSTANT(n, ...) \
+    {                                  \
+        0,                             \
+        0x7fffffffffffffff,            \
+        n,                             \
+        0,                             \
+        ##__VA_ARGS__                  \
+    }                                  \
+
+#else
+#define BYTES_DECLARE_CONSTANT(n, ...) \
+    {                                  \
+        0x7fffffffffffffff,            \
+        n,                             \
+        0,                             \
+        ##__VA_ARGS__                  \
+    }                                  \
+
+#endif
+
 #define BYTES_INCREF(b)                        \
 do {                                           \
     (++(b)->nref);                             \
