@@ -45,26 +45,15 @@ typedef struct _bytes {
     unsigned char data[];
 } bytes_t;
 
-#ifdef DO_MEMDEBUG
-#define BYTES_DECLARE_CONSTANT(n, ...) \
-    {                                  \
-        0,                             \
-        0x40000000,                    \
-        n,                             \
-        0,                             \
-        ##__VA_ARGS__                  \
-    }                                  \
 
-#else
-#define BYTES_DECLARE_CONSTANT(n, ...) \
-    {                                  \
-        0x40000000,                    \
-        n,                             \
-        0,                             \
-        ##__VA_ARGS__                  \
-    }                                  \
+#define BYTES_INITIALIZER(s)   \
+{                              \
+    .nref = 0x40000000,        \
+    .sz = sizeof(s),           \
+    .hash = 0l,                \
+    .data = s                  \
+}                              \
 
-#endif
 
 #define BYTES_INCREF(b)                        \
 do {                                           \
