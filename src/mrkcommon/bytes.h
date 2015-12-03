@@ -125,6 +125,7 @@ void bytes_decref(bytes_t **);
 void bytes_decref_fast(bytes_t *);
 uint64_t bytes_hash(bytes_t *);
 int bytes_cmp(bytes_t *, bytes_t *);
+int bytes_cmpv(bytes_t *, bytes_t *);
 int bytes_cmpi(bytes_t *, bytes_t *);
 int bytes_contains(bytes_t *, bytes_t *);
 int bytes_containsi(bytes_t *, bytes_t *);

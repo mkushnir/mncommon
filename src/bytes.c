@@ -272,6 +272,15 @@ bytes_cmp(bytes_t *a, bytes_t *b)
 
 
 int
+bytes_cmpv(bytes_t *a, bytes_t *b)
+{
+    return strncmp((char *)a->data,
+                   (char *)b->data,
+                   MIN(a->sz, b->sz));
+}
+
+
+int
 bytes_cmpi(bytes_t *a, bytes_t *b)
 {
     return strncasecmp((char *)a->data,
