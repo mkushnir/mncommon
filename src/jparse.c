@@ -1751,6 +1751,20 @@ jparse_ctx_parse(jparse_ctx_t *jctx,
 }
 
 
+int
+jparse_ctx_parse_fd(jparse_ctx_t *jctx,
+                    int fd,
+                    jparse_expect_cb_t cb,
+                    jparse_value_t *val,
+                    void *udata)
+{
+    jctx->fd = fd;
+    jctx->bs.read_more = bytestream_read_more;
+    jctx->udata = udata;
+    return cb(jctx, val, udata);
+}
+
+
 void
 jparse_dump_value(jparse_value_t *val)
 {

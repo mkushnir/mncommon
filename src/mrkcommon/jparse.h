@@ -179,7 +179,17 @@ DECL_JPARSE_ARRAY_ITERATOR(it)                         \
 void jparse_dump_current_pos(jparse_ctx_t *, ssize_t);
 jparse_ctx_t *jparse_ctx_new(size_t, size_t);
 void jparse_ctx_destroy(jparse_ctx_t **);
-int jparse_ctx_parse(jparse_ctx_t *, const char *, jparse_expect_cb_t, jparse_value_t *, void *);
+int jparse_ctx_parse(jparse_ctx_t *,
+                     const char *,
+                     jparse_expect_cb_t,
+                     jparse_value_t *,
+                     void *);
+int
+jparse_ctx_parse_fd(jparse_ctx_t *,
+                    int,
+                    jparse_expect_cb_t,
+                    jparse_value_t *,
+                    void *);
 void jparse_dump_value(jparse_value_t *);
 
 #ifdef __cplusplus
