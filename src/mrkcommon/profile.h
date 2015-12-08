@@ -34,6 +34,7 @@ void profile_report_sec(void);
 #   define PROFILE_STOP(id) profile_stop((id))
 #   define PROFILE_REPORT() profile_report()
 #   define PROFILE_REPORT_SEC() profile_report_sec()
+#   define PROFILE_UNUSED
 #else
 #   define PROFILE_INIT_MODULE()
 #   define PROFILE_FINI_MODULE()
@@ -42,6 +43,7 @@ void profile_report_sec(void);
 #   define PROFILE_STOP(id)
 #   define PROFILE_REPORT()
 #   define PROFILE_REPORT_SEC()
+#   define PROFILE_UNUSED UNUSED
 #endif
 
 #ifdef __cplusplus
