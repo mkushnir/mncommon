@@ -20,7 +20,7 @@ rdtsc(void)
     __asm __volatile ("rdtsc; shl $32,%%rdx; or %%rdx,%%rax"
                       : "=a"(res)
                       :
-                      : "%rax", "%rdx"
+                      :
                      );
     return res;
 #else
