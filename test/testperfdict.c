@@ -6,15 +6,15 @@
 
 #include "unittest.h"
 #include "mrkcommon/dumpm.h"
-#include "mrkcommon/trie.h"
+#include "mrkcommon/dict.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/util.h"
 #include "mrkcommon/memdebug.h"
-MEMDEBUG_DECLARE(testperftrie);
+MEMDEBUG_DECLARE(testperfdict);
 
 typedef struct _key_item {
     uint64_t key;
-    trie_node_t *n;
+    dict_item_t *n;
     uint64_t add_time;
     uint64_t find_time;
     uint64_t remove_time;
@@ -22,7 +22,7 @@ typedef struct _key_item {
 
 static key_item_t keys[1024 * 1024];
 
-static trie_t tr;
+static dict_t dict;
 
 UNUSED static uint64_t
 new_id_random(void)
@@ -46,6 +46,21 @@ initialize_ids(void)
         keys[i].key = new_id_random();
     }
 }
+
+
+static uint64_t
+myhash(void *v)
+{
+    return (uint64_t)(uintptr_t)v;
+}
+
+
+static int
+mycmp(void *a, void *b)
+{
+    return (a > b) ? 1 : (a < b) ? -1 : 0;
+}
+
 
 static void
 test0(void)
@@ -71,28 +86,28 @@ test0(void)
     p_add_node = profile_register("add_node");
     p_find_node = profile_register("find_node");
     p_remove_node = profile_register("remove_node");
-
     TRACE("Started");
     initialize_ids();
     TRACE("initialize_ids OK");
-    trie_init(&tr);
+    dict_init(&dict,
+              32768,
+              (dict_hashfn_t)myhash,
+              (dict_item_comparator_t)mycmp,
+              NULL);
 
     for (i = 0; i < countof(keys); ++i) {
-        trie_node_t *n;
-
         profile_start(p_add_node);
-        n = trie_add_node(&tr, keys[i].key);
-        n->value = (void *)(uintptr_t)(keys[i].key);
+        dict_set_item(&dict, (void *)keys[i].key, NULL);
+        //keys[i].value = dict_get_item(&dict, keys[i].key);
         keys[i].add_time = profile_stop(p_add_node);
-
-        assert(n != NULL);
     }
     TRACE("add_node OK");
 
     for (i = 0; i < countof(keys); ++i) {
 
         profile_start(p_find_node);
-        keys[i].n = trie_find_exact(&tr, keys[i].key);
+        keys[i].n = dict_get_item(&dict, (void *)keys[i].key);
+        assert(keys[i].n != NULL);
         keys[i].find_time = profile_stop(p_find_node);
 
         assert(keys[i].n != NULL);
@@ -102,19 +117,15 @@ test0(void)
     for (i = 0; i < countof(keys); ++i) {
 
         profile_start(p_remove_node);
-        trie_remove_node(&tr, keys[i].n);
+        dict_delete_pair(&dict, keys[i].n);
         keys[i].n = NULL;
         keys[i].remove_time = profile_stop(p_remove_node);
-
-        if ((i % 100000) == 0) {
-            trie_cleanup(&tr);
-        }
     }
 
     TRACE("remove_node OK");
 
-    trie_fini(&tr);
-    TRACE("trie_fini OK");
+    dict_fini(&dict);
+    TRACE("dict_fini OK");
     profile_report();
 
     for (i = 0; i < countof(keys); ++i) {
@@ -130,8 +141,8 @@ int
 main(void)
 {
 #ifndef NDEBUG
-    MEMDEBUG_REGISTER(testperftrie);
-    //MEMDEBUG_REGISTER(trie);
+    MEMDEBUG_REGISTER(testperfdict);
+    //MEMDEBUG_REGISTER(dict);
 #endif
 
     profile_init_module();

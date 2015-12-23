@@ -4,7 +4,7 @@ CLEANFILES = *.core
 
 noinst_PROGRAMS = testfoo
 if DICT
-noinst_PROGRAMS += testdict
+noinst_PROGRAMS += testdict testperfdict
 endif
 if FASTHASH
 noinst_PROGRAMS += testfasthash
@@ -104,6 +104,10 @@ testperftrie_LDFLAGS =
 testperfrb_SOURCES = rb.c ../src/profile.c testperfrb.c
 testperfrb_CFLAGS =
 testperfrb_LDFLAGS =
+
+testperfdict_SOURCES = rb.c ../src/profile.c testperfdict.c
+testperfdict_CFLAGS =
+testperfdict_LDFLAGS =
 
 testrborder_SOURCES = rb.c testrborder.c
 testrborder_CFLAGS =
