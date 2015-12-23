@@ -320,40 +320,40 @@ trie_traverse(trie_t *tr, int (*cb)(trie_node_t *, uint64_t, void *), void *udat
     return 0;
 }
 
-#define TRIE_ADD_NODE_BODY(mallocfn) \
-    int idx, i, sel; \
-    trie_node_t **n; \
-    trie_node_t *cur; \
-    idx = flsl(key); \
-    cur = &tr->roots[idx]; \
-    if (idx == 0) { \
-        ++idx; \
-    } \
-    i = 0; \
-    do { \
-        /* \
-         * sel (selector): \
-         *  - 0, keys are 0x..x \
-         *  - 1, keys are 1x..x \
-         */ \
-        sel = (key & (1ul << (idx - 1))) >> (idx - 1); \
-        n = &cur->child[sel]; \
-        if (*n == NULL) { \
-            if ((*n = mallocfn(sizeof(trie_node_t))) == NULL) { \
-                FAIL("malloc"); \
-            } \
-            trie_node_init(*n, \
-                           cur, \
-                           (int)((unsigned)i | \
-                               ((unsigned)sel << CHILD_SELECTOR_SHIFT)), \
-                           NULL); \
-            ++(tr->volume); \
-        } \
-        cur = *n; \
-        ++i; \
-    } while (--idx); \
-    ++(tr->nvals); \
-    return cur;
+#define TRIE_ADD_NODE_BODY(mallocfn)                                           \
+    int idx, i, sel;                                                           \
+    trie_node_t **n;                                                           \
+    trie_node_t *cur;                                                          \
+    idx = flsl(key);                                                           \
+    cur = &tr->roots[idx];                                                     \
+    if (idx == 0) {                                                            \
+        ++idx;                                                                 \
+    }                                                                          \
+    i = 0;                                                                     \
+    do {                                                                       \
+        /*                                                                     \
+         * sel (selector):                                                     \
+         *  - 0, keys are 0x..x                                                \
+         *  - 1, keys are 1x..x                                                \
+         */                                                                    \
+        sel = (key & (1ul << (idx - 1))) >> (idx - 1);                         \
+        n = &cur->child[sel];                                                  \
+        if (*n == NULL) {                                                      \
+            if ((*n = mallocfn(sizeof(trie_node_t))) == NULL) {                \
+                FAIL("malloc");                                                \
+            }                                                                  \
+            trie_node_init(*n,                                                 \
+                           cur,                                                \
+                           (int)((unsigned)i |                                 \
+                               ((unsigned)sel << CHILD_SELECTOR_SHIFT)),       \
+                           NULL);                                              \
+            ++(tr->volume);                                                    \
+        }                                                                      \
+        cur = *n;                                                              \
+        ++i;                                                                   \
+    } while (--idx);                                                           \
+    ++(tr->nvals);                                                             \
+    return cur;                                                                \
 
 
 
@@ -643,29 +643,30 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
     return NULL;
 }
 
-#define CLEANUP_ORPHANS_BODY(freefn) \
-    trie_node_t *parent; \
-    while (n != NULL) { \
-        if (n->parent == NULL) { \
-            break; \
-        } \
-        if (trie_node_is_orphan(n)) { \
-            parent = n->parent; \
-            if (parent != NULL) { \
-                if (parent->child[0] == n) { \
-                    parent->child[0] = NULL; \
-                } else { \
-                    assert(parent->child[1] == n); \
-                    parent->child[1] = NULL; \
-                } \
-            } \
-            freefn(n); \
-            --(tr->volume); \
-            n = parent; \
-        } else { \
-            break; \
-        } \
-    }
+#define CLEANUP_ORPHANS_BODY(freefn)                   \
+    trie_node_t *parent;                               \
+    while (n != NULL) {                                \
+        if (n->parent == NULL) {                       \
+            break;                                     \
+        }                                              \
+        if (trie_node_is_orphan(n)) {                  \
+            parent = n->parent;                        \
+            if (parent != NULL) {                      \
+                if (parent->child[0] == n) {           \
+                    parent->child[0] = NULL;           \
+                } else {                               \
+                    assert(parent->child[1] == n);     \
+                    parent->child[1] = NULL;           \
+                }                                      \
+            }                                          \
+            freefn(n);                                 \
+            --(tr->volume);                            \
+            n = parent;                                \
+        } else {                                       \
+            break;                                     \
+        }                                              \
+    }                                                  \
+
 
 static void
 cleanup_orphans(trie_t *tr, trie_node_t *n)
@@ -683,28 +684,29 @@ cleanup_orphans_mpool(mpool_ctx_t *mpool, trie_t *tr, trie_node_t *n)
 }
 
 
-#define TRIE_REMOVE_NODE_BODY(finifn, freefn, cleanupfn) \
-    trie_node_t *parent; \
-    parent = n->parent; \
-    if (parent != NULL) { \
-        if (parent->child[0] == n) { \
-            parent->child[0] = NULL; \
-        } else if (parent->child[1] == n) { \
-            parent->child[1] = NULL; \
-        } else { \
-            TRACE("tr=%p parent=%p n=%p " \
-                  "parent->child[0]=%p parent->child[1]=%p", \
-                  tr, parent, n, \
-                  parent->child[0], parent->child[1]); \
-            FAIL("trie_node_remove"); \
-        } \
-    } \
-    finifn(tr, n); \
-    freefn(n); \
-    --(tr->volume); \
-    --(tr->nvals); \
-    cleanupfn(tr, parent); \
-    return 0;
+#define TRIE_REMOVE_NODE_BODY(finifn, freefn, cleanupfn)       \
+    trie_node_t *parent;                                       \
+    parent = n->parent;                                        \
+    if (parent != NULL) {                                      \
+        if (parent->child[0] == n) {                           \
+            parent->child[0] = NULL;                           \
+        } else if (parent->child[1] == n) {                    \
+            parent->child[1] = NULL;                           \
+        } else {                                               \
+            TRACE("tr=%p parent=%p n=%p "                      \
+                  "parent->child[0]=%p parent->child[1]=%p",   \
+                  tr, parent, n,                               \
+                  parent->child[0], parent->child[1]);         \
+            FAIL("trie_node_remove");                          \
+        }                                                      \
+    }                                                          \
+    finifn(tr, n);                                             \
+    freefn(n);                                                 \
+    --(tr->volume);                                            \
+    --(tr->nvals);                                             \
+    cleanupfn(tr, parent);                                     \
+    return 0;                                                  \
+
 
 int
 trie_remove_node(trie_t *tr, trie_node_t *n)
