@@ -8,6 +8,10 @@
 
 #define TREE_DEPTH (sizeof(uintptr_t) * 8)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _trie_node {
     struct _trie_node *parent;
     struct _trie_node *child[2];
@@ -38,6 +42,8 @@ int trie_traverse(trie_t *, int (*)(trie_node_t *, uint64_t, void *), void *);
 
 trie_node_t *trie_add_node(trie_t *, uintptr_t);
 trie_node_t *trie_add_node_mpool(mpool_ctx_t *, trie_t *, uintptr_t);
+int trie_remove_node_no_cleanup(trie_t *, trie_node_t *);
+int trie_remove_node_no_cleanup_mpool(mpool_ctx_t *, trie_t *, trie_node_t *);
 int trie_remove_node(trie_t *, trie_node_t *);
 int trie_remove_node_mpool(mpool_ctx_t *, trie_t *, trie_node_t *);
 size_t trie_get_volume(trie_t *);
@@ -51,6 +57,10 @@ trie_node_t *trie_find_closest(trie_t *, uintptr_t, int);
 
 #define TRIE_MIN(t) trie_find_closest((t), 0, 1)
 #define TRIE_MAX(t) trie_find_closest((t), ULONG_MAX, 0)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

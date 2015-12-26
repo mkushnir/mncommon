@@ -9,13 +9,13 @@
 
 #ifndef HAVE_FLSL
 #   ifdef __GNUC__
-#       define flsl(v) (((v) != 0L) ? (64 - __builtin_clzl(v)) : 0)
+#       define flsl(v) (64 - __builtin_clzl(v))
 #   else
 #       error "Could not find/define flsl."
 #   endif
 #endif
 
-#include <diag.h>
+#include "diag.h"
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/mpool.h>
 #include <mrkcommon/util.h>
@@ -25,6 +25,12 @@
 #include "mrkcommon/memdebug.h"
 MEMDEBUG_DECLARE(trie);
 #endif
+
+#define _malloc(sz) mpool_malloc(mpool, (sz))
+#define _free(ptr) mpool_free(mpool, (ptr))
+#define _trie_node_cleanup(tr, node) trie_node_cleanup_mpool(mpool, (tr), (node))
+#define _cleanup_orphans(tr, node) cleanup_orphans_mpool(mpool, (tr), (node))
+#define _trie_node_fini(tr, node) trie_node_fini_mpool(mpool, (tr), (node))
 
 void
 trie_node_dump(trie_node_t *n)
@@ -118,21 +124,22 @@ trie_init(trie_t *tr)
 }
 
 
-#define TRIE_NODE_FINI_BODY(freefn, finifn) \
-    assert(n != NULL); \
-    if (n->child[0] != NULL) { \
-        finifn(tr, n->child[0]); \
-        freefn(n->child[0]); \
-        n->child[0] = NULL; \
-        --(tr->volume); \
-    } \
-    if (n->child[1] != NULL) { \
-        finifn(tr, n->child[1]); \
-        freefn(n->child[1]); \
-        n->child[1] = NULL; \
-        --(tr->volume); \
-    } \
-    n->parent = NULL
+#define TRIE_NODE_FINI_BODY(freefn, finifn)    \
+    assert(n != NULL);                         \
+    if (n->child[0] != NULL) {                 \
+        finifn(tr, n->child[0]);               \
+        freefn(n->child[0]);                   \
+        n->child[0] = NULL;                    \
+        --(tr->volume);                        \
+    }                                          \
+    if (n->child[1] != NULL) {                 \
+        finifn(tr, n->child[1]);               \
+        freefn(n->child[1]);                   \
+        n->child[1] = NULL;                    \
+        --(tr->volume);                        \
+    }                                          \
+    n->parent = NULL                           \
+
 
 static void
 trie_node_fini(trie_t *tr, trie_node_t *n)
@@ -143,11 +150,7 @@ trie_node_fini(trie_t *tr, trie_node_t *n)
 static void
 trie_node_fini_mpool(mpool_ctx_t *mpool, trie_t *tr, trie_node_t *n)
 {
-#define _free(ptr) mpool_free(mpool, (ptr))
-#define _trie_node_fini(tr, node) trie_node_fini_mpool(mpool, (tr), (node))
     TRIE_NODE_FINI_BODY(_free, _trie_node_fini);
-#undef _free
-#undef _trie_node_fini
 }
 
 void
@@ -177,46 +180,45 @@ trie_fini_mpool(mpool_ctx_t *mpool, trie_t *tr)
 static int
 trie_node_is_orphan(trie_node_t *n)
 {
-    return (n->child[0] == NULL) && (n->child[1] == NULL && n->value == NULL);
+    return (n->child[0] == NULL) && (n->child[1] == NULL) && (n->value == NULL);
 
 }
 
 
-#define TRIE_NODE_CLEANUP_BODY(freefn, cleanupfn) \
-    if (n == NULL) { \
-        return; \
-    } \
-    if (trie_node_is_orphan(n)) { \
-        return; \
-    } \
-    if (n->child[0] != NULL) { \
-        if (!trie_node_is_orphan(n->child[0])) { \
-            cleanupfn(tr, n->child[0]); \
-            if (trie_node_is_orphan(n->child[0])) { \
-                freefn(n->child[0]); \
-                n->child[0] = NULL; \
-                --(tr->volume); \
-            } \
-        } else { \
-            freefn(n->child[0]); \
-            n->child[0] = NULL; \
-            --(tr->volume); \
-        } \
-    } \
-    if (n->child[1] != NULL) { \
-        if (!trie_node_is_orphan(n->child[1])) { \
-            cleanupfn(tr, n->child[1]); \
-            if (trie_node_is_orphan(n->child[1])) { \
-                freefn(n->child[1]); \
-                n->child[1] = NULL; \
-                --(tr->volume); \
-            } \
-        } else { \
-            freefn(n->child[1]); \
-            n->child[1] = NULL; \
-            --(tr->volume); \
-        } \
-    }
+#define TRIE_NODE_CLEANUP_BODY(freefn, cleanupfn)      \
+    assert(n != NULL);                                 \
+    if (trie_node_is_orphan(n)) {                      \
+        return;                                        \
+    }                                                  \
+    if (n->child[0] != NULL) {                         \
+        if (!trie_node_is_orphan(n->child[0])) {       \
+            cleanupfn(tr, n->child[0]);                \
+            if (trie_node_is_orphan(n->child[0])) {    \
+                freefn(n->child[0]);                   \
+                n->child[0] = NULL;                    \
+                --(tr->volume);                        \
+            }                                          \
+        } else {                                       \
+            freefn(n->child[0]);                       \
+            n->child[0] = NULL;                        \
+            --(tr->volume);                            \
+        }                                              \
+    }                                                  \
+    if (n->child[1] != NULL) {                         \
+        if (!trie_node_is_orphan(n->child[1])) {       \
+            cleanupfn(tr, n->child[1]);                \
+            if (trie_node_is_orphan(n->child[1])) {    \
+                freefn(n->child[1]);                   \
+                n->child[1] = NULL;                    \
+                --(tr->volume);                        \
+            }                                          \
+        } else {                                       \
+            freefn(n->child[1]);                       \
+            n->child[1] = NULL;                        \
+            --(tr->volume);                            \
+        }                                              \
+    }                                                  \
+
 
 static void
 trie_node_cleanup(trie_t *tr, trie_node_t *n)
@@ -228,11 +230,7 @@ trie_node_cleanup(trie_t *tr, trie_node_t *n)
 static void
 trie_node_cleanup_mpool(mpool_ctx_t *mpool, trie_t *tr, trie_node_t *n)
 {
-#define _free(ptr) mpool_free(mpool, (ptr))
-#define _trie_node_cleanup(tr, node) trie_node_cleanup_mpool(mpool, (tr), (node))
     TRIE_NODE_CLEANUP_BODY(_free, _trie_node_cleanup);
-#undef _free
-#undef _trie_node_cleanup
 }
 
 
@@ -254,9 +252,7 @@ trie_cleanup(trie_t *tr)
 void
 trie_cleanup_mpool(mpool_ctx_t *mpool, trie_t *tr)
 {
-#define _trie_node_cleanup(tr, node) trie_node_cleanup_mpool(mpool, (tr), (node))
     TRIE_CLEANUP_BODY(_trie_node_cleanup);
-#undef _trie_node_cleanup
 }
 
 
@@ -366,9 +362,7 @@ trie_add_node(trie_t *tr, uintptr_t key)
 trie_node_t *
 trie_add_node_mpool(mpool_ctx_t *mpool, trie_t *tr, uintptr_t key)
 {
-#define _malloc(sz) mpool_malloc(mpool, (sz))
     TRIE_ADD_NODE_BODY(_malloc);
-#undef _malloc
 }
 
 trie_node_t *
@@ -651,13 +645,12 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
         }                                              \
         if (trie_node_is_orphan(n)) {                  \
             parent = n->parent;                        \
-            if (parent != NULL) {                      \
-                if (parent->child[0] == n) {           \
-                    parent->child[0] = NULL;           \
-                } else {                               \
-                    assert(parent->child[1] == n);     \
-                    parent->child[1] = NULL;           \
-                }                                      \
+            assert(parent != NULL);                    \
+            if (parent->child[0] == n) {               \
+                parent->child[0] = NULL;               \
+            } else {                                   \
+                assert(parent->child[1] == n);         \
+                parent->child[1] = NULL;               \
             }                                          \
             freefn(n);                                 \
             --(tr->volume);                            \
@@ -668,23 +661,21 @@ trie_find_closest(trie_t *tr, uintptr_t key, int direction)
     }                                                  \
 
 
-static void
+UNUSED static void
 cleanup_orphans(trie_t *tr, trie_node_t *n)
 {
     CLEANUP_ORPHANS_BODY(free);
 }
 
 
-static void
+UNUSED static void
 cleanup_orphans_mpool(mpool_ctx_t *mpool, trie_t *tr, trie_node_t *n)
 {
-#define _free(ptr) mpool_free(mpool, (ptr))
     CLEANUP_ORPHANS_BODY(_free);
-#undef _free
 }
 
 
-#define TRIE_REMOVE_NODE_BODY(finifn, freefn, cleanupfn)       \
+#define TRIE_REMOVE_NODE_BODY(finifn, freefn, __a1)            \
     trie_node_t *parent;                                       \
     parent = n->parent;                                        \
     if (parent != NULL) {                                      \
@@ -704,33 +695,48 @@ cleanup_orphans_mpool(mpool_ctx_t *mpool, trie_t *tr, trie_node_t *n)
     freefn(n);                                                 \
     --(tr->volume);                                            \
     --(tr->nvals);                                             \
-    cleanupfn(tr, parent);                                     \
+    __a1                                                       \
     return 0;                                                  \
+
+
+int
+trie_remove_node_no_cleanup(trie_t *tr, trie_node_t *n)
+{
+    TRIE_REMOVE_NODE_BODY(trie_node_fini, free, );
+}
+
+
+int
+trie_remove_node_no_cleanup_mpool(mpool_ctx_t *mpool, trie_t *tr, trie_node_t *n)
+{
+    TRIE_REMOVE_NODE_BODY(_trie_node_fini, _free, );
+}
 
 
 int
 trie_remove_node(trie_t *tr, trie_node_t *n)
 {
-    TRIE_REMOVE_NODE_BODY(trie_node_fini, free, cleanup_orphans);
+    TRIE_REMOVE_NODE_BODY(trie_node_fini, free,
+            cleanup_orphans(tr, parent);
+    );
 }
+
 
 int
 trie_remove_node_mpool(mpool_ctx_t *mpool, trie_t *tr, trie_node_t *n)
 {
-#define _trie_node_fini(tr, node) trie_node_fini_mpool(mpool, (tr), (node))
-#define _free(ptr) mpool_free(mpool, (ptr))
-#define _cleanup_orphans(tr, node) cleanup_orphans_mpool(mpool, (tr), (node))
-    TRIE_REMOVE_NODE_BODY(_trie_node_fini, _free, _cleanup_orphans);
-#undef _trie_node_fini
-#undef _free
-#undef _cleanup_orphans
+    TRIE_REMOVE_NODE_BODY(_trie_node_fini, _free,
+            _cleanup_orphans(tr, parent);
+    );
 }
+
 
 size_t
 trie_get_volume(trie_t *tr)
 {
     return tr->volume;
 }
+
 
 size_t
 trie_get_nvals(trie_t *tr)

@@ -43,7 +43,7 @@ initialize_ids(void)
     unsigned i;
 
     for (i = 0; i < countof(keys); ++i) {
-        keys[i].key = new_id_random();
+        keys[i].key = new_id_successive();
     }
 }
 
@@ -106,9 +106,9 @@ test0(void)
         keys[i].n = NULL;
         keys[i].remove_time = profile_stop(p_remove_node);
 
-        if ((i % 100000) == 0) {
-            trie_cleanup(&tr);
-        }
+        //if ((i % 100000) == 0) {
+        //    trie_cleanup(&tr);
+        //}
     }
 
     TRACE("remove_node OK");
