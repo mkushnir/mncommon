@@ -89,15 +89,15 @@ testconf_SOURCES = ../src/array.c ../src/conf.c testconf.c
 testconf_CFLAGS =
 testconf_LDFLAGS =
 
-testtrie_SOURCES = ../src/trie.c testtrie.c
+testtrie_SOURCES = ../src/btrie.c testtrie.c
 testtrie_CFLAGS =
 testtrie_LDFLAGS =
 
-testperftree_SOURCES = ../src/list.c ../src/trie.c ../src/rbt.c ../src/profile.c rb.c testperftree.c
+testperftree_SOURCES = ../src/list.c ../src/btrie.c ../src/rbt.c ../src/profile.c rb.c testperftree.c
 testperftree_CFLAGS =
 testperftree_LDFLAGS =
 
-testperftrie_SOURCES = ../src/trie.c ../src/profile.c testperftrie.c
+testperftrie_SOURCES = ../src/btrie.c ../src/profile.c testperftrie.c
 testperftrie_CFLAGS =
 testperftrie_LDFLAGS =
 
@@ -113,7 +113,7 @@ testrborder_SOURCES = rb.c testrborder.c
 testrborder_CFLAGS =
 testrborder_LDFLAGS =
 
-testtrieorder_SOURCES = ../src/trie.c testtrieorder.c
+testtrieorder_SOURCES = ../src/btrie.c testtrieorder.c
 testtrieorder_CFLAGS =
 testtrieorder_LDFLAGS =
 

@@ -52,8 +52,8 @@ dist_HEADERS += conf_private.h
 endif
 
 if TRIE
-trie_sources = trie.c
-trie_include_headers = mrkcommon/trie.h
+trie_sources = btrie.c
+trie_include_headers = mrkcommon/btrie.h
 endif
 
 if RBT
