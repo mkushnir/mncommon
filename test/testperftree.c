@@ -107,31 +107,31 @@ test_trie(void)
 
     btrie_init(&tr);
 
-    PROFILE_START(RBT_TEST_PROF_btrie_INSERT);
+    PROFILE_START(RBT_TEST_PROF_BTRIE_INSERT);
     for (i = 0; i < nelem; ++i) {
         n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
         *n = *(keys + i);
         nn = btrie_add_node(&tr, *n);
         nn->value = (void *)*n;
     }
-    PROFILE_STOP(RBT_TEST_PROF_btrie_INSERT);
+    PROFILE_STOP(RBT_TEST_PROF_BTRIE_INSERT);
 
-    PROFILE_START(RBT_TEST_PROF_btrie_FIND);
+    PROFILE_START(RBT_TEST_PROF_BTRIE_FIND);
     for (i = 0; i < nelem; ++i) {
         n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
         *n = *(keys + i);
         nn = btrie_find_exact(&tr, *n);
     }
-    PROFILE_STOP(RBT_TEST_PROF_btrie_FIND);
+    PROFILE_STOP(RBT_TEST_PROF_BTRIE_FIND);
 
-    PROFILE_START(RBT_TEST_PROF_btrie_REMOVE);
+    PROFILE_START(RBT_TEST_PROF_BTRIE_REMOVE);
     for (i = 0; i < nelem; ++i) {
         n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
         *n = *(keys + i);
         nn = btrie_find_exact(&tr, *n);
         btrie_remove_node(&tr, nn);
     }
-    PROFILE_STOP(RBT_TEST_PROF_btrie_REMOVE);
+    PROFILE_STOP(RBT_TEST_PROF_BTRIE_REMOVE);
 }
 
 UNUSED static void
