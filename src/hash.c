@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include <mrkcommon/array.h>
-#include <mrkcommon/dict.h>
+#include <mrkcommon/hash.h>
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/mpool.h>
 #include <mrkcommon/util.h>
@@ -42,15 +42,15 @@ null_init(void **v)
     return 0;
 }
 
-#define DICT_SET_ITEM_BODY(malloc_fn)                          \
+#define HASH_SET_ITEM_BODY(malloc_fn)                          \
     uint64_t idx;                                              \
-    dict_item_t **pdit, *dit;                                  \
+    hash_item_t **pdit, *dit;                                  \
     idx = dict->hashfn(key) % dict->table.elnum;               \
     if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
     }                                                          \
     MEMDEBUG_ENTER(dict);                                      \
-    if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) {      \
+    if ((dit = malloc_fn(sizeof(hash_item_t))) == NULL) {      \
         FAIL("malloc_fn");                                     \
     }                                                          \
     MEMDEBUG_LEAVE(dict);                                      \
@@ -70,31 +70,31 @@ null_init(void **v)
     ++dict->elnum;                                             \
 
 void
-dict_set_item(dict_t *dict, void *key, void *value)
+hash_set_item(hash_t *dict, void *key, void *value)
 {
-    DICT_SET_ITEM_BODY(malloc);
+    HASH_SET_ITEM_BODY(malloc);
 }
 
 void
-dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
+hash_set_item_mpool(mpool_ctx_t *mpool, hash_t *dict, void *key, void *value)
 {
 #define _malloc(sz) mpool_malloc(mpool, (sz))
-    DICT_SET_ITEM_BODY(_malloc);
+    HASH_SET_ITEM_BODY(_malloc);
 #undef _malloc
 }
 
-#define DICT_SET_ITEM_UNIQ_BODY(malloc_fn)                     \
+#define HASH_SET_ITEM_UNIQ_BODY(malloc_fn)                     \
     uint64_t idx;                                              \
     assert(oldkey != NULL);                                    \
     assert(oldvalue != NULL);                                  \
-    dict_item_t **pdit, *dit;                                  \
+    hash_item_t **pdit, *dit;                                  \
     idx = dict->hashfn(key) % dict->table.elnum;               \
     if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
     }                                                          \
     if (*pdit == NULL) {                                       \
         MEMDEBUG_ENTER(dict);                                  \
-        if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) {  \
+        if ((dit = malloc_fn(sizeof(hash_item_t))) == NULL) {  \
             FAIL("malloc_fn");                                 \
         }                                                      \
         MEMDEBUG_LEAVE(dict);                                  \
@@ -119,7 +119,7 @@ dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
             }                                                  \
         }                                                      \
         MEMDEBUG_ENTER(dict);                                  \
-        if ((dit = malloc_fn(sizeof(dict_item_t))) == NULL) {  \
+        if ((dit = malloc_fn(sizeof(hash_item_t))) == NULL) {  \
             FAIL("malloc_fn");                                 \
         }                                                      \
         MEMDEBUG_LEAVE(dict);                                  \
@@ -135,33 +135,33 @@ dict_set_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key, void *value)
     *oldvalue = NULL;
 
 void
-dict_set_item_uniq(dict_t *dict,
+hash_set_item_uniq(hash_t *dict,
                    void *key,
                    void *value,
                    void **oldkey,
                    void **oldvalue)
 {
-    DICT_SET_ITEM_UNIQ_BODY(malloc);
+    HASH_SET_ITEM_UNIQ_BODY(malloc);
 }
 
 void
-dict_set_item_uniq_mpool(mpool_ctx_t *mpool,
-                         dict_t *dict,
+hash_set_item_uniq_mpool(mpool_ctx_t *mpool,
+                         hash_t *dict,
                          void *key,
                          void *value,
                          void **oldkey,
                          void **oldvalue)
 {
 #define _malloc(sz) mpool_malloc(mpool, (sz))
-    DICT_SET_ITEM_UNIQ_BODY(_malloc);
+    HASH_SET_ITEM_UNIQ_BODY(_malloc);
 #undef _malloc
 }
 
-dict_item_t *
-dict_get_item(dict_t *dict, void *key)
+hash_item_t *
+hash_get_item(hash_t *dict, void *key)
 {
     uint64_t idx;
-    dict_item_t **pdit, *dit;
+    hash_item_t **pdit, *dit;
 
     if (dict->elnum == 0) {
         return NULL;
@@ -186,9 +186,9 @@ dict_get_item(dict_t *dict, void *key)
 }
 
 
-#define DICT_REMOVE_ITEM_BODY(free_fn)                         \
+#define HASH_REMOVE_ITEM_BODY(free_fn)                         \
     uint64_t idx;                                              \
-    dict_item_t **pdit, *dit;                                  \
+    hash_item_t **pdit, *dit;                                  \
     idx = dict->hashfn(key) % dict->table.elnum;               \
     if ((pdit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
@@ -230,22 +230,22 @@ dict_get_item(dict_t *dict, void *key)
 
 
 void *
-dict_remove_item(dict_t *dict, void *key)
+hash_remove_item(hash_t *dict, void *key)
 {
-    DICT_REMOVE_ITEM_BODY(free);
+    HASH_REMOVE_ITEM_BODY(free);
 }
 
 
 void *
-dict_remove_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key)
+hash_remove_item_mpool(mpool_ctx_t *mpool, hash_t *dict, void *key)
 {
 #define _free(p) mpool_free(mpool, (p))
-    DICT_REMOVE_ITEM_BODY(_free);
+    HASH_REMOVE_ITEM_BODY(_free);
 #undef _free
 }
 
 
-#define DICT_DELETE_PAIR_BODY(free_fn)         \
+#define HASH_DELETE_PAIR_BODY(free_fn)         \
     if (dit->prev != NULL) {                   \
         dit->prev->next = dit->next;           \
     } else {                                   \
@@ -268,7 +268,7 @@ dict_remove_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key)
 
 
 
-#define DICT_DELETE_PAIR_NO_FINI_BODY(free_fn) \
+#define HASH_DELETE_PAIR_NO_FINI_BODY(free_fn) \
     if (dit->prev != NULL) {                   \
         dit->prev->next = dit->next;           \
     } else {                                   \
@@ -289,42 +289,42 @@ dict_remove_item_mpool(mpool_ctx_t *mpool, dict_t *dict, void *key)
 
 
 void
-dict_delete_pair(dict_t *dict, dict_item_t *dit)
+hash_delete_pair(hash_t *dict, hash_item_t *dit)
 {
-    DICT_DELETE_PAIR_BODY(free);
+    HASH_DELETE_PAIR_BODY(free);
 }
 
 
 void
-dict_delete_pair_mpool(mpool_ctx_t *mpool, dict_t *dict, dict_item_t *dit)
+hash_delete_pair_mpool(mpool_ctx_t *mpool, hash_t *dict, hash_item_t *dit)
 {
 #define _free(p) mpool_free(mpool, (p))
-    DICT_DELETE_PAIR_BODY(_free);
+    HASH_DELETE_PAIR_BODY(_free);
 #undef _free
 }
 
 
 void
-dict_delete_pair_no_fini_mpool(mpool_ctx_t *mpool, dict_t *dict, dict_item_t *dit)
+hash_delete_pair_no_fini_mpool(mpool_ctx_t *mpool, hash_t *dict, hash_item_t *dit)
 {
 #define _free(p) mpool_free(mpool, (p))
-    DICT_DELETE_PAIR_NO_FINI_BODY(_free);
+    HASH_DELETE_PAIR_NO_FINI_BODY(_free);
 #undef _free
 }
 
 
 int
-dict_traverse(dict_t *dict, dict_traverser_t cb, void *udata)
+hash_traverse(hash_t *dict, hash_traverser_t cb, void *udata)
 {
     int res;
-    dict_item_t **pdit;
+    hash_item_t **pdit;
     array_iter_t it;
 
     for (pdit = array_first(&dict->table, &it);
          pdit != NULL;
          pdit = array_next(&dict->table, &it)) {
 
-        dict_item_t *dit, *next;
+        hash_item_t *dit, *next;
 
         for (dit = *pdit; dit != NULL; dit = next) {
             next = dit->next;
@@ -338,17 +338,17 @@ dict_traverse(dict_t *dict, dict_traverser_t cb, void *udata)
 
 
 int
-dict_traverse_item(dict_t *dict, dict_traverser_item_t cb, void *udata)
+hash_traverse_item(hash_t *dict, hash_traverser_item_t cb, void *udata)
 {
     int res;
-    dict_item_t **pdit;
+    hash_item_t **pdit;
     array_iter_t it;
 
     for (pdit = array_first(&dict->table, &it);
          pdit != NULL;
          pdit = array_next(&dict->table, &it)) {
 
-        dict_item_t *dit, *next;
+        hash_item_t *dit, *next;
 
         for (dit = *pdit; dit != NULL; dit = next) {
             next = dit->next;
@@ -362,9 +362,9 @@ dict_traverse_item(dict_t *dict, dict_traverser_item_t cb, void *udata)
 
 
 int
-dict_is_empty(dict_t *dict)
+hash_is_empty(hash_t *dict)
 {
-    UNUSED dict_item_t **pdit;
+    UNUSED hash_item_t **pdit;
     UNUSED array_iter_t it;
 
     return dict->elnum == 0;
@@ -381,55 +381,55 @@ dict_is_empty(dict_t *dict)
 }
 
 size_t
-dict_get_elnum(dict_t *dict)
+hash_get_elnum(hash_t *dict)
 {
     return dict->elnum;
 }
 
 
-#define DICT_INIT_BODY(array_init_fn)                          \
+#define HASH_INIT_BODY(array_init_fn)                          \
     assert(hashfn != NULL);                                    \
     dict->hashfn = hashfn;                                     \
     assert(cmp != NULL);                                       \
     dict->cmp = cmp;                                           \
     dict->fini = fini;                                         \
-    array_init_fn(&dict->table, sizeof(dict_item_t *), sz,     \
+    array_init_fn(&dict->table, sizeof(hash_item_t *), sz,     \
                (array_initializer_t)null_init,                 \
                NULL);                                          \
     dict->elnum = 0;                                           \
 
 
 void
-dict_init(dict_t *dict,
+hash_init(hash_t *dict,
           size_t sz,
-          dict_hashfn_t hashfn,
-          dict_item_comparator_t cmp,
-          dict_item_finalizer_t fini)
+          hash_hashfn_t hashfn,
+          hash_item_comparator_t cmp,
+          hash_item_finalizer_t fini)
 {
-    DICT_INIT_BODY(array_init);
+    HASH_INIT_BODY(array_init);
 }
 
 
 void
-dict_init_mpool(mpool_ctx_t *mpool,
-                dict_t *dict,
+hash_init_mpool(mpool_ctx_t *mpool,
+                hash_t *dict,
                 size_t sz,
-                dict_hashfn_t hashfn,
-                dict_item_comparator_t cmp,
-                dict_item_finalizer_t fini)
+                hash_hashfn_t hashfn,
+                hash_item_comparator_t cmp,
+                hash_item_finalizer_t fini)
 {
 #define _array_init(ar, elsz, elnum, init, fini) array_init_mpool(mpool, (ar), (elsz), (elnum), (init), (fini))
-    DICT_INIT_BODY(_array_init);
+    HASH_INIT_BODY(_array_init);
 #undef _array_init
 }
 
 
-#define DICT_CLEANUP_BODY(free_fn)                             \
+#define HASH_CLEANUP_BODY(free_fn)                             \
     if (dict->fini != NULL) {                                  \
         size_t i;                                              \
         for (i = 0; i < dict->table.elnum; ++i) {              \
-            dict_item_t **pdit, *dit, *next;                   \
-            pdit = ARRAY_GET(dict_item_t *, &dict->table, i);  \
+            hash_item_t **pdit, *dit, *next;                   \
+            pdit = ARRAY_GET(hash_item_t *, &dict->table, i);  \
             for (dit = *pdit; dit != NULL; dit = next) {       \
                 next = dit->next;                              \
                 if (dict->fini(dit->key, dit->value) != 0) {   \
@@ -445,8 +445,8 @@ dict_init_mpool(mpool_ctx_t *mpool,
     } else {                                                   \
         size_t i;                                              \
         for (i = 0; i < dict->table.elnum; ++i) {              \
-            dict_item_t **pdit, *dit, *next;                   \
-            pdit = ARRAY_GET(dict_item_t *, &dict->table, i);  \
+            hash_item_t **pdit, *dit, *next;                   \
+            pdit = ARRAY_GET(hash_item_t *, &dict->table, i);  \
             for (dit = *pdit; dit != NULL; dit = next) {       \
                 next = dit->next;                              \
                 MEMDEBUG_ENTER(dict);                          \
@@ -460,42 +460,42 @@ dict_init_mpool(mpool_ctx_t *mpool,
 
 
 
-dict_t *
-dict_new(size_t sz,
-         dict_hashfn_t hashfn,
-         dict_item_comparator_t cmp,
-         dict_item_finalizer_t fini)
+hash_t *
+hash_new(size_t sz,
+         hash_hashfn_t hashfn,
+         hash_item_comparator_t cmp,
+         hash_item_finalizer_t fini)
 {
-    dict_t *dict;
+    hash_t *dict;
 
-    if ((dict = malloc(sizeof(dict_t))) == NULL) {
+    if ((dict = malloc(sizeof(hash_t))) == NULL) {
         FAIL("malloc");
     }
     MEMDEBUG_INIT(dict);
     MEMDEBUG_ENTER(dict);
-    DICT_INIT_BODY(array_init);
+    HASH_INIT_BODY(array_init);
     MEMDEBUG_LEAVE(dict);
 
     return dict;
 }
 
 
-dict_t *
-dict_new_mpool(mpool_ctx_t *mpool,
+hash_t *
+hash_new_mpool(mpool_ctx_t *mpool,
                size_t sz,
-               dict_hashfn_t hashfn,
-               dict_item_comparator_t cmp,
-               dict_item_finalizer_t fini)
+               hash_hashfn_t hashfn,
+               hash_item_comparator_t cmp,
+               hash_item_finalizer_t fini)
 {
-    dict_t *dict;
+    hash_t *dict;
 
-    if ((dict = mpool_malloc(mpool, sizeof(dict_t))) == NULL) {
+    if ((dict = mpool_malloc(mpool, sizeof(hash_t))) == NULL) {
         FAIL("malloc");
     }
 #define _array_init(ar, elsz, elnum, init, fini) array_init_mpool(mpool, (ar), (elsz), (elnum), (init), (fini))
     MEMDEBUG_INIT(dict);
     MEMDEBUG_ENTER(dict);
-    DICT_INIT_BODY(_array_init);
+    HASH_INIT_BODY(_array_init);
 #undef _array_init
     MEMDEBUG_LEAVE(dict);
 
@@ -504,47 +504,47 @@ dict_new_mpool(mpool_ctx_t *mpool,
 
 
 void
-dict_cleanup(dict_t *dict)
+hash_cleanup(hash_t *dict)
 {
-    DICT_CLEANUP_BODY(free);
+    HASH_CLEANUP_BODY(free);
 }
 
 
 void
-dict_cleanup_mpool(mpool_ctx_t *mpool, dict_t *dict)
+hash_cleanup_mpool(mpool_ctx_t *mpool, hash_t *dict)
 {
 #define _free(p) mpool_free(mpool, (p))
-    DICT_CLEANUP_BODY(_free);
+    HASH_CLEANUP_BODY(_free);
 #undef _free
 }
 
 
 void
-dict_fini(dict_t *dict)
+hash_fini(hash_t *dict)
 {
-    dict_cleanup(dict);
+    hash_cleanup(dict);
     array_fini(&dict->table);
 }
 
 void
-dict_fini_mpool(mpool_ctx_t *mpool, dict_t *dict)
+hash_fini_mpool(mpool_ctx_t *mpool, hash_t *dict)
 {
-    dict_cleanup_mpool(mpool, dict);
+    hash_cleanup_mpool(mpool, dict);
     array_fini_mpool(mpool, &dict->table);
 }
 
 
 void
-dict_dump_stats(dict_t *dict)
+hash_dump_stats(hash_t *dict)
 {
     array_iter_t it;
-    dict_item_t **pdit;
+    hash_item_t **pdit;
 
     for (pdit = array_first(&dict->table, &it);
          pdit != NULL;
          pdit = array_next(&dict->table, &it)) {
 
-        dict_item_t *dit;
+        hash_item_t *dit;
         size_t sz;
 
         for (dit = *pdit, sz = 0; dit != NULL; dit = dit->next, ++sz) {

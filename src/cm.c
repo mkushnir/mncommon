@@ -164,13 +164,13 @@ wheel_2x3_find_prime(size_t n)
 void
 pset_init(pset_t *pset,
             ssize_t thresh,
-            dict_hashfn_t hash,
-            dict_item_comparator_t cmp,
-            dict_item_finalizer_t fini,
+            hash_hashfn_t hash,
+            hash_item_comparator_t cmp,
+            hash_item_finalizer_t fini,
             CMTY minthresh)
 {
     pset->nleft = thresh;
-    dict_init(&pset->d, wheel_2x3_find_prime(thresh), hash, cmp, fini);
+    hash_init(&pset->d, wheel_2x3_find_prime(thresh), hash, cmp, fini);
     pset->minthresh = minthresh;
     pset->fast_pop_thresh = minthresh;
 }
@@ -179,7 +179,7 @@ pset_init(pset_t *pset,
 void
 pset_fini(pset_t *pset)
 {
-    dict_fini(&pset->d);
+    hash_fini(&pset->d);
 }
 
 
@@ -204,8 +204,8 @@ pset_item_t *
 pset_peek(pset_t *pset, pset_item_t *it)
 {
     pset_item_t *res;
-    dict_item_t *dit;
-    if ((dit = dict_get_item(&pset->d, it)) == NULL) {
+    hash_item_t *dit;
+    if ((dit = hash_get_item(&pset->d, it)) == NULL) {
         res = NULL;
     } else {
         res = dit->key;
@@ -228,11 +228,11 @@ pset_pop(pset_t *pset)
     params.pset = pset;
     params.weight = 1.0;
     params.it = &it0;
-    (void)dict_traverse(&pset->d, (dict_traverser_t)pset_mingen_fast, &params);
+    (void)hash_traverse(&pset->d, (hash_traverser_t)pset_mingen_fast, &params);
     if (params.it != NULL) {
         //TRACE("removing %p cmprop=%ld", params.it, params.it->cmprop);
 
-        (void)dict_remove_item(&pset->d, params.it);
+        (void)hash_remove_item(&pset->d, params.it);
         res = params.it;
         ++pset->nleft;
         if (pset->nleft <= 0) {
@@ -250,13 +250,13 @@ pset_item_t *
 pset_push(pset_t *pset, pset_item_t *it)
 {
     pset_item_t *res;
-    dict_item_t *dit;
+    hash_item_t *dit;
 
     if (it->cmprop <= pset->fast_pop_thresh) {
         res = it;
     } else {
-        if ((dit = dict_get_item(&pset->d, it)) == NULL) {
-            dict_set_item(&pset->d, it, NULL);
+        if ((dit = hash_get_item(&pset->d, it)) == NULL) {
+            hash_set_item(&pset->d, it, NULL);
             --pset->nleft;
         } else {
             /* noop */
@@ -275,7 +275,7 @@ pset_push(pset_t *pset, pset_item_t *it)
 
 
 int
-pset_traverse(pset_t *pset, dict_traverser_t cb, void *udata)
+pset_traverse(pset_t *pset, hash_traverser_t cb, void *udata)
 {
-    return dict_traverse(&pset->d, cb, udata);
+    return hash_traverse(&pset->d, cb, udata);
 }

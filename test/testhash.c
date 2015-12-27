@@ -4,7 +4,7 @@
 
 #include "unittest.h"
 
-#include "mrkcommon/dict.h"
+#include "mrkcommon/hash.h"
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/util.h"
 
@@ -44,8 +44,8 @@ test0(void)
     } data[] = {
         {0, 0, 0},
     };
-    dict_t dict;
-    dict_item_t *v1;
+    hash_t dict;
+    hash_item_t *v1;
     void *v2;
 
 
@@ -56,32 +56,32 @@ test0(void)
         assert(CDATA.in == CDATA.expected);
     }
 
-    dict_init(&dict, 7, myhash, mycmp, myfini);
+    hash_init(&dict, 7, myhash, mycmp, myfini);
 
-    dict_set_item(&dict, (void *)1, (void *)10);
-    dict_traverse(&dict, mycb, NULL);
+    hash_set_item(&dict, (void *)1, (void *)10);
+    hash_traverse(&dict, mycb, NULL);
 
-    dict_set_item(&dict, (void *)1, (void *)10);
-    dict_set_item(&dict, (void *)1, (void *)10);
-    dict_set_item(&dict, (void *)1, (void *)10);
-    dict_set_item(&dict, (void *)1, (void *)10);
-    dict_traverse(&dict, mycb, NULL);
+    hash_set_item(&dict, (void *)1, (void *)10);
+    hash_set_item(&dict, (void *)1, (void *)10);
+    hash_set_item(&dict, (void *)1, (void *)10);
+    hash_set_item(&dict, (void *)1, (void *)10);
+    hash_traverse(&dict, mycb, NULL);
 
-    v1 = dict_get_item(&dict, (void *)1);
+    v1 = hash_get_item(&dict, (void *)1);
     TRACE("v1=%p", v1->value);
 
-    v2 = dict_remove_item(&dict, (void *)1);
-    dict_traverse(&dict, mycb, NULL);
+    v2 = hash_remove_item(&dict, (void *)1);
+    hash_traverse(&dict, mycb, NULL);
     TRACE("v2=%p", v2);
-    v2 = dict_get_item(&dict, (void *)1);
+    v2 = hash_get_item(&dict, (void *)1);
     TRACE("v2=%p", v2);
 
     for (i = 0; i < 21; ++i) {
-        dict_set_item(&dict, (void *)(uintptr_t)i, (void *)(uintptr_t)i);
+        hash_set_item(&dict, (void *)(uintptr_t)i, (void *)(uintptr_t)i);
     }
-    dict_traverse(&dict, mycb, NULL);
+    hash_traverse(&dict, mycb, NULL);
 
-    dict_fini(&dict);
+    hash_fini(&dict);
 }
 
 
@@ -130,7 +130,7 @@ my_item_cmp(my_item_t *a , my_item_t *b)
 }
 
 static int
-my_item_print(UNUSED dict_t *dict, dict_item_t *dit, UNUSED void *udata)
+my_item_print(UNUSED hash_t *dict, hash_item_t *dit, UNUSED void *udata)
 {
     my_item_t *key;
 
@@ -141,7 +141,7 @@ my_item_print(UNUSED dict_t *dict, dict_item_t *dit, UNUSED void *udata)
 
 
 static int
-my_item_delete(dict_t *dict, dict_item_t *dit, void *udata)
+my_item_delete(hash_t *dict, hash_item_t *dit, void *udata)
 {
     my_item_t *key;
     union {
@@ -154,7 +154,7 @@ my_item_delete(dict_t *dict, dict_item_t *dit, void *udata)
     key = dit->key;
     if (key->value % u.i == 0) {
         TRACE("deleting %ld ...", key->value);
-        dict_delete_pair(dict, dit);
+        hash_delete_pair(dict, dit);
     } else {
         TRACE("keeping %ld ...", key->value);
     }
@@ -165,37 +165,37 @@ my_item_delete(dict_t *dict, dict_item_t *dit, void *udata)
 static void
 test1(void)
 {
-    dict_t dict;
+    hash_t dict;
 
-    dict_init(&dict, 3, (dict_hashfn_t)my_item_hash, (dict_item_comparator_t)my_item_cmp, (dict_item_finalizer_t)my_item_fini);
-    dict_set_item(&dict, my_item_new(1,1), NULL);
-    dict_set_item(&dict, my_item_new(1,2), NULL);
-    dict_set_item(&dict, my_item_new(1,3), NULL);
-    dict_set_item(&dict, my_item_new(1,4), NULL);
-    dict_set_item(&dict, my_item_new(1,5), NULL);
-    dict_set_item(&dict, my_item_new(1,6), NULL);
-    dict_set_item(&dict, my_item_new(1,7), NULL);
-    dict_set_item(&dict, my_item_new(1,8), NULL);
-    dict_set_item(&dict, my_item_new(1,9), NULL);
-    dict_set_item(&dict, my_item_new(1,10), NULL);
-    dict_set_item(&dict, my_item_new(1,11), NULL);
-    dict_set_item(&dict, my_item_new(1,12), NULL);
-    dict_set_item(&dict, my_item_new(1,13), NULL);
-    dict_set_item(&dict, my_item_new(1,14), NULL);
-    dict_set_item(&dict, my_item_new(1,15), NULL);
-    dict_set_item(&dict, my_item_new(2,80), NULL);
-    dict_set_item(&dict, my_item_new(0,81), NULL);
+    hash_init(&dict, 3, (hash_hashfn_t)my_item_hash, (hash_item_comparator_t)my_item_cmp, (hash_item_finalizer_t)my_item_fini);
+    hash_set_item(&dict, my_item_new(1,1), NULL);
+    hash_set_item(&dict, my_item_new(1,2), NULL);
+    hash_set_item(&dict, my_item_new(1,3), NULL);
+    hash_set_item(&dict, my_item_new(1,4), NULL);
+    hash_set_item(&dict, my_item_new(1,5), NULL);
+    hash_set_item(&dict, my_item_new(1,6), NULL);
+    hash_set_item(&dict, my_item_new(1,7), NULL);
+    hash_set_item(&dict, my_item_new(1,8), NULL);
+    hash_set_item(&dict, my_item_new(1,9), NULL);
+    hash_set_item(&dict, my_item_new(1,10), NULL);
+    hash_set_item(&dict, my_item_new(1,11), NULL);
+    hash_set_item(&dict, my_item_new(1,12), NULL);
+    hash_set_item(&dict, my_item_new(1,13), NULL);
+    hash_set_item(&dict, my_item_new(1,14), NULL);
+    hash_set_item(&dict, my_item_new(1,15), NULL);
+    hash_set_item(&dict, my_item_new(2,80), NULL);
+    hash_set_item(&dict, my_item_new(0,81), NULL);
 
     TRACE();
-    dict_traverse_item(&dict, my_item_print, NULL);
+    hash_traverse_item(&dict, my_item_print, NULL);
     TRACE();
-    dict_traverse_item(&dict, my_item_delete, (void *)5);
+    hash_traverse_item(&dict, my_item_delete, (void *)5);
     TRACE();
-    dict_traverse_item(&dict, my_item_delete, (void *)4);
+    hash_traverse_item(&dict, my_item_delete, (void *)4);
     TRACE();
-    dict_traverse_item(&dict, my_item_print, NULL);
+    hash_traverse_item(&dict, my_item_print, NULL);
     TRACE();
-    dict_fini(&dict);
+    hash_fini(&dict);
 }
 
 

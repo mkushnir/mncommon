@@ -6,7 +6,7 @@
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/fasthash.h>
 #include <mrkcommon/bytes.h>
-#include <mrkcommon/dict.h>
+#include <mrkcommon/hash.h>
 #include <mrkcommon/util.h>
 
 #include <mrkcommon/cm.h>
@@ -52,7 +52,7 @@ myfini(cmhash_t *key, UNUSED void *value)
 static void
 test0(void)
 {
-    dict_t d;
+    hash_t d;
     struct {
         long rnd;
         char *s;
@@ -65,22 +65,22 @@ test0(void)
     UNITTEST_PROLOG_RAND;
 
 
-    dict_init(&d, 101,
-              (dict_hashfn_t)myhash,
-              (dict_item_comparator_t)mycmp,
-              (dict_item_finalizer_t)myfini);
+    hash_init(&d, 101,
+              (hash_hashfn_t)myhash,
+              (hash_item_comparator_t)mycmp,
+              (hash_item_finalizer_t)myfini);
 
     FOREACHDATA {
-        dict_item_t *dit;
+        hash_item_t *dit;
         cmhash_t *cmh;
 
         cmh = cmhash_new(10, 20);
         cmhash_hash(cmh, strdup(CDATA.s), strlen(CDATA.s));
 
-        if ((dit = dict_get_item(&d, cmh)) == NULL) {
+        if ((dit = hash_get_item(&d, cmh)) == NULL) {
             //TRACE("setting");
             //cmhash_dump(cmh);
-            dict_set_item(&d, cmh, NULL);
+            hash_set_item(&d, cmh, NULL);
         } else {
             TRACE("collision");
             cmhash_dump(cmh);
@@ -89,24 +89,24 @@ test0(void)
         }
     }
 
-    dict_fini(&d);
+    hash_fini(&d);
 }
 
 
 UNUSED static void
 test1(const char *fname)
 {
-    dict_t d;
+    hash_t d;
     FILE *f = NULL;
     char *s;
     size_t sz0;
     ssize_t sz1;
     size_t nlines;
 
-    dict_init(&d, 1046527,
-              (dict_hashfn_t)myhash,
-              (dict_item_comparator_t)mycmp,
-              (dict_item_finalizer_t)myfini);
+    hash_init(&d, 1046527,
+              (hash_hashfn_t)myhash,
+              (hash_item_comparator_t)mycmp,
+              (hash_item_finalizer_t)myfini);
 
     if ((f = fopen(fname, "r")) == NULL) {
         FAIL("open");
@@ -116,7 +116,7 @@ test1(const char *fname)
          (sz1 = getline(&s, &sz0, f)) > 0;
          s = NULL, sz0 = 0) {
 
-        dict_item_t *dit;
+        hash_item_t *dit;
         cmhash_t *cmh;
 
         if (sz1 < 64) {
@@ -229,10 +229,10 @@ sion
 
         cmhash_hash(cmh, s, sz1);
 
-        if ((dit = dict_get_item(&d, cmh)) == NULL) {
+        if ((dit = hash_get_item(&d, cmh)) == NULL) {
             //TRACE("setting");
             //cmhash_dump(cmh);
-            dict_set_item(&d, cmh, NULL);
+            hash_set_item(&d, cmh, NULL);
         } else {
             TRACE("collision");
             cmhash_dump(cmh);
@@ -243,7 +243,7 @@ sion
     }
 
     fclose(f);
-    dict_fini(&d);
+    hash_fini(&d);
     TRACE("nlines=%ld", nlines);
 }
 
@@ -327,9 +327,9 @@ test2(char *fname)
 
     pset_init(&pset,
                 80,
-                (dict_hashfn_t)pset_item_hash,
-                (dict_item_comparator_t)pset_item_cmp,
-                (dict_item_finalizer_t)pset_item_fini,
+                (hash_hashfn_t)pset_item_hash,
+                (hash_item_comparator_t)pset_item_cmp,
+                (hash_item_finalizer_t)pset_item_fini,
                 1000);
 
     for (s = NULL, nlines = 0;
@@ -366,7 +366,7 @@ test2(char *fname)
     }
 
     aggr = 0;
-    pset_traverse(&pset, (dict_traverser_t)mycb, &aggr);
+    pset_traverse(&pset, (hash_traverser_t)mycb, &aggr);
 
     pset_fini(&pset);
     fclose(f);
@@ -416,9 +416,9 @@ test3(char *fname)
     cm_init(&cm, 4, 1031);
     pset_init(&pset,
                 10,
-                (dict_hashfn_t)pset_item_hash,
-                (dict_item_comparator_t)pset_item_cmp,
-                (dict_item_finalizer_t)pset_item_fini,
+                (hash_hashfn_t)pset_item_hash,
+                (hash_item_comparator_t)pset_item_cmp,
+                (hash_item_finalizer_t)pset_item_fini,
                 0);
 
     for (s = NULL, nlines = 0;
@@ -457,7 +457,7 @@ test3(char *fname)
     }
 
     aggr = 0;
-    pset_traverse(&pset, (dict_traverser_t)mycb, &aggr);
+    pset_traverse(&pset, (hash_traverser_t)mycb, &aggr);
 
     pset_fini(&pset);
     cm_fini(&cm);

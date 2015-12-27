@@ -6,7 +6,7 @@
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/fasthash.h>
 #include <mrkcommon/bytes.h>
-#include <mrkcommon/dict.h>
+#include <mrkcommon/hash.h>
 #include <mrkcommon/util.h>
 
 #include <mrkcommon/heap.h>

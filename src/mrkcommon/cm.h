@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 
-#include <mrkcommon/dict.h>
+#include <mrkcommon/hash.h>
 //#include <mrkcommon/trie.h>
 
 #ifdef __cplusplus
@@ -34,7 +34,7 @@ typedef struct _cmhash {
 
 typedef struct _pset {
     ssize_t nleft;
-    dict_t d;
+    hash_t d;
     CMTY minthresh;
     CMTY fast_pop_thresh;
 } pset_t;
@@ -66,18 +66,18 @@ void cmhash_dump(cmhash_t *);
 
 
 /*
- * pset -- dict_t based priority set
+ * pset -- hash_t based priority set
  */
 pset_item_t *pset_peek(pset_t *, pset_item_t *);
 pset_item_t *pset_pop(pset_t *);
 pset_item_t *pset_push(pset_t *, pset_item_t *);
-int pset_traverse(pset_t *, dict_traverser_t, void *);
+int pset_traverse(pset_t *, hash_traverser_t, void *);
 
 void pset_init(pset_t *,
                  ssize_t,
-                 dict_hashfn_t,
-                 dict_item_comparator_t,
-                 dict_item_finalizer_t,
+                 hash_hashfn_t,
+                 hash_item_comparator_t,
+                 hash_item_finalizer_t,
                  CMTY);
 
 void pset_fini(pset_t *);

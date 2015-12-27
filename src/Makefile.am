@@ -25,9 +25,9 @@ list_sources = list.c
 list_include_headers = mrkcommon/list.h
 endif
 
-if DICT
-dict_sources = dict.c
-dict_include_headers = mrkcommon/dict.h
+if HASH
+hash_sources = hash.c
+hash_include_headers = mrkcommon/hash.h
 endif
 
 if FASTHASH
@@ -115,7 +115,7 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(util_include_headers) \
 			 $(array_include_headers) \
 			 $(list_include_headers) \
-			 $(dict_include_headers) \
+			 $(hash_include_headers) \
 			 $(fasthash_include_headers) \
 			 $(logging_include_headers) \
 			 $(profile_include_headers) \
@@ -136,7 +136,7 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(array_sources) \
 			  $(list_sources) \
-			  $(dict_sources) \
+			  $(hash_sources) \
 			  $(fasthash_sources) \
 			  $(logging_sources) \
 			  $(profile_sources) \

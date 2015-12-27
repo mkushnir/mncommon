@@ -6,7 +6,7 @@
 
 #include "unittest.h"
 #include "mrkcommon/dumpm.h"
-#include "mrkcommon/dict.h"
+#include "mrkcommon/hash.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/util.h"
 #include "mrkcommon/memdebug.h"
@@ -14,7 +14,7 @@ MEMDEBUG_DECLARE(testperfdict);
 
 typedef struct _key_item {
     uint64_t key;
-    dict_item_t *n;
+    hash_item_t *n;
     uint64_t add_time;
     uint64_t find_time;
     uint64_t remove_time;
@@ -22,7 +22,7 @@ typedef struct _key_item {
 
 static key_item_t keys[1024 * 1024];
 
-static dict_t dict;
+static hash_t dict;
 
 UNUSED static uint64_t
 new_id_random(void)
@@ -89,16 +89,16 @@ test0(void)
     TRACE("Started");
     initialize_ids();
     TRACE("initialize_ids OK");
-    dict_init(&dict,
+    hash_init(&dict,
               32768,
-              (dict_hashfn_t)myhash,
-              (dict_item_comparator_t)mycmp,
+              (hash_hashfn_t)myhash,
+              (hash_item_comparator_t)mycmp,
               NULL);
 
     for (i = 0; i < countof(keys); ++i) {
         profile_start(p_add_node);
-        dict_set_item(&dict, (void *)keys[i].key, NULL);
-        //keys[i].value = dict_get_item(&dict, keys[i].key);
+        hash_set_item(&dict, (void *)keys[i].key, NULL);
+        //keys[i].value = hash_get_item(&dict, keys[i].key);
         keys[i].add_time = profile_stop(p_add_node);
     }
     TRACE("add_node OK");
@@ -106,7 +106,7 @@ test0(void)
     for (i = 0; i < countof(keys); ++i) {
 
         profile_start(p_find_node);
-        keys[i].n = dict_get_item(&dict, (void *)keys[i].key);
+        keys[i].n = hash_get_item(&dict, (void *)keys[i].key);
         assert(keys[i].n != NULL);
         keys[i].find_time = profile_stop(p_find_node);
 
@@ -117,15 +117,15 @@ test0(void)
     for (i = 0; i < countof(keys); ++i) {
 
         profile_start(p_remove_node);
-        dict_delete_pair(&dict, keys[i].n);
+        hash_delete_pair(&dict, keys[i].n);
         keys[i].n = NULL;
         keys[i].remove_time = profile_stop(p_remove_node);
     }
 
     TRACE("remove_node OK");
 
-    dict_fini(&dict);
-    TRACE("dict_fini OK");
+    hash_fini(&dict);
+    TRACE("hash_fini OK");
     profile_report();
 
     for (i = 0; i < countof(keys); ++i) {

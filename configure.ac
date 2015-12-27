@@ -132,11 +132,11 @@ AC_ARG_ENABLE(list,
               [AM_CONDITIONAL([LIST], [enable_list=yes])],
              )
 
-AC_ARG_ENABLE(dict,
-              AC_HELP_STRING([--enable-dict],
-                             [Enable simple dictionary (default=yes)]),
-              [AM_CONDITIONAL([DICT], [test "$enable_dict" = "yes"])],
-              [AM_CONDITIONAL([DICT], [enable_dict=yes])],
+AC_ARG_ENABLE(hash,
+              AC_HELP_STRING([--enable-hash],
+                             [Enable simple hash tables (default=yes)]),
+              [AM_CONDITIONAL([HASH], [test "$enable_hash" = "yes"])],
+              [AM_CONDITIONAL([HASH], [enable_hash=yes])],
              )
 
 AC_ARG_ENABLE(fasthash,
@@ -263,9 +263,9 @@ then
     exit 1
 fi
 
-if test "$enable_cm" = "yes" -a \( "$enable_dict" != "yes" -o "$enable_fasthash" != "yes" \)
+if test "$enable_cm" = "yes" -a \( "$enable_hash" != "yes" -o "$enable_fasthash" != "yes" \)
 then
-    echo "ERROR: cannot disable the dict feature because the cm feature requires it."
+    echo "ERROR: cannot disable the hash feature because the cm feature requires it."
     exit 1
 fi
 

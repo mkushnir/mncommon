@@ -3,8 +3,8 @@ CLEANFILES = *.core
 #CLEANFILES += *.in
 
 noinst_PROGRAMS = testfoo
-if DICT
-noinst_PROGRAMS += testdict testperfdict
+if HASH
+noinst_PROGRAMS += testhash testperfhash
 endif
 if FASTHASH
 noinst_PROGRAMS += testfasthash
@@ -69,9 +69,9 @@ testfoo_SOURCES =  testfoo.c
 testfoo_CFLAGS =
 testfoo_LDFLAGS =
 
-testdict_SOURCES = ../src/dict.c testdict.c
-testdict_CFLAGS =
-testdict_LDFLAGS =
+testhash_SOURCES = ../src/hash.c testhash.c
+testhash_CFLAGS =
+testhash_LDFLAGS =
 
 testfasthash_SOURCES = ../src/fasthash.c zltan-fasthash.c testfasthash.c
 testfasthash_CFLAGS =
@@ -105,9 +105,9 @@ testperfrb_SOURCES = rb.c ../src/profile.c testperfrb.c
 testperfrb_CFLAGS =
 testperfrb_LDFLAGS =
 
-testperfdict_SOURCES = rb.c ../src/profile.c testperfdict.c
-testperfdict_CFLAGS =
-testperfdict_LDFLAGS =
+testperfhash_SOURCES = rb.c ../src/profile.c testperfhash.c
+testperfhash_CFLAGS =
+testperfhash_LDFLAGS =
 
 testrborder_SOURCES = rb.c testrborder.c
 testrborder_CFLAGS =
