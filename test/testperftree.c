@@ -5,7 +5,7 @@
 #include "mrkcommon/util.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/rbt.h"
-#include "mrkcommon/trie.h"
+#include "mrkcommon/btrie.h"
 #include "rb.h"
 
 static unsigned niter = 10;
@@ -13,7 +13,7 @@ static unsigned nelem = 1024 * 1024;
 
 struct rb foo = RB_INITIALIZER();
 rbt_t rbt;
-trie_t tr;
+btrie_t tr;
 
 void *rbnodes;
 void *trienodes;
@@ -26,13 +26,13 @@ enum {
     RBT_TEST_PROF_TRIE,
     RBT_TEST_PROF_RB_INSERT,
     RBT_TEST_PROF_RBT_INSERT,
-    RBT_TEST_PROF_TRIE_INSERT,
+    RBT_TEST_PROF_BTRIE_INSERT,
     RBT_TEST_PROF_RB_FIND,
     RBT_TEST_PROF_RBT_FIND,
-    RBT_TEST_PROF_TRIE_FIND,
+    RBT_TEST_PROF_BTRIE_FIND,
     RBT_TEST_PROF_RB_REMOVE,
     RBT_TEST_PROF_RBT_REMOVE,
-    RBT_TEST_PROF_TRIE_REMOVE,
+    RBT_TEST_PROF_BTRIE_REMOVE,
 };
 
 static struct {
@@ -44,13 +44,13 @@ static struct {
     {NULL, "trie"},
     {NULL, "rb_insert"},
     {NULL, "rbt_insert"},
-    {NULL, "trie_insert"},
+    {NULL, "btrie_insert"},
     {NULL, "rb_find"},
     {NULL, "rbt_find"},
-    {NULL, "trie_find"},
+    {NULL, "btrie_find"},
     {NULL, "rb_remove"},
     {NULL, "rbt_remove"},
-    {NULL, "trie_remove"},
+    {NULL, "btrie_remove"},
 };
 
 #ifdef PROFILE_START
@@ -101,37 +101,37 @@ UNUSED static void
 test_trie(void)
 {
     unsigned i;
-    trie_t tr;
+    btrie_t tr;
     uintptr_t *n;
-    trie_node_t *nn;
+    btrie_node_t *nn;
 
-    trie_init(&tr);
+    btrie_init(&tr);
 
-    PROFILE_START(RBT_TEST_PROF_TRIE_INSERT);
+    PROFILE_START(RBT_TEST_PROF_btrie_INSERT);
     for (i = 0; i < nelem; ++i) {
         n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
         *n = *(keys + i);
-        nn = trie_add_node(&tr, *n);
+        nn = btrie_add_node(&tr, *n);
         nn->value = (void *)*n;
     }
-    PROFILE_STOP(RBT_TEST_PROF_TRIE_INSERT);
+    PROFILE_STOP(RBT_TEST_PROF_btrie_INSERT);
 
-    PROFILE_START(RBT_TEST_PROF_TRIE_FIND);
+    PROFILE_START(RBT_TEST_PROF_btrie_FIND);
     for (i = 0; i < nelem; ++i) {
         n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
         *n = *(keys + i);
-        nn = trie_find_exact(&tr, *n);
+        nn = btrie_find_exact(&tr, *n);
     }
-    PROFILE_STOP(RBT_TEST_PROF_TRIE_FIND);
+    PROFILE_STOP(RBT_TEST_PROF_btrie_FIND);
 
-    PROFILE_START(RBT_TEST_PROF_TRIE_REMOVE);
+    PROFILE_START(RBT_TEST_PROF_btrie_REMOVE);
     for (i = 0; i < nelem; ++i) {
         n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
         *n = *(keys + i);
-        nn = trie_find_exact(&tr, *n);
-        trie_remove_node(&tr, nn);
+        nn = btrie_find_exact(&tr, *n);
+        btrie_remove_node(&tr, nn);
     }
-    PROFILE_STOP(RBT_TEST_PROF_TRIE_REMOVE);
+    PROFILE_STOP(RBT_TEST_PROF_btrie_REMOVE);
 }
 
 UNUSED static void

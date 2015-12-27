@@ -8,7 +8,7 @@
 #include <zlib.h>
 
 #include <mrkcommon/dumpm.h>
-#include <mrkcommon/trie.h>
+#include <mrkcommon/btrie.h>
 #include <mrkcommon/bytes.h>
 #include <mrkcommon/util.h>
 #include <mrkcommon/fasthash.h>
@@ -36,7 +36,7 @@ static int genrandom = 0;
 
 
 static int
-trie_node_fini(trie_node_t *trn, UNUSED uint64_t key, UNUSED void *udata)
+btrie_node_fini(btrie_node_t *trn, UNUSED uint64_t key, UNUSED void *udata)
 {
     if (trn->value != NULL) {
         free(trn->value);
@@ -65,7 +65,7 @@ static void
 test1(const char *fname)
 {
     FILE *f;
-    trie_t tr;
+    btrie_t tr;
     char *buf;
     size_t bufsz;
     ssize_t sz;
@@ -75,14 +75,14 @@ test1(const char *fname)
     if ((f = fopen(fname, "r")) == NULL) {
         FAIL("fopen");
     }
-    trie_init(&tr);
+    btrie_init(&tr);
 
     for (buf = NULL;
          (sz = getline(&buf, &bufsz, f)) != -1;
          buf = NULL) {
 
         uint64_t hash;
-        trie_node_t *trn;
+        btrie_node_t *trn;
 
         buf[sz - 1] = '\0';
         --sz;
@@ -93,34 +93,34 @@ test1(const char *fname)
             free(buf);
         } else {
             //printf("%016lx %s\n", hash, buf);
-            if ((trn = trie_find_exact(&tr, hash)) != NULL) {
+            if ((trn = btrie_find_exact(&tr, hash)) != NULL) {
                 TRACE("collision: %016lx\n%s\n%s\n", hash, buf, (char *)(trn->value));
                 free(buf);
             } else {
-                trn = trie_add_node(&tr, hash);
+                trn = btrie_add_node(&tr, hash);
                 trn->value = buf;
             }
         }
     }
 
     fclose(f);
-    trie_traverse(&tr, trie_node_fini, NULL);
-    trie_fini(&tr);
+    btrie_traverse(&tr, btrie_node_fini, NULL);
+    btrie_fini(&tr);
 
 }
 
 static void
-test_one_bytes(trie_t *tr, bytes_t *s)
+test_one_bytes(btrie_t *tr, bytes_t *s)
 {
     uint64_t hash;
-    trie_node_t *trn;
+    btrie_node_t *trn;
 
     hash = fasthash(SEED, s->data, s->sz);
     if (randmod) {
         //printf("%ld\n", hash % randmod);
     } else {
         //printf("%016lx\n", hash);
-        if ((trn = trie_find_exact(tr, hash)) != NULL) {
+        if ((trn = btrie_find_exact(tr, hash)) != NULL) {
             UNUSED bytes_t *ss;
 
             TRACE("collision: %016lx\n", hash);
@@ -130,7 +130,7 @@ test_one_bytes(trie_t *tr, bytes_t *s)
             //D32(s->data, s->sz);
 
         } else {
-            trn = trie_add_node(tr, hash);
+            trn = btrie_add_node(tr, hash);
             trn->value = s;
         }
     }
@@ -140,15 +140,15 @@ UNUSED static void
 test_bytes(bytes_t **data, size_t sz)
 {
     size_t i;
-    trie_t tr;
+    btrie_t tr;
 
-    trie_init(&tr);
+    btrie_init(&tr);
 
     for (i = 0; i < sz; ++i) {
         test_one_bytes(&tr, data[i]);
     }
 
-    trie_fini(&tr);
+    btrie_fini(&tr);
 }
 
 
@@ -158,11 +158,11 @@ test_bytes(bytes_t **data, size_t sz)
 static void
 test2(void)
 {
-    trie_t tr;
+    btrie_t tr;
     int i;
     bytes_t *s;
 
-    trie_init(&tr);
+    btrie_init(&tr);
 
     srandom(time(NULL));
 
@@ -197,7 +197,7 @@ test2(void)
 
     //free(data);
 
-    trie_fini(&tr);
+    btrie_fini(&tr);
 }
 
 

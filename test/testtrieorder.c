@@ -6,19 +6,19 @@
 
 #include "unittest.h"
 #include "mrkcommon/dumpm.h"
-#include "mrkcommon/trie.h"
+#include "mrkcommon/btrie.h"
 #include "mrkcommon/util.h"
 #include "mrkcommon/memdebug.h"
 MEMDEBUG_DECLARE(testtrieorder);
 
 typedef struct _key_item {
     uint64_t key;
-    trie_node_t *n;
+    btrie_node_t *n;
 } key_item_t;
 
 static key_item_t keys[10];
 
-static trie_t tr;
+static btrie_t tr;
 
 UNUSED static uint64_t
 new_id_random(void)
@@ -44,7 +44,7 @@ initialize_ids(void)
 }
 
 static int
-cb(trie_node_t *node, UNUSED void *udata)
+cb(btrie_node_t *node, UNUSED void *udata)
 {
     if (node->value != NULL) {
         uint64_t key;
@@ -70,12 +70,12 @@ test0(void)
 
     initialize_ids();
 
-    trie_init(&tr);
+    btrie_init(&tr);
 
     for (i = 0; i < countof(keys); ++i) {
-        trie_node_t *n;
+        btrie_node_t *n;
 
-        n = trie_add_node(&tr, keys[i].key);
+        n = btrie_add_node(&tr, keys[i].key);
         n->value = (void *)(uintptr_t)keys[i].key;
         TRACE("key=%016lx", (uintptr_t)n->value);
 
@@ -83,10 +83,10 @@ test0(void)
     }
     TRACE("add_node OK");
 
-    trie_traverse(&tr, (trie_traverser_t)cb, NULL);
+    btrie_traverse(&tr, (btrie_traverser_t)cb, NULL);
 
-    trie_fini(&tr);
-    TRACE("trie_fini OK");
+    btrie_fini(&tr);
+    TRACE("btrie_fini OK");
 }
 
 int

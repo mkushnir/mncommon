@@ -4,7 +4,6 @@
 #include <sys/types.h>
 
 #include <mrkcommon/hash.h>
-//#include <mrkcommon/trie.h>
 
 #ifdef __cplusplus
 extern "C" {
