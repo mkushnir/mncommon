@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 typedef struct _hash_item {
-    //struct _hash_item **bucket;
+    struct _hash_item **bucket;
     struct _hash_item *prev;
     struct _hash_item *next;
     void *key;

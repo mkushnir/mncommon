@@ -79,9 +79,7 @@ my_rehash(UNUSED hash_t *dict, hash_item_t *it, void *udata)
         if ((phit = array_get(&dict->table, idx)) == NULL) {           \
             FAIL("array_get");                                         \
         }                                                              \
-/*                                                                     \
         hit->bucket = phit;                                            \
- */                                                                    \
         hit->prev = NULL;                                              \
         if (*phit == NULL) {                                           \
             hit->next = NULL;                                          \
@@ -89,9 +87,7 @@ my_rehash(UNUSED hash_t *dict, hash_item_t *it, void *udata)
             /* insert before the first */                              \
             hit->next = *phit;                                         \
             (*phit)->prev = hit;                                       \
-/*                                                                     \
             (*phit)->bucket = NULL;                                    \
- */                                                                    \
         }                                                              \
     }                                                                  \
     if (params.tmp != NULL) {                                          \
@@ -134,9 +130,7 @@ null_init(void **v)
         FAIL("malloc_fn");                                     \
     }                                                          \
     MEMDEBUG_LEAVE(dict);                                      \
-/*                                                             \
     hit->bucket = phit;                                        \
- */                                                            \
     hit->prev = NULL;                                          \
     if (*phit == NULL) {                                       \
         hit->next = NULL;                                      \
@@ -144,9 +138,7 @@ null_init(void **v)
         /* insert before the first */                          \
         hit->next = *phit;                                     \
         (*phit)->prev = hit;                                   \
-/*                                                             \
         (*phit)->bucket = NULL;                                \
- */                                                            \
     }                                                          \
     hit->key = key;                                            \
     hit->value = value;                                        \
@@ -183,9 +175,7 @@ hash_set_item_mpool(mpool_ctx_t *mpool, hash_t *dict, void *key, void *value)
             FAIL("malloc_fn");                                 \
         }                                                      \
         MEMDEBUG_LEAVE(dict);                                  \
-/*                                                             \
         hit->bucket = phit;                                    \
- */                                                            \
         hit->prev = NULL;                                      \
         hit->next = NULL;                                      \
         hit->key = key;                                        \
@@ -212,9 +202,7 @@ hash_set_item_mpool(mpool_ctx_t *mpool, hash_t *dict, void *key, void *value)
         MEMDEBUG_LEAVE(dict);                                  \
         hit->next = *phit;                                     \
         (*phit)->prev = hit;                                   \
-/*                                                             \
         (*phit)->bucket = NULL;                                \
- */                                                            \
         hit->key = key;                                        \
         hit->value = value;                                    \
         *phit = hit;                                           \
@@ -336,19 +324,15 @@ hash_remove_item_mpool(mpool_ctx_t *mpool, hash_t *dict, void *key)
 #define HASH_DELETE_PAIR_BODY(free_fn)         \
     if (hit->prev != NULL) {                   \
         hit->prev->next = hit->next;           \
-/*                                             \
     } else {                                   \
         assert(hit->bucket != NULL);           \
         *(hit->bucket) = hit->next;            \
- */                                            \
     }                                          \
     if (hit->next != NULL) {                   \
         hit->next->prev = hit->prev;           \
-/*                                             \
         if (hit->prev == NULL) {               \
             hit->next->bucket = hit->bucket;   \
         }                                      \
- */                                            \
     }                                          \
     if (dict->fini != NULL) {                  \
         dict->fini(hit->key, hit->value);      \
@@ -363,19 +347,15 @@ hash_remove_item_mpool(mpool_ctx_t *mpool, hash_t *dict, void *key)
 #define HASH_DELETE_PAIR_NO_FINI_BODY(free_fn) \
     if (hit->prev != NULL) {                   \
         hit->prev->next = hit->next;           \
-/*                                             \
     } else {                                   \
         assert(hit->bucket != NULL);           \
         *(hit->bucket) = hit->next;            \
- */                                            \
     }                                          \
     if (hit->next != NULL) {                   \
         hit->next->prev = hit->prev;           \
-/*                                             \
         if (hit->prev == NULL) {               \
             hit->next->bucket = hit->bucket;   \
         }                                      \
- */                                            \
     }                                          \
     MEMDEBUG_ENTER(dict);                      \
     free_fn(hit);                              \
