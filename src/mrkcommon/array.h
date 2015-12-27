@@ -25,7 +25,6 @@ typedef struct _array {
     size_t datasz;
     array_initializer_t init;
     array_finalizer_t fini;
-    //array_compar_t compar;
 } array_t;
 
 typedef struct _array_iter {
@@ -41,6 +40,9 @@ int array_init_mpool(mpool_ctx_t *,
                      array_t *, size_t, size_t,
                      array_initializer_t,
                      array_finalizer_t);
+
+int array_reset_no_fini(array_t *, size_t);
+int array_reset_no_fini_mpool(mpool_ctx_t *, array_t *, size_t);
 
 #define ARRAY_FLAG_SAVE 0x01
 int array_ensure_len(array_t *, size_t, unsigned int);

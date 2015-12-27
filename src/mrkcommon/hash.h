@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 typedef struct _hash_item {
-    struct _hash_item **bucket;
+    //struct _hash_item **bucket;
     struct _hash_item *prev;
     struct _hash_item *next;
     void *key;
@@ -24,7 +24,7 @@ typedef uint64_t (*hash_hashfn_t)(void *);
 typedef int (*hash_item_comparator_t)(void *, void *);
 typedef int (*hash_item_finalizer_t)(void *, void *);
 typedef int (*hash_traverser_t)(void *, void *, void *);
-typedef struct _dict {
+typedef struct _hash {
 #ifdef DO_MEMDEBUG
     uint64_t mdtag;
 #endif
@@ -39,17 +39,17 @@ typedef struct _dict {
 
 void hash_set_item(hash_t *, void *, void *);
 void hash_set_item_mpool(mpool_ctx_t *, hash_t *, void *, void *);
-void hash_set_item_uniq(hash_t *dict,
-                        void *key,
-                        void *value,
-                        void **oldkey,
-                        void **oldvalue);
-void hash_set_item_uniq_mpool(mpool_ctx_t *mpool,
-                              hash_t *dict,
-                              void *key,
-                              void *value,
-                              void **oldkey,
-                              void **oldvalue);
+void hash_set_item_uniq(hash_t *,
+                        void *,
+                        void *,
+                        void **,
+                        void **);
+void hash_set_item_uniq_mpool(mpool_ctx_t *,
+                              hash_t *,
+                              void *,
+                              void *,
+                              void **,
+                              void **);
 hash_item_t *hash_get_item(hash_t *, void *);
 void *hash_remove_item(hash_t *, void *);
 void *hash_remove_item_mpool(mpool_ctx_t *, hash_t *, void *);
@@ -83,6 +83,8 @@ void hash_init_mpool(mpool_ctx_t *,
                      hash_hashfn_t,
                      hash_item_comparator_t,
                      hash_item_finalizer_t);
+void hash_rehash(hash_t *, size_t);
+void hash_rehash_mpool(mpool_ctx_t *, hash_t *, size_t);
 void hash_cleanup(hash_t *);
 void hash_cleanup_mpool(mpool_ctx_t *, hash_t *);
 void hash_fini(hash_t *);

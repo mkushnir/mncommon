@@ -38,29 +38,30 @@ do {                                                           \
 #endif
 
 
+#define _malloc(sz) mpool_malloc(mpool, (sz))
+#define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
+#define _free(p) mpool_free(mpool, (p))
+
 /*
  * Initialize array structure.
  *
  */
 
 #define ARRAY_INIT_BODY(malloc_fn)                             \
-    unsigned i;                                                \
     assert(elsz > 0);                                          \
     ar->elsz = elsz;                                           \
     ar->elnum = elnum;                                         \
     ar->init = init;                                           \
     ar->fini = fini;                                           \
-/*                                                             \
-    ar->compar = NULL;                                         \
- */                                                            \
     ar->datasz = elsz * elnum;                                 \
     MEMDEBUG_INIT(ar);                                         \
     MEMDEBUG_ENTER(ar);                                        \
     if (elnum > 0) {                                           \
-        if ((ar->data = malloc_fn(elsz * elnum)) == NULL) {    \
+        if ((ar->data = malloc_fn(ar->datasz)) == NULL) {      \
             TRRET(ARRAY_INIT + 1);                             \
         }                                                      \
         if (ar->init != NULL) {                                \
+            unsigned i;                                        \
             for (i = 0; i < elnum; ++i) {                      \
                 if (ar->init(ar->data + (i * ar->elsz)) != 0) {\
                     TRRET(ARRAY_INIT + 2);                     \
@@ -79,17 +80,57 @@ array_init(array_t *ar, size_t elsz, size_t elnum,
            array_initializer_t init,
            array_finalizer_t fini)
 {
-    ARRAY_INIT_BODY(malloc);
+    ARRAY_INIT_BODY(malloc)
 }
+
 
 int
 array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
            array_initializer_t init,
            array_finalizer_t fini)
 {
-#define _malloc(sz) mpool_malloc(mpool, (sz))
-    ARRAY_INIT_BODY(_malloc);
-#undef _malloc
+    ARRAY_INIT_BODY(_malloc)
+}
+
+
+#define ARRAY_RESET_NO_FINI_BODY(free_fn, malloc_fn)           \
+    ar->elnum = newelnum;                                      \
+    ar->datasz = ar->elsz * newelnum;                          \
+    MEMDEBUG_ENTER(ar);                                        \
+    if (ar->data != NULL) {                                    \
+        free_fn(ar->data);                                     \
+    }                                                          \
+    if (newelnum > 0) {                                        \
+        if ((ar->data = malloc_fn(ar->datasz)) == NULL) {      \
+            TRRET(ARRAY_RESET_NO_FINI + 1);                    \
+        }                                                      \
+        if (ar->init != NULL) {                                \
+            unsigned i;                                        \
+            for (i = 0; i < newelnum; ++i) {                   \
+                if (ar->init(ar->data + (i * ar->elsz)) != 0) {\
+                    TRRET(ARRAY_RESET_NO_FINI + 2);            \
+                }                                              \
+            }                                                  \
+        }                                                      \
+    } else {                                                   \
+        ar->data = NULL;                                       \
+    }                                                          \
+    MEMDEBUG_LEAVE(ar);                                        \
+    return 0;                                                  \
+
+
+
+int
+array_reset_no_fini(array_t *ar, size_t newelnum)
+{
+    ARRAY_RESET_NO_FINI_BODY(free, malloc)
+}
+
+
+int
+array_reset_no_fini_mpool(mpool_ctx_t *mpool, array_t *ar, size_t newelnum)
+{
+    ARRAY_RESET_NO_FINI_BODY(_free, _malloc)
 }
 
 
@@ -162,14 +203,10 @@ array_ensure_len_dirty_mpool(mpool_ctx_t *mpool,
                              size_t newelnum,
                              unsigned int flags)
 {
-#define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
-#define _free(p) mpool_free(mpool, (p))
     ARRAY_ENSURE_DIRTY_BODY(_realloc, _free,
             ar->elnum = newelnum;
             return 0;
     )
-#undef _realloc
-#undef _free
 }
 
 
@@ -186,11 +223,7 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
                                 size_t newelnum,
                                 unsigned int flags)
 {
-#define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
-#define _free(p) mpool_free(mpool, (p))
     ARRAY_ENSURE_DIRTY_BODY(_realloc, _free,)
-#undef _realloc
-#undef _free
 }
 
 
@@ -281,14 +314,10 @@ array_ensure_len_mpool(mpool_ctx_t *mpool,
                        size_t newelnum,
                        unsigned int flags)
 {
-#define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
-#define _free(p) mpool_free(mpool, (p))
     ARRAY_ENSURE_BODY(_realloc, _free,
             ar->elnum = newelnum;
             return 0;
     )
-#undef _realloc
-#undef _free
 }
 
 
@@ -305,11 +334,7 @@ array_ensure_datasz_mpool(mpool_ctx_t *mpool,
                           size_t newelnum,
                           unsigned int flags)
 {
-#define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
-#define _free(p) mpool_free(mpool, (p))
     ARRAY_ENSURE_BODY(_realloc, _free,)
-#undef _realloc
-#undef _free
 }
 
 
@@ -326,6 +351,7 @@ array_clear_item(array_t *ar, unsigned idx)
     return 0;
 }
 
+
 void *
 array_get(const array_t *ar, unsigned idx)
 {
@@ -334,6 +360,7 @@ array_get(const array_t *ar, unsigned idx)
     }
     return NULL;
 }
+
 
 void *
 array_get_safe(array_t *ar, unsigned idx)
@@ -414,6 +441,7 @@ array_get_iter(const array_t *ar, array_iter_t *it)
     return NULL;
 }
 
+
 int
 array_fini(array_t *ar)
 {
@@ -431,10 +459,10 @@ array_fini(array_t *ar)
     ar->data = NULL;
     ar->init = NULL;
     ar->fini = NULL;
-    //ar->compar = NULL;
     ar->elnum = 0;
     return 0;
 }
+
 
 int
 array_fini_mpool(mpool_ctx_t *mpool, array_t *ar)
@@ -453,10 +481,10 @@ array_fini_mpool(mpool_ctx_t *mpool, array_t *ar)
     ar->data = NULL;
     ar->init = NULL;
     ar->fini = NULL;
-    //ar->compar = NULL;
     ar->elnum = 0;
     return 0;
 }
+
 
 void *
 array_first(const array_t *ar, array_iter_t *iter)
@@ -468,6 +496,7 @@ array_first(const array_t *ar, array_iter_t *iter)
     return NULL;
 }
 
+
 void *
 array_last(const array_t *ar, array_iter_t *iter)
 {
@@ -478,6 +507,7 @@ array_last(const array_t *ar, array_iter_t *iter)
     return NULL;
 }
 
+
 void *
 array_next(const array_t *ar, array_iter_t *iter)
 {
@@ -486,6 +516,7 @@ array_next(const array_t *ar, array_iter_t *iter)
     }
     return NULL;
 }
+
 
 void *
 array_prev(const array_t *ar, array_iter_t *iter)
@@ -496,6 +527,7 @@ array_prev(const array_t *ar, array_iter_t *iter)
     }
     return NULL;
 }
+
 
 void *
 array_incr(array_t *ar)
@@ -515,6 +547,7 @@ array_incr_mpool(mpool_ctx_t *mpool, array_t *ar)
     return array_get(ar, ar->elnum - 1);
 }
 
+
 void *
 array_incr_iter(array_t *ar, array_iter_t *it)
 {
@@ -525,6 +558,7 @@ array_incr_iter(array_t *ar, array_iter_t *it)
     return array_get(ar, ar->elnum - 1);
 }
 
+
 void *
 array_incr_iter_mpool(mpool_ctx_t *mpool, array_t *ar, array_iter_t *it)
 {
@@ -534,6 +568,7 @@ array_incr_iter_mpool(mpool_ctx_t *mpool, array_t *ar, array_iter_t *it)
     it->iter = ar->elnum - 1;
     return array_get(ar, ar->elnum - 1);
 }
+
 
 int
 array_decr_fast(array_t *ar)
@@ -548,6 +583,7 @@ array_decr_fast(array_t *ar)
     return 0;
 }
 
+
 int
 array_decr(array_t *ar)
 {
@@ -557,6 +593,7 @@ array_decr(array_t *ar)
     return 0;
 }
 
+
 int
 array_decr_mpool(mpool_ctx_t *mpool, array_t *ar)
 {
@@ -565,6 +602,7 @@ array_decr_mpool(mpool_ctx_t *mpool, array_t *ar)
     }
     return 0;
 }
+
 
 //int
 //array_sort(array_t *ar)
@@ -591,6 +629,7 @@ array_decr_mpool(mpool_ctx_t *mpool, array_t *ar)
 //    return bsearch(key, ar->data, ar->elnum, ar->elsz, ar->compar);
 //}
 
+
 int
 array_traverse(array_t *ar, array_traverser_t tr, void *udata)
 {
@@ -603,6 +642,7 @@ array_traverse(array_t *ar, array_traverser_t tr, void *udata)
     }
     return 0;
 }
+
 
 int
 array_cmp(const array_t *ar1, const array_t *ar2, array_compar_t cmp, ssize_t sz)

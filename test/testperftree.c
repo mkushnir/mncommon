@@ -18,7 +18,7 @@ btrie_t tr;
 void *rbnodes;
 void *trienodes;
 void *rbtnodes;
-uintptr_t *keys;
+intmax_t *keys;
 
 enum {
     RBT_TEST_PROF_RB,
@@ -102,14 +102,14 @@ test_trie(void)
 {
     unsigned i;
     btrie_t tr;
-    uintptr_t *n;
+    intmax_t *n;
     btrie_node_t *nn;
 
     btrie_init(&tr);
 
     PROFILE_START(RBT_TEST_PROF_BTRIE_INSERT);
     for (i = 0; i < nelem; ++i) {
-        n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
+        n = (intmax_t *) (trienodes + i * sizeof(intmax_t));
         *n = *(keys + i);
         nn = btrie_add_node(&tr, *n);
         nn->value = (void *)*n;
@@ -118,7 +118,7 @@ test_trie(void)
 
     PROFILE_START(RBT_TEST_PROF_BTRIE_FIND);
     for (i = 0; i < nelem; ++i) {
-        n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
+        n = (intmax_t *) (trienodes + i * sizeof(intmax_t));
         *n = *(keys + i);
         nn = btrie_find_exact(&tr, *n);
     }
@@ -126,7 +126,7 @@ test_trie(void)
 
     PROFILE_START(RBT_TEST_PROF_BTRIE_REMOVE);
     for (i = 0; i < nelem; ++i) {
-        n = (uintptr_t *) (trienodes + i * sizeof(uintptr_t));
+        n = (intmax_t *) (trienodes + i * sizeof(intmax_t));
         *n = *(keys + i);
         nn = btrie_find_exact(&tr, *n);
         btrie_remove_node(&tr, nn);
@@ -274,9 +274,9 @@ main(UNUSED int argc, UNUSED char *argv[])
     }
 
     rbnodes = malloc(sizeof(struct _rb_node) * nelem);
-    trienodes = malloc(sizeof(uintptr_t) * nelem);
+    trienodes = malloc(sizeof(intmax_t) * nelem);
     rbtnodes = malloc(sizeof(rbt_node_t) * nelem);
-    keys = malloc(sizeof(uintptr_t) * nelem);
+    keys = malloc(sizeof(intmax_t) * nelem);
 
     srandom(time(NULL));
     for (i = 0; i < nelem; ++i) {

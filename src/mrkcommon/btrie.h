@@ -6,7 +6,7 @@
 
 #include <mrkcommon/mpool.h>
 
-#define TREE_DEPTH (sizeof(uintptr_t) * 8)
+#define TREE_DEPTH (sizeof(uintmax_t) * 8)
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,8 +40,8 @@ typedef int (*btrie_traverser_t)(btrie_node_t *, uint64_t, void *);
 int btrie_node_traverse(btrie_node_t *, int, uint64_t, btrie_traverser_t, void *);
 int btrie_traverse(btrie_t *, int (*)(btrie_node_t *, uint64_t, void *), void *);
 
-btrie_node_t *btrie_add_node(btrie_t *, uintptr_t);
-btrie_node_t *btrie_add_node_mpool(mpool_ctx_t *, btrie_t *, uintptr_t);
+btrie_node_t *btrie_add_node(btrie_t *, uintmax_t);
+btrie_node_t *btrie_add_node_mpool(mpool_ctx_t *, btrie_t *, uintmax_t);
 int btrie_remove_node_no_cleanup(btrie_t *, btrie_node_t *);
 int btrie_remove_node_no_cleanup_mpool(mpool_ctx_t *, btrie_t *, btrie_node_t *);
 int btrie_remove_node(btrie_t *, btrie_node_t *);
@@ -52,8 +52,8 @@ void btrie_cleanup(btrie_t *);
 void btrie_cleanup_mpool(mpool_ctx_t *, btrie_t *);
 
 
-btrie_node_t *btrie_find_exact(btrie_t *, uintptr_t);
-btrie_node_t *btrie_find_closest(btrie_t *, uintptr_t, int);
+btrie_node_t *btrie_find_exact(btrie_t *, uintmax_t);
+btrie_node_t *btrie_find_closest(btrie_t *, uintmax_t, int);
 
 #define BTRIE_MIN(t) btrie_find_closest((t), 0, 1)
 #define BTRIE_MAX(t) btrie_find_closest((t), ULONG_MAX, 0)

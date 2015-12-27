@@ -1,11 +1,17 @@
-#ifdef HAVE_CONFIG_H
-#   include <config.h>
-#endif
 #include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <limits.h>
+
+#include <mrkcommon/dumpm.h>
+#include <mrkcommon/mpool.h>
+#include <mrkcommon/util.h>
+#include <mrkcommon/btrie.h>
+
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
 
 #ifndef HAVE_FLSL
 #   ifdef __GNUC__
@@ -16,10 +22,6 @@
 #endif
 
 #include "diag.h"
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/mpool.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/btrie.h>
 
 #ifdef DO_MEMDEBUG
 #include "mrkcommon/memdebug.h"
@@ -354,19 +356,19 @@ btrie_traverse(btrie_t *tr, int (*cb)(btrie_node_t *, uint64_t, void *), void *u
 
 
 btrie_node_t *
-btrie_add_node(btrie_t *tr, uintptr_t key)
+btrie_add_node(btrie_t *tr, uintmax_t key)
 {
     btrie_ADD_NODE_BODY(malloc);
 }
 
 btrie_node_t *
-btrie_add_node_mpool(mpool_ctx_t *mpool, btrie_t *tr, uintptr_t key)
+btrie_add_node_mpool(mpool_ctx_t *mpool, btrie_t *tr, uintmax_t key)
 {
     btrie_ADD_NODE_BODY(_malloc);
 }
 
 btrie_node_t *
-btrie_find_exact(btrie_t *tr, uintptr_t key)
+btrie_find_exact(btrie_t *tr, uintmax_t key)
 {
     int idx;
     btrie_node_t **n;
@@ -453,7 +455,7 @@ btrie_find_value(btrie_node_t *n, int bias)
 }
 
 static btrie_node_t *
-find_closest_partial(btrie_node_t *node, int idx, uintptr_t key, int direction)
+find_closest_partial(btrie_node_t *node, int idx, uintmax_t key, int direction)
 {
     /*
      * The exact match loop.
@@ -548,7 +550,7 @@ find_closest_partial(btrie_node_t *node, int idx, uintptr_t key, int direction)
 }
 
 btrie_node_t *
-btrie_find_closest(btrie_t *tr, uintptr_t key, int direction)
+btrie_find_closest(btrie_t *tr, uintmax_t key, int direction)
 {
     unsigned idx;
     btrie_node_t *root, *res;
