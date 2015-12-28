@@ -167,7 +167,12 @@ test1(void)
 {
     hash_t dict;
 
-    hash_init(&dict, 3, (hash_hashfn_t)my_item_hash, (hash_item_comparator_t)my_item_cmp, (hash_item_finalizer_t)my_item_fini);
+    hash_init(&dict,
+              3,
+              (hash_hashfn_t)my_item_hash,
+              (hash_item_comparator_t)my_item_cmp,
+              (hash_item_finalizer_t)my_item_fini);
+
     hash_set_item(&dict, my_item_new(1,1), NULL);
     hash_set_item(&dict, my_item_new(1,2), NULL);
     hash_set_item(&dict, my_item_new(1,3), NULL);
@@ -186,24 +191,55 @@ test1(void)
     hash_set_item(&dict, my_item_new(2,80), NULL);
     hash_set_item(&dict, my_item_new(0,81), NULL);
 
-    TRACE();
+    TRACE("elnum=%ld", hash_get_elnum(&dict));
+    hash_dump_stats(&dict);
     hash_traverse_item(&dict, my_item_print, NULL);
-    TRACE();
+
+    TRACE("elnum=%ld", hash_get_elnum(&dict));
+    hash_dump_stats(&dict);
     hash_traverse_item(&dict, my_item_delete, (void *)5);
-    TRACE();
+
+    TRACE("elnum=%ld", hash_get_elnum(&dict));
+    hash_dump_stats(&dict);
     hash_traverse_item(&dict, my_item_delete, (void *)4);
-    TRACE();
+
+    TRACE("elnum=%ld", hash_get_elnum(&dict));
+    hash_dump_stats(&dict);
     hash_traverse_item(&dict, my_item_print, NULL);
-    TRACE();
+
     hash_fini(&dict);
 }
 
+
+static void
+test2(void)
+{
+    int i;
+    hash_t dict;
+
+    hash_init(&dict,
+              3,
+              (hash_hashfn_t)my_item_hash,
+              (hash_item_comparator_t)my_item_cmp,
+              (hash_item_finalizer_t)my_item_fini);
+
+    for (i = 0; i < 10; ++i) {
+        hash_set_item(&dict, my_item_new(i, i), NULL);
+    }
+    TRACE("elnum=%ld", hash_get_elnum(&dict));
+    hash_dump_stats(&dict);
+    hash_rehash(&dict, 7);
+    TRACE("elnum=%ld", hash_get_elnum(&dict));
+    hash_dump_stats(&dict);
+    hash_fini(&dict);
+}
 
 int
 main(void)
 {
     test0();
     test1();
+    test2();
     return 0;
 }
 

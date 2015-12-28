@@ -89,6 +89,7 @@ my_rehash(UNUSED hash_t *dict, hash_item_t *it, void *udata)
             (*phit)->prev = hit;                                       \
             (*phit)->bucket = NULL;                                    \
         }                                                              \
+        *phit = hit;                                                   \
     }                                                                  \
     if (params.tmp != NULL) {                                          \
         free_fn(params.tmp);                                           \
