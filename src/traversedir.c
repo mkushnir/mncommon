@@ -109,6 +109,7 @@ traverse_dir(const char *path,
                 } else {
                     if ((res = cb(path, de, udata)) != 0) {
                         free(newpath);
+                        closedir(d);
                         return res;
                     }
                 }
