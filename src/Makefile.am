@@ -67,8 +67,8 @@ traversedir_include_headers = mrkcommon/traversedir.h
 endif
 
 if BYTESTREAM
-bytestream_sources = bytestream.c bytestream_aux.c
-bytestream_include_headers = mrkcommon/bytestream.h mrkcommon/bytestream_aux.h
+bytestream_sources = bytestream.c bytestream_aux.c vbytestream.c
+bytestream_include_headers = mrkcommon/bytestream.h mrkcommon/bytestream_aux.h mrkcommon/vbytestream.h
 endif
 
 if JSON

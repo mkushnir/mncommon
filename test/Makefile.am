@@ -24,6 +24,9 @@ endif
 if TRAVERSEDIR
 noinst_PROGRAMS += testtraversedir
 endif
+if BYTESTREAM
+noinst_PROGRAMS += testvbytestream
+endif
 if JSON
 noinst_PROGRAMS += testjson testjparse
 endif
@@ -124,6 +127,10 @@ testpbtrie_LDFLAGS =
 testtraversedir_SOURCES = ../src/traversedir.c testtraversedir.c
 testtraversedir_CFLAGS =
 testtraversedir_LDFLAGS =
+
+testvbytestream_SOURCES = ../src/vbytestream.c testvbytestream.c
+testvbytestream_CFLAGS =
+testvbytestream_LDFLAGS =
 
 testjson_SOURCES = ../src/json.c testjson.c
 testjson_CFLAGS =

@@ -279,6 +279,7 @@ bytestream_rewind(bytestream_t *stream)
     stream->eod = 0;
 }
 
+
 off_t
 bytestream_recycle(bytestream_t *stream, int ngrowsz, off_t from)
 {
