@@ -264,9 +264,6 @@ mpool_ctx_size(mpool_ctx_t *mpool, size_t *sz)
 
     *sz = sizeof(mpool_ctx_t) + mpool->arenasz;
     for (i = 0; i < (mpool->arenasz / sizeof(void *)); ++i) {
-        char *chunk;
-
-        chunk = mpool->arena[i];
         *sz += mpool->chunksz;
     }
 }
