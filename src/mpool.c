@@ -240,7 +240,6 @@ mpool_ctx_chunk_dump_info(mpool_ctx_t *mpool)
             sz1 = sz0 + sizeof(struct _mpool_item);
             j += sz1;
         }
-
     }
 }
 
@@ -255,6 +254,21 @@ mpool_ctx_dump_info(mpool_ctx_t *mpool)
           mpool->current_pos,
           mpool->last_chunk);
     mpool_ctx_chunk_dump_info(mpool);
+}
+
+
+void
+mpool_ctx_size(mpool_ctx_t *mpool, size_t *sz)
+{
+    size_t i;
+
+    *sz = sizeof(mpool_ctx_t) + mpool->arenasz;
+    for (i = 0; i < (mpool->arenasz / sizeof(void *)); ++i) {
+        char *chunk;
+
+        chunk = mpool->arena[i];
+        *sz += mpool->chunksz;
+    }
 }
 
 
