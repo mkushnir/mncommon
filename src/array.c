@@ -352,6 +352,20 @@ array_clear_item(array_t *ar, unsigned idx)
 }
 
 
+int
+array_init_item(array_t *ar, unsigned idx)
+{
+    //TRACE("idx=%d elnum=%ld", idx, ar->elnum);
+    if (idx >= ar->elnum) {
+        TRRET(ARRAY_INIT_ITEM + 1);
+    }
+    if (ar->init != NULL) {
+        return ar->init(ar->data + ar->elsz * idx);
+    }
+    return 0;
+}
+
+
 void *
 array_get(const array_t *ar, unsigned idx)
 {

@@ -8,35 +8,33 @@
 #include <sys/uio.h>
 
 #include <mrkcommon/array.h>
+#include <mrkcommon/bytes.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct _vbiovec {
-    struct iovec iov;
-    size_t sz;
-} vbiovec_t;
-
 typedef struct _vbytestream {
     /*
-     * array of vbiovec_t
+     * array of bytes_t *
+     */
+    array_t bytes;
+    /*
+     * array of struct iovec
      */
     array_t iov;
     /* the current eod iovec */
     struct {
         int idx;
         off_t offt;
-    } ioveod;
-    /* total offset of EOD */
-    off_t eod;
+        off_t total;
+    } eod;
     /* the current pos iovec */
     struct {
         int idx;
         off_t offt;
-    } iovpos;
-    /* total offset of POS */
-    off_t pos;
+        off_t total;
+    } pos;
     size_t growsz;
     ssize_t (*read_more)(struct _vbytestream *, int, ssize_t);
     ssize_t (*write)(struct _vbytestream *, int, size_t);
@@ -44,13 +42,10 @@ typedef struct _vbytestream {
 
 } vbytestream_t;
 
-#define VSDATA(stream, n) vbytestream_data(stream, n)
-
-
 void vbytestream_init(vbytestream_t *, size_t, size_t);
 void vbytestream_fini(vbytestream_t *);
-#define VBYTESTREAM_NPRINTF_ERROR (-129)
-#define VBYTESTREAM_NPRINTF_NEEDMORE (-130)
+#define VBYTESTREAM_NPRINTF_ERROR (-129)    // 0xffffffffffffff7f
+#define VBYTESTREAM_NPRINTF_NEEDMORE (-130) // 0xffffffffffffff7e
 int vbytestream_nprintf(vbytestream_t *, ssize_t, const char *, ...);
 int vbytestream_cat(vbytestream_t *, size_t, const char *);
 int vbytestream_traverse(vbytestream_t *, array_traverser_t, void *);
