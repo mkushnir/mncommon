@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <sys/types.h>
 
 #include <mrkcommon/array.h>
@@ -60,7 +61,7 @@ int hash_traverse(hash_t *, hash_traverser_t, void *);
 typedef int (*hash_traverser_item_t)(hash_t *, hash_item_t *, void *);
 
 int hash_traverse_item(hash_t *, hash_traverser_item_t, void *);
-int hash_is_empty(hash_t *);
+bool hash_is_empty(hash_t *);
 size_t hash_get_elnum(hash_t *);
 
 hash_t *hash_new(size_t,

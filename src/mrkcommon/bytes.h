@@ -2,6 +2,7 @@
 #define MRKCOMMON_BYTES_H_DEFINED
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <sys/types.h>
 
 #include <mrkcommon/mpool.h>
@@ -116,8 +117,8 @@ uint64_t bytes_hash(bytes_t *);
 int bytes_cmp(bytes_t *, bytes_t *);
 int bytes_cmpv(bytes_t *, bytes_t *);
 int bytes_cmpi(bytes_t *, bytes_t *);
-int bytes_contains(bytes_t *, bytes_t *);
-int bytes_containsi(bytes_t *, bytes_t *);
+bool bytes_contains(bytes_t *, bytes_t *);
+bool bytes_containsi(bytes_t *, bytes_t *);
 void bytes_copy(bytes_t *, bytes_t *, size_t);
 void bytes_copyz(bytes_t *, bytes_t *, size_t);
 void bytes_brushdown(bytes_t *);
@@ -125,10 +126,10 @@ void bytes_urldecode(bytes_t *);
 bytes_t *bytes_set_lower(bytes_t *s);
 bytes_t *bytes_json_escape(bytes_t *);
 void bytes_json_unescape(bytes_t *);
-int bytes_is_ascii(bytes_t *);
-int bytes_startswith(const bytes_t *, const bytes_t *);
-int bytes_endswith(const bytes_t *, const bytes_t *);
-int bytes_is_null_or_empty(const bytes_t *);
+bool bytes_is_ascii(bytes_t *);
+bool bytes_startswith(const bytes_t *, const bytes_t *);
+bool bytes_endswith(const bytes_t *, const bytes_t *);
+bool bytes_is_null_or_empty(const bytes_t *);
 typedef int (*bytes_split_cb)(bytes_t *, void *);
 int bytes_split_iter(bytes_t *, char *, bytes_split_cb, void *);
 

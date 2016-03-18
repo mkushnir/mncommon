@@ -389,7 +389,7 @@ array_get_safe(array_t *ar, unsigned idx)
 
     if (datasz > ar->datasz) {
         array_ensure_datasz(ar,
-                            ar->elnum ? ar->elnum * 2 : 1,
+                            (idx + 1) * 2,
                             ARRAY_FLAG_SAVE);
     }
     assert((ar->elsz * idx) < ar->datasz);
@@ -411,7 +411,7 @@ array_get_safe_mpool(mpool_ctx_t *mpool, array_t *ar, unsigned idx)
     if (datasz > ar->datasz) {
         array_ensure_datasz_mpool(mpool,
                                   ar,
-                                  ar->elnum ? ar->elnum * 2 : 1,
+                                  (idx + 1) * 2,
                                   ARRAY_FLAG_SAVE);
     }
     assert((ar->elsz * idx) < ar->datasz);

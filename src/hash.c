@@ -434,7 +434,7 @@ hash_traverse_item(hash_t *dict, hash_traverser_item_t cb, void *udata)
 }
 
 
-int
+bool
 hash_is_empty(hash_t *dict)
 {
     return dict->elnum == 0;

@@ -65,12 +65,12 @@ strrstr(const char *big, const char *little)
 }
 
 
-int
+bool
 bytes_startswith(const bytes_t *big, const bytes_t *small)
 {
-    int res;
+    bool res;
 
-    res = 0;
+    res = false;
     if (big->sz >= small->sz) {
         size_t i;
 
@@ -79,7 +79,7 @@ bytes_startswith(const bytes_t *big, const bytes_t *small)
                 goto end;
             }
         }
-        res = 1;
+        res = true;
     }
 
 end:
@@ -87,12 +87,12 @@ end:
 }
 
 
-int
+bool
 bytes_endswith(const bytes_t *big, const bytes_t *small)
 {
     int res;
 
-    res = 0;
+    res = false;
     if (big->sz >= small->sz) {
         ssize_t i, j;
 
@@ -103,7 +103,7 @@ bytes_endswith(const bytes_t *big, const bytes_t *small)
                 goto end;
             }
         }
-        res = 1;
+        res = true;
     }
 
 end:
@@ -111,7 +111,7 @@ end:
 }
 
 
-int
+bool
 bytes_is_null_or_empty(const bytes_t *s)
 {
     return s == NULL || (s->sz == 1 && *s->data == '\0') || s->sz == 0;
@@ -202,7 +202,7 @@ bytes_json_unescape(bytes_t *src)
 }
 
 
-int
+bool
 bytes_is_ascii(bytes_t *s)
 {
     size_t i, sz;
@@ -216,16 +216,16 @@ bytes_is_ascii(bytes_t *s)
 
         n = (uint64_t *)(s->data + i);
         if (*n & 0x8080808080808080) {
-            return 0;
+            return false;
         }
     }
 
     while (--mod >= 0) {
         if (s->data[i + mod] & 0x80) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 
@@ -289,21 +289,21 @@ bytes_cmpi(bytes_t *a, bytes_t *b)
 }
 
 
-int
+bool
 bytes_contains(bytes_t *a, bytes_t *b)
 {
     if (a->data[a->sz - 1] != '\0' || b->data[b->sz - 1] != '\0') {
-        return 0;
+        return false;
     }
     return strstr((char *)a->data, (char *)b->data) != NULL;
 }
 
 
-int
+bool
 bytes_containsi(bytes_t *a, bytes_t *b)
 {
     if (a->data[a->sz - 1] != '\0' || b->data[b->sz - 1] != '\0') {
-        return 0;
+        return false;
     }
     return strcasestr((char *)a->data, (char *)b->data) != NULL;
 }
