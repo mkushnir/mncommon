@@ -618,30 +618,24 @@ array_decr_mpool(mpool_ctx_t *mpool, array_t *ar)
 }
 
 
-//int
-//array_sort(array_t *ar)
-//{
-//    if (ar->compar == NULL) {
-//        TRRET(ARRAY_SORT + 1);
-//    }
-//    if (ar->elnum == 0) {
-//        TRRET(ARRAY_SORT + 2);
-//    }
-//    qsort(ar->data, ar->elnum, ar->elsz, ar->compar);
-//    return 0;
-//}
-//
-//void *
-//array_find(const array_t *ar, const void *key)
-//{
-//    if (ar->compar == NULL) {
-//        TRRETNULL(ARRAY_FIND + 1);
-//    }
-//    if (ar->elnum == 0) {
-//        TRRETNULL(ARRAY_FIND + 2);
-//    }
-//    return bsearch(key, ar->data, ar->elnum, ar->elsz, ar->compar);
-//}
+int
+array_sort(array_t *ar, array_compar_t compar)
+{
+    if (ar->elnum == 0) {
+        TRRET(ARRAY_SORT + 1);
+    }
+    qsort(ar->data, ar->elnum, ar->elsz, compar);
+    return 0;
+}
+
+void *
+array_find(const array_t *ar, const void *key, array_compar_t compar)
+{
+    if (ar->elnum == 0) {
+        TRRETNULL(ARRAY_FIND + 1);
+    }
+    return bsearch(key, ar->data, ar->elnum, ar->elsz, compar);
+}
 
 
 int

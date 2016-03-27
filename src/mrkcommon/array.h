@@ -77,8 +77,8 @@ void *array_last(const array_t *, array_iter_t *);
 #define ARRAY_LAST(ty, a) (((ty *)((a)->data))[(a)->elnum - 1])
 void *array_next(const array_t *, array_iter_t *);
 void *array_prev(const array_t *, array_iter_t *);
-//int array_sort(array_t *);
-//void *array_find(const array_t *, const void *);
+int array_sort(array_t *, array_compar_t);
+void *array_find(const array_t *, const void *, array_compar_t);
 int array_traverse(array_t *, array_traverser_t, void *);
 int array_cmp(const array_t *, const array_t *, array_compar_t, ssize_t);
 
