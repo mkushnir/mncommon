@@ -381,7 +381,7 @@ mycb201(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 }
 
 
-void
+static void
 test1(void)
 {
     jparse_ctx_t *jctx;
@@ -411,20 +411,206 @@ test1(void)
 }
 
 
+
+
+
+UNUSED static bytes_t _o1 = BYTES_INITIALIZER("o1");
+UNUSED static bytes_t _o2 = BYTES_INITIALIZER("o2");
+UNUSED static bytes_t _o3 = BYTES_INITIALIZER("o3");
+
+
+DEF_JPARSE_ARRAY_ITERATOR(ai, jparse_expect_item_ignore)
+DEF_JPARSE_OBJECT_ITERATOR(oi, jparse_expect_anykvp_ignore)
+
 static int
-mycb300(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
+ocb(jparse_ctx_t *jctx,
+    jparse_value_t *jval,
+    void *udata)
 {
     int res;
-    res = jparse_expect_any(jctx, jval, udata);
-    jparse_dump_value(jval);
+    jparse_value_t _jval;
+
+    jparse_value_init(&_jval);
+
+    if (jval->ty == JSON_ARRAY) {
+        res = REF_JPARSE_ARRAY_ITERATOR(ai)(jctx, &_jval, udata);
+    } else if (jval->ty == JSON_OBJECT) {
+        res = REF_JPARSE_OBJECT_ITERATOR(oi)(jctx, &_jval, udata);
+    } else {
+        res = jparse_expect_ignore(jctx, &_jval, udata);
+    }
+    TR(res);
+    return res;
+}
+
+
+static int
+oexp(jparse_ctx_t *jctx,
+     bytes_t **k,
+     UNUSED jparse_value_t *jval,
+     void *udata)
+{
+    int res;
+    jparse_value_t _jval;
+
+    jparse_value_init(&_jval);
+    _jval.cb = ocb;
+
+    res = jparse_expect_anykvp_any(jctx, k, &_jval, udata);
+    TR(res);
+    if (*k != NULL) {
+        TRACE("k=%s", (*k)->data);
+        jparse_dump_value(&_jval);
+    }
+    return res;
+}
+DEF_JPARSE_OBJECT_ITERATOR(oexp, oexp);
+
+
+static int
+mycb300(jparse_ctx_t *jctx,
+        UNUSED jparse_value_t *jval,
+        void *udata)
+{
+    int res;
+    jparse_value_t _jval;
+
+    assert(jval == NULL);
+
+    jparse_value_init(&_jval);
+
+    res = jparse_expect_object(jctx,
+                               REF_JPARSE_OBJECT_ITERATOR(oexp),
+                               &_jval,
+                               udata);
+
     TR(res);
     return 0;
 }
-void
+
+
+
+
+
+
+
+UNUSED static bytes_t _queries = BYTES_INITIALIZER("queries");
+UNUSED static bytes_t _id = BYTES_INITIALIZER("id");
+UNUSED static bytes_t _name = BYTES_INITIALIZER("name");
+UNUSED static bytes_t _meta = BYTES_INITIALIZER("meta");
+UNUSED static bytes_t _versions = BYTES_INITIALIZER("versions");
+
+
+static int
+query_field_nonscalar(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
+{
+    int res;
+    jparse_value_t _jval;
+
+    jparse_value_init(&_jval);
+
+    if (bytes_cmp(jval->k, &_meta) == 0) {
+        // handle meta
+        res = REF_JPARSE_OBJECT_ITERATOR(oi)(jctx, &_jval, udata);
+    } else if (bytes_cmp(jval->k, &_versions) == 0) {
+        // handle versions
+        res = REF_JPARSE_ARRAY_ITERATOR(ai)(jctx, &_jval, udata);
+    } else if (jval->ty == JSON_ARRAY) {
+        res = REF_JPARSE_ARRAY_ITERATOR(ai)(jctx, &_jval, udata);
+    } else if (jval->ty == JSON_OBJECT) {
+        res = REF_JPARSE_OBJECT_ITERATOR(oi)(jctx, &_jval, udata);
+    } else {
+        FAIL("query_field_nonscalar");
+    }
+    return res;
+}
+
+static int
+query_item(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, void *udata)
+{
+    int res;
+    bytes_t *k;
+    jparse_value_t _jval;
+    jparse_value_init(&_jval);
+    _jval.cb = query_field_nonscalar;
+    res = jparse_expect_anykvp_any(jctx, &k, &_jval, udata);
+    TRACE("k=%s", _jval.k->data);
+    jparse_dump_value(&_jval);
+    return res;
+}
+
+DEF_JPARSE_ARRAY_ITERATOR(query_item, query_item)
+
+
+
+static int
+queries_array(jparse_ctx_t *jctx,
+              UNUSED jparse_value_t *jval,
+              void *udata)
+{
+    int res;
+
+    jparse_value_t _jval;
+    jparse_value_init(&_jval);
+    res = jparse_expect_item_object(jctx,
+                                     REF_JPARSE_ARRAY_ITERATOR(query_item),
+                                     &_jval,
+                                     udata);
+    //jparse_dump_value(jval);
+    //jparse_dump_value(&_jval);
+    return res;
+}
+
+DEF_JPARSE_ARRAY_ITERATOR(queries_array, queries_array)
+
+static int
+queries_key(jparse_ctx_t *jctx,
+            UNUSED bytes_t **k,
+            jparse_value_t *jval,
+            void *udata)
+{
+    int res;
+    res = jparse_expect_kvp_array(
+            jctx,
+            &_queries,
+            REF_JPARSE_ARRAY_ITERATOR(queries_array),
+            jval,
+            udata);
+    //jparse_dump_value(jval);
+    return res;
+
+}
+
+DEF_JPARSE_OBJECT_ITERATOR(queries, queries_key);
+
+
+static int
+mycb400(jparse_ctx_t *jctx,
+        UNUSED jparse_value_t *jval,
+        void *udata)
+{
+    int res;
+    jparse_value_t _jval;
+
+    assert(jval == NULL);
+
+    jparse_value_init(&_jval);
+
+    res = jparse_expect_object(jctx,
+                               REF_JPARSE_OBJECT_ITERATOR(queries),
+                               &_jval,
+                               udata);
+
+    TR(res);
+    return 0;
+}
+
+
+static void
 test2(void)
 {
     jparse_ctx_t *jctx;
-    UNUSED int res;
+    int res;
 
     struct {
         long rnd;
@@ -432,31 +618,26 @@ test2(void)
         jparse_expect_cb_t cb;
     } data[] = {
         {0, "data/testjparse/mixed-01", mycb300},
+        {0, "data/testjparse/mixed-02", mycb400},
 
     };
     UNITTEST_PROLOG;
 
     FOREACHDATA {
-        jparse_value_t jval;
-
         TRACE("in=%s", CDATA.in);
         jctx = jparse_ctx_new(4096, 4096);
-        jctx->default_cb = mycb300;
-        jval.cb = mycb300;
-        jval.udata = NULL;
-        res = jparse_ctx_parse(jctx, CDATA.in, CDATA.cb, &jval, NULL);
+        res = jparse_ctx_parse(jctx, CDATA.in, CDATA.cb, NULL, NULL);
         jparse_ctx_destroy(&jctx);
         assert(res == 0);
     }
 
 }
 
-
 int
 main(void)
 {
     //test0();
-    //test1();
+    test1();
     test2();
     return 0;
 }

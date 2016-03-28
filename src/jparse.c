@@ -23,6 +23,10 @@ MEMDEBUG_DECLARE(jparse);
 static int jparse_expect_tok(jparse_ctx_t *, bytes_t **);
 static int expect_maybe_null(jparse_ctx_t *);
 
+static bytes_t _null = BYTES_INITIALIZER("null");
+static bytes_t _true = BYTES_INITIALIZER("true");
+static bytes_t _false = BYTES_INITIALIZER("false");
+
 
 static int
 reach_nonblank(jparse_ctx_t *jctx)
@@ -253,6 +257,21 @@ probe_colon(jparse_ctx_t *jctx)
 
 
 /*
+ * jparse_value_t
+ */
+
+void
+jparse_value_init(jparse_value_t *jval)
+{
+    jval->k = NULL;
+    jval->v.s = NULL;
+    jval->cb = NULL;
+    jval->udata = NULL;
+    jval->ty = JSON_NULL;
+}
+
+
+/*
  * scalar
  */
 static int
@@ -274,7 +293,7 @@ _jparse_expect_array_ignore_cb(jparse_ctx_t *jctx,
 
 
 int
-jparse_expect_ignore(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
+jparse_expect_ignore(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
 {
     int res;
     off_t start;
@@ -285,41 +304,42 @@ jparse_expect_ignore(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 
     start = SPOS(&jctx->bs);
     if ((res = expect_maybe_null(jctx)) == 0) {
-        val->ty = JSON_NULL;
+        jval->ty = JSON_NULL;
         goto end;
     }
 
     start = SPOS(&jctx->bs);
-    if ((res = jparse_expect_bool(jctx, &val->v.b, udata)) == 0) {
-        val->ty = JSON_BOOLEAN;
+    if ((res = jparse_expect_bool(jctx, &jval->v.b, udata)) == 0) {
+        jval->ty = JSON_BOOLEAN;
         goto end;
     }
 
     start = SPOS(&jctx->bs);
     if (probe_dquote(jctx) == 0) {
-        if ((res = jparse_expect_str(jctx, &val->v.s, udata)) == 0) {
-            val->ty = JSON_STRING;
+        if ((res = jparse_expect_str(jctx, &jval->v.s, udata)) == 0) {
+            jval->ty = JSON_STRING;
             goto end;
         }
     } else if (probe_ostart(jctx) == 0) {
+        jval->ty = JSON_OBJECT;
         if ((res = jparse_expect_object_iter(jctx,
                 _jparse_expect_object_ignore_cb,
-                val,
+                jval,
                 udata)) == 0) {
-            val->ty = JSON_OBJECT;
+            jval->ty = JSON_OBJECT;
             goto end;
         }
     } else if (probe_astart(jctx) == 0) {
+        jval->ty = JSON_ARRAY;
         if ((res = jparse_expect_array_iter(jctx,
                 _jparse_expect_array_ignore_cb,
-                val,
+                jval,
                 udata)) == 0) {
-            val->ty = JSON_ARRAY;
             goto end;
         }
     } else {
-        if ((res = jparse_expect_float(jctx, &val->v.f, udata)) == 0) {
-            val->ty = JSON_FLOAT;
+        if ((res = jparse_expect_float(jctx, &jval->v.f, udata)) == 0) {
+            jval->ty = JSON_FLOAT;
             goto end;
         }
     }
@@ -333,7 +353,7 @@ end:
 
 
 int
-jparse_expect_any(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
+jparse_expect_any(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
 {
     int res;
     off_t start;
@@ -344,35 +364,41 @@ jparse_expect_any(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 
     start = SPOS(&jctx->bs);
     if ((res = expect_maybe_null(jctx)) == 0) {
-        val->ty = JSON_NULL;
+        jval->ty = JSON_NULL;
         goto end;
     }
 
     start = SPOS(&jctx->bs);
-    if ((res = jparse_expect_bool(jctx, &val->v.b, udata)) == 0) {
-        val->ty = JSON_BOOLEAN;
+    if ((res = jparse_expect_bool(jctx, &jval->v.b, udata)) == 0) {
+        jval->ty = JSON_BOOLEAN;
         goto end;
     }
 
     start = SPOS(&jctx->bs);
     if (probe_dquote(jctx) == 0) {
-        if ((res = jparse_expect_str(jctx, &val->v.s, udata)) == 0) {
-            val->ty = JSON_STRING;
+        if ((res = jparse_expect_str(jctx, &jval->v.s, udata)) == 0) {
+            jval->ty = JSON_STRING;
             goto end;
         }
     } else if (probe_ostart(jctx) == 0) {
-        if ((res = jparse_expect_object(jctx, val->cb, val, val->udata)) == 0) {
-            val->ty = JSON_OBJECT;
+        jval->ty = JSON_OBJECT;
+        if ((res = jparse_expect_object(jctx,
+                                        jval->cb,
+                                        jval,
+                                        jval->udata)) == 0) {
             goto end;
         }
     } else if (probe_astart(jctx) == 0) {
-        if ((res = jparse_expect_array(jctx, val->cb, val, val->udata)) == 0) {
-            val->ty = JSON_ARRAY;
+        jval->ty = JSON_ARRAY;
+        if ((res = jparse_expect_array(jctx,
+                                       jval->cb,
+                                       jval,
+                                       jval->udata)) == 0) {
             goto end;
         }
     } else {
-        if ((res = jparse_expect_float(jctx, &val->v.f, udata)) == 0) {
-            val->ty = JSON_FLOAT;
+        if ((res = jparse_expect_float(jctx, &jval->v.f, udata)) == 0) {
+            jval->ty = JSON_FLOAT;
             goto end;
         }
     }
@@ -433,7 +459,7 @@ expect_maybe_null(jparse_ctx_t *jctx)
 
     spos = SPOS(&jctx->bs);
     if (jparse_expect_tok(jctx, &v) == 0) {
-        if (bytes_cmp(v, jctx->_null) == 0) {
+        if (bytes_cmp(v, &_null) == 0) {
             return 0;
         }
     }
@@ -694,10 +720,10 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val, UNUSED void *udata)
 
     spos = SPOS(&jctx->bs);
     if (jparse_expect_tok(jctx, &v) == 0) {
-        if (bytes_cmp(v, jctx->_true) == 0) {
+        if (bytes_cmp(v, &_true) == 0) {
             *val = 1;
             return 0;
-        } else if (bytes_cmp(v, jctx->_false) == 0) {
+        } else if (bytes_cmp(v, &_false) == 0) {
             *val = 0;
             return 0;
         } else {
@@ -716,7 +742,7 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val, UNUSED void *udata)
 int
 jparse_expect_kvp_any(jparse_ctx_t *jctx,
                       bytes_t *key,
-                      jparse_value_t *val,
+                      jparse_value_t *jval,
                       void *udata)
 {
     int res;
@@ -733,7 +759,7 @@ jparse_expect_kvp_any(jparse_ctx_t *jctx,
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_any(jctx, val, udata)) != 0) {
+        if ((res = jparse_expect_any(jctx, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -747,13 +773,13 @@ jparse_expect_kvp_any(jparse_ctx_t *jctx,
 int
 jparse_expect_skvp_any(jparse_ctx_t *jctx,
                        const char *key,
-                       jparse_value_t *val,
+                       jparse_value_t *jval,
                        void *udata)
 {
     int res;
     bytes_t *k;
     k = bytes_new_from_str(key);
-    res = jparse_expect_kvp_any(jctx, k, val, udata);
+    res = jparse_expect_kvp_any(jctx, k, jval, udata);
     bytes_decref(&k);
     return res;
 }
@@ -762,7 +788,7 @@ jparse_expect_skvp_any(jparse_ctx_t *jctx,
 int
 jparse_expect_anykvp_ignore(jparse_ctx_t *jctx,
                             bytes_t **key,
-                            jparse_value_t *val,
+                            jparse_value_t *jval,
                             void *udata)
 {
     int res;
@@ -770,13 +796,13 @@ jparse_expect_anykvp_ignore(jparse_ctx_t *jctx,
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_IGNORE + 1);
     }
-    val->k = *key;
+    jval->k = *key;
     if (reach_colon(jctx) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_IGNORE + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_ignore(jctx, val, udata)) != 0) {
+        if ((res = jparse_expect_ignore(jctx, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -790,7 +816,7 @@ jparse_expect_anykvp_ignore(jparse_ctx_t *jctx,
 int
 jparse_expect_anykvp_any(jparse_ctx_t *jctx,
                          bytes_t **key,
-                         jparse_value_t *val,
+                         jparse_value_t *jval,
                          void *udata)
 {
     int res;
@@ -798,13 +824,13 @@ jparse_expect_anykvp_any(jparse_ctx_t *jctx,
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_ANY + 1);
     }
-    val->k = *key;
+    jval->k = *key;
     if (reach_colon(jctx) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_ANY + 2);
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_any(jctx, val, udata)) != 0) {
+        if ((res = jparse_expect_any(jctx, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -1114,15 +1140,15 @@ int
 jparse_expect_kvp_object(jparse_ctx_t *jctx,
                       bytes_t *key,
                       jparse_expect_cb_t cb,
-                      jparse_value_t *val,
+                      jparse_value_t *jval,
                       void *udata)
 {
     int res;
     res = 0;
-    if (jparse_expect_str(jctx, &val->k, udata) != 0) {
+    if (jparse_expect_str(jctx, &jval->k, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_OBJECT + 1);
     }
-    if (bytes_cmp(val->k, key) != 0) {
+    if (bytes_cmp(jval->k, key) != 0) {
         TRRET(JPARSE_EXPECT_KVP_OBJECT + 2);
     }
     if (reach_colon(jctx) != 0) {
@@ -1130,7 +1156,7 @@ jparse_expect_kvp_object(jparse_ctx_t *jctx,
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_object(jctx, cb, val, udata)) != 0) {
+        if ((res = jparse_expect_object(jctx, cb, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -1145,15 +1171,15 @@ int
 jparse_expect_kvp_object_iter(jparse_ctx_t *jctx,
                       bytes_t *key,
                       jparse_expect_cb_t cb,
-                      jparse_value_t *val,
+                      jparse_value_t *jval,
                       void *udata)
 {
     int res;
     res = 0;
-    if (jparse_expect_str(jctx, &val->k, udata) != 0) {
+    if (jparse_expect_str(jctx, &jval->k, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_OBJECT_ITER + 1);
     }
-    if (bytes_cmp(val->k, key) != 0) {
+    if (bytes_cmp(jval->k, key) != 0) {
         TRRET(JPARSE_EXPECT_KVP_OBJECT_ITER + 2);
     }
     if (reach_colon(jctx) != 0) {
@@ -1161,7 +1187,7 @@ jparse_expect_kvp_object_iter(jparse_ctx_t *jctx,
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_object_iter(jctx, cb, val, udata)) != 0) {
+        if ((res = jparse_expect_object_iter(jctx, cb, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -1176,14 +1202,14 @@ int
 jparse_expect_skvp_object(jparse_ctx_t *jctx,
                           const char *key,
                           jparse_expect_cb_t cb,
-                          jparse_value_t *val,
+                          jparse_value_t *jval,
                           void *udata)
 {
     int res;
     bytes_t *k;
 
     k = bytes_new_from_str(key);
-    res = jparse_expect_kvp_object(jctx, k, cb, val, udata);
+    res = jparse_expect_kvp_object(jctx, k, cb, jval, udata);
     bytes_decref(&k);
     return res;
 }
@@ -1193,7 +1219,7 @@ int
 jparse_expect_anykvp_object(jparse_ctx_t *jctx,
                             bytes_t **key,
                             jparse_expect_cb_t cb,
-                            jparse_value_t *val,
+                            jparse_value_t *jval,
                             void *udata)
 {
     int res;
@@ -1207,8 +1233,8 @@ jparse_expect_anykvp_object(jparse_ctx_t *jctx,
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        val->k = *key;
-        if ((res = jparse_expect_object(jctx, cb, val, udata)) != 0) {
+        jval->k = *key;
+        if ((res = jparse_expect_object(jctx, cb, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -1223,7 +1249,7 @@ int
 jparse_expect_anykvp_object_iter(jparse_ctx_t *jctx,
                             bytes_t **key,
                             jparse_expect_cb_t cb,
-                            jparse_value_t *val,
+                            jparse_value_t *jval,
                             void *udata)
 {
     int res;
@@ -1237,8 +1263,8 @@ jparse_expect_anykvp_object_iter(jparse_ctx_t *jctx,
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        val->k = *key;
-        if ((res = jparse_expect_object_iter(jctx, cb, val, udata)) != 0) {
+        jval->k = *key;
+        if ((res = jparse_expect_object_iter(jctx, cb, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -1253,7 +1279,7 @@ int
 jparse_expect_kvp_array(jparse_ctx_t *jctx,
                         bytes_t *key,
                         jparse_expect_cb_t cb,
-                        jparse_value_t *val,
+                        jparse_value_t *jval,
                         void *udata)
 {
     int res;
@@ -1270,7 +1296,7 @@ jparse_expect_kvp_array(jparse_ctx_t *jctx,
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_array(jctx, cb, val, udata)) != 0) {
+        if ((res = jparse_expect_array(jctx, cb, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -1285,7 +1311,7 @@ int
 jparse_expect_kvp_array_iter(jparse_ctx_t *jctx,
                         bytes_t *key,
                         jparse_expect_cb_t cb,
-                        jparse_value_t *val,
+                        jparse_value_t *jval,
                         void *udata)
 {
     int res;
@@ -1302,7 +1328,7 @@ jparse_expect_kvp_array_iter(jparse_ctx_t *jctx,
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_array_iter(jctx, cb, val, udata)) != 0) {
+        if ((res = jparse_expect_array_iter(jctx, cb, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -1317,14 +1343,14 @@ int
 jparse_expect_skvp_array(jparse_ctx_t *jctx,
                          const char *key,
                          jparse_expect_cb_t cb,
-                         jparse_value_t *val,
+                         jparse_value_t *jval,
                          void *udata)
 {
     int res;
     bytes_t *k;
 
     k = bytes_new_from_str(key);
-    res = jparse_expect_kvp_array(jctx, k, cb, val, udata);
+    res = jparse_expect_kvp_array(jctx, k, cb, jval, udata);
     bytes_decref(&k);
     return res;
 }
@@ -1334,7 +1360,7 @@ int
 jparse_expect_anykvp_array(jparse_ctx_t *jctx,
                            bytes_t **key,
                            jparse_expect_cb_t cb,
-                           jparse_value_t *val,
+                           jparse_value_t *jval,
                            void *udata)
 {
     int res;
@@ -1348,8 +1374,8 @@ jparse_expect_anykvp_array(jparse_ctx_t *jctx,
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        val->k = *key;
-        if ((res = jparse_expect_array(jctx, cb, val, udata)) != 0) {
+        jval->k = *key;
+        if ((res = jparse_expect_array(jctx, cb, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -1364,7 +1390,7 @@ int
 jparse_expect_anykvp_array_iter(jparse_ctx_t *jctx,
                            bytes_t **key,
                            jparse_expect_cb_t cb,
-                           jparse_value_t *val,
+                           jparse_value_t *jval,
                            void *udata)
 {
     int res;
@@ -1378,8 +1404,8 @@ jparse_expect_anykvp_array_iter(jparse_ctx_t *jctx,
     }
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        val->k = *key;
-        if ((res = jparse_expect_array_iter(jctx, cb, val, udata)) != 0) {
+        jval->k = *key;
+        if ((res = jparse_expect_array_iter(jctx, cb, jval, udata)) != 0) {
             TRRET(res);
         }
     }
@@ -1393,7 +1419,7 @@ jparse_expect_anykvp_array_iter(jparse_ctx_t *jctx,
 int
 jparse_expect_object(jparse_ctx_t *jctx,
                      jparse_expect_cb_t cb,
-                     jparse_value_t *val,
+                     jparse_value_t *jval,
                      void *udata)
 {
     off_t spos;
@@ -1404,7 +1430,7 @@ jparse_expect_object(jparse_ctx_t *jctx,
         SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_OBJECT + 1);
     }
-    if ((res = cb(jctx, val, udata)) != 0) {
+    if ((res = cb(jctx, jval, udata)) != 0) {
         SPOS(&jctx->bs) = spos;
         return res;
     }
@@ -1419,7 +1445,7 @@ jparse_expect_object(jparse_ctx_t *jctx,
 int
 jparse_expect_object_iter(jparse_ctx_t *jctx,
                           jparse_expect_cb_t cb,
-                          jparse_value_t *val,
+                          jparse_value_t *jval,
                           void *udata)
 {
     off_t spos;
@@ -1431,7 +1457,7 @@ jparse_expect_object_iter(jparse_ctx_t *jctx,
         TRRET(JPARSE_EXPECT_OBJECT_ITER + 1);
     }
     spos = SPOS(&jctx->bs);
-    for (res = cb(jctx, val, udata); res == 0; res = cb(jctx, val, udata)) {
+    for (res = cb(jctx, jval, udata); res == 0; res = cb(jctx, jval, udata)) {
         ;
     }
     if (res == JPARSE_EOS || (res != 0 && spos == SPOS(&jctx->bs))) {
@@ -1454,7 +1480,7 @@ jparse_expect_object_iter(jparse_ctx_t *jctx,
 int
 jparse_expect_array(jparse_ctx_t *jctx,
                     jparse_expect_cb_t cb,
-                    jparse_value_t *val,
+                    jparse_value_t *jval,
                     void *udata)
 {
     off_t spos;
@@ -1465,7 +1491,7 @@ jparse_expect_array(jparse_ctx_t *jctx,
         SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_ARRAY + 1);
     }
-    if ((res = cb(jctx, val, udata)) != 0) {
+    if ((res = cb(jctx, jval, udata)) != 0) {
         SPOS(&jctx->bs) = spos;
         return res;
     }
@@ -1480,7 +1506,7 @@ jparse_expect_array(jparse_ctx_t *jctx,
 int
 jparse_expect_array_iter(jparse_ctx_t *jctx,
                          jparse_expect_cb_t cb,
-                         jparse_value_t *val,
+                         jparse_value_t *jval,
                          void *udata)
 {
     off_t spos;
@@ -1493,7 +1519,7 @@ jparse_expect_array_iter(jparse_ctx_t *jctx,
     }
 
     spos = SPOS(&jctx->bs);
-    for (res = cb(jctx, val, udata); res == 0; res = cb(jctx, val, udata)) {
+    for (res = cb(jctx, jval, udata); res == 0; res = cb(jctx, jval, udata)) {
         ;
     }
     if (res == JPARSE_EOS || (res != 0 && spos == SPOS(&jctx->bs))) {
@@ -1511,7 +1537,9 @@ jparse_expect_array_iter(jparse_ctx_t *jctx,
 
 
 int
-jparse_expect_item_ignore(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
+jparse_expect_item_ignore(jparse_ctx_t *jctx,
+                          jparse_value_t *jval,
+                          void *udata)
 {
     off_t spos;
     int res;
@@ -1519,7 +1547,7 @@ jparse_expect_item_ignore(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_ignore(jctx, val, udata)) != 0) {
+        if ((res = jparse_expect_ignore(jctx, jval, udata)) != 0) {
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1532,7 +1560,7 @@ jparse_expect_item_ignore(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
 
 
 int
-jparse_expect_item_any(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
+jparse_expect_item_any(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
 {
     off_t spos;
     int res;
@@ -1540,7 +1568,7 @@ jparse_expect_item_any(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_any(jctx, val, udata)) != 0) {
+        if ((res = jparse_expect_any(jctx, jval, udata)) != 0) {
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1639,7 +1667,7 @@ jparse_expect_item_bool(jparse_ctx_t *jctx, char *val, void *udata)
 int
 jparse_expect_item_object(jparse_ctx_t *jctx,
                           jparse_expect_cb_t cb,
-                          jparse_value_t *val,
+                          jparse_value_t *jval,
                           void *udata)
 {
     off_t spos;
@@ -1648,7 +1676,7 @@ jparse_expect_item_object(jparse_ctx_t *jctx,
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_object(jctx, cb, val, udata)) != 0) {
+        if ((res = jparse_expect_object(jctx, cb, jval, udata)) != 0) {
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1663,7 +1691,7 @@ jparse_expect_item_object(jparse_ctx_t *jctx,
 int
 jparse_expect_item_object_iter(jparse_ctx_t *jctx,
                                jparse_expect_cb_t cb,
-                               jparse_value_t *val,
+                               jparse_value_t *jval,
                                void *udata)
 {
     off_t spos;
@@ -1672,7 +1700,7 @@ jparse_expect_item_object_iter(jparse_ctx_t *jctx,
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_object_iter(jctx, cb, val, udata)) != 0) {
+        if ((res = jparse_expect_object_iter(jctx, cb, jval, udata)) != 0) {
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1687,7 +1715,7 @@ jparse_expect_item_object_iter(jparse_ctx_t *jctx,
 int
 jparse_expect_item_array(jparse_ctx_t *jctx,
                          jparse_expect_cb_t cb,
-                         jparse_value_t *val,
+                         jparse_value_t *jval,
                          void *udata)
 {
     off_t spos;
@@ -1696,7 +1724,7 @@ jparse_expect_item_array(jparse_ctx_t *jctx,
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_array(jctx, cb, val, udata)) != 0) {
+        if ((res = jparse_expect_array(jctx, cb, jval, udata)) != 0) {
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1711,7 +1739,7 @@ jparse_expect_item_array(jparse_ctx_t *jctx,
 int
 jparse_expect_item_array_iter(jparse_ctx_t *jctx,
                               jparse_expect_cb_t cb,
-                              jparse_value_t *val,
+                              jparse_value_t *jval,
                               void *udata)
 {
     off_t spos;
@@ -1720,7 +1748,7 @@ jparse_expect_item_array_iter(jparse_ctx_t *jctx,
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
-        if ((res = jparse_expect_array_iter(jctx, cb, val, udata)) != 0) {
+        if ((res = jparse_expect_array_iter(jctx, cb, jval, udata)) != 0) {
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1739,7 +1767,7 @@ int
 jparse_ctx_parse(jparse_ctx_t *jctx,
                  const char *fname,
                  jparse_expect_cb_t cb,
-                 jparse_value_t *val,
+                 jparse_value_t *jval,
                  void *udata)
 {
     if ((jctx->fd = open(fname, O_RDONLY)) <= 0) {
@@ -1747,7 +1775,7 @@ jparse_ctx_parse(jparse_ctx_t *jctx,
     }
     jctx->bs.read_more = bytestream_read_more;
     jctx->udata = udata;
-    return cb(jctx, val, udata);
+    return cb(jctx, jval, udata);
 }
 
 
@@ -1755,40 +1783,40 @@ int
 jparse_ctx_parse_fd(jparse_ctx_t *jctx,
                     int fd,
                     jparse_expect_cb_t cb,
-                    jparse_value_t *val,
+                    jparse_value_t *jval,
                     void *udata)
 {
     jctx->fd = fd;
     jctx->bs.read_more = bytestream_read_more;
     jctx->udata = udata;
-    return cb(jctx, val, udata);
+    return cb(jctx, jval, udata);
 }
 
 
 void
-jparse_dump_value(jparse_value_t *val)
+jparse_dump_value(jparse_value_t *jval)
 {
-    switch (val->ty) {
+    switch (jval->ty) {
     case JSON_INT:
-        TRACE("%s:%ld", JSON_TYPE_STR(val->ty), val->v.i);
+        TRACE("%s:%ld", JSON_TYPE_STR(jval->ty), jval->v.i);
         break;
 
     case JSON_FLOAT:
-        TRACE("%s:%lf", JSON_TYPE_STR(val->ty), val->v.f);
+        TRACE("%s:%lf", JSON_TYPE_STR(jval->ty), jval->v.f);
         break;
 
     case JSON_STRING:
         TRACE("%s:%s",
-              JSON_TYPE_STR(val->ty),
-              val->v.s != NULL ? (char *)val->v.s->data : "<null>");
+              JSON_TYPE_STR(jval->ty),
+              jval->v.s != NULL ? (char *)jval->v.s->data : "<null>");
         break;
 
     case JSON_BOOLEAN:
-        TRACE("%s:%s", JSON_TYPE_STR(val->ty), val->v.b ? "#t" : "#f");
+        TRACE("%s:%s", JSON_TYPE_STR(jval->ty), jval->v.b ? "#t" : "#f");
         break;
 
     default:
-        TRACE("%s:<%p>", JSON_TYPE_STR(val->ty), val);
+        TRACE("%s:<%p>", JSON_TYPE_STR(jval->ty), jval);
         break;
     }
 }
@@ -1812,9 +1840,6 @@ jparse_ctx_new(size_t mpool_chunksz, size_t bytestream_chunksz)
         FAIL("malloc");
     }
     (void)mpool_ctx_init(&jctx->mpool, mpool_chunksz);
-    jctx->_null = bytes_new_from_str_mpool(&jctx->mpool, "null");
-    jctx->_true = bytes_new_from_str_mpool(&jctx->mpool, "true");
-    jctx->_false = bytes_new_from_str_mpool(&jctx->mpool, "false");
     bytestream_init(&jctx->bs, bytestream_chunksz);
     jctx->udata = NULL;
     jctx->default_cb = NULL;
