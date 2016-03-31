@@ -502,6 +502,27 @@ bytes_urldecode(bytes_t *str)
 }
 
 
+void
+bytes_rstrip_blanks(bytes_t *str)
+{
+    ssize_t idx;
+
+    idx = str->sz - 1;
+    while (--idx >= 0) {
+        if (str->data[idx] == ' ' ||
+            str->data[idx] == '\n' ||
+            str->data[idx] == '\t') {
+            str->data[idx] = '\0';
+        } else {
+            str->data[idx + 1] = '\0';
+            break;
+        }
+    }
+    str->hash = 0;
+    str->sz = idx + 2;
+}
+
+
 /*
  * URL decode + remove spaces
  */

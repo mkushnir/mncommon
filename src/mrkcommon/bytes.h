@@ -123,6 +123,7 @@ void bytes_copy(bytes_t *, bytes_t *, size_t);
 void bytes_copyz(bytes_t *, bytes_t *, size_t);
 void bytes_brushdown(bytes_t *);
 void bytes_urldecode(bytes_t *);
+void bytes_rstrip_blanks(bytes_t *);
 bytes_t *bytes_set_lower(bytes_t *s);
 bytes_t *bytes_json_escape(bytes_t *);
 void bytes_json_unescape(bytes_t *);
