@@ -601,6 +601,7 @@ bytes_split_iter(bytes_t *str, char *delim, bytes_split_cb cb, void *udata)
             memcpy(tmp->data, p0, sz);
             *(tmp->data + sz) = '\0';
             tmp->sz = sz + 1;
+            tmp->hash = 0;
             if ((res = cb(tmp, udata)) != 0) {
                 goto end;
             }
@@ -611,6 +612,7 @@ bytes_split_iter(bytes_t *str, char *delim, bytes_split_cb cb, void *udata)
         memcpy(tmp->data, p0, sz);
         *(tmp->data + sz) = '\0';
         tmp->sz = sz + 1;
+        tmp->hash = 0;
         res = cb(tmp, udata);
     }
 
