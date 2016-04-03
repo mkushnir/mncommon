@@ -14,6 +14,9 @@ extern "C" {
 int traverse_dir(const char *,
                  int(*)(const char *, struct dirent *, void *),
                  void *);
+int traverse_dir_no_recurse(const char *,
+                            int(*)(const char *, struct dirent *, void *),
+                            void *);
 char *path_join(const char *, const char *);
 
 #ifdef __cplusplus

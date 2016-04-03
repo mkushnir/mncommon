@@ -65,6 +65,7 @@ path_join(const char *a, const char *b)
     return res;
 }
 
+
 int
 traverse_dir(const char *path,
              int(*cb)(const char *, struct dirent *, void *),
@@ -116,6 +117,62 @@ traverse_dir(const char *path,
             } else {
                 free(newpath);
                 break;
+            }
+            free(newpath);
+            newpath = NULL;
+        }
+    }
+
+    closedir(d);
+    return cb(path, NULL, udata);
+}
+
+
+int
+traverse_dir_no_recurse(const char *path,
+                        int(*cb)(const char *, struct dirent *, void *),
+                        void *udata)
+{
+    int res = 0;
+    DIR *d;
+    struct dirent *de;
+
+    //TRACE("traversing %s", path);
+
+    if ((d = opendir(path)) == NULL) {
+        return 1;
+    }
+
+    while ((de = readdir(d)) != NULL) {
+        char *newpath;
+
+        if (strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0) {
+            continue;
+        }
+
+        if (de->d_type == DT_DIR) {
+            continue;
+        } else {
+            struct stat sb;
+
+            newpath = path_join(path, de->d_name);
+
+            if (lstat(newpath, &sb) == 0) {
+                if (S_ISDIR(sb.st_mode)) {
+                    free(newpath);
+                    newpath = NULL;
+                    continue;
+                } else {
+                    if ((res = cb(path, de, udata)) != 0) {
+                        free(newpath);
+                        closedir(d);
+                        return res;
+                    }
+                }
+            } else {
+                free(newpath);
+                newpath = NULL;
+                continue;
             }
             free(newpath);
             newpath = NULL;
