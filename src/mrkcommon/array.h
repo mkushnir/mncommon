@@ -61,6 +61,7 @@ int array_index(const array_t *, void *);
 void array_copy(array_t *, const array_t *);
 void *array_get_iter(const array_t *, array_iter_t *);
 int array_clear_item(array_t *, unsigned);
+int array_clear(array_t *);
 int array_init_item(array_t *, unsigned);
 void *array_incr(array_t *);
 void *array_incr_mpool(mpool_ctx_t *, array_t *);

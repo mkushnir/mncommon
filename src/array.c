@@ -353,6 +353,23 @@ array_clear_item(array_t *ar, unsigned idx)
 
 
 int
+array_clear(array_t *ar)
+{
+    if (ar->fini != NULL) {
+        int res;
+        unsigned i;
+        for (i = 0; i < ar->elnum; ++i) {
+            if ((res = ar->fini(ar->data + i * ar->elsz)) != 0) {
+                return res;
+            }
+        }
+    }
+    ar->elnum = 0;
+    return 0;
+}
+
+
+int
 array_init_item(array_t *ar, unsigned idx)
 {
     //TRACE("idx=%d elnum=%ld", idx, ar->elnum);
