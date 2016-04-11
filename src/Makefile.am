@@ -49,7 +49,7 @@ endif
 if CONF
 conf_sources = conf.c
 conf_include_headers = mrkcommon/conf.h
-noinst_HEADERS += conf_private.h
+dist_HEADERS += conf_private.h
 endif
 
 if TRIE
