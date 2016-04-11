@@ -2,6 +2,7 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 
 distdir = $(top_srcdir)/$(PACKAGE)-$(VERSION)/src
 dist_HEADERS =
+noinst_HEADERS =
 
 BUILT_SOURCES = diag.c diag.h
 EXTRA_DIST = diag.txt gen-diag
@@ -48,7 +49,7 @@ endif
 if CONF
 conf_sources = conf.c
 conf_include_headers = mrkcommon/conf.h
-dist_HEADERS += conf_private.h
+noinst_HEADERS += conf_private.h
 endif
 
 if TRIE
