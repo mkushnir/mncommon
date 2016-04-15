@@ -46,6 +46,7 @@ typedef struct _bytestream {
 #define SEOD(stream) (stream)->eod
 #define SEDATA(stream) ((stream)->buf.data + SEOD(stream))
 #define SSIZE(stream) (stream)->buf.sz
+#define SGRSZ(stream) (stream)->growsz
 #define SNEEDMORE(stream) (SPOS(stream) >= SEOD(stream))
 #define SAVAIL(stream) (SEOD(stream) - SPOS(stream))
 #define SADVANCEEOD(stream, n) (stream)->eod += (n)
