@@ -7,6 +7,200 @@
 extern "C" {
 #endif
 
+/*
+ * json packing utils
+ */
+#pragma GCC diagnostic ignored "-Waddress"
+
+#define EQC_JCAT_CONST(bs, s) ((void)bytestream_cat(bs, sizeof(s) - 1, s))
+
+
+#define EQC_JPRINTF_PAIR_BS00(bs, key, value, comma)                   \
+do {                                                                   \
+    bytes_t *_eqc_jprintf_pair_bytes_tmp0;                             \
+    bytes_t *_eqc_jprintf_pair_bytes_tmp1;                             \
+    _eqc_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1);         \
+    (void)memcpy((char *)_eqc_jprintf_pair_bytes_tmp0->data,           \
+                 SDATA(value, 0),                                      \
+                 SEOD(value));                                         \
+    _eqc_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';            \
+    _eqc_jprintf_pair_bytes_tmp1 =                                     \
+        bytes_json_escape(_eqc_jprintf_pair_bytes_tmp0);               \
+    (void)bytestream_nprintf(                                          \
+            bs,                                                        \
+            sizeof(key) - 1 + 8 + _eqc_jprintf_pair_bytes_tmp1->sz - 1,\
+            "\"" key "\":\"%s\"" comma,                                \
+            _eqc_jprintf_pair_bytes_tmp1->data);                       \
+    BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp0);                       \
+    BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp1);                       \
+} while (false)                                                        \
+
+
+#define EQC_JPRINTF_PAIR_BS0(bs, key, value) \
+    EQC_JPRINTF_PAIR_BS00(bs, key, value, ",")
+
+#define EQC_JPRINTF_PAIR_BS1(bs, key, value) \
+    EQC_JPRINTF_PAIR_BS00(bs, key, value, "")
+
+
+#define EQC_JPRINTF_ITEM_BS00(bs, value, comma)                \
+do {                                                           \
+    bytes_t *_eqc_jprintf_pair_bytes_tmp0;                     \
+    bytes_t *_eqc_jprintf_pair_bytes_tmp1;                     \
+    _eqc_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1); \
+    (void)memcpy((char *)_eqc_jprintf_pair_bytes_tmp0->data,   \
+                 SDATA(value, 0),                              \
+                 SEOD(value));                                 \
+    _eqc_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';    \
+    _eqc_jprintf_pair_bytes_tmp1 =                             \
+        bytes_json_escape(_eqc_jprintf_pair_bytes_tmp0);       \
+    (void)bytestream_nprintf(                                  \
+            bs,                                                \
+            8 + _eqc_jprintf_pair_bytes_tmp1->sz - 1,          \
+            "\"%s\"" comma,                                    \
+            _eqc_jprintf_pair_bytes_tmp1->data);               \
+    BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp0);               \
+    BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp1);               \
+} while (false)                                                \
+
+
+#define EQC_JPRINTF_ITEM_BS0(bs, value) \
+    EQC_JPRINTF_ITEM_BS00(bs, value, ",")
+
+#define EQC_JPRINTF_ITEM_BS1(bs, value) \
+    EQC_JPRINTF_ITEM_BS00(bs, value, "")
+
+
+#define EQC_JPRINTF_PAIR_BYTES00(bs, key, value, comma)                        \
+do {                                                                           \
+    if (value != NULL) {                                                       \
+        bytes_t *_eqc_jprintf_pair_bytes_tmp;                                  \
+        _eqc_jprintf_pair_bytes_tmp = bytes_json_escape(value);                \
+        (void)bytestream_nprintf(                                              \
+                bs,                                                            \
+                sizeof(key) - 1 + 8 + _eqc_jprintf_pair_bytes_tmp->sz - 1,     \
+                "\"" key "\":\"%s\"" comma,                                    \
+                _eqc_jprintf_pair_bytes_tmp->data);                            \
+        BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp);                            \
+    } else {                                                                   \
+        (void)bytestream_nprintf(                                              \
+                bs,                                                            \
+                sizeof(key) - 1 + 8,                                           \
+                "\"" key "\":null" comma);                                     \
+    }                                                                          \
+} while (false)                                                                \
+
+
+#define EQC_JPRINTF_PAIR_BYTES0(bs, key, value) \
+    EQC_JPRINTF_PAIR_BYTES00(bs, key, value, ",")
+
+#define EQC_JPRINTF_PAIR_BYTES1(bs, key, value) \
+    EQC_JPRINTF_PAIR_BYTES00(bs, key, value, "")
+
+
+#define EQC_JPRINTF_ITEM_BYTES00(bs, value, comma)             \
+do {                                                           \
+    if (value != NULL) {                                       \
+        bytes_t *_eqc_jprintf_pair_bytes_tmp;                  \
+        _eqc_jprintf_pair_bytes_tmp = bytes_json_escape(value);\
+        (void)bytestream_nprintf(                              \
+                bs,                                            \
+                8 + _eqc_jprintf_pair_bytes_tmp->sz - 1,       \
+                "\"%s\"" comma,                                \
+                _eqc_jprintf_pair_bytes_tmp->data);            \
+        BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp);            \
+    } else {                                                   \
+        (void)bytestream_nprintf( bs, 8, "null" comma);        \
+    }                                                          \
+} while (false)                                                \
+
+
+#define EQC_JPRINTF_ITEM_BYTES0(bs, value) \
+    EQC_JPRINTF_ITEM_BYTES00(bs, value, ",")
+
+#define EQC_JPRINTF_ITEM_BYTES1(bs, value) \
+    EQC_JPRINTF_ITEM_BYTES00(bs, value, "")
+
+
+#define EQC_JPRINTF_PAIR_INT00(bs, key, value, comma)  \
+    (void)bytestream_nprintf(                          \
+            bs,                                        \
+            sizeof(key) - 1 + 8 + 1024,                \
+            "\"" key "\":%ld" comma, (intmax_t)value)  \
+
+
+#define EQC_JPRINTF_PAIR_INT0(bs, key, value) \
+    EQC_JPRINTF_PAIR_INT00(bs, key, value, ",")
+
+#define EQC_JPRINTF_PAIR_INT1(bs, key, value) \
+    EQC_JPRINTF_PAIR_INT00(bs, key, value, "")
+
+
+#define EQC_JPRINTF_ITEM_INT00(bs, value, comma)                       \
+    (void)bytestream_nprintf( bs, 1024, "%ld" comma, (intmax_t)value)  \
+
+
+#define EQC_JPRINTF_ITEM_INT0(bs, value) \
+    EQC_JPRINTF_ITEM_INT00(bs, value, ",")
+
+#define EQC_JPRINTF_ITEM_INT1(bs, value) \
+    EQC_JPRINTF_ITEM_INT00(bs, value, "")
+
+
+
+#define EQC_JPRINTF_PAIR_FLOAT00(bs, key, value, comma)\
+    (void)bytestream_nprintf(                          \
+            bs,                                        \
+            sizeof(key) - 1 + 4 + 1024,                \
+            "\"" key "\":%lf" comma, (double)value)    \
+
+
+#define EQC_JPRINTF_PAIR_FLOAT0(bs, key, value) \
+    EQC_JPRINTF_PAIR_FLOAT00(bs, key, value, ",")
+
+#define EQC_JPRINTF_PAIR_FLOAT1(bs, key, value) \
+    EQC_JPRINTF_PAIR_FLOAT00(bs, key, value, "")
+
+
+#define EQC_JPRINTF_ITEM_FLOAT00(bs, value, comma)                     \
+    (void)bytestream_nprintf( bs, 1024, "%lf" comma, (double)value)    \
+
+
+#define EQC_JPRINTF_ITEM_FLOAT0(bs, value) \
+    EQC_JPRINTF_ITEM_FLOAT00(bs, value, ",")
+
+#define EQC_JPRINTF_ITEM_FLOAT1(bs, value) \
+    EQC_JPRINTF_ITEM_FLOAT00(bs, value, "")
+
+
+#define EQC_JPRINTF_PAIR_BOOL00(bs, key, value, comma)         \
+    (void)bytestream_nprintf(                                  \
+            bs,                                                \
+            sizeof(key) - 1 + 32,                              \
+            "\"" key "\":%s" comma, value ? "true" : "false")  \
+
+
+#define EQC_JPRINTF_PAIR_BOOL0(bs, key, value) \
+    EQC_JPRINTF_PAIR_BOOL00(bs, key, value, ",")
+
+#define EQC_JPRINTF_PAIR_BOOL1(bs, key, value) \
+    EQC_JPRINTF_PAIR_BOOL00(bs, key, value, "")
+
+
+#define EQC_JPRINTF_ITEM_BOOL00(bs, value, comma)                              \
+    (void)bytestream_nprintf( bs, 16, "%s" comma, value ? "true" : "false")    \
+
+
+#define EQC_JPRINTF_ITEM_BOOL0(bs, value) \
+    EQC_JPRINTF_ITEM_BOOL00(bs, value, ",")
+
+#define EQC_JPRINTF_ITEM_BOOL1(bs, value) \
+    EQC_JPRINTF_ITEM_BOOL00(bs, value, "")
+
+
+/*
+ * json types
+ */
 typedef enum _json_type {
     JSON_OBJECT,
     JSON_ARRAY,
