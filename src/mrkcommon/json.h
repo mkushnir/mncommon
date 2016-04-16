@@ -12,10 +12,10 @@ extern "C" {
  */
 #pragma GCC diagnostic ignored "-Waddress"
 
-#define EQC_JCAT_CONST(bs, s) ((void)bytestream_cat(bs, sizeof(s) - 1, s))
+#define MRK_JCAT_CONST(bs, s) ((void)bytestream_cat(bs, sizeof(s) - 1, s))
 
 
-#define EQC_JPRINTF_PAIR_BS00(bs, key, value, comma)                   \
+#define MRK_JPRINTF_PAIR_BS00(bs, key, value, comma)                   \
 do {                                                                   \
     bytes_t *_eqc_jprintf_pair_bytes_tmp0;                             \
     bytes_t *_eqc_jprintf_pair_bytes_tmp1;                             \
@@ -36,14 +36,14 @@ do {                                                                   \
 } while (false)                                                        \
 
 
-#define EQC_JPRINTF_PAIR_BS0(bs, key, value) \
-    EQC_JPRINTF_PAIR_BS00(bs, key, value, ",")
+#define MRK_JPRINTF_PAIR_BS0(bs, key, value) \
+    MRK_JPRINTF_PAIR_BS00(bs, key, value, ",")
 
-#define EQC_JPRINTF_PAIR_BS1(bs, key, value) \
-    EQC_JPRINTF_PAIR_BS00(bs, key, value, "")
+#define MRK_JPRINTF_PAIR_BS1(bs, key, value) \
+    MRK_JPRINTF_PAIR_BS00(bs, key, value, "")
 
 
-#define EQC_JPRINTF_ITEM_BS00(bs, value, comma)                \
+#define MRK_JPRINTF_ITEM_BS00(bs, value, comma)                \
 do {                                                           \
     bytes_t *_eqc_jprintf_pair_bytes_tmp0;                     \
     bytes_t *_eqc_jprintf_pair_bytes_tmp1;                     \
@@ -64,14 +64,14 @@ do {                                                           \
 } while (false)                                                \
 
 
-#define EQC_JPRINTF_ITEM_BS0(bs, value) \
-    EQC_JPRINTF_ITEM_BS00(bs, value, ",")
+#define MRK_JPRINTF_ITEM_BS0(bs, value) \
+    MRK_JPRINTF_ITEM_BS00(bs, value, ",")
 
-#define EQC_JPRINTF_ITEM_BS1(bs, value) \
-    EQC_JPRINTF_ITEM_BS00(bs, value, "")
+#define MRK_JPRINTF_ITEM_BS1(bs, value) \
+    MRK_JPRINTF_ITEM_BS00(bs, value, "")
 
 
-#define EQC_JPRINTF_PAIR_BYTES00(bs, key, value, comma)                        \
+#define MRK_JPRINTF_PAIR_BYTES00(bs, key, value, comma)                        \
 do {                                                                           \
     if (value != NULL) {                                                       \
         bytes_t *_eqc_jprintf_pair_bytes_tmp;                                  \
@@ -91,14 +91,14 @@ do {                                                                           \
 } while (false)                                                                \
 
 
-#define EQC_JPRINTF_PAIR_BYTES0(bs, key, value) \
-    EQC_JPRINTF_PAIR_BYTES00(bs, key, value, ",")
+#define MRK_JPRINTF_PAIR_BYTES0(bs, key, value) \
+    MRK_JPRINTF_PAIR_BYTES00(bs, key, value, ",")
 
-#define EQC_JPRINTF_PAIR_BYTES1(bs, key, value) \
-    EQC_JPRINTF_PAIR_BYTES00(bs, key, value, "")
+#define MRK_JPRINTF_PAIR_BYTES1(bs, key, value) \
+    MRK_JPRINTF_PAIR_BYTES00(bs, key, value, "")
 
 
-#define EQC_JPRINTF_ITEM_BYTES00(bs, value, comma)             \
+#define MRK_JPRINTF_ITEM_BYTES00(bs, value, comma)             \
 do {                                                           \
     if (value != NULL) {                                       \
         bytes_t *_eqc_jprintf_pair_bytes_tmp;                  \
@@ -115,87 +115,87 @@ do {                                                           \
 } while (false)                                                \
 
 
-#define EQC_JPRINTF_ITEM_BYTES0(bs, value) \
-    EQC_JPRINTF_ITEM_BYTES00(bs, value, ",")
+#define MRK_JPRINTF_ITEM_BYTES0(bs, value) \
+    MRK_JPRINTF_ITEM_BYTES00(bs, value, ",")
 
-#define EQC_JPRINTF_ITEM_BYTES1(bs, value) \
-    EQC_JPRINTF_ITEM_BYTES00(bs, value, "")
+#define MRK_JPRINTF_ITEM_BYTES1(bs, value) \
+    MRK_JPRINTF_ITEM_BYTES00(bs, value, "")
 
 
-#define EQC_JPRINTF_PAIR_INT00(bs, key, value, comma)  \
+#define MRK_JPRINTF_PAIR_INT00(bs, key, value, comma)  \
     (void)bytestream_nprintf(                          \
             bs,                                        \
             sizeof(key) - 1 + 8 + 1024,                \
             "\"" key "\":%ld" comma, (intmax_t)value)  \
 
 
-#define EQC_JPRINTF_PAIR_INT0(bs, key, value) \
-    EQC_JPRINTF_PAIR_INT00(bs, key, value, ",")
+#define MRK_JPRINTF_PAIR_INT0(bs, key, value) \
+    MRK_JPRINTF_PAIR_INT00(bs, key, value, ",")
 
-#define EQC_JPRINTF_PAIR_INT1(bs, key, value) \
-    EQC_JPRINTF_PAIR_INT00(bs, key, value, "")
+#define MRK_JPRINTF_PAIR_INT1(bs, key, value) \
+    MRK_JPRINTF_PAIR_INT00(bs, key, value, "")
 
 
-#define EQC_JPRINTF_ITEM_INT00(bs, value, comma)                       \
+#define MRK_JPRINTF_ITEM_INT00(bs, value, comma)                       \
     (void)bytestream_nprintf( bs, 1024, "%ld" comma, (intmax_t)value)  \
 
 
-#define EQC_JPRINTF_ITEM_INT0(bs, value) \
-    EQC_JPRINTF_ITEM_INT00(bs, value, ",")
+#define MRK_JPRINTF_ITEM_INT0(bs, value) \
+    MRK_JPRINTF_ITEM_INT00(bs, value, ",")
 
-#define EQC_JPRINTF_ITEM_INT1(bs, value) \
-    EQC_JPRINTF_ITEM_INT00(bs, value, "")
+#define MRK_JPRINTF_ITEM_INT1(bs, value) \
+    MRK_JPRINTF_ITEM_INT00(bs, value, "")
 
 
 
-#define EQC_JPRINTF_PAIR_FLOAT00(bs, key, value, comma)\
+#define MRK_JPRINTF_PAIR_FLOAT00(bs, key, value, comma)\
     (void)bytestream_nprintf(                          \
             bs,                                        \
             sizeof(key) - 1 + 4 + 1024,                \
             "\"" key "\":%lf" comma, (double)value)    \
 
 
-#define EQC_JPRINTF_PAIR_FLOAT0(bs, key, value) \
-    EQC_JPRINTF_PAIR_FLOAT00(bs, key, value, ",")
+#define MRK_JPRINTF_PAIR_FLOAT0(bs, key, value) \
+    MRK_JPRINTF_PAIR_FLOAT00(bs, key, value, ",")
 
-#define EQC_JPRINTF_PAIR_FLOAT1(bs, key, value) \
-    EQC_JPRINTF_PAIR_FLOAT00(bs, key, value, "")
+#define MRK_JPRINTF_PAIR_FLOAT1(bs, key, value) \
+    MRK_JPRINTF_PAIR_FLOAT00(bs, key, value, "")
 
 
-#define EQC_JPRINTF_ITEM_FLOAT00(bs, value, comma)                     \
+#define MRK_JPRINTF_ITEM_FLOAT00(bs, value, comma)                     \
     (void)bytestream_nprintf( bs, 1024, "%lf" comma, (double)value)    \
 
 
-#define EQC_JPRINTF_ITEM_FLOAT0(bs, value) \
-    EQC_JPRINTF_ITEM_FLOAT00(bs, value, ",")
+#define MRK_JPRINTF_ITEM_FLOAT0(bs, value) \
+    MRK_JPRINTF_ITEM_FLOAT00(bs, value, ",")
 
-#define EQC_JPRINTF_ITEM_FLOAT1(bs, value) \
-    EQC_JPRINTF_ITEM_FLOAT00(bs, value, "")
+#define MRK_JPRINTF_ITEM_FLOAT1(bs, value) \
+    MRK_JPRINTF_ITEM_FLOAT00(bs, value, "")
 
 
-#define EQC_JPRINTF_PAIR_BOOL00(bs, key, value, comma)         \
+#define MRK_JPRINTF_PAIR_BOOL00(bs, key, value, comma)         \
     (void)bytestream_nprintf(                                  \
             bs,                                                \
             sizeof(key) - 1 + 32,                              \
             "\"" key "\":%s" comma, value ? "true" : "false")  \
 
 
-#define EQC_JPRINTF_PAIR_BOOL0(bs, key, value) \
-    EQC_JPRINTF_PAIR_BOOL00(bs, key, value, ",")
+#define MRK_JPRINTF_PAIR_BOOL0(bs, key, value) \
+    MRK_JPRINTF_PAIR_BOOL00(bs, key, value, ",")
 
-#define EQC_JPRINTF_PAIR_BOOL1(bs, key, value) \
-    EQC_JPRINTF_PAIR_BOOL00(bs, key, value, "")
+#define MRK_JPRINTF_PAIR_BOOL1(bs, key, value) \
+    MRK_JPRINTF_PAIR_BOOL00(bs, key, value, "")
 
 
-#define EQC_JPRINTF_ITEM_BOOL00(bs, value, comma)                              \
+#define MRK_JPRINTF_ITEM_BOOL00(bs, value, comma)                              \
     (void)bytestream_nprintf( bs, 16, "%s" comma, value ? "true" : "false")    \
 
 
-#define EQC_JPRINTF_ITEM_BOOL0(bs, value) \
-    EQC_JPRINTF_ITEM_BOOL00(bs, value, ",")
+#define MRK_JPRINTF_ITEM_BOOL0(bs, value) \
+    MRK_JPRINTF_ITEM_BOOL00(bs, value, ",")
 
-#define EQC_JPRINTF_ITEM_BOOL1(bs, value) \
-    EQC_JPRINTF_ITEM_BOOL00(bs, value, "")
+#define MRK_JPRINTF_ITEM_BOOL1(bs, value) \
+    MRK_JPRINTF_ITEM_BOOL00(bs, value, "")
 
 
 /*
