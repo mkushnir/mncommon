@@ -1768,6 +1768,37 @@ jparse_expect_item_array_iter(jparse_ctx_t *jctx,
 
 
 /*
+ *
+ */
+DEF_JPARSE_ARRAY_ITERATOR(ai, jparse_expect_item_ignore)
+
+DEF_JPARSE_OBJECT_ITERATOR(oi, jparse_expect_anykvp_ignore)
+
+int
+jparse_ignore_nonscalar(jparse_ctx_t *jctx,
+                        jparse_value_t *jval,
+                        UNUSED void *udata)
+{
+    int res;
+    jparse_value_t _jval;
+
+    res = 0;
+    jparse_value_init(&_jval);
+    _jval.cb = jparse_ignore_nonscalar;
+    if (jval->ty == JSON_ARRAY) {
+        //TRACE("ignoring: %s", jval->k->data);
+        res = REF_JPARSE_ARRAY_ITERATOR(ai)(jctx, &_jval, NULL);
+    } else if (jval->ty == JSON_OBJECT) {
+        //TRACE("ignoring: %s", jval->k->data);
+        res = REF_JPARSE_OBJECT_ITERATOR(oi)(jctx, &_jval, NULL);
+    } else {
+        FAIL("jparse_ignore_nonscalar");
+    }
+    return res;
+}
+
+
+/*
  * parse
  */
 int

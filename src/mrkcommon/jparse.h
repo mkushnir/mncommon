@@ -420,6 +420,7 @@ DECL_JPARSE_OBJECT_ITERATOR(it)                        \
 }                                                      \
 
 
+int jparse_ignore_nonscalar(jparse_ctx_t *, jparse_value_t *, void *);
 
 void jparse_dump_current_pos(jparse_ctx_t *, ssize_t);
 jparse_ctx_t *jparse_ctx_new(size_t, size_t);
