@@ -423,12 +423,17 @@ int jparse_ctx_parse(jparse_ctx_t *,
                      jparse_expect_cb_t,
                      jparse_value_t *,
                      void *);
-int
-jparse_ctx_parse_fd(jparse_ctx_t *,
-                    int,
-                    jparse_expect_cb_t,
-                    jparse_value_t *,
-                    void *);
+int jparse_ctx_parse_fd(jparse_ctx_t *,
+                        int,
+                        jparse_expect_cb_t,
+                        jparse_value_t *,
+                        void *);
+int jparse_ctx_parse_data(jparse_ctx_t *,
+                          const char *,
+                          size_t,
+                          jparse_expect_cb_t,
+                          jparse_value_t *,
+                          void *);
 void jparse_dump_value(jparse_value_t *);
 
 #ifdef __cplusplus

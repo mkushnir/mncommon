@@ -1793,6 +1793,37 @@ jparse_ctx_parse_fd(jparse_ctx_t *jctx,
 }
 
 
+static ssize_t
+_jparse_ctx_parse_data_read_more(UNUSED bytestream_t *bs,
+                                 UNUSED int fd,
+                                 UNUSED ssize_t sz)
+{
+    return 0;
+}
+
+
+int
+jparse_ctx_parse_data(jparse_ctx_t *jctx,
+                      const char *data,
+                      size_t sz,
+                      jparse_expect_cb_t cb,
+                      jparse_value_t *jval,
+                      void *udata)
+{
+    int res;
+
+    bytestream_fini(&jctx->bs);
+    jctx->bs.buf.data = (char *)data;
+    jctx->bs.buf.sz = sz;
+    jctx->bs.eod = sz;
+    jctx->bs.read_more = _jparse_ctx_parse_data_read_more;
+    jctx->udata = udata;
+    res = cb(jctx, jval, udata);
+    jctx->bs.buf.data = NULL;
+    return res;
+}
+
+
 void
 jparse_dump_value(jparse_value_t *jval)
 {
