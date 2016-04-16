@@ -778,9 +778,10 @@ jparse_expect_skvp_any(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *k;
-    k = bytes_new_from_str(key);
+    //k = bytes_new_from_str(key);
+    k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_any(jctx, k, jval, udata);
-    bytes_decref(&k);
+    //BYTES_DECREF(&k);
     return res;
 }
 
@@ -880,9 +881,10 @@ jparse_expect_skvp_int(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *k;
-    k = bytes_new_from_str(key);
+    //k = bytes_new_from_str(key);
+    k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_int(jctx, k, val, udata);
-    bytes_decref(&k);
+    //BYTES_DECREF(&k);
     return res;
 }
 
@@ -953,9 +955,10 @@ jparse_expect_skvp_float(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *k;
-    k = bytes_new_from_str(key);
+    //k = bytes_new_from_str(key);
+    k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_float(jctx, k, val, udata);
-    bytes_decref(&k);
+    //BYTES_DECREF(&k);
     return res;
 }
 
@@ -1027,9 +1030,10 @@ jparse_expect_skvp_str(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *k;
-    k = bytes_new_from_str(key);
+    //k = bytes_new_from_str(key);
+    k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_str(jctx, k, val, udata);
-    bytes_decref(&k);
+    //BYTES_DECREF(&k);
     return res;
 }
 
@@ -1101,9 +1105,10 @@ jparse_expect_skvp_bool(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *k;
-    k = bytes_new_from_str(key);
+    //k = bytes_new_from_str(key);
+    k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_bool(jctx, k, val, udata);
-    bytes_decref(&k);
+    //BYTES_DECREF(&k);
     return res;
 }
 
@@ -1208,9 +1213,10 @@ jparse_expect_skvp_object(jparse_ctx_t *jctx,
     int res;
     bytes_t *k;
 
-    k = bytes_new_from_str(key);
+    //k = bytes_new_from_str(key);
+    k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_object(jctx, k, cb, jval, udata);
-    bytes_decref(&k);
+    //BYTES_DECREF(&k);
     return res;
 }
 
@@ -1349,9 +1355,10 @@ jparse_expect_skvp_array(jparse_ctx_t *jctx,
     int res;
     bytes_t *k;
 
-    k = bytes_new_from_str(key);
+    //k = bytes_new_from_str(key);
+    k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_array(jctx, k, cb, jval, udata);
-    bytes_decref(&k);
+    //BYTES_DECREF(&k);
     return res;
 }
 
