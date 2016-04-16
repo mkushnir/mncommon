@@ -32,6 +32,12 @@ typedef struct _jparse_value {
     json_type_t ty;
 } jparse_value_t;
 
+#define JPARSE_CAST_NUM(jval, ty_)                     \
+    ((jval)->ty == JSON_FLOAT) ? (ty_)(jval)->v.f :    \
+    ((jval)->ty == JSON_INT) ? (ty_)(jval)->v.i :      \
+    ((jval)->ty == JSON_BOOLEAN) ? (ty_)(jval)->v.b :  \
+    (ty_)0                                             \
+
 typedef struct _jparse_ctx {
     mpool_ctx_t mpool;
     bytes_t *_null;
