@@ -8,13 +8,6 @@
 extern "C" {
 #endif
 
-/*
- * This macro is also defined in snproto_bytes.h for a different structure.
- * Surprisingly, it appears to be exactly the same.
- *
- */
-#define BDATA(b) ((b) != NULL ? (b)->data : NULL)
-
 typedef struct _byterange {
     off_t start;
     off_t end;

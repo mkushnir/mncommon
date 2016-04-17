@@ -47,6 +47,9 @@ typedef struct _bytes {
 } bytes_t;
 
 
+#define BDATA(b) ((b) != NULL ? (b)->data : NULL)
+
+
 #define BYTES_INITIALIZER(s)   \
 {                              \
     .nref = 0x40000000,        \
@@ -55,7 +58,6 @@ typedef struct _bytes {
     .data = s                  \
 }                              \
 
-#define BDATA(s) ((s) != NULL ? (s)->data : NULL)
 
 #define BYTES_INCREF(b)                        \
 do {                                           \
