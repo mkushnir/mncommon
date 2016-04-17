@@ -55,6 +55,7 @@ typedef struct _bytes {
     .data = s                  \
 }                              \
 
+#define BDATA(s) ((s) != NULL ? (s)->data : NULL)
 
 #define BYTES_INCREF(b)                        \
 do {                                           \
