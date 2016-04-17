@@ -202,6 +202,7 @@ do {                                                           \
  * json types
  */
 typedef enum _json_type {
+    JSON_UNDEF,
     JSON_OBJECT,
     JSON_ARRAY,
     JSON_STRING,
@@ -211,16 +212,18 @@ typedef enum _json_type {
     JSON_NULL,
 } json_type_t;
 
-#define JSON_TYPE_STR(ty) ( \
-    (ty) == JSON_OBJECT ? "OBJECT" : \
-    (ty) == JSON_ARRAY ? "ARRAY" : \
-    (ty) == JSON_STRING ? "STRING" : \
-    (ty) == JSON_INT ? "INT" : \
-    (ty) == JSON_FLOAT ? "FLOAT" : \
+#define JSON_TYPE_STR(ty) (            \
+    (ty) == JSON_UNDEF ? "UNDEF" :     \
+    (ty) == JSON_OBJECT ? "OBJECT" :   \
+    (ty) == JSON_ARRAY ? "ARRAY" :     \
+    (ty) == JSON_STRING ? "STRING" :   \
+    (ty) == JSON_INT ? "INT" :         \
+    (ty) == JSON_FLOAT ? "FLOAT" :     \
     (ty) == JSON_BOOLEAN ? "BOOLEAN" : \
-    (ty) == JSON_NULL ? "NULL" : \
-    "<unknown>" \
-)
+    (ty) == JSON_NULL ? "NULL" :       \
+    "<unknown>"                        \
+)                                      \
+
 
 struct _json_ctx;
 typedef int (*json_cb) (struct _json_ctx *, void *);

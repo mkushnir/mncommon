@@ -122,6 +122,9 @@ reach_blank(jparse_ctx_t *jctx)
             TRACE("failing %c at %ld", ch, SPOS(&jctx->bs));                   \
             jparse_dump_current_pos(jctx, 16);                                 \
  */                                                                            \
+            if (jctx->errorpos == -1) {                                        \
+                jctx->errorpos = SPOS(&jctx->bs);                              \
+            }                                                                  \
             SPOS(&jctx->bs) = spos;                                            \
             res = msg + 2;                                                     \
             break;                                                             \
@@ -150,6 +153,9 @@ reach_blank(jparse_ctx_t *jctx)
             SINCR(&jctx->bs);                                                  \
         } else {                                                               \
             /* TRACE("failing %c at %ld", ch, SPOS(&jctx->bs)); */             \
+            if (jctx->errorpos == -1) {                                        \
+                jctx->errorpos = SPOS(&jctx->bs);                              \
+            }                                                                  \
             SPOS(&jctx->bs) = spos;                                            \
             res = msg + 2;                                                     \
             break;                                                             \
@@ -267,7 +273,7 @@ jparse_value_init(jparse_value_t *jval)
     jval->v.s = NULL;
     jval->cb = NULL;
     jval->udata = NULL;
-    jval->ty = JSON_NULL;
+    jval->ty = JSON_UNDEF;
 }
 
 
@@ -298,6 +304,7 @@ jparse_expect_ignore(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
     int res;
     off_t start;
 
+    jctx->errorpos = -1;
     if (reach_nonblank(jctx) != 0) {
         TRRET(JPARSE_EXPECT_IGNORE + 1);
     }
@@ -344,6 +351,9 @@ jparse_expect_ignore(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
         }
     }
 
+    if (jctx->errorpos == -1) {
+        jctx->errorpos = SPOS(&jctx->bs);
+    }
     SPOS(&jctx->bs) = start;
     res = JPARSE_EXPECT_IGNORE + 1;
 
@@ -358,6 +368,7 @@ jparse_expect_any(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
     int res;
     off_t start;
 
+    jctx->errorpos = -1;
     if (reach_nonblank(jctx) != 0) {
         TRRET(JPARSE_EXPECT_ANY + 1);
     }
@@ -403,6 +414,9 @@ jparse_expect_any(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
         }
     }
 
+    if (jctx->errorpos == -1) {
+        jctx->errorpos = SPOS(&jctx->bs);
+    }
     SPOS(&jctx->bs) = start;
     res = JPARSE_EXPECT_ANY + 2;
 
@@ -418,6 +432,7 @@ jparse_expect_tok(jparse_ctx_t *jctx, bytes_t **val)
     off_t start, stop;
     size_t sz;
 
+    jctx->errorpos = -1;
     if (reach_nonblank(jctx) != 0) {
         TRRET(JPARSE_EXPECT_TOK + 1);
     }
@@ -457,11 +472,15 @@ expect_maybe_null(jparse_ctx_t *jctx)
     bytes_t *v;
     off_t spos;
 
+    jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
     if (jparse_expect_tok(jctx, &v) == 0) {
         if (bytes_cmp(v, &_null) == 0) {
             return 0;
         }
+    }
+    if (jctx->errorpos == -1) {
+        jctx->errorpos = SPOS(&jctx->bs);
     }
     SPOS(&jctx->bs) = spos;
     return -2;
@@ -474,6 +493,7 @@ jparse_expect_int(jparse_ctx_t *jctx, long *val, UNUSED void *udata)
     off_t spos;
     int st, res, sign;
 
+    jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
     if (reach_nonblank(jctx) != 0) {
         TRRET(JPARSE_EXPECT_INT + 1);
@@ -506,6 +526,9 @@ jparse_expect_int(jparse_ctx_t *jctx, long *val, UNUSED void *udata)
                 st = JPS_NUM;
             } else {
                 res = JPARSE_EXPECT_INT + 1;
+                if (jctx->errorpos == -1) {
+                    jctx->errorpos = SPOS(&jctx->bs);
+                }
                 SPOS(&jctx->bs) = spos;
                 break;
             }
@@ -519,6 +542,9 @@ jparse_expect_int(jparse_ctx_t *jctx, long *val, UNUSED void *udata)
             }
         } else {
             res = JPARSE_EXPECT_INT + 2;
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             break;
         }
@@ -544,6 +570,7 @@ jparse_expect_float(jparse_ctx_t *jctx, double *val, UNUSED void *udata)
     UNUSED off_t stop;
     char *endptr;
 
+    jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
     if (reach_nonblank(jctx) != 0) {
         TRRET(JPARSE_EXPECT_FLOAT + 1);
@@ -618,6 +645,9 @@ jparse_expect_float(jparse_ctx_t *jctx, double *val, UNUSED void *udata)
 
         } else {
             res = JPARSE_EXPECT_INT + 2;
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             break;
         }
@@ -646,8 +676,12 @@ jparse_expect_str(jparse_ctx_t *jctx, bytes_t **val, UNUSED void *udata)
     off_t start, stop, spos;
     size_t sz;
 
+    jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
     if (reach_dquote(jctx) != 0) {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_STR + 1);
     }
@@ -693,6 +727,9 @@ jparse_expect_str(jparse_ctx_t *jctx, bytes_t **val, UNUSED void *udata)
             }
         } else {
             res = JPARSE_EXPECT_STR + 3;
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             break;
         }
@@ -718,6 +755,7 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val, UNUSED void *udata)
     off_t spos;
     bytes_t *v;
 
+    jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
     if (jparse_expect_tok(jctx, &v) == 0) {
         if (bytes_cmp(v, &_true) == 0) {
@@ -727,9 +765,15 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val, UNUSED void *udata)
             *val = 0;
             return 0;
         } else {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(JPARSE_EXPECT_BOOL + 1);
         }
+    }
+    if (jctx->errorpos == -1) {
+        jctx->errorpos = SPOS(&jctx->bs);
     }
     SPOS(&jctx->bs) = spos;
     TRRET(JPARSE_EXPECT_BOOL + 2);
@@ -747,6 +791,8 @@ jparse_expect_kvp_any(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *v;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_ANY + 1);
@@ -778,6 +824,8 @@ jparse_expect_skvp_any(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *k;
+
+    jctx->errorpos = -1;
     //k = bytes_new_from_str(key);
     k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_any(jctx, k, jval, udata);
@@ -793,6 +841,8 @@ jparse_expect_anykvp_ignore(jparse_ctx_t *jctx,
                             void *udata)
 {
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_IGNORE + 1);
@@ -821,6 +871,8 @@ jparse_expect_anykvp_any(jparse_ctx_t *jctx,
                          void *udata)
 {
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_ANY + 1);
@@ -849,6 +901,8 @@ jparse_expect_kvp_int(jparse_ctx_t *jctx,
                       void *udata)
 {
     int res;
+
+    jctx->errorpos = -1;
     bytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
@@ -880,6 +934,8 @@ jparse_expect_skvp_int(jparse_ctx_t *jctx,
                        void *udata)
 {
     int res;
+
+    jctx->errorpos = -1;
     bytes_t *k;
     //k = bytes_new_from_str(key);
     k = bytes_new_from_str_mpool(&jctx->mpool, key);
@@ -896,6 +952,8 @@ jparse_expect_anykvp_int(jparse_ctx_t *jctx,
                          void *udata)
 {
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_INT + 1);
@@ -923,6 +981,8 @@ jparse_expect_kvp_float(jparse_ctx_t *jctx,
                       void *udata)
 {
     int res;
+
+    jctx->errorpos = -1;
     bytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
@@ -954,6 +1014,8 @@ jparse_expect_skvp_float(jparse_ctx_t *jctx,
                          void *udata)
 {
     int res;
+
+    jctx->errorpos = -1;
     bytes_t *k;
     //k = bytes_new_from_str(key);
     k = bytes_new_from_str_mpool(&jctx->mpool, key);
@@ -971,6 +1033,7 @@ jparse_expect_anykvp_float(jparse_ctx_t *jctx,
 {
     int res;
 
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_FLOAT + 1);
@@ -999,6 +1062,8 @@ jparse_expect_kvp_str(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *v;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_STR + 1);
@@ -1046,6 +1111,7 @@ jparse_expect_anykvp_str(jparse_ctx_t *jctx,
 {
     int res;
 
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_STR + 1);
@@ -1074,6 +1140,8 @@ jparse_expect_kvp_bool(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *v;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_BOOL + 1);
@@ -1105,6 +1173,8 @@ jparse_expect_skvp_bool(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *k;
+
+    jctx->errorpos = -1;
     //k = bytes_new_from_str(key);
     k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_bool(jctx, k, val, udata);
@@ -1121,6 +1191,7 @@ jparse_expect_anykvp_bool(jparse_ctx_t *jctx,
 {
     int res;
 
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_BOOL + 1);
@@ -1149,6 +1220,8 @@ jparse_expect_kvp_object(jparse_ctx_t *jctx,
                       void *udata)
 {
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, &jval->k, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_OBJECT + 1);
@@ -1180,6 +1253,8 @@ jparse_expect_kvp_object_iter(jparse_ctx_t *jctx,
                       void *udata)
 {
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, &jval->k, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_OBJECT_ITER + 1);
@@ -1213,6 +1288,7 @@ jparse_expect_skvp_object(jparse_ctx_t *jctx,
     int res;
     bytes_t *k;
 
+    jctx->errorpos = -1;
     //k = bytes_new_from_str(key);
     k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_object(jctx, k, cb, jval, udata);
@@ -1230,6 +1306,7 @@ jparse_expect_anykvp_object(jparse_ctx_t *jctx,
 {
     int res;
 
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_OBJECT + 1);
@@ -1260,6 +1337,7 @@ jparse_expect_anykvp_object_iter(jparse_ctx_t *jctx,
 {
     int res;
 
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_OBJECT_ITER + 1);
@@ -1290,6 +1368,8 @@ jparse_expect_kvp_array(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *v;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_ARRAY + 1);
@@ -1322,6 +1402,8 @@ jparse_expect_kvp_array_iter(jparse_ctx_t *jctx,
 {
     int res;
     bytes_t *v;
+
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_ARRAY_ITER + 1);
@@ -1355,6 +1437,7 @@ jparse_expect_skvp_array(jparse_ctx_t *jctx,
     int res;
     bytes_t *k;
 
+    jctx->errorpos = -1;
     //k = bytes_new_from_str(key);
     k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_array(jctx, k, cb, jval, udata);
@@ -1372,6 +1455,7 @@ jparse_expect_anykvp_array(jparse_ctx_t *jctx,
 {
     int res;
 
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_ARRAY + 1);
@@ -1402,6 +1486,7 @@ jparse_expect_anykvp_array_iter(jparse_ctx_t *jctx,
 {
     int res;
 
+    jctx->errorpos = -1;
     res = 0;
     if (jparse_expect_str(jctx, key, udata) != 0) {
         TRRET(JPARSE_EXPECT_ANYKVP_ARRAY_ITER + 1);
@@ -1432,16 +1517,26 @@ jparse_expect_object(jparse_ctx_t *jctx,
     off_t spos;
     int res;
 
+    jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
     if (reach_ostart(jctx) != 0) {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_OBJECT + 1);
     }
     if ((res = cb(jctx, jval, udata)) != 0) {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         return res;
     }
     if (reach_oend(jctx) != 0) {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_OBJECT + 2);
     }
@@ -1458,8 +1553,12 @@ jparse_expect_object_iter(jparse_ctx_t *jctx,
     off_t spos;
     int res;
 
+    jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
     if (reach_ostart(jctx) != 0) {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_OBJECT_ITER + 1);
     }
@@ -1470,10 +1569,16 @@ jparse_expect_object_iter(jparse_ctx_t *jctx,
     if (res == JPARSE_EOS || (res != 0 && spos == SPOS(&jctx->bs))) {
         res = 0;
         if (reach_oend(jctx) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(JPARSE_EXPECT_OBJECT_ITER + 2);
         }
     } else {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         return res;
     }
@@ -1493,16 +1598,26 @@ jparse_expect_array(jparse_ctx_t *jctx,
     off_t spos;
     int res;
 
+    jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
     if (reach_astart(jctx) != 0) {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_ARRAY + 1);
     }
     if ((res = cb(jctx, jval, udata)) != 0) {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         return res;
     }
     if (reach_aend(jctx) != 0) {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_ARRAY + 2);
     }
@@ -1519,8 +1634,12 @@ jparse_expect_array_iter(jparse_ctx_t *jctx,
     off_t spos;
     int res;
 
+    jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
     if (reach_astart(jctx) != 0) {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         TRRET(JPARSE_EXPECT_ARRAY_ITER + 1);
     }
@@ -1532,10 +1651,16 @@ jparse_expect_array_iter(jparse_ctx_t *jctx,
     if (res == JPARSE_EOS || (res != 0 && spos == SPOS(&jctx->bs))) {
         res = 0;
         if (reach_aend(jctx) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(JPARSE_EXPECT_ARRAY_ITER + 2);
         }
     } else {
+        if (jctx->errorpos == -1) {
+            jctx->errorpos = SPOS(&jctx->bs);
+        }
         SPOS(&jctx->bs) = spos;
         return res;
     }
@@ -1550,11 +1675,16 @@ jparse_expect_item_ignore(jparse_ctx_t *jctx,
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_ignore(jctx, jval, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1571,11 +1701,16 @@ jparse_expect_item_any(jparse_ctx_t *jctx, jparse_value_t *jval, void *udata)
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_any(jctx, jval, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1592,11 +1727,16 @@ jparse_expect_item_int(jparse_ctx_t *jctx, long *val, void *udata)
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_int(jctx, val, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1613,11 +1753,16 @@ jparse_expect_item_float(jparse_ctx_t *jctx, double *val, void *udata)
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_float(jctx, val, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1634,11 +1779,16 @@ jparse_expect_item_str(jparse_ctx_t *jctx, bytes_t **val, void *udata)
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_str(jctx, val, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1655,11 +1805,16 @@ jparse_expect_item_bool(jparse_ctx_t *jctx, char *val, void *udata)
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_bool(jctx, val, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1679,11 +1834,16 @@ jparse_expect_item_object(jparse_ctx_t *jctx,
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_object(jctx, cb, jval, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1703,11 +1863,16 @@ jparse_expect_item_object_iter(jparse_ctx_t *jctx,
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_object_iter(jctx, cb, jval, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1727,11 +1892,16 @@ jparse_expect_item_array(jparse_ctx_t *jctx,
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_array(jctx, cb, jval, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1751,11 +1921,16 @@ jparse_expect_item_array_iter(jparse_ctx_t *jctx,
 {
     off_t spos;
     int res;
+
+    jctx->errorpos = -1;
     res = 0;
     spos = SPOS(&jctx->bs);
     if (expect_maybe_null(jctx) == 0) {
     } else {
         if ((res = jparse_expect_array_iter(jctx, cb, jval, udata)) != 0) {
+            if (jctx->errorpos == -1) {
+                jctx->errorpos = SPOS(&jctx->bs);
+            }
             SPOS(&jctx->bs) = spos;
             TRRET(res);
         }
@@ -1775,24 +1950,28 @@ DEF_JPARSE_ARRAY_ITERATOR(ai, jparse_expect_item_ignore)
 DEF_JPARSE_OBJECT_ITERATOR(oi, jparse_expect_anykvp_ignore)
 
 int
-jparse_ignore_nonscalar(jparse_ctx_t *jctx,
-                        jparse_value_t *jval,
-                        UNUSED void *udata)
+jparse_ignore_nonscalar_iterator(jparse_ctx_t *jctx,
+                                 jparse_value_t *jval,
+                                 UNUSED void *udata)
 {
     int res;
     jparse_value_t _jval;
 
+    jctx->errorpos = -1;
     res = 0;
     jparse_value_init(&_jval);
-    _jval.cb = jparse_ignore_nonscalar;
+    _jval.cb = jparse_ignore_nonscalar_iterator;
     if (jval->ty == JSON_ARRAY) {
         //TRACE("ignoring: %s", jval->k->data);
         res = REF_JPARSE_ARRAY_ITERATOR(ai)(jctx, &_jval, NULL);
     } else if (jval->ty == JSON_OBJECT) {
         //TRACE("ignoring: %s", jval->k->data);
         res = REF_JPARSE_OBJECT_ITERATOR(oi)(jctx, &_jval, NULL);
+    } else if (jval->ty == JSON_UNDEF) {
+        //TRACE("ignoring: %s", jval->k->data);
     } else {
-        FAIL("jparse_ignore_nonscalar");
+        jparse_dump_value(jval);
+        FAIL("jparse_ignore_nonscalar_iterator");
     }
     return res;
 }
@@ -1867,25 +2046,25 @@ jparse_dump_value(jparse_value_t *jval)
 {
     switch (jval->ty) {
     case JSON_INT:
-        TRACE("%s:%ld", JSON_TYPE_STR(jval->ty), jval->v.i);
+        TRACE("%s/%s:%ld", jval->k ? jval->k->data : NULL, JSON_TYPE_STR(jval->ty), jval->v.i);
         break;
 
     case JSON_FLOAT:
-        TRACE("%s:%lf", JSON_TYPE_STR(jval->ty), jval->v.f);
+        TRACE("%s/%s:%lf", jval->k ? jval->k->data : NULL, JSON_TYPE_STR(jval->ty), jval->v.f);
         break;
 
     case JSON_STRING:
-        TRACE("%s:%s",
+        TRACE("%s/%s:%s", jval->k ? jval->k->data : NULL,
               JSON_TYPE_STR(jval->ty),
               jval->v.s != NULL ? (char *)jval->v.s->data : "<null>");
         break;
 
     case JSON_BOOLEAN:
-        TRACE("%s:%s", JSON_TYPE_STR(jval->ty), jval->v.b ? "#t" : "#f");
+        TRACE("%s/%s:%s", jval->k ? jval->k->data : NULL, JSON_TYPE_STR(jval->ty), jval->v.b ? "#t" : "#f");
         break;
 
     default:
-        TRACE("%s:<%p>", JSON_TYPE_STR(jval->ty), jval);
+        TRACE("%s/%s:<%p/%p>", jval->k ? jval->k->data : NULL, JSON_TYPE_STR(jval->ty), jval->cb, jval->udata);
         break;
     }
 }
@@ -1894,8 +2073,23 @@ jparse_dump_value(jparse_value_t *jval)
 void
 jparse_dump_current_pos(jparse_ctx_t *jctx, ssize_t sz)
 {
-    D8(SPDATA(&jctx->bs), MIN(sz, SEOD(&jctx->bs) - SPOS(&jctx->bs)));
+    D16(SPDATA(&jctx->bs), MIN(sz, SEOD(&jctx->bs) - SPOS(&jctx->bs)));
 }
+
+
+void
+jparse_dump_error_pos(jparse_ctx_t *jctx, ssize_t sz, int flags)
+{
+    if (jctx->errorpos >= 0) {
+        TRACE("error at pos %ld:", jctx->errorpos);
+        D16(SDATA(&jctx->bs, jctx->errorpos),
+           MIN(sz, SEOD(&jctx->bs) - SPOS(&jctx->bs)));
+    }
+    if (flags & JPARSE_DEP_FCLEAR) {
+        jctx->errorpos = -2;
+    }
+}
+
 
 /*
  * context
@@ -1912,6 +2106,7 @@ jparse_ctx_new(size_t mpool_chunksz, size_t bytestream_chunksz)
     bytestream_init(&jctx->bs, bytestream_chunksz);
     jctx->udata = NULL;
     jctx->default_cb = NULL;
+    jctx->errorpos = -1;
     jctx->fd = -1;
 
     return jctx;

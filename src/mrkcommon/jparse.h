@@ -40,12 +40,10 @@ typedef struct _jparse_value {
 
 typedef struct _jparse_ctx {
     mpool_ctx_t mpool;
-    bytes_t *_null;
-    bytes_t *_true;
-    bytes_t *_false;
     bytestream_t bs;
     jparse_expect_cb_t default_cb;
     void *udata;
+    ssize_t errorpos;
     int fd;
 } jparse_ctx_t;
 
@@ -420,9 +418,11 @@ DECL_JPARSE_OBJECT_ITERATOR(it)                        \
 }                                                      \
 
 
-int jparse_ignore_nonscalar(jparse_ctx_t *, jparse_value_t *, void *);
+int jparse_ignore_nonscalar_iterator(jparse_ctx_t *, jparse_value_t *, void *);
 
 void jparse_dump_current_pos(jparse_ctx_t *, ssize_t);
+#define JPARSE_DEP_FCLEAR (0x01)
+void jparse_dump_error_pos(jparse_ctx_t *, ssize_t, int);
 jparse_ctx_t *jparse_ctx_new(size_t, size_t);
 void jparse_ctx_destroy(jparse_ctx_t **);
 int jparse_ctx_parse(jparse_ctx_t *,
