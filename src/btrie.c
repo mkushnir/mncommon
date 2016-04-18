@@ -125,8 +125,8 @@ btrie_init(btrie_t *tr)
     tr->nvals = 0;
 }
 
-
-#define btrie_NODE_FINI_BODY(freefn, finifn)    \
+                                               \
+#define BTRIE_NODE_FINI_BODY(freefn, finifn)   \
     assert(n != NULL);                         \
     if (n->child[0] != NULL) {                 \
         finifn(tr, n->child[0]);               \
@@ -141,18 +141,18 @@ btrie_init(btrie_t *tr)
         --(tr->volume);                        \
     }                                          \
     n->parent = NULL                           \
-
+                                               \
 
 static void
 btrie_node_fini(btrie_t *tr, btrie_node_t *n)
 {
-    btrie_NODE_FINI_BODY(free, btrie_node_fini);
+    BTRIE_NODE_FINI_BODY(free, btrie_node_fini);
 }
 
 static void
 btrie_node_fini_mpool(mpool_ctx_t *mpool, btrie_t *tr, btrie_node_t *n)
 {
-    btrie_NODE_FINI_BODY(_free, _btrie_node_fini);
+    BTRIE_NODE_FINI_BODY(_free, _btrie_node_fini);
 }
 
 void
@@ -187,15 +187,15 @@ btrie_node_is_orphan(btrie_node_t *n)
 }
 
 
-#define btrie_NODE_CLEANUP_BODY(freefn, cleanupfn)      \
+#define BTRIE_NODE_CLEANUP_BODY(freefn, cleanupfn)     \
     assert(n != NULL);                                 \
-    if (btrie_node_is_orphan(n)) {                      \
+    if (btrie_node_is_orphan(n)) {                     \
         return;                                        \
     }                                                  \
     if (n->child[0] != NULL) {                         \
-        if (!btrie_node_is_orphan(n->child[0])) {       \
+        if (!btrie_node_is_orphan(n->child[0])) {      \
             cleanupfn(tr, n->child[0]);                \
-            if (btrie_node_is_orphan(n->child[0])) {    \
+            if (btrie_node_is_orphan(n->child[0])) {   \
                 freefn(n->child[0]);                   \
                 n->child[0] = NULL;                    \
                 --(tr->volume);                        \
@@ -207,9 +207,9 @@ btrie_node_is_orphan(btrie_node_t *n)
         }                                              \
     }                                                  \
     if (n->child[1] != NULL) {                         \
-        if (!btrie_node_is_orphan(n->child[1])) {       \
+        if (!btrie_node_is_orphan(n->child[1])) {      \
             cleanupfn(tr, n->child[1]);                \
-            if (btrie_node_is_orphan(n->child[1])) {    \
+            if (btrie_node_is_orphan(n->child[1])) {   \
                 freefn(n->child[1]);                   \
                 n->child[1] = NULL;                    \
                 --(tr->volume);                        \
@@ -225,36 +225,36 @@ btrie_node_is_orphan(btrie_node_t *n)
 static void
 btrie_node_cleanup(btrie_t *tr, btrie_node_t *n)
 {
-    btrie_NODE_CLEANUP_BODY(free, btrie_node_cleanup);
+    BTRIE_NODE_CLEANUP_BODY(free, btrie_node_cleanup);
 }
 
 
 static void
 btrie_node_cleanup_mpool(mpool_ctx_t *mpool, btrie_t *tr, btrie_node_t *n)
 {
-    btrie_NODE_CLEANUP_BODY(_free, _btrie_node_cleanup);
+    BTRIE_NODE_CLEANUP_BODY(_free, _btrie_node_cleanup);
 }
 
 
-#define btrie_CLEANUP_BODY(cleanupfn) \
-    unsigned i; \
-    assert(tr != NULL); \
+#define BTRIE_CLEANUP_BODY(cleanupfn)          \
+    unsigned i;                                \
+    assert(tr != NULL);                        \
     for (i = 0; i < countof(tr->roots); ++i) { \
-        cleanupfn(tr, &tr->roots[i]); \
-    }
+        cleanupfn(tr, &tr->roots[i]);          \
+    }                                          \
 
 
 void
 btrie_cleanup(btrie_t *tr)
 {
-    btrie_CLEANUP_BODY(btrie_node_cleanup);
+    BTRIE_CLEANUP_BODY(btrie_node_cleanup);
 }
 
 
 void
 btrie_cleanup_mpool(mpool_ctx_t *mpool, btrie_t *tr)
 {
-    btrie_CLEANUP_BODY(_btrie_node_cleanup);
+    BTRIE_CLEANUP_BODY(_btrie_node_cleanup);
 }
 
 
@@ -318,10 +318,10 @@ btrie_traverse(btrie_t *tr, int (*cb)(btrie_node_t *, uint64_t, void *), void *u
     return 0;
 }
 
-#define btrie_ADD_NODE_BODY(mallocfn)                                           \
+#define BTRIE_ADD_NODE_BODY(mallocfn)                                          \
     int idx, i, sel;                                                           \
-    btrie_node_t **n;                                                           \
-    btrie_node_t *cur;                                                          \
+    btrie_node_t **n;                                                          \
+    btrie_node_t *cur;                                                         \
     idx = flsl(key);                                                           \
     cur = &tr->roots[idx];                                                     \
     if (idx == 0) {                                                            \
@@ -337,10 +337,10 @@ btrie_traverse(btrie_t *tr, int (*cb)(btrie_node_t *, uint64_t, void *), void *u
         sel = (key & (1ul << (idx - 1))) >> (idx - 1);                         \
         n = &cur->child[sel];                                                  \
         if (*n == NULL) {                                                      \
-            if ((*n = mallocfn(sizeof(btrie_node_t))) == NULL) {                \
+            if ((*n = mallocfn(sizeof(btrie_node_t))) == NULL) {               \
                 FAIL("malloc");                                                \
             }                                                                  \
-            btrie_node_init(*n,                                                 \
+            btrie_node_init(*n,                                                \
                            cur,                                                \
                            (int)((unsigned)i |                                 \
                                ((unsigned)sel << CHILD_SELECTOR_SHIFT)),       \
@@ -358,13 +358,13 @@ btrie_traverse(btrie_t *tr, int (*cb)(btrie_node_t *, uint64_t, void *), void *u
 btrie_node_t *
 btrie_add_node(btrie_t *tr, uintmax_t key)
 {
-    btrie_ADD_NODE_BODY(malloc);
+    BTRIE_ADD_NODE_BODY(malloc);
 }
 
 btrie_node_t *
 btrie_add_node_mpool(mpool_ctx_t *mpool, btrie_t *tr, uintmax_t key)
 {
-    btrie_ADD_NODE_BODY(_malloc);
+    BTRIE_ADD_NODE_BODY(_malloc);
 }
 
 btrie_node_t *
@@ -639,28 +639,28 @@ btrie_find_closest(btrie_t *tr, uintmax_t key, int direction)
     return NULL;
 }
 
-#define CLEANUP_ORPHANS_BODY(freefn)                   \
-    btrie_node_t *parent;                               \
-    while (n != NULL) {                                \
-        if (n->parent == NULL) {                       \
-            break;                                     \
-        }                                              \
-        if (btrie_node_is_orphan(n)) {                  \
-            parent = n->parent;                        \
-            assert(parent != NULL);                    \
-            if (parent->child[0] == n) {               \
-                parent->child[0] = NULL;               \
-            } else {                                   \
-                assert(parent->child[1] == n);         \
-                parent->child[1] = NULL;               \
-            }                                          \
-            freefn(n);                                 \
-            --(tr->volume);                            \
-            n = parent;                                \
-        } else {                                       \
-            break;                                     \
-        }                                              \
-    }                                                  \
+#define CLEANUP_ORPHANS_BODY(freefn)           \
+    btrie_node_t *parent;                      \
+    while (n != NULL) {                        \
+        if (n->parent == NULL) {               \
+            break;                             \
+        }                                      \
+        if (btrie_node_is_orphan(n)) {         \
+            parent = n->parent;                \
+            assert(parent != NULL);            \
+            if (parent->child[0] == n) {       \
+                parent->child[0] = NULL;       \
+            } else {                           \
+                assert(parent->child[1] == n); \
+                parent->child[1] = NULL;       \
+            }                                  \
+            freefn(n);                         \
+            --(tr->volume);                    \
+            n = parent;                        \
+        } else {                               \
+            break;                             \
+        }                                      \
+    }                                          \
 
 
 UNUSED static void
@@ -677,8 +677,8 @@ cleanup_orphans_mpool(mpool_ctx_t *mpool, btrie_t *tr, btrie_node_t *n)
 }
 
 
-#define btrie_REMOVE_NODE_BODY(finifn, freefn, __a1)            \
-    btrie_node_t *parent;                                       \
+#define BTRIE_REMOVE_NODE_BODY(finifn, freefn, __a1)           \
+    btrie_node_t *parent;                                      \
     parent = n->parent;                                        \
     if (parent != NULL) {                                      \
         if (parent->child[0] == n) {                           \
@@ -690,7 +690,7 @@ cleanup_orphans_mpool(mpool_ctx_t *mpool, btrie_t *tr, btrie_node_t *n)
                   "parent->child[0]=%p parent->child[1]=%p",   \
                   tr, parent, n,                               \
                   parent->child[0], parent->child[1]);         \
-            FAIL("btrie_node_remove");                          \
+            FAIL("btrie_node_remove");                         \
         }                                                      \
     }                                                          \
     finifn(tr, n);                                             \
@@ -704,21 +704,21 @@ cleanup_orphans_mpool(mpool_ctx_t *mpool, btrie_t *tr, btrie_node_t *n)
 int
 btrie_remove_node_no_cleanup(btrie_t *tr, btrie_node_t *n)
 {
-    btrie_REMOVE_NODE_BODY(btrie_node_fini, free, );
+    BTRIE_REMOVE_NODE_BODY(btrie_node_fini, free, );
 }
 
 
 int
 btrie_remove_node_no_cleanup_mpool(mpool_ctx_t *mpool, btrie_t *tr, btrie_node_t *n)
 {
-    btrie_REMOVE_NODE_BODY(_btrie_node_fini, _free, );
+    BTRIE_REMOVE_NODE_BODY(_btrie_node_fini, _free, );
 }
 
 
 int
 btrie_remove_node(btrie_t *tr, btrie_node_t *n)
 {
-    btrie_REMOVE_NODE_BODY(btrie_node_fini, free,
+    BTRIE_REMOVE_NODE_BODY(btrie_node_fini, free,
             cleanup_orphans(tr, parent);
     );
 }
@@ -727,7 +727,7 @@ btrie_remove_node(btrie_t *tr, btrie_node_t *n)
 int
 btrie_remove_node_mpool(mpool_ctx_t *mpool, btrie_t *tr, btrie_node_t *n)
 {
-    btrie_REMOVE_NODE_BODY(_btrie_node_fini, _free,
+    BTRIE_REMOVE_NODE_BODY(_btrie_node_fini, _free,
             _cleanup_orphans(tr, parent);
     );
 }
