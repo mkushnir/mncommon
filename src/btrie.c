@@ -350,7 +350,6 @@ btrie_traverse(btrie_t *tr, int (*cb)(btrie_node_t *, uint64_t, void *), void *u
         cur = *n;                                                              \
         ++i;                                                                   \
     } while (--idx);                                                           \
-    ++(tr->nvals);                                                             \
     return cur;                                                                \
 
 
@@ -696,7 +695,6 @@ cleanup_orphans_mpool(mpool_ctx_t *mpool, btrie_t *tr, btrie_node_t *n)
     finifn(tr, n);                                             \
     freefn(n);                                                 \
     --(tr->volume);                                            \
-    --(tr->nvals);                                             \
     __a1                                                       \
     return 0;                                                  \
 
