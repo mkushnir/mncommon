@@ -47,7 +47,8 @@ typedef struct _bytes {
 } bytes_t;
 
 
-#define BDATA(b) ((b) != NULL ? (b)->data : NULL)
+#define BDATA(b) (b)->data
+#define BDATASAFE(b) ((b) != NULL ? (b)->data : NULL)
 
 
 #define BYTES_INITIALIZER(s)   \
