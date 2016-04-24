@@ -44,6 +44,15 @@ int array_init_mpool(mpool_ctx_t *,
 int array_reset_no_fini(array_t *, size_t);
 int array_reset_no_fini_mpool(mpool_ctx_t *, array_t *, size_t);
 
+array_t *array_new(size_t, size_t,
+                   array_initializer_t,
+                   array_finalizer_t);
+
+array_t *array_new_mpool(mpool_ctx_t *,
+                         size_t, size_t,
+                         array_initializer_t,
+                         array_finalizer_t);
+
 #define ARRAY_FLAG_SAVE 0x01
 int array_ensure_len(array_t *, size_t, unsigned int);
 int array_ensure_len_dirty(array_t *, size_t, unsigned int);

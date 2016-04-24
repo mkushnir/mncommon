@@ -42,6 +42,19 @@ do {                                                           \
 #define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
 #define _free(p) mpool_free(mpool, (p))
 
+#define _array_init(ar,        \
+                    elsz,      \
+                    elnum,     \
+                    init,      \
+                    fini)      \
+array_init_mpool(mpool,        \
+                 (ar),         \
+                 (elsz),       \
+                 (elnum),      \
+                 (init),       \
+                 (fini))       \
+
+
 /*
  * Initialize array structure.
  *
@@ -118,6 +131,39 @@ array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
     MEMDEBUG_LEAVE(ar);                                        \
     return 0;                                                  \
 
+
+
+
+#define ARRAY_NEW_BODY(malloc_fn, array_init_fn)              \
+    array_t *res;                                              \
+    if ((res = malloc_fn(sizeof(array_t))) == NULL) {          \
+        FAIL("malloc");                                        \
+    }                                                          \
+    if (array_init_fn(res, elsz, elnum, init, fini) != 0) {    \
+        FAIL("array_init");                                    \
+    }                                                          \
+    return res;                                                \
+
+
+array_t *
+array_new(size_t elsz,
+          size_t elnum,
+          array_initializer_t init,
+          array_finalizer_t fini)
+{
+    ARRAY_NEW_BODY(malloc, array_init)
+}
+
+
+array_t *
+array_new_mpool(mpool_ctx_t *mpool,
+                size_t elsz,
+                size_t elnum,
+                array_initializer_t init,
+                array_finalizer_t fini)
+{
+    ARRAY_NEW_BODY(_malloc, _array_init)
+}
 
 
 int
