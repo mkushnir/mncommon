@@ -198,6 +198,50 @@ do {                                                           \
     MRK_JPRINTF_ITEM_BOOL00(bs, value, "")
 
 
+
+
+#define MRK_JPRINTF_PAIR_CB0(bs, key, cb, udata)       \
+do {                                                   \
+    (void)bytestream_nprintf((bs),                     \
+                             sizeof(key) - 1 + 8,      \
+                             "\"%s\":", key);          \
+    (cb)((bs), (udata));                               \
+    (void)bytestream_cat((bs), 1, ",");                \
+} while (false)                                        \
+
+
+#define MRK_JPRINTF_PAIR_CB1(bs, key, cb, udata)       \
+do {                                                   \
+    (void)bytestream_nprintf((bs),                     \
+                             sizeof(key) - 1 + 8,      \
+                             "\"%s\":", key);          \
+    (cb)((bs), (udata));                               \
+} while (false)                                        \
+
+
+#define MRK_JPRINTF_BPAIR_CB0(bs, key, cb, udata)      \
+do {                                                   \
+    (void)bytestream_nprintf((bs),                     \
+                             BSZ(key) - 1 + 8,         \
+                             "\"%s\":", BDATA(key));   \
+    (cb)((bs), (udata));                               \
+    (void)bytestream_cat((bs), 1, ",");                \
+} while (false)                                        \
+
+
+#define MRK_JPRINTF_BPAIR_CB1(bs, key, cb, udata)      \
+do {                                                   \
+    (void)bytestream_nprintf((bs),                     \
+                             BSZ(key) - 1 + 8,         \
+                             "\"%s\":", BDATA(key));   \
+    (cb)((bs), (udata));                               \
+} while (false)                                        \
+
+
+#define MRK_JCHOP_COMMA(bs)                                    \
+if (*SDATA(bs, SEOD(bs) - 1) == ',') SADVANCEEOD(bs, -1)       \
+
+
 /*
  * json types
  */
