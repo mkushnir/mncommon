@@ -81,6 +81,8 @@ int array_decr_fast(array_t *);
 int array_decr_mpool(mpool_ctx_t *, array_t *);
 int array_fini(array_t *);
 int array_fini_mpool(mpool_ctx_t *mpool, array_t *);
+void array_destroy(array_t **);
+void array_destroy_mpool(mpool_ctx_t *, array_t **);
 void *array_first(const array_t *, array_iter_t *);
 #define ARRAY_FIRST(ty, a) (((ty *)((a)->data))[0])
 void *array_last(const array_t *, array_iter_t *);

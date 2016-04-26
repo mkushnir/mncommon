@@ -180,6 +180,27 @@ array_reset_no_fini_mpool(mpool_ctx_t *mpool, array_t *ar, size_t newelnum)
 }
 
 
+void
+array_destroy(array_t **ar)
+{
+    if (*ar != NULL) {
+        array_fini(*ar);
+        free(*ar);
+        *ar = NULL;
+    }
+}
+
+
+void
+array_destroy_mpool(mpool_ctx_t *mpool, array_t **ar)
+{
+    if (*ar != NULL) {
+        array_fini_mpool(mpool, *ar);
+        mpool_free(mpool, *ar);
+        *ar = NULL;
+    }
+}
+
 /*
  * Make sure array is at least newelnum long.
  */

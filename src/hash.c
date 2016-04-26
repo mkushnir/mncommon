@@ -590,6 +590,28 @@ hash_fini_mpool(mpool_ctx_t *mpool, hash_t *dict)
 
 
 void
+hash_destroy(hash_t **hash)
+{
+    if (*hash != NULL) {
+        hash_fini(*hash);
+        free(*hash);
+        *hash = NULL;
+    }
+}
+
+
+void
+hash_destroy_mpool(mpool_ctx_t *mpool, hash_t **hash)
+{
+    if (*hash != NULL) {
+        hash_fini_mpool(mpool, *hash);
+        mpool_free(mpool, *hash);
+        *hash = NULL;
+    }
+}
+
+
+void
 hash_dump_stats(hash_t *dict)
 {
     array_iter_t it;

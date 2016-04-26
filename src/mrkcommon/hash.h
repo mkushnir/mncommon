@@ -90,6 +90,8 @@ void hash_cleanup(hash_t *);
 void hash_cleanup_mpool(mpool_ctx_t *, hash_t *);
 void hash_fini(hash_t *);
 void hash_fini_mpool(mpool_ctx_t *, hash_t *);
+void hash_destroy(hash_t **);
+void hash_destroy_mpool(mpool_ctx_t *, hash_t **);
 
 void hash_dump_stats(hash_t *);
 
