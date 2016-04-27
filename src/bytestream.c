@@ -318,3 +318,28 @@ bytestream_fini(bytestream_t *stream)
     stream->write = NULL;
     stream->udata = NULL;
 }
+
+
+bytestream_t *
+bytestream_new(ssize_t growsz)
+{
+    bytestream_t *res;
+
+    if ((res = malloc(sizeof(bytestream_t))) == NULL) {
+        FAIL("malloc");
+    }
+    bytestream_init(res, growsz);
+    return res;
+}
+
+
+void
+bytestream_destroy(bytestream_t **bs)
+{
+    if (*bs != NULL) {
+        bytestream_fini(*bs);
+        free(*bs);
+        *bs = NULL;
+    }
+}
+

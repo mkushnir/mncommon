@@ -50,6 +50,9 @@ typedef struct _bytestream {
 int bytestream_init(bytestream_t *, ssize_t);
 void bytestream_fini(bytestream_t *);
 
+bytestream_t *bytestream_new(ssize_t);
+void bytestream_destroy(bytestream_t **);
+
 int bytestream_grow(bytestream_t *, size_t);
 
 ssize_t bytestream_read_more(bytestream_t *, int, ssize_t);
