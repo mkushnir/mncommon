@@ -373,6 +373,13 @@ hash_delete_pair(hash_t *dict, hash_item_t *hit)
 
 
 void
+hash_delete_pair_no_fini(hash_t *dict, hash_item_t *hit)
+{
+    HASH_DELETE_PAIR_NO_FINI_BODY(free);
+}
+
+
+void
 hash_delete_pair_mpool(mpool_ctx_t *mpool, hash_t *dict, hash_item_t *hit)
 {
     HASH_DELETE_PAIR_BODY(_free);

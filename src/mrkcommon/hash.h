@@ -55,6 +55,7 @@ hash_item_t *hash_get_item(hash_t *, void *);
 void *hash_remove_item(hash_t *, void *);
 void *hash_remove_item_mpool(mpool_ctx_t *, hash_t *, void *);
 void hash_delete_pair(hash_t *, hash_item_t *);
+void hash_delete_pair_no_fini(hash_t *, hash_item_t *);
 void hash_delete_pair_mpool(mpool_ctx_t *, hash_t *, hash_item_t *);
 void hash_delete_pair_no_fini_mpool(mpool_ctx_t *, hash_t *, hash_item_t *);
 int hash_traverse(hash_t *, hash_traverser_t, void *);
