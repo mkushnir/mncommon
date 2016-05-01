@@ -37,6 +37,12 @@ typedef struct _hash {
 } hash_t;
 
 
+typedef struct _hash_iter {
+    array_iter_t it;
+    hash_item_t **phit;
+    hash_item_t *hit;
+} hash_iter_t;
+
 
 void hash_set_item(hash_t *, void *, void *);
 void hash_set_item_mpool(mpool_ctx_t *, hash_t *, void *, void *);
@@ -62,6 +68,8 @@ int hash_traverse(hash_t *, hash_traverser_t, void *);
 typedef int (*hash_traverser_item_t)(hash_t *, hash_item_t *, void *);
 
 int hash_traverse_item(hash_t *, hash_traverser_item_t, void *);
+hash_item_t *hash_first(hash_t *, hash_iter_t *);
+hash_item_t *hash_next(hash_t *, hash_iter_t *);
 bool hash_is_empty(hash_t *);
 size_t hash_get_elnum(hash_t *);
 

@@ -441,6 +441,42 @@ hash_traverse_item(hash_t *dict, hash_traverser_item_t cb, void *udata)
 }
 
 
+hash_item_t *
+hash_first(hash_t *hash, hash_iter_t *it)
+{
+    it->hit = NULL;
+    for (it->phit = array_first(&hash->table, &it->it);
+         it->phit != NULL;
+         it->phit = array_next(&hash->table, &it->it)) {
+        if (*it->phit != NULL) {
+            it->hit = *it->phit;
+            break;
+        }
+    }
+    return it->hit;
+}
+
+
+hash_item_t *
+hash_next(hash_t *hash, hash_iter_t *it)
+{
+    if (it->hit != NULL) {
+        it->hit = it->hit->next;
+    }
+    if (it->hit == NULL) {
+        for (it->phit = array_next(&hash->table, &it->it);
+             it->phit != NULL;
+             it->phit = array_next(&hash->table, &it->it)) {
+            if (*it->phit != NULL) {
+                it->hit = *it->phit;
+                break;
+            }
+        }
+    }
+    return it->hit;
+}
+
+
 bool
 hash_is_empty(hash_t *dict)
 {
