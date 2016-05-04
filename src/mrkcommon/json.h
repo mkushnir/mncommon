@@ -85,7 +85,7 @@ do {                                                                           \
     } else {                                                                   \
         (void)bytestream_nprintf(                                              \
                 bs,                                                            \
-                sizeof(key) - 1 + 8,                                           \
+                sizeof(key) - 1 + 16,                                          \
                 "\"" key "\":null" comma);                                     \
     }                                                                          \
 } while (false)                                                                \
