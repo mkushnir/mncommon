@@ -9,6 +9,12 @@ extern "C" {
 
 const char *mrkcommon_diag_str(int);
 
+#ifdef __GNUC__
+#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#else
+#define GCC_VERSION 0
+#endif
+
 #ifndef MAX
 #   define MAX(a,b) ((a)>(b)?(a):(b))
 #endif

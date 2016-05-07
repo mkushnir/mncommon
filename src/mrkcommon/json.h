@@ -10,7 +10,9 @@ extern "C" {
 /*
  * json packing utils
  */
+#if GCC_VERSION >= 40200
 #pragma GCC diagnostic ignored "-Waddress"
+#endif
 
 #define MRK_JCAT_CONST(bs, s) ((void)bytestream_cat(bs, sizeof(s) - 1, s))
 
