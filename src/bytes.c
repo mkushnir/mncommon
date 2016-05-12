@@ -252,6 +252,21 @@ bytes_hash(bytes_t *bytes)
 }
 
 
+#define BUTES_CMP_SAFE_BODY(cmpfn)     \
+    if (a == NULL) {                   \
+        if (b == NULL) {               \
+            return 0;                  \
+        } else {                       \
+            return -1;                 \
+        }                              \
+    } else {                           \
+        if (b == NULL) {               \
+            return 1;                  \
+        }                              \
+    }                                  \
+    return cmpfn(a, b);                \
+
+
 int
 bytes_cmp(bytes_t *a, bytes_t *b)
 {
@@ -272,6 +287,13 @@ bytes_cmp(bytes_t *a, bytes_t *b)
 
 
 int
+bytes_cmp_safe(bytes_t *a, bytes_t *b)
+{
+    BUTES_CMP_SAFE_BODY(bytes_cmp)
+}
+
+
+int
 bytes_cmpv(bytes_t *a, bytes_t *b)
 {
     return strncmp((char *)a->data,
@@ -281,11 +303,25 @@ bytes_cmpv(bytes_t *a, bytes_t *b)
 
 
 int
+bytes_cmpv_safe(bytes_t *a, bytes_t *b)
+{
+    BUTES_CMP_SAFE_BODY(bytes_cmpv)
+}
+
+
+int
 bytes_cmpi(bytes_t *a, bytes_t *b)
 {
     return strncasecmp((char *)a->data,
                        (char *)b->data,
                        MIN(a->sz, b->sz));
+}
+
+
+int
+bytes_cmpi_safe(bytes_t *a, bytes_t *b)
+{
+    BUTES_CMP_SAFE_BODY(bytes_cmpi)
 }
 
 
