@@ -2,6 +2,7 @@
 #define MRKCOMMON_BYTES_H_DEFINED
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <sys/types.h>
 
