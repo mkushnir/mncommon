@@ -19,11 +19,11 @@ dumpdir(struct dirent *de)
           _D_EXACT_NAMLEN(de),
           de->d_name);
 #else
-    TRACE("fileno=%ld reclen=%hd type=%hhd namelen=%hd name=%s",
+    TRACE("fileno=%ld reclen=%hd type=%hhd namelen=%d name=%s",
           (long)de->d_fileno,
           de->d_reclen,
           de->d_type,
-          _D_EXACT_NAMLEN(de),
+          (int)_D_EXACT_NAMLEN(de),
           de->d_name);
 #endif
 }
