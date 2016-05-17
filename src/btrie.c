@@ -86,13 +86,13 @@ btrie_node_dump_cb(btrie_node_t *n, UNUSED uint64_t key, void *arg)
         return 0;
     }
     if (flags) {
-        TRACE("key=%02lx", d->key);
+        TRACE("key=%02lx", (unsigned long)d->key);
         //TRACE("n=%p value=%p key=%02lx", n, d, d->key);
     } else {
         if (selector) {
-            LTRACE(indent + 1, FRED("key=%02lx"), d->key);
+            LTRACE(indent + 1, FRED("key=%02lx"), (unsigned long)d->key);
         } else {
-            LTRACE(indent + 1, "key=%02lx", d->key);
+            LTRACE(indent + 1, "key=%02lx", (unsigned long)d->key);
         }
         //LTRACE(indent + 1, "n=%p value=%p key=%02lx", n, d, d->key);
     }

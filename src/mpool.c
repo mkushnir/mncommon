@@ -251,7 +251,7 @@ mpool_ctx_dump_info(mpool_ctx_t *mpool)
           mpool->arenasz / sizeof(void *),
           mpool->chunksz,
           mpool->current_chunk,
-          mpool->current_pos,
+          (long)mpool->current_pos,
           mpool->last_chunk);
     mpool_ctx_chunk_dump_info(mpool);
 }

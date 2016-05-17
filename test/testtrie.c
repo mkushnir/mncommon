@@ -150,7 +150,7 @@ test2(void)
     //btrie_traverse(&tr, btrie_node_dump_cb, NULL);
 
     for (i = 0; i < countof(keys); ++i) {
-        TRACE("querying: %016lx", keys[i]);
+        TRACE("querying: %016lx", (long)keys[i]);
         n = btrie_find_exact(&tr, keys[i]);
         //btrie_node_dump_cb(n, keys[i], NULL);
         n = btrie_find_closest(&tr, keys[i], 0);
@@ -160,7 +160,7 @@ test2(void)
     }
 
     for (i = 0; i < countof(keys); ++i) {
-        TRACE("removing: %016lx", keys[i]);
+        TRACE("removing: %016lx", (long)keys[i]);
         n = btrie_find_exact(&tr, keys[i]);
         if (n != NULL) {
             btrie_remove_node(&tr, n);

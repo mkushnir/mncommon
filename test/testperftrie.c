@@ -9,8 +9,10 @@
 #include "mrkcommon/btrie.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/util.h"
+#ifdef USE_MEMDEBUG
 #include "mrkcommon/memdebug.h"
 MEMDEBUG_DECLARE(testperftrie);
+#endif
 
 typedef struct _key_item {
     uint64_t key;
@@ -120,9 +122,9 @@ test0(void)
     for (i = 0; i < countof(keys); ++i) {
         printf("%d %ld %ld %ld\n",
                i,
-               keys[i].add_time,
-               keys[i].find_time,
-               keys[i].remove_time);
+               (long)keys[i].add_time,
+               (long)keys[i].find_time,
+               (long)keys[i].remove_time);
     }
 }
 
@@ -130,15 +132,18 @@ int
 main(void)
 {
 #ifndef NDEBUG
+#ifdef USE_MEMDEBUG
     MEMDEBUG_REGISTER(testperftrie);
     //MEMDEBUG_REGISTER(trie);
+#endif
 #endif
 
     profile_init_module();
 
     test0();
-
+#ifdef USE_MEMDEBUG
     memdebug_print_stats();
+#endif
     profile_fini_module();
     return 0;
 }

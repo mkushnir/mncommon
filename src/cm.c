@@ -127,8 +127,8 @@ cmhash_dump(cmhash_t *cmh)
     TRACEN("%ld/%ld/%016lx/%016lx",
            cmh->w,
            cmh->d,
-           cmh->h,
-           cmh->oh);
+           (long)cmh->h,
+           (long)cmh->oh);
     for (i = 0; i < cmh->w; ++i) {
         TRACEC(" %d", cmh->v[i]);
     }

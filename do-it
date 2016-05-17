@@ -7,6 +7,9 @@ if test "$uname_s" = "Linux"
 then
     linux_exclusions='--enable-conf=no'
     sha256_cmd=/usr/bin/sha256sum
+elif test "$uname_s" = "Darwin"
+then
+    linux_exclusions='--enable-memdebug=no'
 fi
 
 if test "$1" = "init"

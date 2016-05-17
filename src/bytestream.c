@@ -44,7 +44,7 @@ int
 bytestream_dump(bytestream_t *stream)
 {
     TRACE("stream pos=%ld eod=%ld sz=%ld",
-          stream->pos, stream->eod, stream->buf.sz);
+          (long)stream->pos, (long)stream->eod, stream->buf.sz);
     TRACE("stream start");
     D16(stream->buf.data, MIN(stream->eod, 128));
     return 0;

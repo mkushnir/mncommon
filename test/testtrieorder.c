@@ -8,8 +8,10 @@
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/btrie.h"
 #include "mrkcommon/util.h"
+#ifdef USE_MEMDEBUG
 #include "mrkcommon/memdebug.h"
 MEMDEBUG_DECLARE(testtrieorder);
+#endif
 
 typedef struct _key_item {
     uint64_t key;
@@ -50,7 +52,7 @@ cb(btrie_node_t *node, UNUSED void *udata)
         uint64_t key;
 
         key = (uintptr_t)(node->value);
-        TRACE("key=%016lx", key);
+        TRACE("key=%016lx", (long)key);
     }
     return 0;
 }
@@ -92,7 +94,9 @@ test0(void)
 int
 main(void)
 {
+#ifdef USE_MEMDEBUG
     MEMDEBUG_REGISTER(testtrieorder);
+#endif
     test0();
     return 0;
 }

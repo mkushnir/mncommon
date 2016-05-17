@@ -396,9 +396,11 @@ conf_seek_buf(void *cookie, off_t offset, int whence)
         ctx->pos += offset;
     } else if (whence == SEEK_END) {
         ctx->pos += ctx->sz + offset;
+#ifdef SEEK_HOLE
     } else if (whence == SEEK_HOLE) {
         errno = ENXIO;
         return -1;
+#endif
     } else {
         errno = EINVAL;
         return -1;

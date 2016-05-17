@@ -135,7 +135,7 @@ my_item_print(UNUSED hash_t *dict, hash_item_t *dit, UNUSED void *udata)
     my_item_t *key;
 
     key = dit->key;
-    TRACE("<h=%ld v=%ld>", key->hash, key->value);
+    TRACE("<h=%ld v=%ld>", (long)key->hash, (long)key->value);
     return 0;
 }
 
@@ -153,10 +153,10 @@ my_item_delete(hash_t *dict, hash_item_t *dit, void *udata)
 
     key = dit->key;
     if (key->value % u.i == 0) {
-        TRACE("deleting %ld ...", key->value);
+        TRACE("deleting %ld ...", (long)key->value);
         hash_delete_pair(dict, dit);
     } else {
-        TRACE("keeping %ld ...", key->value);
+        TRACE("keeping %ld ...", (long)key->value);
     }
     return 0;
 }

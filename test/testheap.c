@@ -45,7 +45,7 @@ mycb(UNUSED heap_t *heap, void *pval, UNUSED void *udata)
         return -1;
     }
     v = pval;
-    TRACE("val=%ld", *v);
+    TRACE("val=%ld", (long)*v);
     return 0;
 }
 

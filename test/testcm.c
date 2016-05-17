@@ -305,7 +305,7 @@ mycb(pset_item_t *it, UNUSED void *v, void *udata)
     s = it->v;
     aggr = udata;
     *aggr += it->cmprop;
-    TRACE("%03ld %s", it->cmprop, s->data);
+    TRACE("%03ld %s", (long)it->cmprop, s->data);
     return 0;
 }
 
@@ -370,7 +370,7 @@ test2(char *fname)
 
     pset_fini(&pset);
     fclose(f);
-    TRACE("nlines=%ld aggr=%ld", nlines, aggr);
+    TRACE("nlines=%ld aggr=%ld", nlines, (long)aggr);
 }
 
 
@@ -462,7 +462,7 @@ test3(char *fname)
     pset_fini(&pset);
     cm_fini(&cm);
     fclose(f);
-    TRACE("nlines=%ld aggr=%ld", nlines, aggr);
+    TRACE("nlines=%ld aggr=%ld", nlines, (long)aggr);
 }
 
 

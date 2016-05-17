@@ -57,7 +57,7 @@ test0(void)
         if (randmod) {
             h %= randmod;
         }
-        printf("%ld %ld\n", i, h);
+        printf("%ld %ld\n", (long)i, (long)h);
     }
 }
 
@@ -94,7 +94,7 @@ test1(const char *fname)
         } else {
             //printf("%016lx %s\n", hash, buf);
             if ((trn = btrie_find_exact(&tr, hash)) != NULL) {
-                TRACE("collision: %016lx\n%s\n%s\n", hash, buf, (char *)(trn->value));
+                TRACE("collision: %016lx\n%s\n%s\n", (long)hash, buf, (char *)(trn->value));
                 free(buf);
             } else {
                 trn = btrie_add_node(&tr, hash);
@@ -123,7 +123,7 @@ test_one_bytes(btrie_t *tr, bytes_t *s)
         if ((trn = btrie_find_exact(tr, hash)) != NULL) {
             UNUSED bytes_t *ss;
 
-            TRACE("collision: %016lx\n", hash);
+            TRACE("collision: %016lx\n", (long)hash);
             //ss = trn->value;
             //D32(ss->data, ss->sz);
             //TRACE();

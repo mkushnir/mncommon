@@ -13,14 +13,14 @@ dumpdir(struct dirent *de)
 {
 #if defined(_BITS_TYPESIZES_H) && defined(__INO_T_TYPE)
     TRACE("fileno=%ld reclen=%hd type=%d namelen=%ld name=%s",
-          de->d_fileno,
+          (long)de->d_fileno,
           de->d_reclen,
           de->d_type,
           _D_EXACT_NAMLEN(de),
           de->d_name);
 #else
-    TRACE("fileno=%d reclen=%hd type=%hhd namelen=%hhd name=%s",
-          de->d_fileno,
+    TRACE("fileno=%ld reclen=%hd type=%hhd namelen=%hd name=%s",
+          (long)de->d_fileno,
           de->d_reclen,
           de->d_type,
           _D_EXACT_NAMLEN(de),
