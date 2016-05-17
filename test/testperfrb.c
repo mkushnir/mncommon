@@ -8,7 +8,7 @@
 #include "rb.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/util.h"
-#ifdef USE_MEMDEBUG
+#ifdef DO_MEMDEBUG
 #include "mrkcommon/memdebug.h"
 MEMDEBUG_DECLARE(testperfrb);
 #endif
@@ -135,7 +135,7 @@ test0(void)
 int
 main(void)
 {
-#ifdef USE_MEMDEBUG
+#ifdef DO_MEMDEBUG
     MEMDEBUG_REGISTER(testperfrb);
 #endif
 
@@ -143,7 +143,7 @@ main(void)
 
     test0();
 
-#ifdef USE_MEMDEBUG
+#ifdef DO_MEMDEBUG
     memdebug_print_stats();
 #endif
 

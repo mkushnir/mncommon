@@ -9,7 +9,7 @@
 #include "mrkcommon/hash.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/util.h"
-#ifdef USE_MEMDEBUG
+#ifdef DO_MEMDEBUG
 #include "mrkcommon/memdebug.h"
 MEMDEBUG_DECLARE(testperfdict);
 #endif
@@ -143,7 +143,7 @@ int
 main(void)
 {
 #ifndef NDEBUG
-#ifdef USE_MEMDEBUG
+#ifdef DO_MEMDEBUG
     MEMDEBUG_REGISTER(testperfdict);
     //MEMDEBUG_REGISTER(dict);
 #endif
@@ -153,7 +153,7 @@ main(void)
 
     test0();
 
-#ifdef USE_MEMDEBUG
+#ifdef DO_MEMDEBUG
     memdebug_print_stats();
 #endif
     profile_fini_module();

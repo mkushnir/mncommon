@@ -8,7 +8,7 @@
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/btrie.h"
 #include "mrkcommon/util.h"
-#ifdef USE_MEMDEBUG
+#ifdef DO_MEMDEBUG
 #include "mrkcommon/memdebug.h"
 MEMDEBUG_DECLARE(testtrieorder);
 #endif
@@ -94,7 +94,7 @@ test0(void)
 int
 main(void)
 {
-#ifdef USE_MEMDEBUG
+#ifdef DO_MEMDEBUG
     MEMDEBUG_REGISTER(testtrieorder);
 #endif
     test0();
