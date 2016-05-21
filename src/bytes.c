@@ -202,6 +202,22 @@ bytes_json_unescape(bytes_t *src)
 }
 
 
+void bytes_tr(bytes_t *s, unsigned char *from, unsigned char *to, size_t sz) {
+    size_t i;
+
+    for (i = 0; i < s->sz; ++i) {
+        size_t j;
+
+        for (j = 0; j < sz; ++j) {
+            if (s->data[i] == from[j]) {
+                s->data[i] = to[j];
+            }
+        }
+    }
+    s->hash = 0;
+}
+
+
 bool
 bytes_is_ascii(bytes_t *s)
 {

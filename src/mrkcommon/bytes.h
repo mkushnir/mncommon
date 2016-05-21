@@ -137,6 +137,7 @@ void bytes_rstrip_blanks(bytes_t *);
 bytes_t *bytes_set_lower(bytes_t *s);
 bytes_t *bytes_json_escape(bytes_t *);
 void bytes_json_unescape(bytes_t *);
+void bytes_tr(bytes_t *, unsigned char *, unsigned char *, size_t);
 bool bytes_is_ascii(bytes_t *);
 bool bytes_startswith(const bytes_t *, const bytes_t *);
 bool bytes_endswith(const bytes_t *, const bytes_t *);
