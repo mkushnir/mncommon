@@ -333,6 +333,39 @@ bytestream_new(ssize_t growsz)
 }
 
 
+bytestream_t *
+bytestream_copy(bytestream_t *bs)
+{
+    bytestream_t *res;
+
+    if ((res = malloc(sizeof(bytestream_t))) == NULL) {
+        FAIL("malloc");
+    }
+
+    res->buf.sz = bs->buf.sz;
+    res->growsz = bs->growsz;
+    MEMDEBUG_INIT(res);
+    MEMDEBUG_ENTER(res);
+    if (bs->buf.data != NULL) {
+        assert(res->buf.sz > 0);
+        if ((res->buf.data = malloc(res->buf.sz)) == NULL) {
+            FAIL("malloc");
+        }
+        (void)memcpy(res->buf.data, bs->buf.data, res->buf.sz);
+    } else {
+        res->buf.data = NULL;
+    }
+    MEMDEBUG_LEAVE(res);
+    res->eod = bs->eod;
+    res->pos = bs->pos;
+    res->read_more = bs->read_more;
+    res->write = bs->write;
+    res->udata = bs->udata;
+
+    return res;
+}
+
+
 void
 bytestream_destroy(bytestream_t **bs)
 {

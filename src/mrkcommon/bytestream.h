@@ -51,6 +51,7 @@ int bytestream_init(bytestream_t *, ssize_t);
 void bytestream_fini(bytestream_t *);
 
 bytestream_t *bytestream_new(ssize_t);
+bytestream_t *bytestream_copy(bytestream_t *);
 void bytestream_destroy(bytestream_t **);
 
 int bytestream_grow(bytestream_t *, size_t);
