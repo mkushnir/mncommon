@@ -653,7 +653,7 @@ bytes_split_iter(bytes_t *str, char *delim, bytes_split_cb cb, void *udata)
     }
 
 end:
-    bytes_decref(&tmp);
+    BYTES_DECREF(&tmp);
     return res;
 }
 
