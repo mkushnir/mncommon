@@ -53,7 +53,6 @@ if HEAP
 noinst_PROGRAMS += testheap
 endif
 
-distdir = $(top_srcdir)/$(PACKAGE)-$(VERSION)/test
 noinst_HEADERS = unittest.h rb.h zltan-fasthash.h
 
 BUILT_SOURCES = ../src/diag.c ../src/diag.h
