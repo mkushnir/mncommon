@@ -78,6 +78,25 @@ bytestream_init(bytestream_t *stream, ssize_t growsz)
 
 
 int
+bytestream_init_data(bytestream_t *stream, char *data, ssize_t sz, ssize_t growsz)
+{
+    stream->buf.sz = sz;
+    stream->growsz = growsz;
+    if (sz > 0) {
+        stream->buf.data = data;
+    } else {
+        stream->buf.data = NULL;
+    }
+    stream->eod = sz;
+    stream->pos = 0;
+    stream->read_more = NULL;
+    stream->write = NULL;
+    stream->udata = NULL;
+    return 0;
+}
+
+
+int
 bytestream_grow(bytestream_t *stream, size_t incr)
 {
     char *tmp;

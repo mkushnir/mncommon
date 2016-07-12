@@ -48,6 +48,7 @@ typedef struct _bytestream {
 #define SADVANCEPOS(stream, n) (stream)->pos += (n)
 
 int bytestream_init(bytestream_t *, ssize_t);
+int bytestream_init_data(bytestream_t *, char *, ssize_t, ssize_t);
 void bytestream_fini(bytestream_t *);
 
 bytestream_t *bytestream_new(ssize_t);
