@@ -70,38 +70,50 @@ dnl AM_MAINTAINER_MODE
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile])
 AC_CONFIG_HEADERS(config.h)
 
-AC_CHECK_HEADERS([syslog.h])
-AC_CHECK_HEADERS([stddef.h])
-AC_CHECK_HEADERS([sys/socket.h])
-AC_CHECK_HEADERS([sys/param.h])
+AC_CHECK_HEADERS([byteswap.h])
+AC_CHECK_HEADERS([endian.h])
 AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([limits.h])
-AC_CHECK_HEADERS([sys/limits.h])
+AC_CHECK_HEADERS([malloc.h])
 AC_CHECK_HEADERS([malloc_np.h])
+AC_CHECK_HEADERS([stddef.h])
+AC_CHECK_HEADERS([sys/endian.h])
+AC_CHECK_HEADERS([sys/limits.h])
+AC_CHECK_HEADERS([sys/param.h])
+AC_CHECK_HEADERS([sys/socket.h])
+AC_CHECK_HEADERS([syslog.h])
+AC_CHECK_HEADER_STDBOOL
 # FreeBSD
 AC_CHECK_HEADERS([sys/tree.h])
 
 
 AC_C_CONST
 AC_C_INLINE
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
+AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
-AC_TYPE_OFF_T
-AC_TYPE_SSIZE_T
 
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([strdup])
-AC_CHECK_FUNCS([strndup])
+
+AC_CHECK_FUNCS([clock_gettime])
+AC_CHECK_FUNCS([flsl])
+AC_CHECK_FUNCS([getpagesize])
+AC_CHECK_FUNCS([malloc_usable_size])
 AC_CHECK_FUNCS([memmove])
 AC_CHECK_FUNCS([memset])
+AC_CHECK_FUNCS([strdup])
+AC_CHECK_FUNCS([strncasecmp])
+AC_CHECK_FUNCS([strndup])
+AC_CHECK_FUNCS([strstr])
 AC_CHECK_FUNCS([strtol])
-AC_CHECK_FUNCS([flsl])
-AC_CHECK_FUNCS([malloc_usable_size])
 # FreeBSD specific
 AC_CHECK_FUNCS([reallocf])
 AC_CHECK_FUNCS([sysctlbyname])

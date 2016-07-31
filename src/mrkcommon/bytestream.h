@@ -71,6 +71,81 @@ off_t bytestream_recycle(bytestream_t *, int, off_t);
 #define BYTESTREAM_NPRINTF_NEEDNORE (-130)
 int bytestream_nprintf(bytestream_t *, size_t, const char *, ...);
 int bytestream_cat(bytestream_t *, size_t, const char *);
+
+#define SCATC(bs, c)                                   \
+do {                                                   \
+    if ((bs)->eod >= (bs)->buf.sz) {                   \
+        (void)bytestream_grow((bs), (bs)->growsz);     \
+    }                                                  \
+    *((bs)->buf.data + (bs)->eod) = c;                 \
+    ++(bs)->eod;                                       \
+} while (0)                                            \
+
+
+#define SCATI32(bs, i)                                 \
+do {                                                   \
+    union {                                            \
+        char *c;                                       \
+        int32_t *i;                                    \
+    } _scat32_u;                                       \
+    while (((bs)->eod + (ssize_t)sizeof(int32_t)) >    \
+            (bs)->buf.sz) {                            \
+        (void)bytestream_grow((bs), (bs)->growsz);     \
+    }                                                  \
+    _scat32_u.c = (bs)->buf.data + (bs)->eod;          \
+    *_scat32_u.i = i;                                  \
+    (bs)->eod += sizeof(int32_t);                      \
+} while (0)                                            \
+
+
+#define SCATI64(bs, i)                                 \
+do {                                                   \
+    union {                                            \
+        char *c;                                       \
+        int64_t *i;                                    \
+    } _scat64_u;                                       \
+    while (((bs)->eod + (ssize_t)sizeof(int64_t)) >    \
+            (bs)->buf.sz) {                            \
+        (void)bytestream_grow((bs), (bs)->growsz);     \
+    }                                                  \
+    _scat64_u.c = (bs)->buf.data + (bs)->eod;          \
+    *_scat64_u.i = i;                                  \
+    (bs)->eod += sizeof(int64_t);                      \
+} while (0)                                            \
+
+
+#define SCATF(bs, f)                                   \
+do {                                                   \
+    union {                                            \
+        char *c;                                       \
+        float *f;                                      \
+    } _scat64_u;                                       \
+    while (((bs)->eod + (ssize_t)sizeof(float)) >      \
+            (bs)->buf.sz) {                            \
+        (void)bytestream_grow((bs), (bs)->growsz);     \
+    }                                                  \
+    _scat64_u.c = (bs)->buf.data + (bs)->eod;          \
+    *_scat64_u.f = f;                                  \
+    (bs)->eod += sizeof(float);                        \
+} while (0)                                            \
+
+
+#define SCATD(bs, d)                                   \
+do {                                                   \
+    union {                                            \
+        char *c;                                       \
+        double *d;                                     \
+    } _scat64_u;                                       \
+    while (((bs)->eod + (ssize_t)sizeof(double)) >     \
+            (bs)->buf.sz) {                            \
+        (void)bytestream_grow((bs), (bs)->growsz);     \
+    }                                                  \
+    _scat64_u.c = (bs)->buf.data + (bs)->eod;          \
+    *_scat64_u.d = d;                                  \
+    (bs)->eod += sizeof(double);                       \
+} while (0)                                            \
+
+
 int bytestream_dump(bytestream_t *);
 
 #ifdef __cplusplus
