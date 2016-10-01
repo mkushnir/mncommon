@@ -53,7 +53,7 @@ if HEAP
 noinst_PROGRAMS += testheap
 endif
 
-noinst_HEADERS = unittest.h rb.h zltan-fasthash.h
+noinst_HEADERS = unittest.h rb.h zltan-fasthash.h fnv/fnv.h fnv/longlong.h
 
 BUILT_SOURCES = ../src/diag.c ../src/diag.h
 
@@ -75,7 +75,7 @@ testhash_SOURCES = ../src/hash.c testhash.c
 testhash_CFLAGS =
 testhash_LDFLAGS =
 
-testfasthash_SOURCES = ../src/fasthash.c zltan-fasthash.c testfasthash.c
+testfasthash_SOURCES = ../src/fasthash.c zltan-fasthash.c fnv/hash_64a.c testfasthash.c
 testfasthash_CFLAGS =
 testfasthash_LDFLAGS = -lz
 

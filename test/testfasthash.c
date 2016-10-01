@@ -12,11 +12,13 @@
 #include <mrkcommon/bytes.h>
 #include <mrkcommon/util.h>
 #include <mrkcommon/fasthash.h>
+#include <mrkcommon/fnvhash.h>
 
 #include "diag.h"
 #include "unittest.h"
 
 #include "zltan-fasthash.h"
+#include "fnv/fnv.h"
 
 #ifndef NDEBUG
 const char *_malloc_options = "AJ";
@@ -28,11 +30,14 @@ static int genrandom = 0;
 //#define SEED (17337407878196250699ul)
 //#define SEED (0x2127599bf4325c37ULL)
 //#define SEED (0x880355f21e6d1965ULL)
-#define SEED (0)
+//#define SEED (0ull)
+#define SEED FNV_OFFSET_BASIS64
 
 //#define fasthash(seed, s, sz) fasthash64((const void *)(s), sz, seed)
 //#define fasthash(seed, s, sz) (uint64_t)adler32((uLong)seed, (const Bytef *)(s), (uInt)sz)
-#define fasthash(seed, s, sz) (uint64_t)crc32((uLong)seed, (const Bytef *)(s), (uInt)sz)
+//#define fasthash(seed, s, sz) (uint64_t)crc32((uLong)seed, (const Bytef *)(s), (uInt)sz)
+//#define fasthash(seed, s, sz) fnvhash64(seed, (const unsigned char *)(s), sz)
+//#define fasthash(seed, s, sz) fnv_64a_buf((void *)(s), sz, seed)
 
 
 static int
