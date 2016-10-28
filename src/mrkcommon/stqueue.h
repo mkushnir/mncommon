@@ -58,6 +58,8 @@ struct {                       \
 
 #define STQUEUE_HEAD(q) ((q)->stq_head)
 
+#define STQUEUE_NEXT(link, e) ((e)->link.stq_next)
+
 #define STQUEUE_TAIL(q) ((q)->stq_tail)
 
 #define STQUEUE_LENGTH(q) ((q)->nelems)
