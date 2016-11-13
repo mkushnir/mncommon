@@ -32,6 +32,8 @@ struct {                       \
 
 #define STQUEUE_FINI STQUEUE_INIT
 
+#define STQUEUE_INITIALIZER {NULL, NULL, 0}
+
 
 #define STQUEUE_ENTRY_INIT(link, e)    \
     do {                               \
@@ -40,6 +42,8 @@ struct {                       \
 
 
 #define STQUEUE_ENTRY_FINI STQUEUE_ENTRY_INIT
+
+#define STQUEUE_ENTRY_INITIALIZER {NULL}
 
 
 #define STQUEUE_ENQUEUE(q, link, entry)                \

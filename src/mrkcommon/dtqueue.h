@@ -35,6 +35,9 @@ struct {                       \
 
 #define DTQUEUE_FINI DTQUEUE_INIT
 
+#define DTQUEUE_INITIALIZER {NULL, NULL, 0}
+
+
 #define DTQUEUE_ENTRY_INIT(link, entry)\
     do {                               \
         (entry)->link.dtq_next = NULL; \
@@ -43,6 +46,9 @@ struct {                       \
 
 
 #define DTQUEUE_ENTRY_FINI DTQUEUE_ENTRY_INIT
+
+#define DTQUEUE_ENTRY_INITIALIZER {NULL, NULL}
+
 
 #define DTQUEUE_ENQUEUE(q, link, entry)                \
     do {                                               \
