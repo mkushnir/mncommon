@@ -129,15 +129,18 @@ int bytes_cmpi(bytes_t *, bytes_t *);
 int bytes_cmpi_safe(bytes_t *, bytes_t *);
 bool bytes_contains(bytes_t *, bytes_t *);
 bool bytes_containsi(bytes_t *, bytes_t *);
-void bytes_copy(bytes_t *, bytes_t *, size_t);
-void bytes_copyz(bytes_t *, bytes_t *, size_t);
+void bytes_copy(bytes_t * restrict, bytes_t * restrict, size_t);
+void bytes_copyz(bytes_t * restrict, bytes_t * restrict, size_t);
 void bytes_brushdown(bytes_t *);
 void bytes_urldecode(bytes_t *);
 void bytes_rstrip_blanks(bytes_t *);
 bytes_t *bytes_set_lower(bytes_t *s);
 bytes_t *bytes_json_escape(bytes_t *);
 void bytes_json_unescape(bytes_t *);
-void bytes_tr(bytes_t *, unsigned char *, unsigned char *, size_t);
+void bytes_tr(bytes_t * restrict,
+              unsigned char * restrict,
+              unsigned char * restrict,
+              size_t);
 bool bytes_is_ascii(bytes_t *);
 bool bytes_startswith(const bytes_t *, const bytes_t *);
 bool bytes_endswith(const bytes_t *, const bytes_t *);

@@ -202,7 +202,10 @@ bytes_json_unescape(bytes_t *src)
 }
 
 
-void bytes_tr(bytes_t *s, unsigned char *from, unsigned char *to, size_t sz) {
+void bytes_tr(bytes_t * restrict s,
+              unsigned char * restrict from,
+              unsigned char * restrict to,
+              size_t sz) {
     size_t i;
 
     for (i = 0; i < s->sz; ++i) {
@@ -489,7 +492,7 @@ bytes_printf(const char *fmt, ...)
 }
 
 void
-bytes_copy(bytes_t *dst, bytes_t *src, size_t off)
+bytes_copy(bytes_t * restrict dst, bytes_t * restrict src, size_t off)
 {
     assert((off + src->sz) <= dst->sz);
     memcpy(dst->data + off, src->data, src->sz);
@@ -497,7 +500,7 @@ bytes_copy(bytes_t *dst, bytes_t *src, size_t off)
 
 
 void
-bytes_copyz(bytes_t *dst, bytes_t *src, size_t off)
+bytes_copyz(bytes_t * restrict dst, bytes_t * restrict src, size_t off)
 {
     assert((off + src->sz - 1) <= dst->sz);
     memcpy(dst->data + off, src->data, src->sz - 1);
