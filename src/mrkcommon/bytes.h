@@ -63,6 +63,16 @@ typedef struct _bytes {
 }                              \
 
 
+#define BYTES_ALLOCA(n, s)                             \
+    struct {                                           \
+        ssize_t nref;                                  \
+        size_t sz;                                     \
+        uint64_t hash;                                 \
+        unsigned char data[sizeof(s)];                 \
+    } __bytes_alloca_ ## n = BYTES_INITIALIZER(s);     \
+    bytes_t *n = (bytes_t *) &__bytes_alloca_ ## n;    \
+
+
 #define BYTES_INCREF(b)                        \
 do {                                           \
     (++(b)->nref);                             \
