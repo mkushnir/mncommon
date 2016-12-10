@@ -204,7 +204,7 @@ pset_item_t *
 pset_peek(pset_t *pset, pset_item_t *it)
 {
     pset_item_t *res;
-    hash_item_t *dit;
+    mnhash_item_t *dit;
     if ((dit = hash_get_item(&pset->d, it)) == NULL) {
         res = NULL;
     } else {
@@ -250,7 +250,7 @@ pset_item_t *
 pset_push(pset_t *pset, pset_item_t *it)
 {
     pset_item_t *res;
-    hash_item_t *dit;
+    mnhash_item_t *dit;
 
     if (it->cmprop <= pset->fast_pop_thresh) {
         res = it;

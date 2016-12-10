@@ -33,7 +33,7 @@ typedef struct _cmhash {
 
 typedef struct _pset {
     ssize_t nleft;
-    hash_t d;
+    mnhash_t d;
     CMTY minthresh;
     CMTY fast_pop_thresh;
 } pset_t;
@@ -65,7 +65,7 @@ void cmhash_dump(cmhash_t *);
 
 
 /*
- * pset -- hash_t based priority set
+ * pset -- mnhash_t based priority set
  */
 pset_item_t *pset_peek(pset_t *, pset_item_t *);
 pset_item_t *pset_pop(pset_t *);

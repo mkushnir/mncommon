@@ -66,7 +66,7 @@ strrstr(const char *big, const char *little)
 
 
 bool
-bytes_startswith(const bytes_t *big, const bytes_t *small)
+bytes_startswith(const mnbytes_t *big, const mnbytes_t *small)
 {
     bool res;
 
@@ -88,7 +88,7 @@ end:
 
 
 bool
-bytes_endswith(const bytes_t *big, const bytes_t *small)
+bytes_endswith(const mnbytes_t *big, const mnbytes_t *small)
 {
     int res;
 
@@ -112,17 +112,17 @@ end:
 
 
 bool
-bytes_is_null_or_empty(const bytes_t *s)
+bytes_is_null_or_empty(const mnbytes_t *s)
 {
     return s == NULL || (s->sz == 1 && *s->data == '\0') || s->sz == 0;
 }
 
 
-bytes_t *
-bytes_json_escape(bytes_t *src)
+mnbytes_t *
+bytes_json_escape(mnbytes_t *src)
 {
     size_t i, j;
-    bytes_t *dest;
+    mnbytes_t *dest;
 
     /* partial json string support */
     dest = bytes_new(src->sz * 2);
@@ -163,10 +163,10 @@ bytes_json_escape(bytes_t *src)
 
 
 void
-bytes_json_unescape(bytes_t *src)
+bytes_json_unescape(mnbytes_t *src)
 {
     size_t i, j;
-    bytes_t *dest;
+    mnbytes_t *dest;
 
     /* partial json string support */
     dest = src;
@@ -202,7 +202,7 @@ bytes_json_unescape(bytes_t *src)
 }
 
 
-void bytes_tr(bytes_t * restrict s,
+void bytes_tr(mnbytes_t * restrict s,
               unsigned char * restrict from,
               unsigned char * restrict to,
               size_t sz) {
@@ -222,7 +222,7 @@ void bytes_tr(bytes_t * restrict s,
 
 
 bool
-bytes_is_ascii(bytes_t *s)
+bytes_is_ascii(mnbytes_t *s)
 {
     size_t i, sz;
     char mod;
@@ -248,8 +248,8 @@ bytes_is_ascii(bytes_t *s)
 }
 
 
-bytes_t *
-bytes_set_lower(bytes_t *s)
+mnbytes_t *
+bytes_set_lower(mnbytes_t *s)
 {
     ssize_t sz;
 
@@ -262,7 +262,7 @@ bytes_set_lower(bytes_t *s)
 }
 
 uint64_t
-bytes_hash(bytes_t *bytes)
+bytes_hash(mnbytes_t *bytes)
 {
     if (bytes->hash == 0) {
         bytes->hash = fasthash(0, bytes->data, bytes->sz);
@@ -287,7 +287,7 @@ bytes_hash(bytes_t *bytes)
 
 
 int
-bytes_cmp(bytes_t *a, bytes_t *b)
+bytes_cmp(mnbytes_t *a, mnbytes_t *b)
 {
     uint64_t ha, hb;
     int64_t diff;
@@ -306,14 +306,14 @@ bytes_cmp(bytes_t *a, bytes_t *b)
 
 
 int
-bytes_cmp_safe(bytes_t *a, bytes_t *b)
+bytes_cmp_safe(mnbytes_t *a, mnbytes_t *b)
 {
     BUTES_CMP_SAFE_BODY(bytes_cmp)
 }
 
 
 int
-bytes_cmpv(bytes_t *a, bytes_t *b)
+bytes_cmpv(mnbytes_t *a, mnbytes_t *b)
 {
     return strncmp((char *)a->data,
                    (char *)b->data,
@@ -322,14 +322,14 @@ bytes_cmpv(bytes_t *a, bytes_t *b)
 
 
 int
-bytes_cmpv_safe(bytes_t *a, bytes_t *b)
+bytes_cmpv_safe(mnbytes_t *a, mnbytes_t *b)
 {
     BUTES_CMP_SAFE_BODY(bytes_cmpv)
 }
 
 
 int
-bytes_cmpi(bytes_t *a, bytes_t *b)
+bytes_cmpi(mnbytes_t *a, mnbytes_t *b)
 {
     return strncasecmp((char *)a->data,
                        (char *)b->data,
@@ -338,14 +338,14 @@ bytes_cmpi(bytes_t *a, bytes_t *b)
 
 
 int
-bytes_cmpi_safe(bytes_t *a, bytes_t *b)
+bytes_cmpi_safe(mnbytes_t *a, mnbytes_t *b)
 {
     BUTES_CMP_SAFE_BODY(bytes_cmpi)
 }
 
 
 bool
-bytes_contains(bytes_t *a, bytes_t *b)
+bytes_contains(mnbytes_t *a, mnbytes_t *b)
 {
     if (a->data[a->sz - 1] != '\0' || b->data[b->sz - 1] != '\0') {
         return false;
@@ -355,7 +355,7 @@ bytes_contains(bytes_t *a, bytes_t *b)
 
 
 bool
-bytes_containsi(bytes_t *a, bytes_t *b)
+bytes_containsi(mnbytes_t *a, mnbytes_t *b)
 {
     if (a->data[a->sz - 1] != '\0' || b->data[b->sz - 1] != '\0') {
         return false;
@@ -366,7 +366,7 @@ bytes_containsi(bytes_t *a, bytes_t *b)
 
 #define BYTES_NEW_BODY(malloc_fn)                              \
     size_t mod, msz;                                           \
-    bytes_t *res;                                              \
+    mnbytes_t *res;                                              \
     assert(sz > 0);                                            \
     msz = sz;                                                  \
     mod = sz % 8;                                              \
@@ -375,7 +375,7 @@ bytes_containsi(bytes_t *a, bytes_t *b)
     } else {                                                   \
         msz += 8;                                              \
     }                                                          \
-    if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) {    \
+    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {    \
         FAIL("malloc");                                        \
     }                                                          \
     MEMDEBUG_INIT(res);                                        \
@@ -385,7 +385,7 @@ bytes_containsi(bytes_t *a, bytes_t *b)
     return res
 
 #define BYTES_NEW_FROM_STR_BODY(malloc_fn)                     \
-    bytes_t *res;                                              \
+    mnbytes_t *res;                                              \
     size_t mod, msz;                                           \
     size_t sz;                                                 \
     sz = strlen(s) + 1;                                        \
@@ -396,7 +396,7 @@ bytes_containsi(bytes_t *a, bytes_t *b)
     } else {                                                   \
         msz += 8;                                              \
     }                                                          \
-    if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) {    \
+    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {    \
         FAIL("malloc");                                        \
     }                                                          \
     MEMDEBUG_INIT(res);                                        \
@@ -407,14 +407,14 @@ bytes_containsi(bytes_t *a, bytes_t *b)
     return res
 
 
-bytes_t *
+mnbytes_t *
 bytes_new(size_t sz)
 {
     BYTES_NEW_BODY(malloc);
 }
 
 
-bytes_t *
+mnbytes_t *
 bytes_new_from_str(const char *s)
 {
     BYTES_NEW_FROM_STR_BODY(malloc);
@@ -422,7 +422,7 @@ bytes_new_from_str(const char *s)
 
 
 #define BYTES_NEW_FROM_BYTES_BODY(malloc_fn)                   \
-    bytes_t *res;                                              \
+    mnbytes_t *res;                                              \
     size_t mod, msz;                                           \
     assert(s->sz > 0);                                         \
     msz = s->sz;                                               \
@@ -432,7 +432,7 @@ bytes_new_from_str(const char *s)
     } else {                                                   \
         msz += 8;                                              \
     }                                                          \
-    if ((res = malloc_fn(sizeof(bytes_t) + msz)) == NULL) {    \
+    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {    \
         FAIL("malloc");                                        \
     }                                                          \
     MEMDEBUG_INIT(res);                                        \
@@ -443,38 +443,38 @@ bytes_new_from_str(const char *s)
     return res
 
 
-bytes_t *
-bytes_new_from_bytes(const bytes_t *s)
+mnbytes_t *
+bytes_new_from_bytes(const mnbytes_t *s)
 {
     BYTES_NEW_FROM_BYTES_BODY(malloc);
 }
 
 
 #define _malloc(sz) mpool_malloc(mpool, (sz))
-bytes_t *
+mnbytes_t *
 bytes_new_mpool(mpool_ctx_t *mpool, size_t sz)
 {
     BYTES_NEW_BODY(_malloc);
 }
-bytes_t *
+mnbytes_t *
 bytes_new_from_str_mpool(mpool_ctx_t *mpool, const char *s)
 {
     BYTES_NEW_FROM_STR_BODY(_malloc);
 }
-bytes_t *
-bytes_new_from_bytes_mpool(mpool_ctx_t *mpool, const bytes_t *s)
+mnbytes_t *
+bytes_new_from_bytes_mpool(mpool_ctx_t *mpool, const mnbytes_t *s)
 {
     BYTES_NEW_FROM_BYTES_BODY(_malloc);
 }
 #undef _malloc
 
 
-bytes_t * PRINTFLIKE(1, 2)
+mnbytes_t * PRINTFLIKE(1, 2)
 bytes_printf(const char *fmt, ...)
 {
     int nused;
     char x;
-    bytes_t *res;
+    mnbytes_t *res;
     va_list ap0, ap1;
 
     va_start(ap0, fmt);
@@ -492,7 +492,7 @@ bytes_printf(const char *fmt, ...)
 }
 
 void
-bytes_copy(bytes_t * restrict dst, bytes_t * restrict src, size_t off)
+bytes_copy(mnbytes_t * restrict dst, mnbytes_t * restrict src, size_t off)
 {
     assert((off + src->sz) <= dst->sz);
     memcpy(dst->data + off, src->data, src->sz);
@@ -500,7 +500,7 @@ bytes_copy(bytes_t * restrict dst, bytes_t * restrict src, size_t off)
 
 
 void
-bytes_copyz(bytes_t * restrict dst, bytes_t * restrict src, size_t off)
+bytes_copyz(mnbytes_t * restrict dst, mnbytes_t * restrict src, size_t off)
 {
     assert((off + src->sz - 1) <= dst->sz);
     memcpy(dst->data + off, src->data, src->sz - 1);
@@ -509,7 +509,7 @@ bytes_copyz(bytes_t * restrict dst, bytes_t * restrict src, size_t off)
 
 
 void
-bytes_urldecode(bytes_t *str)
+bytes_urldecode(mnbytes_t *str)
 {
     unsigned char *src, *dst;
     unsigned char *end;
@@ -558,7 +558,7 @@ bytes_urldecode(bytes_t *str)
 
 
 void
-bytes_rstrip_blanks(bytes_t *str)
+bytes_rstrip_blanks(mnbytes_t *str)
 {
     ssize_t idx;
 
@@ -582,7 +582,7 @@ bytes_rstrip_blanks(bytes_t *str)
  * URL decode + remove spaces
  */
 void
-bytes_brushdown(bytes_t *str)
+bytes_brushdown(mnbytes_t *str)
 {
     unsigned char *src, *dst;
     unsigned char *end;
@@ -636,10 +636,10 @@ bytes_brushdown(bytes_t *str)
 
 
 int
-bytes_split_iter(bytes_t *str, char *delim, bytes_split_cb cb, void *udata)
+bytes_split_iter(mnbytes_t *str, char *delim, bytes_split_cb cb, void *udata)
 {
     int res = 0;
-    bytes_t *tmp = NULL;
+    mnbytes_t *tmp = NULL;
 
     if (*delim != '\0') {
         char *p0, *p1;
@@ -678,21 +678,21 @@ end:
 
 
 void
-bytes_decref(bytes_t **value)
+bytes_decref(mnbytes_t **value)
 {
     _BYTES_DECREF(value);
 }
 
 
 void
-bytes_decref_fast(bytes_t *value)
+bytes_decref_fast(mnbytes_t *value)
 {
     _BYTES_DECREF_FAST(value);
 }
 
 
 void
-bytes_incref(bytes_t *value)
+bytes_incref(mnbytes_t *value)
 {
     BYTES_INCREF(value);
 }

@@ -19,8 +19,8 @@ extern "C" {
 
 #define MRK_JPRINTF_PAIR_BS00(bs, key, value, comma)                   \
 do {                                                                   \
-    bytes_t *_eqc_jprintf_pair_bytes_tmp0;                             \
-    bytes_t *_eqc_jprintf_pair_bytes_tmp1;                             \
+    mnbytes_t *_eqc_jprintf_pair_bytes_tmp0;                             \
+    mnbytes_t *_eqc_jprintf_pair_bytes_tmp1;                             \
     _eqc_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1);         \
     (void)memcpy((char *)_eqc_jprintf_pair_bytes_tmp0->data,           \
                  SDATA(value, 0),                                      \
@@ -47,8 +47,8 @@ do {                                                                   \
 
 #define MRK_JPRINTF_ITEM_BS00(bs, value, comma)                \
 do {                                                           \
-    bytes_t *_eqc_jprintf_pair_bytes_tmp0;                     \
-    bytes_t *_eqc_jprintf_pair_bytes_tmp1;                     \
+    mnbytes_t *_eqc_jprintf_pair_bytes_tmp0;                     \
+    mnbytes_t *_eqc_jprintf_pair_bytes_tmp1;                     \
     _eqc_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1); \
     (void)memcpy((char *)_eqc_jprintf_pair_bytes_tmp0->data,   \
                  SDATA(value, 0),                              \
@@ -76,7 +76,7 @@ do {                                                           \
 #define MRK_JPRINTF_PAIR_BYTES00(bs, key, value, comma)                        \
 do {                                                                           \
     if (value != NULL) {                                                       \
-        bytes_t *_eqc_jprintf_pair_bytes_tmp;                                  \
+        mnbytes_t *_eqc_jprintf_pair_bytes_tmp;                                  \
         _eqc_jprintf_pair_bytes_tmp = bytes_json_escape(value);                \
         (void)bytestream_nprintf(                                              \
                 bs,                                                            \
@@ -103,7 +103,7 @@ do {                                                                           \
 #define MRK_JPRINTF_ITEM_BYTES00(bs, value, comma)             \
 do {                                                           \
     if (value != NULL) {                                       \
-        bytes_t *_eqc_jprintf_pair_bytes_tmp;                  \
+        mnbytes_t *_eqc_jprintf_pair_bytes_tmp;                  \
         _eqc_jprintf_pair_bytes_tmp = bytes_json_escape(value);\
         (void)bytestream_nprintf(                              \
                 bs,                                            \

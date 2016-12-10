@@ -3,7 +3,7 @@
 #include <mrkcommon/util.h>
 
 static ssize_t
-bytestream_read_more_bytes(bytestream_t *bs, UNUSED int fd, ssize_t sz)
+bytestream_read_more_bytes(mnbytestream_t *bs, UNUSED int fd, ssize_t sz)
 {
     ssize_t over;
     ssize_t nleft;
@@ -24,7 +24,7 @@ bytestream_read_more_bytes(bytestream_t *bs, UNUSED int fd, ssize_t sz)
 
 
 void
-bytestream_from_bytes(bytestream_t *bs, const bytes_t *str)
+bytestream_from_bytes(mnbytestream_t *bs, const mnbytes_t *str)
 {
     bytestream_init(bs, 0);
     bs->read_more = bytestream_read_more_bytes;

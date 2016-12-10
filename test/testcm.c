@@ -52,7 +52,7 @@ myfini(cmhash_t *key, UNUSED void *value)
 static void
 test0(void)
 {
-    hash_t d;
+    mnhash_t d;
     struct {
         long rnd;
         char *s;
@@ -71,7 +71,7 @@ test0(void)
               (hash_item_finalizer_t)myfini);
 
     FOREACHDATA {
-        hash_item_t *dit;
+        mnhash_item_t *dit;
         cmhash_t *cmh;
 
         cmh = cmhash_new(10, 20);
@@ -96,7 +96,7 @@ test0(void)
 UNUSED static void
 test1(const char *fname)
 {
-    hash_t d;
+    mnhash_t d;
     FILE *f = NULL;
     char *s;
     size_t sz0;
@@ -116,7 +116,7 @@ test1(const char *fname)
          (sz1 = getline(&s, &sz0, f)) > 0;
          s = NULL, sz0 = 0) {
 
-        hash_item_t *dit;
+        mnhash_item_t *dit;
         cmhash_t *cmh;
 
         if (sz1 < 64) {
@@ -252,7 +252,7 @@ sion
 static uint64_t
 pset_item_hash(pset_item_t *it)
 {
-    bytes_t *s;
+    mnbytes_t *s;
     s = it->v;
     return bytes_hash(s);
 }
@@ -261,7 +261,7 @@ pset_item_hash(pset_item_t *it)
 static int
 pset_item_cmp(pset_item_t *a, pset_item_t *b)
 {
-    bytes_t *sa, *sb;
+    mnbytes_t *sa, *sb;
     sa = a->v;
     sb = b->v;
     return bytes_cmp(sa, sb);
@@ -272,7 +272,7 @@ static int
 pset_item_fini(pset_item_t *it)
 {
     if (it != NULL) {
-        bytes_t *s;
+        mnbytes_t *s;
         s = it->v;
         //TRACE("decrefing %s", s->data);
         bytes_decref(&s);
@@ -300,7 +300,7 @@ int
 mycb(pset_item_t *it, UNUSED void *v, void *udata)
 {
     CMTY *aggr;
-    bytes_t *s;
+    mnbytes_t *s;
 
     s = it->v;
     aggr = udata;
@@ -350,14 +350,14 @@ test2(char *fname)
 
         if ((it1 = pset_peek(&pset, it0)) == NULL) {
             if ((it1 = pset_push(&pset, it0)) != NULL) {
-                UNUSED bytes_t *s;
+                UNUSED mnbytes_t *s;
 
                 s = it1->v;
                 //TRACE("deleting %s", s->data);
                 pset_item_fini(it1);
             }
         } else {
-            UNUSED bytes_t *s;
+            UNUSED mnbytes_t *s;
 
             s = it0->v;
             //TRACE("deleting dup %s", s->data);
@@ -377,7 +377,7 @@ test2(char *fname)
 static void
 pset_item_tell_cm(pset_item_t *it, cm_t *cm)
 {
-    bytes_t *s;
+    mnbytes_t *s;
 
     s = it->v;
     cm_add(cm, s->data, s->sz, 1);
@@ -389,7 +389,7 @@ pset_item_tell_cm(pset_item_t *it, cm_t *cm)
 UNUSED static void
 pset_item_ask_cm(pset_item_t *it, cm_t *cm)
 {
-    bytes_t *s;
+    mnbytes_t *s;
 
     s = it->v;
     it->cmprop = 0x7fffffff;
@@ -440,14 +440,14 @@ test3(char *fname)
 
         if ((it1 = pset_peek(&pset, it0)) == NULL) {
             if ((it1 = pset_push(&pset, it0)) != NULL) {
-                UNUSED bytes_t *s;
+                UNUSED mnbytes_t *s;
 
                 //s = it1->v;
                 //TRACE("deleting %s", s->data);
                 pset_item_fini(it1);
             }
         } else {
-            UNUSED bytes_t *s;
+            UNUSED mnbytes_t *s;
 
             //s = it0->v;
             //TRACE("deleting dup %s", s->data);

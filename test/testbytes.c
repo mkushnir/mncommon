@@ -22,7 +22,7 @@ test0(void)
         {0, 0, 0},
     };
 
-    bytes_t *b1;
+    mnbytes_t *b1;
 
     UNITTEST_PROLOG_RAND;
 
@@ -86,7 +86,7 @@ static void
 test1(void)
 {
     unsigned i;
-    bytes_t *b1, *b2;
+    mnbytes_t *b1, *b2;
     const char *s[] = {
         "This is the test",
         "This is the test\\",
@@ -259,7 +259,7 @@ test5(void)
     } data[] = {
         {0, 0, 0},
     };
-    bytes_t *b;
+    mnbytes_t *b;
     UNITTEST_PROLOG_RAND;
 
     b = bytes_printf("%d:%d:%d:%s:%lld", 1,2,3, "tis is", 0x12345678912345ll);

@@ -44,8 +44,8 @@ test0(void)
     } data[] = {
         {0, 0, 0},
     };
-    hash_t dict;
-    hash_item_t *v1;
+    mnhash_t dict;
+    mnhash_item_t *v1;
     void *v2;
 
 
@@ -130,7 +130,7 @@ my_item_cmp(my_item_t *a , my_item_t *b)
 }
 
 static int
-my_item_print(UNUSED hash_t *dict, hash_item_t *dit, UNUSED void *udata)
+my_item_print(UNUSED mnhash_t *dict, mnhash_item_t *dit, UNUSED void *udata)
 {
     my_item_t *key;
 
@@ -141,7 +141,7 @@ my_item_print(UNUSED hash_t *dict, hash_item_t *dit, UNUSED void *udata)
 
 
 static int
-my_item_delete(hash_t *dict, hash_item_t *dit, void *udata)
+my_item_delete(mnhash_t *dict, mnhash_item_t *dit, void *udata)
 {
     my_item_t *key;
     union {
@@ -165,7 +165,7 @@ my_item_delete(hash_t *dict, hash_item_t *dit, void *udata)
 static void
 test1(void)
 {
-    hash_t dict;
+    mnhash_t dict;
 
     hash_init(&dict,
               3,
@@ -215,7 +215,7 @@ static void
 test2(void)
 {
     int i;
-    hash_t dict;
+    mnhash_t dict;
 
     hash_init(&dict,
               3,

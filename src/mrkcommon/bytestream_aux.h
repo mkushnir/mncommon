@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-void bytestream_from_bytes(bytestream_t *, const bytes_t *);
+void bytestream_from_bytes(mnbytestream_t *, const mnbytes_t *);
 
 #ifdef __cplusplus
 }

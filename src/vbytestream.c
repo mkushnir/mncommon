@@ -14,7 +14,7 @@
 
 
 static int
-bytes_init(bytes_t **b)
+bytes_init(mnbytes_t **b)
 {
     *b = NULL;
     return 0;
@@ -22,7 +22,7 @@ bytes_init(bytes_t **b)
 
 
 static int
-bytes_fini(bytes_t **b)
+bytes_fini(mnbytes_t **b)
 {
     BYTES_DECREF(b);
     return 0;
@@ -64,7 +64,7 @@ vbytestream_init(vbytestream_t *stream, size_t growsz, size_t iovreserve)
     assert(growsz > 0);
 
     (void)array_init(&stream->bytes,
-                     sizeof(bytes_t *),
+                     sizeof(mnbytes_t *),
                      0,
                      (array_initializer_t)bytes_init,
                      (array_finalizer_t)bytes_fini);

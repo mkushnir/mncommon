@@ -113,7 +113,7 @@ static int
 oint(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
-    bytes_t *key;
+    mnbytes_t *key;
     jparse_value_t val = {.v.i = 0};
 
     key = bytes_new_from_str("abc");
@@ -149,7 +149,7 @@ static int
 ofloat(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
-    bytes_t *key;
+    mnbytes_t *key;
     jparse_value_t val = { .v.f = .0};
 
     key = bytes_new_from_str("abc");
@@ -176,7 +176,7 @@ static int
 ostr(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
-    bytes_t *key;
+    mnbytes_t *key;
     jparse_value_t val = { .v.s = NULL};
 
     key = bytes_new_from_str("abc");
@@ -203,7 +203,7 @@ static int
 obool(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
-    bytes_t *key;
+    mnbytes_t *key;
     jparse_value_t val = { .v.b = 0 };
 
     key = bytes_new_from_str("abc");
@@ -237,7 +237,7 @@ static int
 oarray(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
-    bytes_t *key;
+    mnbytes_t *key;
 
     key = bytes_new_from_str("abc");
     res = jparse_expect_kvp_array(jctx, key, aint, NULL, NULL);
@@ -414,9 +414,9 @@ test1(void)
 
 
 
-UNUSED static bytes_t _o1 = BYTES_INITIALIZER("o1");
-UNUSED static bytes_t _o2 = BYTES_INITIALIZER("o2");
-UNUSED static bytes_t _o3 = BYTES_INITIALIZER("o3");
+UNUSED static mnbytes_t _o1 = BYTES_INITIALIZER("o1");
+UNUSED static mnbytes_t _o2 = BYTES_INITIALIZER("o2");
+UNUSED static mnbytes_t _o3 = BYTES_INITIALIZER("o3");
 
 
 DEF_JPARSE_ARRAY_ITERATOR(ai, jparse_expect_item_ignore)
@@ -446,7 +446,7 @@ ocb(jparse_ctx_t *jctx,
 
 static int
 oexp(jparse_ctx_t *jctx,
-     bytes_t **k,
+     mnbytes_t **k,
      UNUSED jparse_value_t *jval,
      void *udata)
 {
@@ -494,11 +494,11 @@ mycb300(jparse_ctx_t *jctx,
 
 
 
-UNUSED static bytes_t _queries = BYTES_INITIALIZER("queries");
-UNUSED static bytes_t _id = BYTES_INITIALIZER("id");
-UNUSED static bytes_t _name = BYTES_INITIALIZER("name");
-UNUSED static bytes_t _meta = BYTES_INITIALIZER("meta");
-UNUSED static bytes_t _versions = BYTES_INITIALIZER("versions");
+UNUSED static mnbytes_t _queries = BYTES_INITIALIZER("queries");
+UNUSED static mnbytes_t _id = BYTES_INITIALIZER("id");
+UNUSED static mnbytes_t _name = BYTES_INITIALIZER("name");
+UNUSED static mnbytes_t _meta = BYTES_INITIALIZER("meta");
+UNUSED static mnbytes_t _versions = BYTES_INITIALIZER("versions");
 
 
 static int
@@ -529,7 +529,7 @@ static int
 query_item(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, void *udata)
 {
     int res;
-    bytes_t *k;
+    mnbytes_t *k;
     jparse_value_t _jval;
     jparse_value_init(&_jval);
     _jval.cb = query_field_nonscalar;
@@ -565,7 +565,7 @@ DEF_JPARSE_ARRAY_ITERATOR(queries_array, queries_array)
 
 static int
 queries_key(jparse_ctx_t *jctx,
-            UNUSED bytes_t **k,
+            UNUSED mnbytes_t **k,
             jparse_value_t *jval,
             void *udata)
 {

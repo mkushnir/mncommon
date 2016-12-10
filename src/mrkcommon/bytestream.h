@@ -28,7 +28,7 @@ typedef struct _bytestream {
     ssize_t (*write)(struct _bytestream *, int, size_t);
     void *udata;
 
-} bytestream_t;
+} mnbytestream_t;
 
 #define SNCHR(stream, n) ((stream)->buf.data[(n)])
 #define SPCHR(stream) SNCHR((stream), (stream)->pos)
@@ -47,30 +47,30 @@ typedef struct _bytestream {
 #define SDECR(stream) --((stream)->pos)
 #define SADVANCEPOS(stream, n) (stream)->pos += (n)
 
-int bytestream_init(bytestream_t *, ssize_t);
-int bytestream_init_data(bytestream_t *, char *, ssize_t, ssize_t);
-void bytestream_fini(bytestream_t *);
+int bytestream_init(mnbytestream_t *, ssize_t);
+int bytestream_init_data(mnbytestream_t *, char *, ssize_t, ssize_t);
+void bytestream_fini(mnbytestream_t *);
 
-bytestream_t *bytestream_new(ssize_t);
-bytestream_t *bytestream_copy(bytestream_t *);
-void bytestream_destroy(bytestream_t **);
+mnbytestream_t *bytestream_new(ssize_t);
+mnbytestream_t *bytestream_copy(mnbytestream_t *);
+void bytestream_destroy(mnbytestream_t **);
 
-int bytestream_grow(bytestream_t *, size_t);
+int bytestream_grow(mnbytestream_t *, size_t);
 
-ssize_t bytestream_read_more(bytestream_t *, int, ssize_t);
-ssize_t bytestream_recv_more(bytestream_t *, int, ssize_t);
-ssize_t bytestream_write(bytestream_t *, int, size_t);
-ssize_t bytestream_stderr_write(bytestream_t *, int, size_t);
-ssize_t bytestream_send(bytestream_t *, int, size_t);
+ssize_t bytestream_read_more(mnbytestream_t *, int, ssize_t);
+ssize_t bytestream_recv_more(mnbytestream_t *, int, ssize_t);
+ssize_t bytestream_write(mnbytestream_t *, int, size_t);
+ssize_t bytestream_stderr_write(mnbytestream_t *, int, size_t);
+ssize_t bytestream_send(mnbytestream_t *, int, size_t);
 
-int bytestream_consume_data(bytestream_t *, int);
-int bytestream_produce_data(bytestream_t *, int);
-void bytestream_rewind(bytestream_t *);
-off_t bytestream_recycle(bytestream_t *, int, off_t);
+int bytestream_consume_data(mnbytestream_t *, int);
+int bytestream_produce_data(mnbytestream_t *, int);
+void bytestream_rewind(mnbytestream_t *);
+off_t bytestream_recycle(mnbytestream_t *, int, off_t);
 #define BYTESTREAM_NPRINTF_ERROR (-129)
 #define BYTESTREAM_NPRINTF_NEEDNORE (-130)
-int bytestream_nprintf(bytestream_t *, size_t, const char *, ...);
-int bytestream_cat(bytestream_t *, size_t, const char *);
+int bytestream_nprintf(mnbytestream_t *, size_t, const char *, ...);
+int bytestream_cat(mnbytestream_t *, size_t, const char *);
 
 #define SCATC(bs, c)                                   \
 do {                                                   \
@@ -146,7 +146,7 @@ do {                                                   \
 } while (0)                                            \
 
 
-int bytestream_dump(bytestream_t *);
+int bytestream_dump(mnbytestream_t *);
 
 #ifdef __cplusplus
 }

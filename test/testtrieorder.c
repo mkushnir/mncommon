@@ -15,12 +15,12 @@ MEMDEBUG_DECLARE(testtrieorder);
 
 typedef struct _key_item {
     uint64_t key;
-    btrie_node_t *n;
+    mnbtrie_node_t *n;
 } key_item_t;
 
 static key_item_t keys[10];
 
-static btrie_t tr;
+static mnbtrie_t tr;
 
 UNUSED static uint64_t
 new_id_random(void)
@@ -46,7 +46,7 @@ initialize_ids(void)
 }
 
 static int
-cb(btrie_node_t *node, UNUSED void *udata)
+cb(mnbtrie_node_t *node, UNUSED void *udata)
 {
     if (node->value != NULL) {
         uint64_t key;
@@ -75,7 +75,7 @@ test0(void)
     btrie_init(&tr);
 
     for (i = 0; i < countof(keys); ++i) {
-        btrie_node_t *n;
+        mnbtrie_node_t *n;
 
         n = btrie_add_node(&tr, keys[i].key);
         n->value = (void *)(uintptr_t)keys[i].key;

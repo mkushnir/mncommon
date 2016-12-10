@@ -24,12 +24,12 @@ typedef struct _file_info2 {
     file_info_t *fi;
 } file_info2_t;
 
-static array_t files;
+static mnarray_t files;
 
 static int
 mycb(const char *path, struct dirent *de, void *ctx)
 {
-    array_t *files = (array_t *)ctx;
+    mnarray_t *files = (mnarray_t *)ctx;
     file_info_t *fi;
     UNUSED struct stat sb;
 

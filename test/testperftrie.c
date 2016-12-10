@@ -16,7 +16,7 @@ MEMDEBUG_DECLARE(testperftrie);
 
 typedef struct _key_item {
     uint64_t key;
-    btrie_node_t *n;
+    mnbtrie_node_t *n;
     uint64_t add_time;
     uint64_t find_time;
     uint64_t remove_time;
@@ -24,7 +24,7 @@ typedef struct _key_item {
 
 static key_item_t keys[1024 * 1024];
 
-static btrie_t tr;
+static mnbtrie_t tr;
 
 UNUSED static uint64_t
 new_id_random(void)
@@ -80,7 +80,7 @@ test0(void)
     btrie_init(&tr);
 
     for (i = 0; i < countof(keys); ++i) {
-        btrie_node_t *n;
+        mnbtrie_node_t *n;
 
         profile_start(p_add_node);
         n = btrie_add_node(&tr, keys[i].key);

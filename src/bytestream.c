@@ -41,7 +41,7 @@ do {                                                           \
 #endif
 
 int
-bytestream_dump(bytestream_t *stream)
+bytestream_dump(mnbytestream_t *stream)
 {
     TRACE("stream pos=%ld eod=%ld sz=%ld",
           (long)stream->pos, (long)stream->eod, stream->buf.sz);
@@ -54,7 +54,7 @@ bytestream_dump(bytestream_t *stream)
 
 
 int
-bytestream_init(bytestream_t *stream, ssize_t growsz)
+bytestream_init(mnbytestream_t *stream, ssize_t growsz)
 {
     stream->buf.sz = growsz;
     stream->growsz = growsz;
@@ -78,7 +78,7 @@ bytestream_init(bytestream_t *stream, ssize_t growsz)
 
 
 int
-bytestream_init_data(bytestream_t *stream, char *data, ssize_t sz, ssize_t growsz)
+bytestream_init_data(mnbytestream_t *stream, char *data, ssize_t sz, ssize_t growsz)
 {
     stream->buf.sz = sz;
     stream->growsz = growsz;
@@ -97,7 +97,7 @@ bytestream_init_data(bytestream_t *stream, char *data, ssize_t sz, ssize_t grows
 
 
 int
-bytestream_grow(bytestream_t *stream, size_t incr)
+bytestream_grow(mnbytestream_t *stream, size_t incr)
 {
     char *tmp;
     MEMDEBUG_ENTER(stream);
@@ -113,7 +113,7 @@ bytestream_grow(bytestream_t *stream, size_t incr)
 
 
 ssize_t
-bytestream_read_more(bytestream_t *stream, int fd, ssize_t sz)
+bytestream_read_more(mnbytestream_t *stream, int fd, ssize_t sz)
 {
     ssize_t nread;
     ssize_t need;
@@ -134,7 +134,7 @@ bytestream_read_more(bytestream_t *stream, int fd, ssize_t sz)
 
 
 ssize_t
-bytestream_recv_more(bytestream_t *stream, int fd, ssize_t sz)
+bytestream_recv_more(mnbytestream_t *stream, int fd, ssize_t sz)
 {
     ssize_t nrecv;
     ssize_t need;
@@ -158,7 +158,7 @@ bytestream_recv_more(bytestream_t *stream, int fd, ssize_t sz)
 
 
 ssize_t
-bytestream_write(bytestream_t *stream, int fd, size_t sz)
+bytestream_write(mnbytestream_t *stream, int fd, size_t sz)
 {
     ssize_t nwritten;
 
@@ -174,7 +174,7 @@ bytestream_write(bytestream_t *stream, int fd, size_t sz)
 }
 
 ssize_t
-bytestream_stderr_write(bytestream_t *stream, int fd, size_t sz)
+bytestream_stderr_write(mnbytestream_t *stream, int fd, size_t sz)
 {
     ssize_t nwritten;
 
@@ -194,7 +194,7 @@ bytestream_stderr_write(bytestream_t *stream, int fd, size_t sz)
 }
 
 ssize_t
-bytestream_send(bytestream_t *stream, int fd, size_t sz)
+bytestream_send(mnbytestream_t *stream, int fd, size_t sz)
 {
     ssize_t nwritten;
 
@@ -210,7 +210,7 @@ bytestream_send(bytestream_t *stream, int fd, size_t sz)
 }
 
 int
-bytestream_consume_data(bytestream_t *stream, int fd)
+bytestream_consume_data(mnbytestream_t *stream, int fd)
 {
     ssize_t nread;
     ssize_t need;
@@ -232,7 +232,7 @@ bytestream_consume_data(bytestream_t *stream, int fd)
 }
 
 int
-bytestream_produce_data(bytestream_t *stream, int fd)
+bytestream_produce_data(mnbytestream_t *stream, int fd)
 {
     assert(stream->write != NULL);
 
@@ -245,7 +245,7 @@ bytestream_produce_data(bytestream_t *stream, int fd)
 
 
 int PRINTFLIKE(3, 4)
-bytestream_nprintf(bytestream_t *stream,
+bytestream_nprintf(mnbytestream_t *stream,
                    size_t sz,
                    const char *fmt, ...)
 {
@@ -273,7 +273,7 @@ bytestream_nprintf(bytestream_t *stream,
 
 
 int
-bytestream_cat(bytestream_t *stream, size_t sz, const char *data)
+bytestream_cat(mnbytestream_t *stream, size_t sz, const char *data)
 {
     ssize_t need;
     need = (stream->eod + sz) - stream->buf.sz;
@@ -292,7 +292,7 @@ bytestream_cat(bytestream_t *stream, size_t sz, const char *data)
 
 
 void
-bytestream_rewind(bytestream_t *stream)
+bytestream_rewind(mnbytestream_t *stream)
 {
     stream->pos = 0;
     stream->eod = 0;
@@ -300,7 +300,7 @@ bytestream_rewind(bytestream_t *stream)
 
 
 off_t
-bytestream_recycle(bytestream_t *stream, int ngrowsz, off_t from)
+bytestream_recycle(mnbytestream_t *stream, int ngrowsz, off_t from)
 {
     int pgsz;
 
@@ -325,7 +325,7 @@ bytestream_recycle(bytestream_t *stream, int ngrowsz, off_t from)
 
 
 void
-bytestream_fini(bytestream_t *stream)
+bytestream_fini(mnbytestream_t *stream)
 {
     MEMDEBUG_ENTER(stream);
     if (stream->buf.data != NULL) {
@@ -339,12 +339,12 @@ bytestream_fini(bytestream_t *stream)
 }
 
 
-bytestream_t *
+mnbytestream_t *
 bytestream_new(ssize_t growsz)
 {
-    bytestream_t *res;
+    mnbytestream_t *res;
 
-    if ((res = malloc(sizeof(bytestream_t))) == NULL) {
+    if ((res = malloc(sizeof(mnbytestream_t))) == NULL) {
         FAIL("malloc");
     }
     bytestream_init(res, growsz);
@@ -352,12 +352,12 @@ bytestream_new(ssize_t growsz)
 }
 
 
-bytestream_t *
-bytestream_copy(bytestream_t *bs)
+mnbytestream_t *
+bytestream_copy(mnbytestream_t *bs)
 {
-    bytestream_t *res;
+    mnbytestream_t *res;
 
-    if ((res = malloc(sizeof(bytestream_t))) == NULL) {
+    if ((res = malloc(sizeof(mnbytestream_t))) == NULL) {
         FAIL("malloc");
     }
 
@@ -386,7 +386,7 @@ bytestream_copy(bytestream_t *bs)
 
 
 void
-bytestream_destroy(bytestream_t **bs)
+bytestream_destroy(mnbytestream_t **bs)
 {
     if (*bs != NULL) {
         bytestream_fini(*bs);

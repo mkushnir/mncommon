@@ -14,8 +14,8 @@
 #include "diag.h"
 
 
-static array_t conf_parser_words;
-static array_t conf_parser_prefixes;
+static mnarray_t conf_parser_words;
+static mnarray_t conf_parser_prefixes;
 
 /*
  * Configuraiton parser.
@@ -30,7 +30,7 @@ conf_parser_handler_entry_fini(UNUSED conf_parser_handler_entry_t *he)
 static conf_parser_handler_entry_t *
 conf_parser_get_handler_entry(conf_parser_ctx_t *ctx)
 {
-    array_iter_t it;
+    mnarray_iter_t it;
     conf_parser_handler_entry_t *he;
     for (he = array_first(&conf_parser_words, &it);
          he != NULL;

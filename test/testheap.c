@@ -37,7 +37,7 @@ myswap(void **a, void **b)
 
 
 static int
-mycb(UNUSED heap_t *heap, void *pval, UNUSED void *udata)
+mycb(UNUSED mnheap_t *heap, void *pval, UNUSED void *udata)
 {
     uint64_t *v;
 
@@ -53,7 +53,7 @@ mycb(UNUSED heap_t *heap, void *pval, UNUSED void *udata)
 static void
 test0(void)
 {
-    heap_t heap;
+    mnheap_t heap;
     int res;
     struct {
         long rnd;
@@ -123,7 +123,7 @@ test0(void)
 static void
 test1(void)
 {
-    heap_t heap;
+    mnheap_t heap;
     int res;
     struct {
         long rnd;

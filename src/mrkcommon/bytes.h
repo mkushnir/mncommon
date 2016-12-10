@@ -45,7 +45,7 @@ typedef struct _bytes {
     size_t sz;
     uint64_t hash;
     unsigned char data[];
-} bytes_t;
+} mnbytes_t;
 
 
 #define BDATA(b) (b)->data
@@ -70,7 +70,7 @@ typedef struct _bytes {
         uint64_t hash;                                 \
         unsigned char data[sizeof(s)];                 \
     } __bytes_alloca_ ## n = BYTES_INITIALIZER(s);     \
-    bytes_t *n = (bytes_t *) &__bytes_alloca_ ## n;    \
+    mnbytes_t *n = (mnbytes_t *) &__bytes_alloca_ ## n;    \
 
 
 #define BYTES_INCREF(b)                        \
@@ -120,43 +120,43 @@ do {                                                           \
 
 char *strrstr(const char *, const char *);
 
-bytes_t *bytes_new(size_t);
-bytes_t *bytes_new_mpool(mpool_ctx_t *, size_t);
-bytes_t *bytes_new_from_str(const char *);
-bytes_t *bytes_new_from_str_mpool(mpool_ctx_t *, const char *);
-bytes_t *bytes_new_from_bytes(const bytes_t *);
-bytes_t *bytes_new_from_bytes_mpool(mpool_ctx_t *, const bytes_t *);
-bytes_t * PRINTFLIKE(1, 2) bytes_printf(const char *, ...);
-void bytes_incref(bytes_t *);
-void bytes_decref(bytes_t **);
-void bytes_decref_fast(bytes_t *);
-uint64_t bytes_hash(bytes_t *);
-int bytes_cmp(bytes_t *, bytes_t *);
-int bytes_cmp_safe(bytes_t *, bytes_t *);
-int bytes_cmpv(bytes_t *, bytes_t *);
-int bytes_cmpv_safe(bytes_t *, bytes_t *);
-int bytes_cmpi(bytes_t *, bytes_t *);
-int bytes_cmpi_safe(bytes_t *, bytes_t *);
-bool bytes_contains(bytes_t *, bytes_t *);
-bool bytes_containsi(bytes_t *, bytes_t *);
-void bytes_copy(bytes_t * restrict, bytes_t * restrict, size_t);
-void bytes_copyz(bytes_t * restrict, bytes_t * restrict, size_t);
-void bytes_brushdown(bytes_t *);
-void bytes_urldecode(bytes_t *);
-void bytes_rstrip_blanks(bytes_t *);
-bytes_t *bytes_set_lower(bytes_t *s);
-bytes_t *bytes_json_escape(bytes_t *);
-void bytes_json_unescape(bytes_t *);
-void bytes_tr(bytes_t * restrict,
+mnbytes_t *bytes_new(size_t);
+mnbytes_t *bytes_new_mpool(mpool_ctx_t *, size_t);
+mnbytes_t *bytes_new_from_str(const char *);
+mnbytes_t *bytes_new_from_str_mpool(mpool_ctx_t *, const char *);
+mnbytes_t *bytes_new_from_bytes(const mnbytes_t *);
+mnbytes_t *bytes_new_from_bytes_mpool(mpool_ctx_t *, const mnbytes_t *);
+mnbytes_t * PRINTFLIKE(1, 2) bytes_printf(const char *, ...);
+void bytes_incref(mnbytes_t *);
+void bytes_decref(mnbytes_t **);
+void bytes_decref_fast(mnbytes_t *);
+uint64_t bytes_hash(mnbytes_t *);
+int bytes_cmp(mnbytes_t *, mnbytes_t *);
+int bytes_cmp_safe(mnbytes_t *, mnbytes_t *);
+int bytes_cmpv(mnbytes_t *, mnbytes_t *);
+int bytes_cmpv_safe(mnbytes_t *, mnbytes_t *);
+int bytes_cmpi(mnbytes_t *, mnbytes_t *);
+int bytes_cmpi_safe(mnbytes_t *, mnbytes_t *);
+bool bytes_contains(mnbytes_t *, mnbytes_t *);
+bool bytes_containsi(mnbytes_t *, mnbytes_t *);
+void bytes_copy(mnbytes_t * restrict, mnbytes_t * restrict, size_t);
+void bytes_copyz(mnbytes_t * restrict, mnbytes_t * restrict, size_t);
+void bytes_brushdown(mnbytes_t *);
+void bytes_urldecode(mnbytes_t *);
+void bytes_rstrip_blanks(mnbytes_t *);
+mnbytes_t *bytes_set_lower(mnbytes_t *s);
+mnbytes_t *bytes_json_escape(mnbytes_t *);
+void bytes_json_unescape(mnbytes_t *);
+void bytes_tr(mnbytes_t * restrict,
               unsigned char * restrict,
               unsigned char * restrict,
               size_t);
-bool bytes_is_ascii(bytes_t *);
-bool bytes_startswith(const bytes_t *, const bytes_t *);
-bool bytes_endswith(const bytes_t *, const bytes_t *);
-bool bytes_is_null_or_empty(const bytes_t *);
-typedef int (*bytes_split_cb)(bytes_t *, void *);
-int bytes_split_iter(bytes_t *, char *, bytes_split_cb, void *);
+bool bytes_is_ascii(mnbytes_t *);
+bool bytes_startswith(const mnbytes_t *, const mnbytes_t *);
+bool bytes_endswith(const mnbytes_t *, const mnbytes_t *);
+bool bytes_is_null_or_empty(const mnbytes_t *);
+typedef int (*bytes_split_cb)(mnbytes_t *, void *);
+int bytes_split_iter(mnbytes_t *, char *, bytes_split_cb, void *);
 
 #ifdef __cplusplus
 }

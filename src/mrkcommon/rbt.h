@@ -17,30 +17,30 @@ typedef struct _rbt_node {
     uintptr_t flags;
     uintptr_t key;
     void *data;
-} rbt_node_t;
+} mnrbt_node_t;
 
 typedef struct _rbt {
-    rbt_node_t *root;
-    rbt_node_t *head;
-    rbt_node_t *tail;
+    mnrbt_node_t *root;
+    mnrbt_node_t *head;
+    mnrbt_node_t *tail;
     size_t nelem;
-} rbt_t;
+} mnrbt_t;
 
 
-int rbt_init(rbt_t *);
-int rbt_fini(rbt_t *);
-int rbt_dump_tree(rbt_t *);
-int rbt_dump_list(rbt_t *);
-int rbt_find(rbt_t *, uintptr_t, rbt_node_t **);
-int rbt_insert(rbt_t *, rbt_node_t *, rbt_node_t **);
+int rbt_init(mnrbt_t *);
+int rbt_fini(mnrbt_t *);
+int rbt_dump_tree(mnrbt_t *);
+int rbt_dump_list(mnrbt_t *);
+int rbt_find(mnrbt_t *, uintptr_t, mnrbt_node_t **);
+int rbt_insert(mnrbt_t *, mnrbt_node_t *, mnrbt_node_t **);
 #define RBT_DUPLICATE -1
 
-int rbt_remove_node(rbt_t *, rbt_node_t *);
-int rbt_remove_key(rbt_t *, uintptr_t);
+int rbt_remove_node(mnrbt_t *, mnrbt_node_t *);
+int rbt_remove_key(mnrbt_t *, uintptr_t);
 
-int rbt_node_init(rbt_node_t *, uintptr_t, void *);
-void rbt_node_dump_tree(rbt_node_t *, int);
-void rbt_node_dump_list(rbt_node_t *);
+int rbt_node_init(mnrbt_node_t *, uintptr_t, void *);
+void rbt_node_dump_tree(mnrbt_node_t *, int);
+void rbt_node_dump_list(mnrbt_node_t *);
 
 #ifdef __cplusplus
 }

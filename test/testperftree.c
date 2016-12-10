@@ -12,8 +12,8 @@ static unsigned niter = 10;
 static unsigned nelem = 1024 * 1024;
 
 struct rb foo = RB_INITIALIZER();
-rbt_t rbt;
-btrie_t tr;
+mnrbt_t rbt;
+mnbtrie_t tr;
 
 void *rbnodes;
 void *trienodes;
@@ -101,9 +101,9 @@ UNUSED static void
 test_trie(void)
 {
     unsigned i;
-    btrie_t tr;
+    mnbtrie_t tr;
     intmax_t *n;
-    btrie_node_t *nn;
+    mnbtrie_node_t *nn;
 
     btrie_init(&tr);
 
@@ -139,14 +139,14 @@ test_rbt(void)
 {
     unsigned i;
     UNUSED int res;
-    rbt_node_t *dup;
-    rbt_node_t *n;
+    mnrbt_node_t *dup;
+    mnrbt_node_t *n;
 
     rbt_init(&rbt);
 
     PROFILE_START(RBT_TEST_PROF_RBT_INSERT);
     for (i = 0; i < nelem; ++i) {
-        n = (rbt_node_t *) (rbtnodes + i * sizeof(rbt_node_t));
+        n = (mnrbt_node_t *) (rbtnodes + i * sizeof(mnrbt_node_t));
         rbt_node_init(n, *(keys + i), NULL);
         //n->key = *(keys + i);
         res = rbt_insert(&rbt, n, &dup);
@@ -236,7 +236,7 @@ test_rbt(void)
 //        dup = rbt.head;
 //        //sleep(1);
 //    }
-//    rbt_node_t *n = malloc(sizeof(rbt_node_t));
+//    mnrbt_node_t *n = malloc(sizeof(mnrbt_node_t));
 //    rbt_node_init(n, 10, (void *)123);
 //    rbt_insert(&rbt, n, &dup);
 //    TRACE("n=%p dup=%p", n, dup);
@@ -254,7 +254,7 @@ test_rbt(void)
     rbt_find(&rbt, rbt.head->key, &dup);
     PROFILE_START(RBT_TEST_PROF_RBT_REMOVE);
     while (dup != NULL) {
-        rbt_node_t *tmp = dup->next;
+        mnrbt_node_t *tmp = dup->next;
         rbt_remove_node(&rbt, dup);
         dup = tmp;
     }
@@ -275,7 +275,7 @@ main(UNUSED int argc, UNUSED char *argv[])
 
     rbnodes = malloc(sizeof(struct _rb_node) * nelem);
     trienodes = malloc(sizeof(intmax_t) * nelem);
-    rbtnodes = malloc(sizeof(rbt_node_t) * nelem);
+    rbtnodes = malloc(sizeof(mnrbt_node_t) * nelem);
     keys = malloc(sizeof(intmax_t) * nelem);
 
     srandom(time(NULL));

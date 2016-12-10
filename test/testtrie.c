@@ -14,8 +14,8 @@ test0(void)
     //int values[] = {0x00, 0x200};
     //int values1[] = {0x400};
     unsigned i;
-    btrie_t tr;
-    btrie_node_t *n;
+    mnbtrie_t tr;
+    mnbtrie_node_t *n;
 
     btrie_init(&tr);
 
@@ -60,8 +60,8 @@ test1(void)
     //uint64_t values1[] = {0, 11, 22, 33, 44, 55, 66, 77, 88};
     //uint64_t values[] = {4};
     unsigned i;
-    btrie_t tr;
-    btrie_node_t *n;
+    mnbtrie_t tr;
+    mnbtrie_node_t *n;
 
     btrie_init(&tr);
 
@@ -133,8 +133,8 @@ test2(void)
         0x0ffffffffffffffe,
     };
     unsigned i;
-    btrie_t tr;
-    btrie_node_t *n;
+    mnbtrie_t tr;
+    mnbtrie_node_t *n;
 
     btrie_init(&tr);
 

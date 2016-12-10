@@ -16,13 +16,13 @@ extern "C" {
 
 typedef struct _vbytestream {
     /*
-     * array of bytes_t *
+     * array of mnbytes_t *
      */
-    array_t bytes;
+    mnarray_t bytes;
     /*
      * array of struct iovec
      */
-    array_t iov;
+    mnarray_t iov;
     /* the current eod iovec */
     struct {
         int idx;

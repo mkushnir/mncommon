@@ -12,7 +12,7 @@
 #define HEAP_PARENT(i) (((i) - 1) / HEAP_D)
 
 static int
-siftdown(heap_t *heap, int i)
+siftdown(mnheap_t *heap, int i)
 {
     int res;
     void *a, *b, *minb;
@@ -51,7 +51,7 @@ siftdown(heap_t *heap, int i)
 
 
 void
-heap_ify(heap_t *heap)
+heap_ify(mnheap_t *heap)
 {
     int i;
 
@@ -62,7 +62,7 @@ heap_ify(heap_t *heap)
 
 
 void
-heap_push(heap_t *heap, void *v)
+heap_push(mnheap_t *heap, void *v)
 {
     void **pv;
     int i;
@@ -78,7 +78,7 @@ heap_push(heap_t *heap, void *v)
 }
 
 
-int heap_pop(heap_t *heap, void **rv)
+int heap_pop(mnheap_t *heap, void **rv)
 {
     int res;
     void **pv;
@@ -106,7 +106,7 @@ int heap_pop(heap_t *heap, void **rv)
 }
 
 
-int heap_pushpop(heap_t *heap, void **rv)
+int heap_pushpop(mnheap_t *heap, void **rv)
 {
     int res;
     void **pv;
@@ -140,7 +140,7 @@ int heap_pushpop(heap_t *heap, void **rv)
 
 
 int
-heap_traverse(heap_t *heap, heap_traverser_t cb, void *udata)
+heap_traverse(mnheap_t *heap, heap_traverser_t cb, void *udata)
 {
     int res;
     size_t i;
@@ -162,14 +162,14 @@ heap_traverse(heap_t *heap, heap_traverser_t cb, void *udata)
 
 
 ssize_t
-heap_len(const heap_t *heap)
+heap_len(const mnheap_t *heap)
 {
     return heap->sz;
 }
 
 
 void
-heap_init(heap_t *heap,
+heap_init(mnheap_t *heap,
           size_t elsz,
           size_t elnum,
           array_initializer_t init,
@@ -184,7 +184,7 @@ heap_init(heap_t *heap,
 }
 
 void
-heap_fini(heap_t *heap)
+heap_fini(mnheap_t *heap)
 {
     array_fini(&heap->data);
     heap->cmp = NULL;

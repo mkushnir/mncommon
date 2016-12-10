@@ -19,7 +19,7 @@ typedef struct _hash_item {
     struct _hash_item *next;
     void *key;
     void *value;
-} hash_item_t;
+} mnhash_item_t;
 
 typedef uint64_t (*hash_hashfn_t)(void *);
 typedef int (*hash_item_comparator_t)(void *, void *);
@@ -32,77 +32,77 @@ typedef struct _hash {
     hash_hashfn_t hashfn;
     hash_item_comparator_t cmp;
     hash_item_finalizer_t fini;
-    array_t table;
+    mnarray_t table;
     size_t elnum;
-} hash_t;
+} mnhash_t;
 
 
 typedef struct _hash_iter {
-    array_iter_t it;
-    hash_item_t **phit;
-    hash_item_t *hit;
+    mnarray_iter_t it;
+    mnhash_item_t **phit;
+    mnhash_item_t *hit;
 } hash_iter_t;
 
 
-void hash_set_item(hash_t *, void *, void *);
-void hash_set_item_mpool(mpool_ctx_t *, hash_t *, void *, void *);
-void hash_set_item_uniq(hash_t *,
+void hash_set_item(mnhash_t *, void *, void *);
+void hash_set_item_mpool(mpool_ctx_t *, mnhash_t *, void *, void *);
+void hash_set_item_uniq(mnhash_t *,
                         void *,
                         void *,
                         void **,
                         void **);
 void hash_set_item_uniq_mpool(mpool_ctx_t *,
-                              hash_t *,
+                              mnhash_t *,
                               void *,
                               void *,
                               void **,
                               void **);
-hash_item_t *hash_get_item(hash_t *, void *);
-void *hash_remove_item(hash_t *, void *);
-void *hash_remove_item_mpool(mpool_ctx_t *, hash_t *, void *);
-void hash_delete_pair(hash_t *, hash_item_t *);
-void hash_delete_pair_no_fini(hash_t *, hash_item_t *);
-void hash_delete_pair_mpool(mpool_ctx_t *, hash_t *, hash_item_t *);
-void hash_delete_pair_no_fini_mpool(mpool_ctx_t *, hash_t *, hash_item_t *);
-int hash_traverse(hash_t *, hash_traverser_t, void *);
-typedef int (*hash_traverser_item_t)(hash_t *, hash_item_t *, void *);
+mnhash_item_t *hash_get_item(mnhash_t *, void *);
+void *hash_remove_item(mnhash_t *, void *);
+void *hash_remove_item_mpool(mpool_ctx_t *, mnhash_t *, void *);
+void hash_delete_pair(mnhash_t *, mnhash_item_t *);
+void hash_delete_pair_no_fini(mnhash_t *, mnhash_item_t *);
+void hash_delete_pair_mpool(mpool_ctx_t *, mnhash_t *, mnhash_item_t *);
+void hash_delete_pair_no_fini_mpool(mpool_ctx_t *, mnhash_t *, mnhash_item_t *);
+int hash_traverse(mnhash_t *, hash_traverser_t, void *);
+typedef int (*hash_traverser_item_t)(mnhash_t *, mnhash_item_t *, void *);
 
-int hash_traverse_item(hash_t *, hash_traverser_item_t, void *);
-hash_item_t *hash_first(hash_t *, hash_iter_t *);
-hash_item_t *hash_next(hash_t *, hash_iter_t *);
-bool hash_is_empty(hash_t *);
-size_t hash_get_elnum(hash_t *);
+int hash_traverse_item(mnhash_t *, hash_traverser_item_t, void *);
+mnhash_item_t *hash_first(mnhash_t *, hash_iter_t *);
+mnhash_item_t *hash_next(mnhash_t *, hash_iter_t *);
+bool hash_is_empty(mnhash_t *);
+size_t hash_get_elnum(mnhash_t *);
 
-hash_t *hash_new(size_t,
+mnhash_t *hash_new(size_t,
                  hash_hashfn_t,
                  hash_item_comparator_t,
                  hash_item_finalizer_t);
-hash_t *hash_new_mpool(mpool_ctx_t *,
+mnhash_t *hash_new_mpool(mpool_ctx_t *,
                        size_t,
                        hash_hashfn_t,
                        hash_item_comparator_t,
                        hash_item_finalizer_t);
-void hash_init(hash_t *,
+void hash_init(mnhash_t *,
                size_t,
                hash_hashfn_t,
                hash_item_comparator_t,
                hash_item_finalizer_t);
 void hash_init_mpool(mpool_ctx_t *,
-                     hash_t *,
+                     mnhash_t *,
                      size_t,
                      hash_hashfn_t,
                      hash_item_comparator_t,
                      hash_item_finalizer_t);
-void hash_rehash(hash_t *, size_t);
-void hash_rehash_mpool(mpool_ctx_t *, hash_t *, size_t);
-void hash_cleanup(hash_t *);
-void hash_cleanup_mpool(mpool_ctx_t *, hash_t *);
-void hash_fini(hash_t *);
-void hash_fini_mpool(mpool_ctx_t *, hash_t *);
-void hash_destroy(hash_t **);
-void hash_destroy_mpool(mpool_ctx_t *, hash_t **);
+void hash_rehash(mnhash_t *, size_t);
+void hash_rehash_mpool(mpool_ctx_t *, mnhash_t *, size_t);
+void hash_cleanup(mnhash_t *);
+void hash_cleanup_mpool(mpool_ctx_t *, mnhash_t *);
+void hash_fini(mnhash_t *);
+void hash_fini_mpool(mpool_ctx_t *, mnhash_t *);
+void hash_destroy(mnhash_t **);
+void hash_destroy_mpool(mpool_ctx_t *, mnhash_t **);
 
-void hash_dump_stats(hash_t *);
+void hash_dump_stats(mnhash_t *);
 
 #ifdef __cplusplus
 }

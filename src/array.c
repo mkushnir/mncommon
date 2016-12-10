@@ -89,7 +89,7 @@ array_init_mpool(mpool,        \
 
 
 int
-array_init(array_t *ar, size_t elsz, size_t elnum,
+array_init(mnarray_t *ar, size_t elsz, size_t elnum,
            array_initializer_t init,
            array_finalizer_t fini)
 {
@@ -98,7 +98,7 @@ array_init(array_t *ar, size_t elsz, size_t elnum,
 
 
 int
-array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
+array_init_mpool(mpool_ctx_t *mpool, mnarray_t *ar, size_t elsz, size_t elnum,
            array_initializer_t init,
            array_finalizer_t fini)
 {
@@ -135,8 +135,8 @@ array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
 
 
 #define ARRAY_NEW_BODY(malloc_fn, array_init_fn)              \
-    array_t *res;                                              \
-    if ((res = malloc_fn(sizeof(array_t))) == NULL) {          \
+    mnarray_t *res;                                              \
+    if ((res = malloc_fn(sizeof(mnarray_t))) == NULL) {          \
         FAIL("malloc");                                        \
     }                                                          \
     if (array_init_fn(res, elsz, elnum, init, fini) != 0) {    \
@@ -145,7 +145,7 @@ array_init_mpool(mpool_ctx_t *mpool, array_t *ar, size_t elsz, size_t elnum,
     return res;                                                \
 
 
-array_t *
+mnarray_t *
 array_new(size_t elsz,
           size_t elnum,
           array_initializer_t init,
@@ -155,7 +155,7 @@ array_new(size_t elsz,
 }
 
 
-array_t *
+mnarray_t *
 array_new_mpool(mpool_ctx_t *mpool,
                 size_t elsz,
                 size_t elnum,
@@ -167,21 +167,21 @@ array_new_mpool(mpool_ctx_t *mpool,
 
 
 int
-array_reset_no_fini(array_t *ar, size_t newelnum)
+array_reset_no_fini(mnarray_t *ar, size_t newelnum)
 {
     ARRAY_RESET_NO_FINI_BODY(free, malloc)
 }
 
 
 int
-array_reset_no_fini_mpool(mpool_ctx_t *mpool, array_t *ar, size_t newelnum)
+array_reset_no_fini_mpool(mpool_ctx_t *mpool, mnarray_t *ar, size_t newelnum)
 {
     ARRAY_RESET_NO_FINI_BODY(_free, _malloc)
 }
 
 
 void
-array_destroy(array_t **ar)
+array_destroy(mnarray_t **ar)
 {
     if (*ar != NULL) {
         array_fini(*ar);
@@ -192,7 +192,7 @@ array_destroy(array_t **ar)
 
 
 void
-array_destroy_mpool(mpool_ctx_t *mpool, array_t **ar)
+array_destroy_mpool(mpool_ctx_t *mpool, mnarray_t **ar)
 {
     if (*ar != NULL) {
         array_fini_mpool(mpool, *ar);
@@ -255,7 +255,7 @@ array_destroy_mpool(mpool_ctx_t *mpool, array_t **ar)
 
 
 int
-array_ensure_len_dirty(array_t *ar, size_t newelnum, unsigned int flags)
+array_ensure_len_dirty(mnarray_t *ar, size_t newelnum, unsigned int flags)
 {
     ARRAY_ENSURE_DIRTY_BODY(realloc, free,
             ar->elnum = newelnum;
@@ -266,7 +266,7 @@ array_ensure_len_dirty(array_t *ar, size_t newelnum, unsigned int flags)
 
 int
 array_ensure_len_dirty_mpool(mpool_ctx_t *mpool,
-                             array_t *ar,
+                             mnarray_t *ar,
                              size_t newelnum,
                              unsigned int flags)
 {
@@ -278,7 +278,7 @@ array_ensure_len_dirty_mpool(mpool_ctx_t *mpool,
 
 
 void
-array_ensure_datasz_dirty(array_t *ar, size_t newelnum, unsigned int flags)
+array_ensure_datasz_dirty(mnarray_t *ar, size_t newelnum, unsigned int flags)
 {
     ARRAY_ENSURE_DIRTY_BODY(realloc, free,)
 }
@@ -286,7 +286,7 @@ array_ensure_datasz_dirty(array_t *ar, size_t newelnum, unsigned int flags)
 
 void
 array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
-                                array_t *ar,
+                                mnarray_t *ar,
                                 size_t newelnum,
                                 unsigned int flags)
 {
@@ -366,7 +366,7 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
 
 
 int
-array_ensure_len(array_t *ar, size_t newelnum, unsigned int flags)
+array_ensure_len(mnarray_t *ar, size_t newelnum, unsigned int flags)
 {
     ARRAY_ENSURE_BODY(realloc, free,
             ar->elnum = newelnum;
@@ -377,7 +377,7 @@ array_ensure_len(array_t *ar, size_t newelnum, unsigned int flags)
 
 int
 array_ensure_len_mpool(mpool_ctx_t *mpool,
-                       array_t *ar,
+                       mnarray_t *ar,
                        size_t newelnum,
                        unsigned int flags)
 {
@@ -389,7 +389,7 @@ array_ensure_len_mpool(mpool_ctx_t *mpool,
 
 
 void
-array_ensure_datasz(array_t *ar, size_t newelnum, unsigned int flags)
+array_ensure_datasz(mnarray_t *ar, size_t newelnum, unsigned int flags)
 {
     ARRAY_ENSURE_BODY(realloc, free,)
 }
@@ -397,7 +397,7 @@ array_ensure_datasz(array_t *ar, size_t newelnum, unsigned int flags)
 
 void
 array_ensure_datasz_mpool(mpool_ctx_t *mpool,
-                          array_t *ar,
+                          mnarray_t *ar,
                           size_t newelnum,
                           unsigned int flags)
 {
@@ -406,7 +406,7 @@ array_ensure_datasz_mpool(mpool_ctx_t *mpool,
 
 
 int
-array_clear_item(array_t *ar, unsigned idx)
+array_clear_item(mnarray_t *ar, unsigned idx)
 {
     //TRACE("idx=%d elnum=%ld", idx, ar->elnum);
     if (idx >= ar->elnum) {
@@ -420,7 +420,7 @@ array_clear_item(array_t *ar, unsigned idx)
 
 
 int
-array_clear(array_t *ar)
+array_clear(mnarray_t *ar)
 {
     if (ar->fini != NULL) {
         int res;
@@ -437,7 +437,7 @@ array_clear(array_t *ar)
 
 
 int
-array_init_item(array_t *ar, unsigned idx)
+array_init_item(mnarray_t *ar, unsigned idx)
 {
     //TRACE("idx=%d elnum=%ld", idx, ar->elnum);
     if (idx >= ar->elnum) {
@@ -451,7 +451,7 @@ array_init_item(array_t *ar, unsigned idx)
 
 
 void *
-array_get(const array_t *ar, unsigned idx)
+array_get(const mnarray_t *ar, unsigned idx)
 {
     if (idx < ar->elnum) {
         return ar->data + ar->elsz * idx;
@@ -461,7 +461,7 @@ array_get(const array_t *ar, unsigned idx)
 
 
 void *
-array_get_safe(array_t *ar, unsigned idx)
+array_get_safe(mnarray_t *ar, unsigned idx)
 {
     size_t datasz;
 
@@ -483,7 +483,7 @@ array_get_safe(array_t *ar, unsigned idx)
 
 
 void *
-array_get_safe_mpool(mpool_ctx_t *mpool, array_t *ar, unsigned idx)
+array_get_safe_mpool(mpool_ctx_t *mpool, mnarray_t *ar, unsigned idx)
 {
     size_t datasz;
 
@@ -505,7 +505,7 @@ array_get_safe_mpool(mpool_ctx_t *mpool, array_t *ar, unsigned idx)
 
 
 int
-array_index(const array_t *ar, void *item)
+array_index(const mnarray_t *ar, void *item)
 {
     uintptr_t n = (uintptr_t)item;
     uintptr_t s = (uintptr_t)ar->data;
@@ -521,7 +521,7 @@ array_index(const array_t *ar, void *item)
 
 
 void
-array_copy(array_t *dst, const array_t *src)
+array_copy(mnarray_t *dst, const mnarray_t *src)
 {
     size_t sz;
     sz = dst->elnum * dst->elsz;
@@ -531,7 +531,7 @@ array_copy(array_t *dst, const array_t *src)
 
 
 void *
-array_get_iter(const array_t *ar, array_iter_t *it)
+array_get_iter(const mnarray_t *ar, mnarray_iter_t *it)
 {
     if (it->iter < ar->elnum) {
         return ar->data + ar->elsz * it->iter;
@@ -541,7 +541,7 @@ array_get_iter(const array_t *ar, array_iter_t *it)
 
 
 int
-array_fini(array_t *ar)
+array_fini(mnarray_t *ar)
 {
     unsigned i;
     MEMDEBUG_ENTER(ar);
@@ -563,7 +563,7 @@ array_fini(array_t *ar)
 
 
 int
-array_fini_mpool(mpool_ctx_t *mpool, array_t *ar)
+array_fini_mpool(mpool_ctx_t *mpool, mnarray_t *ar)
 {
     unsigned i;
     MEMDEBUG_ENTER(ar);
@@ -585,7 +585,7 @@ array_fini_mpool(mpool_ctx_t *mpool, array_t *ar)
 
 
 void *
-array_first(const array_t *ar, array_iter_t *iter)
+array_first(const mnarray_t *ar, mnarray_iter_t *iter)
 {
     iter->iter = 0;
     if (iter->iter < ar->elnum) {
@@ -596,7 +596,7 @@ array_first(const array_t *ar, array_iter_t *iter)
 
 
 void *
-array_last(const array_t *ar, array_iter_t *iter)
+array_last(const mnarray_t *ar, mnarray_iter_t *iter)
 {
     iter->iter = ar->elnum - 1;
     if (iter->iter < ar->elnum) {
@@ -607,7 +607,7 @@ array_last(const array_t *ar, array_iter_t *iter)
 
 
 void *
-array_next(const array_t *ar, array_iter_t *iter)
+array_next(const mnarray_t *ar, mnarray_iter_t *iter)
 {
     if (++iter->iter < ar->elnum) {
         return ar->data + iter->iter * ar->elsz;
@@ -617,7 +617,7 @@ array_next(const array_t *ar, array_iter_t *iter)
 
 
 void *
-array_prev(const array_t *ar, array_iter_t *iter)
+array_prev(const mnarray_t *ar, mnarray_iter_t *iter)
 {
     --iter->iter;
     if (iter->iter < ar->elnum) {
@@ -628,7 +628,7 @@ array_prev(const array_t *ar, array_iter_t *iter)
 
 
 void *
-array_incr(array_t *ar)
+array_incr(mnarray_t *ar)
 {
     if (array_ensure_len(ar, ar->elnum + 1, ARRAY_FLAG_SAVE) != 0) {
         TRRETNULL(ARRAY_INCR + 1);
@@ -637,7 +637,7 @@ array_incr(array_t *ar)
 }
 
 void *
-array_incr_mpool(mpool_ctx_t *mpool, array_t *ar)
+array_incr_mpool(mpool_ctx_t *mpool, mnarray_t *ar)
 {
     if (array_ensure_len_mpool(mpool, ar, ar->elnum + 1, ARRAY_FLAG_SAVE) != 0) {
         TRRETNULL(ARRAY_INCR + 1);
@@ -647,7 +647,7 @@ array_incr_mpool(mpool_ctx_t *mpool, array_t *ar)
 
 
 void *
-array_incr_iter(array_t *ar, array_iter_t *it)
+array_incr_iter(mnarray_t *ar, mnarray_iter_t *it)
 {
     if (array_ensure_len(ar, ar->elnum + 1, ARRAY_FLAG_SAVE) != 0) {
         TRRETNULL(ARRAY_INCR + 1);
@@ -658,7 +658,7 @@ array_incr_iter(array_t *ar, array_iter_t *it)
 
 
 void *
-array_incr_iter_mpool(mpool_ctx_t *mpool, array_t *ar, array_iter_t *it)
+array_incr_iter_mpool(mpool_ctx_t *mpool, mnarray_t *ar, mnarray_iter_t *it)
 {
     if (array_ensure_len_mpool(mpool, ar, ar->elnum + 1, ARRAY_FLAG_SAVE) != 0) {
         TRRETNULL(ARRAY_INCR + 1);
@@ -669,7 +669,7 @@ array_incr_iter_mpool(mpool_ctx_t *mpool, array_t *ar, array_iter_t *it)
 
 
 int
-array_decr_fast(array_t *ar)
+array_decr_fast(mnarray_t *ar)
 {
     if (!ar->elnum) {
         TRRET(ARRAY_DECR_FAST + 1);
@@ -683,7 +683,7 @@ array_decr_fast(array_t *ar)
 
 
 int
-array_decr(array_t *ar)
+array_decr(mnarray_t *ar)
 {
     if (array_ensure_len(ar, ar->elnum - 1, ARRAY_FLAG_SAVE) != 0) {
         TRRET(ARRAY_DECR + 1);
@@ -693,7 +693,7 @@ array_decr(array_t *ar)
 
 
 int
-array_decr_mpool(mpool_ctx_t *mpool, array_t *ar)
+array_decr_mpool(mpool_ctx_t *mpool, mnarray_t *ar)
 {
     if (array_ensure_len_mpool(mpool, ar, ar->elnum - 1, ARRAY_FLAG_SAVE) != 0) {
         TRRET(ARRAY_DECR + 1);
@@ -703,7 +703,7 @@ array_decr_mpool(mpool_ctx_t *mpool, array_t *ar)
 
 
 int
-array_sort(array_t *ar, array_compar_t compar)
+array_sort(mnarray_t *ar, array_compar_t compar)
 {
     if (ar->elnum == 0) {
         TRRET(ARRAY_SORT + 1);
@@ -713,7 +713,7 @@ array_sort(array_t *ar, array_compar_t compar)
 }
 
 void *
-array_find(const array_t *ar, const void *key, array_compar_t compar)
+array_find(const mnarray_t *ar, const void *key, array_compar_t compar)
 {
     if (ar->elnum == 0) {
         TRRETNULL(ARRAY_FIND + 1);
@@ -723,7 +723,7 @@ array_find(const array_t *ar, const void *key, array_compar_t compar)
 
 
 int
-array_traverse(array_t *ar, array_traverser_t tr, void *udata)
+array_traverse(mnarray_t *ar, array_traverser_t tr, void *udata)
 {
     unsigned i;
     int res;
@@ -737,7 +737,7 @@ array_traverse(array_t *ar, array_traverser_t tr, void *udata)
 
 
 int
-array_cmp(const array_t *ar1, const array_t *ar2, array_compar_t cmp, ssize_t sz)
+array_cmp(const mnarray_t *ar1, const mnarray_t *ar2, array_compar_t cmp, ssize_t sz)
 {
     ssize_t res;
     ssize_t sz1, sz2;

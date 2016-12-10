@@ -10,7 +10,7 @@
 #include "mrkcommon/rbt.h"
 
 int
-rbt_node_init(rbt_node_t *node, uintptr_t key, void *data)
+rbt_node_init(mnrbt_node_t *node, uintptr_t key, void *data)
 {
     node->parent = NULL;
     node->left = NULL;
@@ -24,7 +24,7 @@ rbt_node_init(rbt_node_t *node, uintptr_t key, void *data)
 }
 
 int
-rbt_init(rbt_t *rbt)
+rbt_init(mnrbt_t *rbt)
 {
     rbt->root = NULL;
     rbt->head = NULL;
@@ -35,9 +35,9 @@ rbt_init(rbt_t *rbt)
 }
 
 int
-rbt_fini(rbt_t *rbt)
+rbt_fini(mnrbt_t *rbt)
 {
-    rbt_node_t *e = rbt->head;
+    mnrbt_node_t *e = rbt->head;
 
     while (e != NULL) {
         rbt_remove_node(rbt, e);
@@ -55,7 +55,7 @@ rbt_fini(rbt_t *rbt)
 #define RBT_ASSIGN(rbt, slot, node) (slot) = node; RBT_SETRED(node); ++(rbt)->nelem
 
 void
-rbt_node_dump_tree(rbt_node_t *node, int level)
+rbt_node_dump_tree(mnrbt_node_t *node, int level)
 {
     if (RBT_ISRED(node)) {
         LTRACE(level, "%02lx<-\033[01;31m%02lx\033[00m",
@@ -69,7 +69,7 @@ rbt_node_dump_tree(rbt_node_t *node, int level)
 }
 
 void
-rbt_node_dump_list(rbt_node_t *node)
+rbt_node_dump_list(mnrbt_node_t *node)
 {
     if (RBT_ISRED(node)) {
         LTRACE(0, "%02lx<-\033[01;31m%02lx\033[00m->%02lx",
@@ -85,7 +85,7 @@ rbt_node_dump_list(rbt_node_t *node)
 }
 
 static void
-_rbt_dump_tree(rbt_t *rbt, rbt_node_t *node, int level)
+_rbt_dump_tree(mnrbt_t *rbt, mnrbt_node_t *node, int level)
 {
     if (node->right != NULL) {
          _rbt_dump_tree(rbt, node->right, level + 1);
@@ -96,7 +96,7 @@ _rbt_dump_tree(rbt_t *rbt, rbt_node_t *node, int level)
     }
 }
 
-int rbt_dump_tree(rbt_t *rbt)
+int rbt_dump_tree(mnrbt_t *rbt)
 {
     TRACE("nelem=%ld", rbt->nelem);
     if (rbt->root != NULL) {
@@ -105,9 +105,9 @@ int rbt_dump_tree(rbt_t *rbt)
     return 0;
 }
 
-int rbt_dump_list(rbt_t *rbt)
+int rbt_dump_list(mnrbt_t *rbt)
 {
-    rbt_node_t *node;
+    mnrbt_node_t *node;
 
     TRACE("nelem=%ld", rbt->nelem);
     node = rbt->head;
@@ -119,9 +119,9 @@ int rbt_dump_list(rbt_t *rbt)
 }
 
 int
-rbt_find(rbt_t *rbt, uintptr_t key, rbt_node_t **rv)
+rbt_find(mnrbt_t *rbt, uintptr_t key, mnrbt_node_t **rv)
 {
-    rbt_node_t *tmp = rbt->root;
+    mnrbt_node_t *tmp = rbt->root;
 
     while (tmp != NULL) {
         if (key == tmp->key) {
@@ -139,7 +139,7 @@ rbt_find(rbt_t *rbt, uintptr_t key, rbt_node_t **rv)
 }
 
 static int
-_rbt_insert(rbt_t *rbt, rbt_node_t *source, rbt_node_t *target, rbt_node_t **dup)
+_rbt_insert(mnrbt_t *rbt, mnrbt_node_t *source, mnrbt_node_t *target, mnrbt_node_t **dup)
 {
     //TRACE("Assigning %ld", target->key);
     if (source == NULL) {
@@ -197,11 +197,11 @@ _rbt_insert(rbt_t *rbt, rbt_node_t *source, rbt_node_t *target, rbt_node_t **dup
 }
 
 inline static void
-_rbt_rotate_left(rbt_t *rbt, rbt_node_t *n)
+_rbt_rotate_left(mnrbt_t *rbt, mnrbt_node_t *n)
 {
-    rbt_node_t *p = n->parent;
-    rbt_node_t *nr = n->right;
-    rbt_node_t *nrl = nr->left;
+    mnrbt_node_t *p = n->parent;
+    mnrbt_node_t *nr = n->right;
+    mnrbt_node_t *nrl = nr->left;
 
     assert(nr != NULL);
 
@@ -225,11 +225,11 @@ _rbt_rotate_left(rbt_t *rbt, rbt_node_t *n)
 }
 
 inline static void
-_rbt_rotate_right(rbt_t *rbt, rbt_node_t *n)
+_rbt_rotate_right(mnrbt_t *rbt, mnrbt_node_t *n)
 {
-    rbt_node_t *p = n->parent;
-    rbt_node_t *nl = n->left;
-    rbt_node_t *nlr = nl->right;
+    mnrbt_node_t *p = n->parent;
+    mnrbt_node_t *nl = n->left;
+    mnrbt_node_t *nlr = nl->right;
 
     assert(nl != NULL);
 
@@ -254,9 +254,9 @@ _rbt_rotate_right(rbt_t *rbt, rbt_node_t *n)
 
 
 inline static void
-_rbt_adjust_on_insert(rbt_t *rbt, rbt_node_t *node)
+_rbt_adjust_on_insert(mnrbt_t *rbt, mnrbt_node_t *node)
 {
-    rbt_node_t *p, *g, *u;
+    mnrbt_node_t *p, *g, *u;
 
     /*
      * Case 1.
@@ -352,7 +352,7 @@ _rbt_adjust_on_insert(rbt_t *rbt, rbt_node_t *node)
 }
 
 inline int
-rbt_insert(rbt_t *rbt, rbt_node_t *node, rbt_node_t **dup)
+rbt_insert(mnrbt_t *rbt, mnrbt_node_t *node, mnrbt_node_t **dup)
 {
     int res;
 
@@ -368,9 +368,9 @@ rbt_insert(rbt_t *rbt, rbt_node_t *node, rbt_node_t **dup)
 }
 
 static void
-_rbt_adjust_on_remove(rbt_t *rbt, rbt_node_t *node)
+_rbt_adjust_on_remove(mnrbt_t *rbt, mnrbt_node_t *node)
 {
-    rbt_node_t *sibling, *parent, *sl, *sr;
+    mnrbt_node_t *sibling, *parent, *sl, *sr;
 
     /*
      * Case 1.
@@ -517,7 +517,7 @@ _rbt_adjust_on_remove(rbt_t *rbt, rbt_node_t *node)
 }
 
 static void
-_rbt_remove_list(rbt_t *rbt, rbt_node_t *node)
+_rbt_remove_list(mnrbt_t *rbt, mnrbt_node_t *node)
 {
     if (node->next != NULL) {
         node->next->prev = node->prev;
@@ -547,10 +547,10 @@ _rbt_remove_list(rbt_t *rbt, rbt_node_t *node)
     node->next = NULL;
 }
 
-int rbt_remove_node(rbt_t *rbt, rbt_node_t *node)
+int rbt_remove_node(mnrbt_t *rbt, mnrbt_node_t *node)
 {
-    rbt_node_t *nodeparent;
-    rbt_node_t *repl, *replchild, *replparent;
+    mnrbt_node_t *nodeparent;
+    mnrbt_node_t *repl, *replchild, *replparent;
 
     /*
      * Find a replacement and remove it from the tree, that is put one of
@@ -638,7 +638,7 @@ int rbt_remove_node(rbt_t *rbt, rbt_node_t *node)
      * Remove node and put replacment in place of node.  The Wikipaedia
      * says to copy values of repl to the node being removed. We here do
      * actual replacement (and copying node's color into that of repl)
-     * since rbt_node_t is assumed to be a part of a larger structure
+     * since mnrbt_node_t is assumed to be a part of a larger structure
      * which is actually referenced in the node->data.
      */
 
@@ -678,9 +678,9 @@ int rbt_remove_node(rbt_t *rbt, rbt_node_t *node)
 }
 
 int
-rbt_remove_key(rbt_t *rbt, uintptr_t key)
+rbt_remove_key(mnrbt_t *rbt, uintptr_t key)
 {
-    rbt_node_t *node;
+    mnrbt_node_t *node;
 
     rbt_find(rbt, key, &node);
 

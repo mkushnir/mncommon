@@ -16,7 +16,7 @@ MEMDEBUG_DECLARE(testperfdict);
 
 typedef struct _key_item {
     uint64_t key;
-    hash_item_t *n;
+    mnhash_item_t *n;
     uint64_t add_time;
     uint64_t find_time;
     uint64_t remove_time;
@@ -24,7 +24,7 @@ typedef struct _key_item {
 
 static key_item_t keys[1024 * 1024];
 
-static hash_t dict;
+static mnhash_t dict;
 
 UNUSED static uint64_t
 new_id_random(void)

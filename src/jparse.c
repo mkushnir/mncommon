@@ -20,12 +20,12 @@ MEMDEBUG_DECLARE(jparse);
 #define JSN_ISALPHA(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
 #define JSN_ISSPACE(c) ((c) == ' ' || (c) == '\t' || (c) == '\r' || (c) == '\n')
 
-static int jparse_expect_tok(jparse_ctx_t *, bytes_t **);
+static int jparse_expect_tok(jparse_ctx_t *, mnbytes_t **);
 static int expect_maybe_null(jparse_ctx_t *);
 
-static bytes_t _null = BYTES_INITIALIZER("null");
-static bytes_t _true = BYTES_INITIALIZER("true");
-static bytes_t _false = BYTES_INITIALIZER("false");
+static mnbytes_t _null = BYTES_INITIALIZER("null");
+static mnbytes_t _true = BYTES_INITIALIZER("true");
+static mnbytes_t _false = BYTES_INITIALIZER("false");
 
 
 static int
@@ -426,7 +426,7 @@ end:
 
 
 static int
-jparse_expect_tok(jparse_ctx_t *jctx, bytes_t **val)
+jparse_expect_tok(jparse_ctx_t *jctx, mnbytes_t **val)
 {
     int res;
     off_t start, stop;
@@ -469,7 +469,7 @@ jparse_expect_tok(jparse_ctx_t *jctx, bytes_t **val)
 static int
 expect_maybe_null(jparse_ctx_t *jctx)
 {
-    bytes_t *v;
+    mnbytes_t *v;
     off_t spos;
 
     jctx->errorpos = -1;
@@ -670,7 +670,7 @@ jparse_expect_float(jparse_ctx_t *jctx, double *val, UNUSED void *udata)
 
 
 int
-jparse_expect_str(jparse_ctx_t *jctx, bytes_t **val, UNUSED void *udata)
+jparse_expect_str(jparse_ctx_t *jctx, mnbytes_t **val, UNUSED void *udata)
 {
     int st, flags, res;
     off_t start, stop, spos;
@@ -753,7 +753,7 @@ int
 jparse_expect_bool(jparse_ctx_t *jctx, char *val, UNUSED void *udata)
 {
     off_t spos;
-    bytes_t *v;
+    mnbytes_t *v;
 
     jctx->errorpos = -1;
     spos = SPOS(&jctx->bs);
@@ -785,12 +785,12 @@ jparse_expect_bool(jparse_ctx_t *jctx, char *val, UNUSED void *udata)
  */
 int
 jparse_expect_kvp_any(jparse_ctx_t *jctx,
-                      bytes_t *key,
+                      mnbytes_t *key,
                       jparse_value_t *jval,
                       void *udata)
 {
     int res;
-    bytes_t *v;
+    mnbytes_t *v;
 
     jctx->errorpos = -1;
     res = 0;
@@ -823,7 +823,7 @@ jparse_expect_skvp_any(jparse_ctx_t *jctx,
                        void *udata)
 {
     int res;
-    bytes_t *k;
+    mnbytes_t *k;
 
     jctx->errorpos = -1;
     //k = bytes_new_from_str(key);
@@ -836,7 +836,7 @@ jparse_expect_skvp_any(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_ignore(jparse_ctx_t *jctx,
-                            bytes_t **key,
+                            mnbytes_t **key,
                             jparse_value_t *jval,
                             void *udata)
 {
@@ -866,7 +866,7 @@ jparse_expect_anykvp_ignore(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_any(jparse_ctx_t *jctx,
-                         bytes_t **key,
+                         mnbytes_t **key,
                          jparse_value_t *jval,
                          void *udata)
 {
@@ -896,14 +896,14 @@ jparse_expect_anykvp_any(jparse_ctx_t *jctx,
 
 int
 jparse_expect_kvp_int(jparse_ctx_t *jctx,
-                      bytes_t *key,
+                      mnbytes_t *key,
                       long *val,
                       void *udata)
 {
     int res;
 
     jctx->errorpos = -1;
-    bytes_t *v;
+    mnbytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_INT + 1);
@@ -936,7 +936,7 @@ jparse_expect_skvp_int(jparse_ctx_t *jctx,
     int res;
 
     jctx->errorpos = -1;
-    bytes_t *k;
+    mnbytes_t *k;
     //k = bytes_new_from_str(key);
     k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_int(jctx, k, val, udata);
@@ -947,7 +947,7 @@ jparse_expect_skvp_int(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_int(jparse_ctx_t *jctx,
-                         bytes_t **key,
+                         mnbytes_t **key,
                          long *val,
                          void *udata)
 {
@@ -976,14 +976,14 @@ jparse_expect_anykvp_int(jparse_ctx_t *jctx,
 
 int
 jparse_expect_kvp_float(jparse_ctx_t *jctx,
-                      bytes_t *key,
+                      mnbytes_t *key,
                       double *val,
                       void *udata)
 {
     int res;
 
     jctx->errorpos = -1;
-    bytes_t *v;
+    mnbytes_t *v;
     res = 0;
     if (jparse_expect_str(jctx, &v, udata) != 0) {
         TRRET(JPARSE_EXPECT_KVP_FLOAT + 1);
@@ -1016,7 +1016,7 @@ jparse_expect_skvp_float(jparse_ctx_t *jctx,
     int res;
 
     jctx->errorpos = -1;
-    bytes_t *k;
+    mnbytes_t *k;
     //k = bytes_new_from_str(key);
     k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_float(jctx, k, val, udata);
@@ -1027,7 +1027,7 @@ jparse_expect_skvp_float(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_float(jparse_ctx_t *jctx,
-                           bytes_t **key,
+                           mnbytes_t **key,
                            double *val,
                            void *udata)
 {
@@ -1056,12 +1056,12 @@ jparse_expect_anykvp_float(jparse_ctx_t *jctx,
 
 int
 jparse_expect_kvp_str(jparse_ctx_t *jctx,
-                      bytes_t *key,
-                      bytes_t **val,
+                      mnbytes_t *key,
+                      mnbytes_t **val,
                       void *udata)
 {
     int res;
-    bytes_t *v;
+    mnbytes_t *v;
 
     jctx->errorpos = -1;
     res = 0;
@@ -1090,11 +1090,11 @@ jparse_expect_kvp_str(jparse_ctx_t *jctx,
 int
 jparse_expect_skvp_str(jparse_ctx_t *jctx,
                        const char *key,
-                       bytes_t **val,
+                       mnbytes_t **val,
                        void *udata)
 {
     int res;
-    bytes_t *k;
+    mnbytes_t *k;
     //k = bytes_new_from_str(key);
     k = bytes_new_from_str_mpool(&jctx->mpool, key);
     res = jparse_expect_kvp_str(jctx, k, val, udata);
@@ -1105,8 +1105,8 @@ jparse_expect_skvp_str(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_str(jparse_ctx_t *jctx,
-                         bytes_t **key,
-                         bytes_t **val,
+                         mnbytes_t **key,
+                         mnbytes_t **val,
                          void *udata)
 {
     int res;
@@ -1134,12 +1134,12 @@ jparse_expect_anykvp_str(jparse_ctx_t *jctx,
 
 int
 jparse_expect_kvp_bool(jparse_ctx_t *jctx,
-                      bytes_t *key,
+                      mnbytes_t *key,
                       char *val,
                       void *udata)
 {
     int res;
-    bytes_t *v;
+    mnbytes_t *v;
 
     jctx->errorpos = -1;
     res = 0;
@@ -1172,7 +1172,7 @@ jparse_expect_skvp_bool(jparse_ctx_t *jctx,
                         void *udata)
 {
     int res;
-    bytes_t *k;
+    mnbytes_t *k;
 
     jctx->errorpos = -1;
     //k = bytes_new_from_str(key);
@@ -1185,7 +1185,7 @@ jparse_expect_skvp_bool(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_bool(jparse_ctx_t *jctx,
-                          bytes_t **key,
+                          mnbytes_t **key,
                           char *val,
                           void *udata)
 {
@@ -1214,7 +1214,7 @@ jparse_expect_anykvp_bool(jparse_ctx_t *jctx,
 
 int
 jparse_expect_kvp_object(jparse_ctx_t *jctx,
-                      bytes_t *key,
+                      mnbytes_t *key,
                       jparse_expect_cb_t cb,
                       jparse_value_t *jval,
                       void *udata)
@@ -1247,7 +1247,7 @@ jparse_expect_kvp_object(jparse_ctx_t *jctx,
 
 int
 jparse_expect_kvp_object_iter(jparse_ctx_t *jctx,
-                      bytes_t *key,
+                      mnbytes_t *key,
                       jparse_expect_cb_t cb,
                       jparse_value_t *jval,
                       void *udata)
@@ -1286,7 +1286,7 @@ jparse_expect_skvp_object(jparse_ctx_t *jctx,
                           void *udata)
 {
     int res;
-    bytes_t *k;
+    mnbytes_t *k;
 
     jctx->errorpos = -1;
     //k = bytes_new_from_str(key);
@@ -1299,7 +1299,7 @@ jparse_expect_skvp_object(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_object(jparse_ctx_t *jctx,
-                            bytes_t **key,
+                            mnbytes_t **key,
                             jparse_expect_cb_t cb,
                             jparse_value_t *jval,
                             void *udata)
@@ -1330,7 +1330,7 @@ jparse_expect_anykvp_object(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_object_iter(jparse_ctx_t *jctx,
-                            bytes_t **key,
+                            mnbytes_t **key,
                             jparse_expect_cb_t cb,
                             jparse_value_t *jval,
                             void *udata)
@@ -1361,13 +1361,13 @@ jparse_expect_anykvp_object_iter(jparse_ctx_t *jctx,
 
 int
 jparse_expect_kvp_array(jparse_ctx_t *jctx,
-                        bytes_t *key,
+                        mnbytes_t *key,
                         jparse_expect_cb_t cb,
                         jparse_value_t *jval,
                         void *udata)
 {
     int res;
-    bytes_t *v;
+    mnbytes_t *v;
 
     jctx->errorpos = -1;
     res = 0;
@@ -1395,13 +1395,13 @@ jparse_expect_kvp_array(jparse_ctx_t *jctx,
 
 int
 jparse_expect_kvp_array_iter(jparse_ctx_t *jctx,
-                        bytes_t *key,
+                        mnbytes_t *key,
                         jparse_expect_cb_t cb,
                         jparse_value_t *jval,
                         void *udata)
 {
     int res;
-    bytes_t *v;
+    mnbytes_t *v;
 
     jctx->errorpos = -1;
     res = 0;
@@ -1435,7 +1435,7 @@ jparse_expect_skvp_array(jparse_ctx_t *jctx,
                          void *udata)
 {
     int res;
-    bytes_t *k;
+    mnbytes_t *k;
 
     jctx->errorpos = -1;
     //k = bytes_new_from_str(key);
@@ -1448,7 +1448,7 @@ jparse_expect_skvp_array(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_array(jparse_ctx_t *jctx,
-                           bytes_t **key,
+                           mnbytes_t **key,
                            jparse_expect_cb_t cb,
                            jparse_value_t *jval,
                            void *udata)
@@ -1479,7 +1479,7 @@ jparse_expect_anykvp_array(jparse_ctx_t *jctx,
 
 int
 jparse_expect_anykvp_array_iter(jparse_ctx_t *jctx,
-                           bytes_t **key,
+                           mnbytes_t **key,
                            jparse_expect_cb_t cb,
                            jparse_value_t *jval,
                            void *udata)
@@ -1775,7 +1775,7 @@ jparse_expect_item_float(jparse_ctx_t *jctx, double *val, void *udata)
 
 
 int
-jparse_expect_item_str(jparse_ctx_t *jctx, bytes_t **val, void *udata)
+jparse_expect_item_str(jparse_ctx_t *jctx, mnbytes_t **val, void *udata)
 {
     off_t spos;
     int res;
@@ -2011,7 +2011,7 @@ jparse_ctx_parse_fd(jparse_ctx_t *jctx,
 
 
 static ssize_t
-_jparse_ctx_parse_data_read_more(UNUSED bytestream_t *bs,
+_jparse_ctx_parse_data_read_more(UNUSED mnbytestream_t *bs,
                                  UNUSED int fd,
                                  UNUSED ssize_t sz)
 {
