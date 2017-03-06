@@ -40,8 +40,8 @@ siftdown(mnheap_t *heap, int i)
             }
         }
         if (heap->cmp(a, minb) > 0) {
-            heap->swap(a, minb);
-            siftdown(heap, minj);
+            (void)heap->swap(a, minb);
+            (void)siftdown(heap, minj);
             res = 1;
         }
     }
@@ -56,7 +56,7 @@ heap_ify(mnheap_t *heap)
     int i;
 
     for (i = (int)heap->data.elnum / HEAP_D - 1; i >= 0; --i) {
-        siftdown(heap, i);
+        (void)siftdown(heap, i);
     }
 }
 
@@ -72,7 +72,7 @@ heap_push(mnheap_t *heap, void *v)
     ++heap->sz;
     if (heap->data.elnum > 1) {
         for (i = (int)HEAP_PARENT(heap->data.elnum - 1); i >= 0; --i) {
-            siftdown(heap, i);
+            (void)siftdown(heap, i);
         }
     }
 }
@@ -93,9 +93,9 @@ int heap_pop(mnheap_t *heap, void **rv)
         *rv = *pv;
         lv = array_get(&heap->data, heap->data.elnum - 1);
         if (lv != pv) {
-            heap->swap(pv, lv);
+            (void)heap->swap(pv, lv);
             array_decr_fast(&heap->data);
-            siftdown(heap, 0);
+            (void)siftdown(heap, 0);
         } else {
             array_decr_fast(&heap->data);
         }
@@ -125,10 +125,10 @@ int heap_pushpop(mnheap_t *heap, void **rv)
         if (lv != pv) {
             int i;
 
-            heap->swap(pv, lv);
+            (void)heap->swap(pv, lv);
             *lv = tmp;
             for (i = (int)HEAP_PARENT(heap->data.elnum - 1); i >= 0; --i) {
-                siftdown(heap, i);
+                (void)siftdown(heap, i);
             }
         } else {
             *lv = tmp;
