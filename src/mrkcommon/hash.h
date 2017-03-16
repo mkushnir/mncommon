@@ -13,6 +13,51 @@
 extern "C" {
 #endif
 
+/* Useful primes
+ * 7
+ * 11
+ * 17
+ * 31
+ * 61
+ * 127
+ *
+ * 251
+ * 257
+ *
+ * 509
+ * 521
+ *
+ * 1021
+ * 1031
+ *
+ * 2039
+ * 2053
+ *
+ * 4093
+ * 4099
+ *
+ * 8191
+ * 8209
+ *
+ * 16381
+ * 16411
+ *
+ * 32749
+ * 32771
+ *
+ * 65213 centered heptagonal prime
+ * 65537 Fermat prime
+ * 68111 chp
+ * 72073 chp
+ * 76147 chp
+ * 84631 chp
+ * 89041 chp
+ * 93563 chp
+ * 193939 circular prime
+ * 1046527 carol prime
+ * 27644437 bell number prime
+ */
+
 typedef struct _hash_item {
     struct _hash_item **bucket;
     struct _hash_item *prev;
@@ -25,7 +70,7 @@ typedef uint64_t (*hash_hashfn_t)(void *);
 typedef int (*hash_item_comparator_t)(void *, void *);
 typedef int (*hash_item_finalizer_t)(void *, void *);
 typedef int (*hash_traverser_t)(void *, void *, void *);
-typedef struct _hash {
+typedef struct _mnhash {
 #ifdef DO_MEMDEBUG
     uint64_t mdtag;
 #endif
@@ -37,11 +82,11 @@ typedef struct _hash {
 } mnhash_t;
 
 
-typedef struct _hash_iter {
+typedef struct _mnhash_iter {
     mnarray_iter_t it;
     mnhash_item_t **phit;
     mnhash_item_t *hit;
-} hash_iter_t;
+} mnhash_iter_t;
 
 
 void hash_set_item(mnhash_t *, void *, void *);
@@ -68,8 +113,8 @@ int hash_traverse(mnhash_t *, hash_traverser_t, void *);
 typedef int (*hash_traverser_item_t)(mnhash_t *, mnhash_item_t *, void *);
 
 int hash_traverse_item(mnhash_t *, hash_traverser_item_t, void *);
-mnhash_item_t *hash_first(mnhash_t *, hash_iter_t *);
-mnhash_item_t *hash_next(mnhash_t *, hash_iter_t *);
+mnhash_item_t *hash_first(mnhash_t *, mnhash_iter_t *);
+mnhash_item_t *hash_next(mnhash_t *, mnhash_iter_t *);
 bool hash_is_empty(mnhash_t *);
 size_t hash_get_elnum(mnhash_t *);
 

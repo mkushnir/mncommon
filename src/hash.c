@@ -56,7 +56,7 @@ my_rehash(UNUSED mnhash_t *dict, mnhash_item_t *it, void *udata)
 #define HASH_REHASH_BODY(malloc_fn, free_fn, array_reset_no_fini_fn)   \
     unsigned i;                                                        \
     struct {                                                           \
-        mnhash_item_t **tmp;                                             \
+        mnhash_item_t **tmp;                                           \
         size_t n;                                                      \
     } params;                                                          \
     if ((params.tmp = malloc_fn(                                       \
@@ -73,7 +73,7 @@ my_rehash(UNUSED mnhash_t *dict, mnhash_item_t *it, void *udata)
     assert(params.n == dict->elnum);                                   \
     for (i = 0; i < dict->elnum; ++i) {                                \
         uint64_t idx;                                                  \
-        mnhash_item_t *hit, **phit;                                      \
+        mnhash_item_t *hit, **phit;                                    \
         hit = params.tmp[i];                                           \
         idx = dict->hashfn(hit->key) % sz;                             \
         if ((phit = array_get(&dict->table, idx)) == NULL) {           \
@@ -121,13 +121,13 @@ null_init(void **v)
 
 #define HASH_SET_ITEM_BODY(malloc_fn)                          \
     uint64_t idx;                                              \
-    mnhash_item_t **phit, *hit;                                  \
+    mnhash_item_t **phit, *hit;                                \
     idx = dict->hashfn(key) % dict->table.elnum;               \
     if ((phit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
     }                                                          \
     MEMDEBUG_ENTER(dict);                                      \
-    if ((hit = malloc_fn(sizeof(mnhash_item_t))) == NULL) {      \
+    if ((hit = malloc_fn(sizeof(mnhash_item_t))) == NULL) {    \
         FAIL("malloc_fn");                                     \
     }                                                          \
     MEMDEBUG_LEAVE(dict);                                      \
@@ -165,14 +165,14 @@ hash_set_item_mpool(mpool_ctx_t *mpool, mnhash_t *dict, void *key, void *value)
     uint64_t idx;                                              \
     assert(oldkey != NULL);                                    \
     assert(oldvalue != NULL);                                  \
-    mnhash_item_t **phit, *hit;                                  \
+    mnhash_item_t **phit, *hit;                                \
     idx = dict->hashfn(key) % dict->table.elnum;               \
     if ((phit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
     }                                                          \
     if (*phit == NULL) {                                       \
         MEMDEBUG_ENTER(dict);                                  \
-        if ((hit = malloc_fn(sizeof(mnhash_item_t))) == NULL) {  \
+        if ((hit = malloc_fn(sizeof(mnhash_item_t))) == NULL) {\
             FAIL("malloc_fn");                                 \
         }                                                      \
         MEMDEBUG_LEAVE(dict);                                  \
@@ -197,7 +197,7 @@ hash_set_item_mpool(mpool_ctx_t *mpool, mnhash_t *dict, void *key, void *value)
             }                                                  \
         }                                                      \
         MEMDEBUG_ENTER(dict);                                  \
-        if ((hit = malloc_fn(sizeof(mnhash_item_t))) == NULL) {  \
+        if ((hit = malloc_fn(sizeof(mnhash_item_t))) == NULL) {\
             FAIL("malloc_fn");                                 \
         }                                                      \
         MEMDEBUG_LEAVE(dict);                                  \
@@ -267,7 +267,7 @@ hash_get_item(mnhash_t *dict, void *key)
 
 #define HASH_REMOVE_ITEM_BODY(free_fn)                         \
     uint64_t idx;                                              \
-    mnhash_item_t **phit, *hit;                                  \
+    mnhash_item_t **phit, *hit;                                \
     idx = dict->hashfn(key) % dict->table.elnum;               \
     if ((phit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
@@ -442,7 +442,7 @@ hash_traverse_item(mnhash_t *dict, hash_traverser_item_t cb, void *udata)
 
 
 mnhash_item_t *
-hash_first(mnhash_t *hash, hash_iter_t *it)
+hash_first(mnhash_t *hash, mnhash_iter_t *it)
 {
     it->hit = NULL;
     for (it->phit = array_first(&hash->table, &it->it);
@@ -458,7 +458,7 @@ hash_first(mnhash_t *hash, hash_iter_t *it)
 
 
 mnhash_item_t *
-hash_next(mnhash_t *hash, hash_iter_t *it)
+hash_next(mnhash_t *hash, mnhash_iter_t *it)
 {
     if (it->hit != NULL) {
         it->hit = it->hit->next;
@@ -496,7 +496,7 @@ hash_get_elnum(mnhash_t *dict)
     assert(cmp != NULL);                                       \
     dict->cmp = cmp;                                           \
     dict->fini = fini;                                         \
-    array_init_fn(&dict->table, sizeof(mnhash_item_t *), sz,     \
+    array_init_fn(&dict->table, sizeof(mnhash_item_t *), sz,   \
                (array_initializer_t)null_init,                 \
                NULL);                                          \
     dict->elnum = 0;                                           \
@@ -529,8 +529,8 @@ hash_init_mpool(mpool_ctx_t *mpool,
     if (dict->fini != NULL) {                                  \
         size_t i;                                              \
         for (i = 0; i < dict->table.elnum; ++i) {              \
-            mnhash_item_t **phit, *hit, *next;                   \
-            phit = ARRAY_GET(mnhash_item_t *, &dict->table, i);  \
+            mnhash_item_t **phit, *hit, *next;                 \
+            phit = ARRAY_GET(mnhash_item_t *, &dict->table, i);\
             for (hit = *phit; hit != NULL; hit = next) {       \
                 next = hit->next;                              \
                 if (dict->fini(hit->key, hit->value) != 0) {   \
@@ -546,8 +546,8 @@ hash_init_mpool(mpool_ctx_t *mpool,
     } else {                                                   \
         size_t i;                                              \
         for (i = 0; i < dict->table.elnum; ++i) {              \
-            mnhash_item_t **phit, *hit, *next;                   \
-            phit = ARRAY_GET(mnhash_item_t *, &dict->table, i);  \
+            mnhash_item_t **phit, *hit, *next;                 \
+            phit = ARRAY_GET(mnhash_item_t *, &dict->table, i);\
             for (hit = *phit; hit != NULL; hit = next) {       \
                 next = hit->next;                              \
                 MEMDEBUG_ENTER(dict);                          \

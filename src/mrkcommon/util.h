@@ -51,6 +51,9 @@ const char *mrkcommon_diag_str(int);
 #define INB2(lo, x, hi) (((lo) < (x)) && ((x) <= (hi)))
 #define INB3(lo, x, hi) (((lo) < (x)) && ((x) < (hi)))
 
+#define MRKLIKELY(x) __builtin_expect((x), 1)
+#define MRKUNLIKELY(x) __builtin_expect((x), 0)
+
 #ifdef __cplusplus
 }
 #endif

@@ -15,7 +15,7 @@ typedef int (*array_traverser_t) (void *, void *);
 typedef int (*array_compar_t) (const void *, const void *);
 
 /**/
-typedef struct _array {
+typedef struct _mnarray {
 #ifdef DO_MEMDEBUG
     uint64_t mdtag;
 #endif

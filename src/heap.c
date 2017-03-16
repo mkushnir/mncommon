@@ -177,7 +177,8 @@ heap_init(mnheap_t *heap,
           array_compar_t cmp,
           heap_swapfn_t swap)
 {
-    (void)array_init(&heap->data, elsz, elnum, init, fini);
+    (void)array_init(&heap->data, elsz, 0, init, fini);
+    array_ensure_datasz_dirty(&heap->data, elnum, 0);
     heap->cmp = cmp;
     heap->swap = swap;
     heap->sz = 0;
