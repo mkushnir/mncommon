@@ -184,6 +184,7 @@ heap_init(mnheap_t *heap,
     heap->sz = 0;
 }
 
+
 void
 heap_fini(mnheap_t *heap)
 {
@@ -191,4 +192,26 @@ heap_fini(mnheap_t *heap)
     heap->cmp = NULL;
     heap->swap = NULL;
     heap->sz = 0;
+}
+
+
+int
+heap_pointer_swap(void *a, void *b)
+{
+    void **pa = (void **)a;
+    void **pb = (void **)b;
+    void *tmp;
+    tmp = *pa;
+    *pa = *pb;
+    *pb = tmp;
+    return 0;
+}
+
+
+int
+heap_pointer_null(void *a)
+{
+    void **aa = (void **)a;
+    *aa = NULL;
+    return 0;
 }

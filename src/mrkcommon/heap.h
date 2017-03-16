@@ -34,6 +34,8 @@ void heap_init(mnheap_t *,
                heap_swapfn_t);
 
 void heap_fini(mnheap_t *);
+int heap_pointer_swap(void *, void *);
+int heap_pointer_null(void *);
 #ifdef __cplusplus
 }
 #endif
