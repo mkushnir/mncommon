@@ -149,6 +149,15 @@ void hash_destroy_mpool(mpool_ctx_t *, mnhash_t **);
 
 void hash_dump_stats(mnhash_t *);
 
+/*
+ * set
+ */
+void hash_set_add(mnhash_t *, void *);
+void hash_set_remove(mnhash_t*, void *);
+void hash_set_union2(mnhash_t *, mnhash_t *);
+void hash_set_union3(mnhash_t *, mnhash_t *, mnhash_t *);
+void hash_set_diff3(mnhash_t *, mnhash_t *, mnhash_t *);
+
 #ifdef __cplusplus
 }
 #endif

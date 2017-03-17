@@ -673,3 +673,86 @@ hash_dump_stats(mnhash_t *dict)
     }
 }
 
+
+/*
+ * set
+ */
+void
+hash_set_add(mnhash_t *hash, void *key)
+{
+    if (hash_get_item(hash, key) == NULL) {
+        hash_set_item(hash, key, NULL);
+    }
+}
+
+void
+hash_set_remove(mnhash_t *hash, void *key)
+{
+    (void)hash_remove_item(hash, key);
+}
+
+
+static int
+hash_set_union2_cb(UNUSED mnhash_t *b, mnhash_item_t *hit, mnhash_t *a)
+{
+    if (hash_get_item(a, hit->key) == NULL) {
+        hash_set_item(a, hit->key, hit->value);
+    }
+    return 0;
+}
+
+
+void
+hash_set_union2(mnhash_t *a, mnhash_t *b)
+{
+    (void)hash_traverse_item(b, (hash_traverser_item_t)hash_set_union2_cb, a);
+}
+
+
+static int
+hash_set_union3_cb(UNUSED mnhash_t *a, mnhash_item_t *hit, mnhash_t *res)
+{
+    if (hash_get_item(res, hit->key) == NULL) {
+        hash_set_item(res, hit->key, hit->value);
+    }
+    return 0;
+}
+
+
+void
+hash_set_union3(mnhash_t *res, mnhash_t *a, mnhash_t *b)
+{
+    (void)hash_traverse_item(a,
+                             (hash_traverser_item_t)hash_set_union3_cb,
+                             res);
+    (void)hash_traverse_item(b,
+                             (hash_traverser_item_t)hash_set_union3_cb,
+                             res);
+}
+
+
+static int
+hash_set_diff3_cb(UNUSED mnhash_t *a, mnhash_item_t *hit, void *udata)
+{
+    struct {
+        mnhash_t *res;
+        mnhash_t *b;
+    } *params = udata;
+    if (hash_get_item(params->b, hit->key) == NULL) {
+        hash_set_item(params->res, hit->key, hit->value);
+    }
+    return 0;
+}
+
+
+void
+hash_set_diff3(mnhash_t *res, mnhash_t *a, mnhash_t *b)
+{
+    struct {
+        mnhash_t *res;
+        mnhash_t *b;
+    } params = { res, b };
+    (void)hash_traverse_item(a,
+                             (hash_traverser_item_t)hash_set_diff3_cb,
+                             &params);
+}
