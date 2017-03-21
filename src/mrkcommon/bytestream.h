@@ -82,7 +82,39 @@ do {                                                   \
 } while (0)                                            \
 
 
-#define SCATI32(bs, i)                                 \
+#define SCATI(bs, ty, _i)                              \
+do {                                                   \
+    union {                                            \
+        char *c;                                       \
+        ty *i;                                         \
+    } _scati_u;                                        \
+    while (((bs)->eod + (ssize_t)sizeof(ty)) >         \
+            (bs)->buf.sz) {                            \
+        (void)bytestream_grow((bs), (bs)->growsz);     \
+    }                                                  \
+    _scati_u.c = (bs)->buf.data + (bs)->eod;           \
+    *_scati_u.i = _i;                                  \
+    (bs)->eod += sizeof(ty);                           \
+} while (0)                                            \
+
+
+#define SCATI16(bs, _i)                                \
+do {                                                   \
+    union {                                            \
+        char *c;                                       \
+        int16_t *i;                                    \
+    } _scat16_u;                                       \
+    while (((bs)->eod + (ssize_t)sizeof(int16_t)) >    \
+            (bs)->buf.sz) {                            \
+        (void)bytestream_grow((bs), (bs)->growsz);     \
+    }                                                  \
+    _scat16_u.c = (bs)->buf.data + (bs)->eod;          \
+    *_scat16_u.i = _i;                                 \
+    (bs)->eod += sizeof(int16_t);                      \
+} while (0)                                            \
+
+
+#define SCATI32(bs, _i)                                \
 do {                                                   \
     union {                                            \
         char *c;                                       \
@@ -93,12 +125,12 @@ do {                                                   \
         (void)bytestream_grow((bs), (bs)->growsz);     \
     }                                                  \
     _scat32_u.c = (bs)->buf.data + (bs)->eod;          \
-    *_scat32_u.i = i;                                  \
+    *_scat32_u.i = _i;                                 \
     (bs)->eod += sizeof(int32_t);                      \
 } while (0)                                            \
 
 
-#define SCATI64(bs, i)                                 \
+#define SCATI64(bs, _i)                                \
 do {                                                   \
     union {                                            \
         char *c;                                       \
@@ -109,12 +141,12 @@ do {                                                   \
         (void)bytestream_grow((bs), (bs)->growsz);     \
     }                                                  \
     _scat64_u.c = (bs)->buf.data + (bs)->eod;          \
-    *_scat64_u.i = i;                                  \
+    *_scat64_u.i = _i;                                 \
     (bs)->eod += sizeof(int64_t);                      \
 } while (0)                                            \
 
 
-#define SCATF(bs, f)                                   \
+#define SCATF(bs, _f)                                  \
 do {                                                   \
     union {                                            \
         char *c;                                       \
@@ -125,12 +157,12 @@ do {                                                   \
         (void)bytestream_grow((bs), (bs)->growsz);     \
     }                                                  \
     _scat64_u.c = (bs)->buf.data + (bs)->eod;          \
-    *_scat64_u.f = f;                                  \
+    *_scat64_u.f = _f;                                 \
     (bs)->eod += sizeof(float);                        \
 } while (0)                                            \
 
 
-#define SCATD(bs, d)                                   \
+#define SCATD(bs, _d)                                  \
 do {                                                   \
     union {                                            \
         char *c;                                       \
@@ -141,7 +173,7 @@ do {                                                   \
         (void)bytestream_grow((bs), (bs)->growsz);     \
     }                                                  \
     _scat64_u.c = (bs)->buf.data + (bs)->eod;          \
-    *_scat64_u.d = d;                                  \
+    *_scat64_u.d = _d;                                 \
     (bs)->eod += sizeof(double);                       \
 } while (0)                                            \
 

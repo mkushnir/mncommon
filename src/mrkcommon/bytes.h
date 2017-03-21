@@ -127,6 +127,7 @@ mnbytes_t *bytes_new_from_str_mpool(mpool_ctx_t *, const char *);
 mnbytes_t *bytes_new_from_bytes(const mnbytes_t *);
 mnbytes_t *bytes_new_from_bytes_mpool(mpool_ctx_t *, const mnbytes_t *);
 mnbytes_t * PRINTFLIKE(1, 2) bytes_printf(const char *, ...);
+mnbytes_t *bytes_vprintf(const char *, __va_list);
 void bytes_incref(mnbytes_t *);
 void bytes_decref(mnbytes_t **);
 void bytes_decref_fast(mnbytes_t *);

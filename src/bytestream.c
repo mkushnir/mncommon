@@ -218,6 +218,9 @@ bytestream_consume_data(mnbytestream_t *stream, int fd)
     assert(stream->read_more != NULL);
 
     need = (stream->pos + stream->growsz) - stream->eod;
+    if (need <= 0) {
+        need = stream->growsz;
+    }
     nread = stream->read_more(stream, fd, need);
 
     if (nread == 0) {

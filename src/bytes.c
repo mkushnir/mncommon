@@ -491,6 +491,28 @@ bytes_printf(const char *fmt, ...)
     return res;
 }
 
+
+mnbytes_t *
+bytes_vprintf(const char *fmt, va_list ap0)
+{
+    int nused;
+    char x;
+    mnbytes_t *res;
+    va_list ap1;
+
+    va_copy(ap1, ap0);
+    nused = vsnprintf(&x, 0, fmt, ap0);
+
+    res = bytes_new(nused + 1);
+
+    nused = vsnprintf((char *)res->data, res->sz, fmt, ap1);
+    va_end(ap1);
+    assert((size_t)nused < res->sz);
+
+    return res;
+}
+
+
 void
 bytes_copy(mnbytes_t * restrict dst, mnbytes_t * restrict src, size_t off)
 {
