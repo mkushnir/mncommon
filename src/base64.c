@@ -6,18 +6,16 @@
 #include <mrkcommon/dumpm.h>
 
 
-#define MRK_BASE64_ALPHABET(c63, c64)                                          \
-"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c63 #c64     \
-"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c63 #c64     \
-"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c63 #c64     \
-"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c63 #c64 "=" \
+#define MRK_BASE64_ALPHABET(c62, c63)                                          \
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c62 #c63     \
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c62 #c63     \
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c62 #c63     \
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c62 #c63 "=" \
 
 
 static char *alphabet_mime = MRK_BASE64_ALPHABET(+, /);
 
-static char *alphabet_url_std = MRK_BASE64_ALPHABET(+, _);
-
-static char *alphabet_url_modified = MRK_BASE64_ALPHABET(-, _);
+static char *alphabet_url_std = MRK_BASE64_ALPHABET(-, _);
 
 
 static char codes_mime[256] = {
@@ -63,42 +61,6 @@ static char codes_url_std[256] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x3e, 0x00, 0x00, 0x00, 0x00,
-    0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b,
-    0x3c, 0x3d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
-    0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
-    0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-    0x17, 0x18, 0x19, 0x00, 0x00, 0x00, 0x00, 0x3f,
-    0x00, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20,
-    0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
-    0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30,
-    0x31, 0x32, 0x33, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-
-static char codes_url_modified[256] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x00, 0x00,
     0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b,
     0x3c, 0x3d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
@@ -260,51 +222,34 @@ mrkbase64_encode_url_std(const unsigned char *src,
 }
 
 
-int
-mrkbase64_encode_url_modified(const unsigned char *src,
-                 size_t srcsz,
-                 char *dst,
-                 size_t dstsz)
-{
-    MRKBASE64_ENCODE_BODY(alphabet_url_modified);
-}
-
-
-
-
-#define MRKBASE64_DECODE_LOOP(codes)                                                   \
-        if (src[i * 4] < 0x20 || src[i * 4] > 0x7f) {                                  \
-            return -1;                                                                 \
-        }                                                                              \
-        if (src[i * 4 + 1] < 0x20 || src[i * 4 + 1] > 0x7f) {                          \
-            return -1;                                                                 \
-        }                                                                              \
-        if (src[i * 4] == '=' || src[i * 4 + 1] == '=') {                              \
-            break;                                                                     \
-        }                                                                              \
-        dst[i * 3] =                                                                   \
-            codes[(int)src[i * 4]] << 2 | codes[(int)src[i * 4 + 1]]  >> 4;            \
-        ++(*dstsz);                                                                    \
-                                                                                       \
-        if (src[i * 4 + 2] == '=') {                                                   \
-            break;                                                                     \
-        }                                                                              \
-        if (src[i * 4 + 2] < 0x20 || src[i * 4 + 2] > 0x7f) {                          \
-            return -1;                                                                 \
-        }                                                                              \
-        dst[i * 3 + 1] =                                                               \
-            (codes[(int)src[i * 4 + 1]]) << 4 | codes[(int)src[i * 4 + 2]] >> 2;       \
-        ++(*dstsz);                                                                    \
-                                                                                       \
-        if (src[i * 4 + 3] == '=') {                                                   \
-            break;                                                                     \
-        }                                                                              \
-        if (src[i * 4 + 3] < 0x20 || src[i * 4 + 3] > 0x7f) {                          \
-            return -1;                                                                 \
-        }                                                                              \
-        dst[i * 3 + 2] =                                                               \
-            (codes[(int)src[i * 4 + 2]]) << 6 | codes[(int)src[i * 4 + 3]] >> 0;       \
-        ++(*dstsz)                                                                     \
+#define MRKBASE64_DECODE_LOOP(codes)                                           \
+    union {                                                                    \
+        uint32_t *i;                                                           \
+        const char *c;                                                         \
+    } u = { .c = src + i * 4 };                                                \
+    if (*(u.i) & 0x80808080 || !((*u.i) & 0xe0e0e0e0)) {                       \
+        return -1;                                                             \
+    }                                                                          \
+    if (src[i * 4] == '=' || src[i * 4 + 1] == '=') {                          \
+        break;                                                                 \
+    }                                                                          \
+    dst[i * 3] =                                                               \
+        codes[(int)src[i * 4]] << 2 | codes[(int)src[i * 4 + 1]]  >> 4;        \
+    ++(*dstsz);                                                                \
+                                                                               \
+    if (src[i * 4 + 2] == '=') {                                               \
+        break;                                                                 \
+    }                                                                          \
+    dst[i * 3 + 1] =                                                           \
+        (codes[(int)src[i * 4 + 1]]) << 4 | codes[(int)src[i * 4 + 2]] >> 2;   \
+    ++(*dstsz);                                                                \
+                                                                               \
+    if (src[i * 4 + 3] == '=') {                                               \
+        break;                                                                 \
+    }                                                                          \
+    dst[i * 3 + 2] =                                                           \
+        (codes[(int)src[i * 4 + 2]]) << 6 | codes[(int)src[i * 4 + 3]] >> 0;   \
+    ++(*dstsz)                                                                 \
 
 
 
@@ -314,13 +259,12 @@ mrkbase64_decode_mime(const char *src,
                       unsigned char *dst,
                       size_t *dstsz)
 {
-    size_t i, sz;
-
-    if (MRKUNLIKELY((srcsz % 4 != 0) || (*dstsz / 3) * 4 < srcsz)) {
+    size_t m = srcsz % 4, sz, i;
+    if (MRKUNLIKELY((m != 0) || (*dstsz / 3) * 4 < srcsz)) {
         return -1;
     }
     *dstsz = 0;
-    sz = (srcsz + ((srcsz % 4) ? 4 - (srcsz % 4) : 0)) / 4;
+    sz = (srcsz + (m ? 4 - m : 0)) / 4;
     for (i = 0; i < sz; ++i) {
         MRKBASE64_DECODE_LOOP(codes_mime);
     }
@@ -343,26 +287,6 @@ mrkbase64_decode_url_std(const char *src,
     sz = (ssize_t)srcsz / 4 + 1;
     for (i = 0; i < sz; ++i) {
         MRKBASE64_DECODE_LOOP(codes_url_std);
-    }
-    return 0;
-}
-
-
-int
-mrkbase64_decode_url_modified(const char *src,
-                              size_t srcsz,
-                              unsigned char *dst,
-                              size_t *dstsz)
-{
-    ssize_t i, sz;
-
-    if (MRKUNLIKELY((srcsz % 4 != 0) || (*dstsz / 3) * 4 < srcsz)) {
-        return -1;
-    }
-    *dstsz = 0;
-    sz = (ssize_t)srcsz / 4 + 1;
-    for (i = 0; i < sz; ++i) {
-        MRKBASE64_DECODE_LOOP(codes_url_modified);
     }
     return 0;
 }
@@ -424,7 +348,6 @@ mrkbase64_test1(void)
 
     MRKBASE64_TEST1_BODY(codes_mime, alphabet_mime);
     MRKBASE64_TEST1_BODY(codes_url_std, alphabet_url_std);
-    MRKBASE64_TEST1_BODY(codes_url_modified, alphabet_url_modified);
 }
 
 

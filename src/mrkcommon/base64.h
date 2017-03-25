@@ -8,22 +8,18 @@ extern "C" {
 /*
  * Supported:
  *  rfc 4648 (MIME) +/
- *  rfc 4648 (url) +_
- *  modified (url) -_
+ *  rfc 4648 (url) -_
  *
  *
  */
 int mrkbase64_encode_mime(const unsigned char *, size_t, char *, size_t);
 int mrkbase64_encode_url_std(const unsigned char *, size_t, char *, size_t);
-int mrkbase64_encode_url_modified(const unsigned char *, size_t, char *, size_t);
 
 int mrkbase64_decode_mime(const char *, size_t, unsigned char *, size_t *);
 int mrkbase64_decode_url_std(const char *, size_t, unsigned char *, size_t *);
-int mrkbase64_decode_url_modified(const char *, size_t, unsigned char *, size_t *);
 
 int mrkbase64_decode_mime_inplace(char *, size_t *);
 int mrkbase64_decode_url_std_inplace(char *, size_t *);
-int mrkbase64_decode_url_modified_inplace(char *, size_t *);
 
 
 /*
