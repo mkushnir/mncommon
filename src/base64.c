@@ -301,6 +301,15 @@ mrkbase64_decode_mime_inplace(char *s, size_t *sz)
 }
 
 
+int
+mrkbase64_decode_url_std_inplace(char *s, size_t *sz)
+{
+    unsigned char *dst = (unsigned char *)s;
+    size_t srcsz = *sz;
+    return mrkbase64_decode_url_std(s, srcsz, dst, sz);
+}
+
+
 
 void
 mrkbase64_test0(void)

@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
+#include <mrkcommon/base64.h>
 #include <mrkcommon/mpool.h>
 #include <mrkcommon/util.h>
 

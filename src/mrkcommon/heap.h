@@ -1,5 +1,5 @@
-#ifndef MRKCOMMON_LIST_H
-#define MRKCOMMON_LIST_H
+#ifndef MRKCOMMON_HEAP_H
+#define MRKCOMMON_HEAP_H
 
 #include <mrkcommon/array.h>
 
@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 typedef int (*heap_swapfn_t) (void *, void *);
-typedef struct _heap {
+typedef struct _mnheap {
     mnarray_t data;
     array_compar_t cmp;
     heap_swapfn_t swap;

@@ -657,6 +657,46 @@ bytes_brushdown(mnbytes_t *str)
 }
 
 
+mnbytes_t *
+bytes_base64_encode_url_str(mnbytes_t *s)
+{
+    mnbytes_t *res;
+    size_t sz0, sz1;
+    size_t m;
+
+    if (BSZ(s) == 0) {
+        return NULL;
+    }
+
+    sz0 = BSZ(s) - 1;
+    m = sz0 % 3;
+    sz1 = (sz0 + (m ? (3 - m) : 0)) * 4 / 3;
+
+    res = bytes_new(sz1 + 1);
+    if (MRKUNLIKELY(mrkbase64_encode_url_std(BDATA(s),
+                    sz0,
+                    (char *)BDATA(res),
+                    sz1) != 0)) {
+        BYTES_DECREF(&res);
+    } else {
+        BDATA(res)[sz1] = '\0';
+    }
+
+    return res;
+}
+
+
+int
+bytes_base64_decode_url(mnbytes_t *s)
+{
+    int res;
+
+    res = mrkbase64_decode_url_std_inplace((char *)BDATA(s), &BSZ(s));
+    (void)bytes_hash(s);
+    return res;
+}
+
+
 int
 bytes_split_iter(mnbytes_t *str, char *delim, bytes_split_cb cb, void *udata)
 {
