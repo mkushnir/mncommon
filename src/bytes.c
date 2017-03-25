@@ -690,8 +690,11 @@ int
 bytes_base64_decode_url(mnbytes_t *s)
 {
     int res;
+    size_t sz = BSZ(s) - 1;
 
-    res = mrkbase64_decode_url_std_inplace((char *)BDATA(s), &BSZ(s));
+    res = mrkbase64_decode_url_std_inplace((char *)BDATA(s), &sz);
+    BDATA(s)[sz] = '\0';
+    BSZ(s) = sz + 1;
     (void)bytes_hash(s);
     return res;
 }
