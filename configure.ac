@@ -263,6 +263,13 @@ AC_ARG_ENABLE(heap,
               [AM_CONDITIONAL([HEAP], [enable_heap=yes])],
              )
 
+AC_ARG_ENABLE(base64,
+              AC_HELP_STRING([--enable-base64],
+                             [Enable base64 (default=yes)]),
+              [AM_CONDITIONAL([BASE64], [test "$enable_base64" = "yes"])],
+              [AM_CONDITIONAL([BASE64], [enable_base64=yes])],
+             )
+
 if test "$enable_profile" = "yes" -a "$enable_list" != "yes"
 then
     echo "ERROR: cannot disable the list feature because the profile feature requires it."

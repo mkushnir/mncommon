@@ -110,6 +110,11 @@ heap_sources = heap.c
 heap_include_headers = mrkcommon/heap.h
 endif
 
+if BASE64
+base64_sources = base64.c
+base64_include_headers = mrkcommon/base64.h
+endif
+
 nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(util_include_headers) \
 			 $(array_include_headers) \
@@ -130,7 +135,8 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(mpool_include_headers) \
 			 $(bytes_include_headers) \
 			 $(cm_include_headers) \
-			 $(heap_include_headers)
+			 $(heap_include_headers) \
+			 $(base64_include_headers)
 
 libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(array_sources) \
@@ -151,7 +157,8 @@ libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(mpool_sources) \
 			  $(bytes_sources) \
 			  $(cm_sources) \
-			  $(heap_sources)
+			  $(heap_sources) \
+			  $(base64_sources)
 
 nodist_libmrkcommon_la_SOURCES = diag.c
 

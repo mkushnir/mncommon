@@ -13,6 +13,9 @@
 extern "C" {
 #endif
 
+/*
+ * https://tools.ietf.org/html/rfc7159
+ */
 #define JPARSE_EOS (-1)
 
 struct _jparse_ctx;

@@ -68,8 +68,10 @@ int bytestream_produce_data(mnbytestream_t *, int);
 void bytestream_rewind(mnbytestream_t *);
 off_t bytestream_recycle(mnbytestream_t *, int, off_t);
 #define BYTESTREAM_NPRINTF_ERROR (-129)
-#define BYTESTREAM_NPRINTF_NEEDNORE (-130)
+#define BYTESTREAM_NPRINTF_NEEDMORE (-130)
 int bytestream_nprintf(mnbytestream_t *, size_t, const char *, ...);
+int bytestream_vnprintf(mnbytestream_t *, size_t, const char *, va_list);
+#define BYTESTREAM_CAT_ERROR (-127)
 int bytestream_cat(mnbytestream_t *, size_t, const char *);
 
 #define SCATC(bs, c)                                   \

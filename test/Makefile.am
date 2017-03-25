@@ -53,6 +53,10 @@ if HEAP
 noinst_PROGRAMS += testheap
 endif
 
+if BASE64
+noinst_PROGRAMS += testbase64
+endif
+
 noinst_HEADERS = unittest.h rb.h zltan-fasthash.h fnv/fnv.h fnv/longlong.h
 
 BUILT_SOURCES = ../src/diag.c ../src/diag.h
@@ -166,6 +170,10 @@ testcm_LDFLAGS =
 testheap_SOURCES = ../src/heap.c testheap.c
 testheap_CFLAGS =
 testheap_LDFLAGS =
+
+testbase64_SOURCES = ../src/base64.c testbase64.c
+testbase64_CFLAGS =
+testbase64_LDFLAGS =
 
 ../src/diag.c ../src/diag.h: ../src/diag.txt
 	$(AM_V_GEN) /bin/sh ../gen-diag mrkcommon

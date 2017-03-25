@@ -268,7 +268,32 @@ bytestream_nprintf(mnbytestream_t *stream,
     nused = vsnprintf(SDATA(stream, stream->eod), sz, fmt, ap);
     va_end(ap);
     if (nused >= ((ssize_t)sz)) {
-        TRRET(BYTESTREAM_NPRINTF_NEEDNORE);
+        TRRET(BYTESTREAM_NPRINTF_NEEDMORE);
+    }
+    stream->eod += nused;
+    return nused;
+}
+
+
+int
+bytestream_vnprintf(mnbytestream_t *stream,
+                   size_t sz,
+                   const char *fmt, va_list ap)
+{
+    int nused;
+    ssize_t need;
+    need = (stream->eod + sz) - stream->buf.sz;
+    if (need > 0) {
+        if (bytestream_grow(stream,
+                   (need < stream->growsz) ?
+                   stream->growsz :
+                   need) != 0) {
+            TRRET(BYTESTREAM_NPRINTF_ERROR);
+        }
+    }
+    nused = vsnprintf(SDATA(stream, stream->eod), sz, fmt, ap);
+    if (nused >= ((ssize_t)sz)) {
+        TRRET(BYTESTREAM_NPRINTF_NEEDMORE);
     }
     stream->eod += nused;
     return nused;
@@ -285,7 +310,7 @@ bytestream_cat(mnbytestream_t *stream, size_t sz, const char *data)
                    (need < stream->growsz) ?
                    stream->growsz :
                    need) != 0) {
-            TRRET(-127);
+            TRRET(BYTESTREAM_CAT_ERROR);
         }
     }
     memcpy(SDATA(stream, stream->eod), data, sz);
