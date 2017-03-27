@@ -31,7 +31,7 @@ echo "#ifdef __cplusplus" >> diag.h
 echo "extern \"C\" {" >> diag.h
 echo "#endif" >> diag.h
 echo '#define DIAG_CLASS_BASE INT_MIN' >> diag.h
-echo '#define DIAG_CLASS_MASK 0x7fff0000' >> diag.h
+echo '#define DIAG_CLASS_MASK 0xffff0000' >> diag.h
 echo '#define DIAG_CLASS_SHL 16' >> diag.h
 echo 'struct _diag_entry_st {int cls; const char *fmt;};' >> diag.h
 echo 'const char *diag_str(int);' >> diag.h
