@@ -278,13 +278,12 @@ mrkbase64_decode_url_std(const char *src,
                          unsigned char *dst,
                          size_t *dstsz)
 {
-    ssize_t i, sz;
-
-    if (MRKUNLIKELY((srcsz % 4 != 0) || (*dstsz / 3) * 4 < srcsz)) {
+    size_t m = srcsz % 4, sz, i;
+    if (MRKUNLIKELY((m != 0) || (*dstsz / 3) * 4 < srcsz)) {
         return -1;
     }
     *dstsz = 0;
-    sz = (ssize_t)srcsz / 4 + 1;
+    sz = (srcsz + (m ? 4 - m : 0)) / 4;
     for (i = 0; i < sz; ++i) {
         MRKBASE64_DECODE_LOOP(codes_url_std);
     }

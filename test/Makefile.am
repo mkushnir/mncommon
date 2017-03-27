@@ -176,7 +176,7 @@ testbase64_CFLAGS =
 testbase64_LDFLAGS =
 
 ../src/diag.c ../src/diag.h: ../src/diag.txt
-	$(AM_V_GEN) /bin/sh ../gen-diag mrkcommon
+	$(AM_V_GEN) /bin/sh cat ../src/diag.txt | sort -u | ../gen-diag mrkcommon ../src
 
 testrun: all
 	for i in $(noinst_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;

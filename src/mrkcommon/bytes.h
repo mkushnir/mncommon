@@ -145,6 +145,8 @@ bool bytes_containsi(mnbytes_t *, mnbytes_t *);
 void bytes_copy(mnbytes_t * restrict, mnbytes_t * restrict, size_t);
 void bytes_copyz(mnbytes_t * restrict, mnbytes_t * restrict, size_t);
 void bytes_brushdown(mnbytes_t *);
+mnbytes_t *bytes_base64_encode_url_str(mnbytes_t *);
+int bytes_base64_decode_url(mnbytes_t *);
 void bytes_urldecode(mnbytes_t *);
 void bytes_rstrip_blanks(mnbytes_t *);
 mnbytes_t *bytes_set_lower(mnbytes_t *s);
