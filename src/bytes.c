@@ -422,7 +422,7 @@ bytes_new_from_str(const char *s)
 
 
 #define BYTES_NEW_FROM_BYTES_BODY(malloc_fn)                   \
-    mnbytes_t *res;                                              \
+    mnbytes_t *res;                                            \
     size_t mod, msz;                                           \
     assert(s->sz > 0);                                         \
     msz = s->sz;                                               \
@@ -432,7 +432,7 @@ bytes_new_from_str(const char *s)
     } else {                                                   \
         msz += 8;                                              \
     }                                                          \
-    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {    \
+    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {  \
         FAIL("malloc");                                        \
     }                                                          \
     MEMDEBUG_INIT(res);                                        \
@@ -447,6 +447,37 @@ mnbytes_t *
 bytes_new_from_bytes(const mnbytes_t *s)
 {
     BYTES_NEW_FROM_BYTES_BODY(malloc);
+}
+
+
+#define BYTES_NEW_FROM_STR_LEN_BODY(malloc_fn)                 \
+    mnbytes_t *res;                                            \
+    size_t mod, msz;                                           \
+    ++sz;                                                      \
+    msz = sz;                                                  \
+    mod = sz % 8;                                              \
+    if (mod) {                                                 \
+        msz += (8 - mod);                                      \
+    } else {                                                   \
+        msz += 8;                                              \
+    }                                                          \
+    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {  \
+        FAIL("malloc");                                        \
+    }                                                          \
+    MEMDEBUG_INIT(res);                                        \
+    memcpy(res->data, s, sz);                                  \
+    res->data[sz - 1] = '\0';                                  \
+    res->nref = 0;                                             \
+    res->sz = sz;                                              \
+    res->hash = 0;                                             \
+    return res                                                 \
+
+
+
+mnbytes_t *
+bytes_new_from_str_len(const char *s, size_t sz)
+{
+    BYTES_NEW_FROM_STR_LEN_BODY(malloc);
 }
 
 
@@ -465,6 +496,11 @@ mnbytes_t *
 bytes_new_from_bytes_mpool(mpool_ctx_t *mpool, const mnbytes_t *s)
 {
     BYTES_NEW_FROM_BYTES_BODY(_malloc);
+}
+mnbytes_t *
+bytes_new_from_str_len_mpool(mpool_ctx_t *mpool, const char *s, size_t sz)
+{
+    BYTES_NEW_FROM_STR_LEN_BODY(_malloc);
 }
 #undef _malloc
 
