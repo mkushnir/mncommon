@@ -113,10 +113,11 @@ bytestream_grow(mnbytestream_t *stream, size_t incr)
 
 
 ssize_t
-bytestream_read_more(mnbytestream_t *stream, int fd, ssize_t sz)
+bytestream_read_more(mnbytestream_t *stream, void *in, ssize_t sz)
 {
     ssize_t nread;
     ssize_t need;
+    int fd = (intptr_t)in;
     need = (stream->eod + sz) - stream->buf.sz;
     if (need > 0) {
         if (bytestream_grow(stream,
@@ -134,10 +135,11 @@ bytestream_read_more(mnbytestream_t *stream, int fd, ssize_t sz)
 
 
 ssize_t
-bytestream_recv_more(mnbytestream_t *stream, int fd, ssize_t sz)
+bytestream_recv_more(mnbytestream_t *stream, void *in, ssize_t sz)
 {
     ssize_t nrecv;
     ssize_t need;
+    int fd = (intptr_t)in;
     need = (stream->eod + sz) - stream->buf.sz;
     if (need > 0) {
         if (bytestream_grow(stream,
@@ -158,9 +160,10 @@ bytestream_recv_more(mnbytestream_t *stream, int fd, ssize_t sz)
 
 
 ssize_t
-bytestream_write(mnbytestream_t *stream, int fd, size_t sz)
+bytestream_write(mnbytestream_t *stream, void *out, size_t sz)
 {
     ssize_t nwritten;
+    int fd = (intptr_t)out;
 
     if ((stream->pos + (ssize_t)sz) > stream->eod) {
         return -1;
@@ -174,11 +177,10 @@ bytestream_write(mnbytestream_t *stream, int fd, size_t sz)
 }
 
 ssize_t
-bytestream_stderr_write(mnbytestream_t *stream, int fd, size_t sz)
+bytestream_stderr_write(mnbytestream_t *stream, UNUSED void *out, size_t sz)
 {
     ssize_t nwritten;
-
-    fd = 2;
+    int fd = 2;
 
     if ((stream->pos + (ssize_t)sz) > stream->eod) {
         return -1;
@@ -194,9 +196,10 @@ bytestream_stderr_write(mnbytestream_t *stream, int fd, size_t sz)
 }
 
 ssize_t
-bytestream_send(mnbytestream_t *stream, int fd, size_t sz)
+bytestream_send(mnbytestream_t *stream, void *out, size_t sz)
 {
     ssize_t nwritten;
+    int fd = (intptr_t)out;
 
     if ((stream->pos + (ssize_t)sz) > stream->eod) {
         return -1;
@@ -210,7 +213,7 @@ bytestream_send(mnbytestream_t *stream, int fd, size_t sz)
 }
 
 int
-bytestream_consume_data(mnbytestream_t *stream, int fd)
+bytestream_consume_data(mnbytestream_t *stream, void *in)
 {
     ssize_t nread;
     ssize_t need;
@@ -221,7 +224,7 @@ bytestream_consume_data(mnbytestream_t *stream, int fd)
     if (need <= 0) {
         need = stream->growsz;
     }
-    nread = stream->read_more(stream, fd, need);
+    nread = stream->read_more(stream, in, need);
 
     if (nread == 0) {
         /* eof */
@@ -235,11 +238,11 @@ bytestream_consume_data(mnbytestream_t *stream, int fd)
 }
 
 int
-bytestream_produce_data(mnbytestream_t *stream, int fd)
+bytestream_produce_data(mnbytestream_t *stream, void *out)
 {
     assert(stream->write != NULL);
 
-    if (stream->write(stream, fd, SEOD(stream) - SPOS(stream)) < 0) {
+    if (stream->write(stream, out, SEOD(stream) - SPOS(stream)) < 0) {
         TRRET(BYTESTREAM_PRODUCE_DATA + 1);
     }
 

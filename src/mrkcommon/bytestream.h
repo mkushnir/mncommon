@@ -2,6 +2,7 @@
 #define MRKCOMMON_BYTESTREAM_H
 
 #include <stdarg.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 #ifdef __cplusplus
@@ -24,8 +25,8 @@ typedef struct _bytestream {
     ssize_t growsz;
     off_t eod;
     off_t pos;
-    ssize_t (*read_more)(struct _bytestream *, int, ssize_t);
-    ssize_t (*write)(struct _bytestream *, int, size_t);
+    ssize_t (*read_more)(struct _bytestream *, void *, ssize_t);
+    ssize_t (*write)(struct _bytestream *, void *, size_t);
     void *udata;
 
 } mnbytestream_t;
@@ -57,14 +58,14 @@ void bytestream_destroy(mnbytestream_t **);
 
 int bytestream_grow(mnbytestream_t *, size_t);
 
-ssize_t bytestream_read_more(mnbytestream_t *, int, ssize_t);
-ssize_t bytestream_recv_more(mnbytestream_t *, int, ssize_t);
-ssize_t bytestream_write(mnbytestream_t *, int, size_t);
-ssize_t bytestream_stderr_write(mnbytestream_t *, int, size_t);
-ssize_t bytestream_send(mnbytestream_t *, int, size_t);
+ssize_t bytestream_read_more(mnbytestream_t *, void *, ssize_t);
+ssize_t bytestream_recv_more(mnbytestream_t *, void *, ssize_t);
+ssize_t bytestream_write(mnbytestream_t *, void *, size_t);
+ssize_t bytestream_stderr_write(mnbytestream_t *, void *, size_t);
+ssize_t bytestream_send(mnbytestream_t *, void *, size_t);
 
-int bytestream_consume_data(mnbytestream_t *, int);
-int bytestream_produce_data(mnbytestream_t *, int);
+int bytestream_consume_data(mnbytestream_t *, void *);
+int bytestream_produce_data(mnbytestream_t *, void *);
 void bytestream_rewind(mnbytestream_t *);
 off_t bytestream_recycle(mnbytestream_t *, int, off_t);
 #define BYTESTREAM_NPRINTF_ERROR (-129)
