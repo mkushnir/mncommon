@@ -2,6 +2,11 @@
 #define MRKCOMMON_JSON_H
 
 #include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#include <mrkcommon/bytes.h>
+#include <mrkcommon/bytestream.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,27 +19,27 @@ extern "C" {
 #pragma GCC diagnostic ignored "-Waddress"
 #endif
 
-#define MRK_JCAT_CONST(bs, s) ((void)bytestream_cat(bs, sizeof(s) - 1, s))
+#define MRK_JCAT_CONST(bs, s) bytestream_cat(bs, sizeof(s) - 1, s)
 
 
 #define MRK_JPRINTF_PAIR_BS00(bs, key, value, comma)                   \
 do {                                                                   \
-    mnbytes_t *_eqc_jprintf_pair_bytes_tmp0;                             \
-    mnbytes_t *_eqc_jprintf_pair_bytes_tmp1;                             \
-    _eqc_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1);         \
-    (void)memcpy((char *)_eqc_jprintf_pair_bytes_tmp0->data,           \
+    mnbytes_t *_mrk_jprintf_pair_bytes_tmp0;                           \
+    mnbytes_t *_mrk_jprintf_pair_bytes_tmp1;                           \
+    _mrk_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1);         \
+    (void)memcpy((char *)_mrk_jprintf_pair_bytes_tmp0->data,           \
                  SDATA(value, 0),                                      \
                  SEOD(value));                                         \
-    _eqc_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';            \
-    _eqc_jprintf_pair_bytes_tmp1 =                                     \
-        bytes_json_escape(_eqc_jprintf_pair_bytes_tmp0);               \
+    _mrk_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';            \
+    _mrk_jprintf_pair_bytes_tmp1 =                                     \
+        bytes_json_escape(_mrk_jprintf_pair_bytes_tmp0);               \
     (void)bytestream_nprintf(                                          \
             bs,                                                        \
-            sizeof(key) - 1 + 8 + _eqc_jprintf_pair_bytes_tmp1->sz - 1,\
+            sizeof(key) - 1 + 8 + _mrk_jprintf_pair_bytes_tmp1->sz - 1,\
             "\"" key "\":\"%s\"" comma,                                \
-            _eqc_jprintf_pair_bytes_tmp1->data);                       \
-    BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp0);                       \
-    BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp1);                       \
+            _mrk_jprintf_pair_bytes_tmp1->data);                       \
+    BYTES_DECREF(&_mrk_jprintf_pair_bytes_tmp0);                       \
+    BYTES_DECREF(&_mrk_jprintf_pair_bytes_tmp1);                       \
 } while (false)                                                        \
 
 
@@ -47,22 +52,22 @@ do {                                                                   \
 
 #define MRK_JPRINTF_ITEM_BS00(bs, value, comma)                \
 do {                                                           \
-    mnbytes_t *_eqc_jprintf_pair_bytes_tmp0;                     \
-    mnbytes_t *_eqc_jprintf_pair_bytes_tmp1;                     \
-    _eqc_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1); \
-    (void)memcpy((char *)_eqc_jprintf_pair_bytes_tmp0->data,   \
+    mnbytes_t *_mrk_jprintf_pair_bytes_tmp0;                   \
+    mnbytes_t *_mrk_jprintf_pair_bytes_tmp1;                   \
+    _mrk_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1); \
+    (void)memcpy((char *)_mrk_jprintf_pair_bytes_tmp0->data,   \
                  SDATA(value, 0),                              \
                  SEOD(value));                                 \
-    _eqc_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';    \
-    _eqc_jprintf_pair_bytes_tmp1 =                             \
-        bytes_json_escape(_eqc_jprintf_pair_bytes_tmp0);       \
+    _mrk_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';    \
+    _mrk_jprintf_pair_bytes_tmp1 =                             \
+        bytes_json_escape(_mrk_jprintf_pair_bytes_tmp0);       \
     (void)bytestream_nprintf(                                  \
             bs,                                                \
-            8 + _eqc_jprintf_pair_bytes_tmp1->sz - 1,          \
+            8 + _mrk_jprintf_pair_bytes_tmp1->sz - 1,          \
             "\"%s\"" comma,                                    \
-            _eqc_jprintf_pair_bytes_tmp1->data);               \
-    BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp0);               \
-    BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp1);               \
+            _mrk_jprintf_pair_bytes_tmp1->data);               \
+    BYTES_DECREF(&_mrk_jprintf_pair_bytes_tmp0);               \
+    BYTES_DECREF(&_mrk_jprintf_pair_bytes_tmp1);               \
 } while (false)                                                \
 
 
@@ -76,14 +81,14 @@ do {                                                           \
 #define MRK_JPRINTF_PAIR_BYTES00(bs, key, value, comma)                        \
 do {                                                                           \
     if (value != NULL) {                                                       \
-        mnbytes_t *_eqc_jprintf_pair_bytes_tmp;                                  \
-        _eqc_jprintf_pair_bytes_tmp = bytes_json_escape(value);                \
+        mnbytes_t *_mrk_jprintf_pair_bytes_tmp;                                \
+        _mrk_jprintf_pair_bytes_tmp = bytes_json_escape(value);                \
         (void)bytestream_nprintf(                                              \
                 bs,                                                            \
-                sizeof(key) - 1 + 8 + _eqc_jprintf_pair_bytes_tmp->sz - 1,     \
+                sizeof(key) - 1 + 8 + _mrk_jprintf_pair_bytes_tmp->sz - 1,     \
                 "\"" key "\":\"%s\"" comma,                                    \
-                _eqc_jprintf_pair_bytes_tmp->data);                            \
-        BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp);                            \
+                _mrk_jprintf_pair_bytes_tmp->data);                            \
+        BYTES_DECREF(&_mrk_jprintf_pair_bytes_tmp);                            \
     } else {                                                                   \
         (void)bytestream_nprintf(                                              \
                 bs,                                                            \
@@ -103,14 +108,14 @@ do {                                                                           \
 #define MRK_JPRINTF_ITEM_BYTES00(bs, value, comma)             \
 do {                                                           \
     if (value != NULL) {                                       \
-        mnbytes_t *_eqc_jprintf_pair_bytes_tmp;                  \
-        _eqc_jprintf_pair_bytes_tmp = bytes_json_escape(value);\
+        mnbytes_t *_mrk_jprintf_pair_bytes_tmp;                \
+        _mrk_jprintf_pair_bytes_tmp = bytes_json_escape(value);\
         (void)bytestream_nprintf(                              \
                 bs,                                            \
-                8 + _eqc_jprintf_pair_bytes_tmp->sz - 1,       \
+                8 + _mrk_jprintf_pair_bytes_tmp->sz - 1,       \
                 "\"%s\"" comma,                                \
-                _eqc_jprintf_pair_bytes_tmp->data);            \
-        BYTES_DECREF(&_eqc_jprintf_pair_bytes_tmp);            \
+                _mrk_jprintf_pair_bytes_tmp->data);            \
+        BYTES_DECREF(&_mrk_jprintf_pair_bytes_tmp);            \
     } else {                                                   \
         (void)bytestream_nprintf( bs, 8, "null" comma);        \
     }                                                          \
@@ -379,6 +384,30 @@ int json_parse_array(json_ctx_t *);
 int json_parse_str(json_ctx_t *);
 int json_parse_num(json_ctx_t *);
 int json_parse_tok(json_ctx_t *);
+
+
+
+ssize_t mnjson_bs_pair0(mnbytestream_t *, mnbytes_t *, mnbytestream_t *);
+ssize_t mnjson_bs_pair1(mnbytestream_t *, mnbytes_t *, mnbytestream_t *);
+ssize_t mnjson_bs_item0(mnbytestream_t *, mnbytestream_t *);
+ssize_t mnjson_bs_item1(mnbytestream_t *, mnbytestream_t *);
+ssize_t mnjson_bytes_pair0(mnbytestream_t *, mnbytes_t *, mnbytes_t *);
+ssize_t mnjson_bytes_pair1(mnbytestream_t *, mnbytes_t *, mnbytes_t *);
+ssize_t mnjson_bytes_item0(mnbytestream_t *, mnbytes_t *);
+ssize_t mnjson_bytes_item1(mnbytestream_t *, mnbytes_t *);
+ssize_t mnjson_int_pair0(mnbytestream_t *, mnbytes_t *, intmax_t);
+ssize_t mnjson_int_pair1(mnbytestream_t *, mnbytes_t *, intmax_t);
+ssize_t mnjson_int_item0(mnbytestream_t *, intmax_t);
+ssize_t mnjson_int_item1(mnbytestream_t *, intmax_t);
+ssize_t mnjson_float_pair0(mnbytestream_t *, mnbytes_t *, double);
+ssize_t mnjson_float_pair1(mnbytestream_t *, mnbytes_t *, double);
+ssize_t mnjson_float_item0(mnbytestream_t *, double);
+ssize_t mnjson_float_item1(mnbytestream_t *, double);
+ssize_t mnjson_bool_pair0(mnbytestream_t *, mnbytes_t *, bool);
+ssize_t mnjson_bool_pair1(mnbytestream_t *, mnbytes_t *, bool);
+ssize_t mnjson_bool_item0(mnbytestream_t *, bool);
+ssize_t mnjson_bool_item1(mnbytestream_t *, bool);
+ssize_t mnjson_chop_comma(mnbytestream_t *);
 
 #ifdef __cplusplus
 }

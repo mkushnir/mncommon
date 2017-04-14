@@ -41,6 +41,26 @@ do {                                                           \
 #define MEMDEBUG_LEAVE(self)
 #endif
 
+
+#define RFC3986_RESEVED 0x01
+#define RFC3986_OTHERS  0x02
+#define RFC3986_UNRESERVED  0x04
+
+#define ISSPACE(c) ((c) == ' ' || (c) == '\t')
+
+static char charflags[256] = {
+/*  0 1 2 3 4 5 6 7 8 9 a b c d e f 0 1 2 3 4 5 6 7 8 9 a b c d e f */
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+    2,1,2,1,1,2,1,1,1,1,1,1,1,4,4,1,2,2,2,2,2,2,2,2,2,2,1,1,2,1,2,1,
+    1,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,1,2,1,2,4,
+    2,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,2,2,2,4,2,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+};
+
+
 char *
 strrstr(const char *big, const char *little)
 {
@@ -612,6 +632,50 @@ bytes_urldecode(mnbytes_t *str)
     *(dst - 1) = '\0';
     str->sz = (intptr_t)(dst - str->data);
     str->hash = 0;
+}
+
+
+static size_t
+urlencode_reserved(char *dst, const char *src, size_t sz)
+{
+    unsigned char c;
+    unsigned int i, j;
+
+    for (i = 0, j = 0; i < sz; ++i, ++j) {
+        c = (unsigned char)(src[i]);
+
+        if (!(charflags[c] & RFC3986_UNRESERVED)) {
+            unsigned char cc = c >> 4;
+
+            *(dst + j++) = '%';
+            if (cc < 10) {
+                *(dst + j++) = '0' + cc;
+            } else {
+                *(dst + j++) = 'A' + cc - 10;
+            }
+            cc = (c & 0x0f);
+            if (cc < 10) {
+                *(dst + j) = '0' + cc;
+            } else {
+                *(dst + j) = 'A' + cc - 10;
+            }
+
+        } else {
+            *(dst + j) = (char)c;
+        }
+    }
+
+    *(dst + j) = '\0';
+    return j + 1;
+}
+
+
+void
+bytes_urlencode2(mnbytes_t *dst, mnbytes_t *src)
+{
+    assert(BSZ(dst) >= (BSZ(src) * 3 + 1));
+    BSZ(dst) = urlencode_reserved((char *)BDATA(dst), (char *)BDATA(src), BSZ(src));
+    dst->hash = 0;
 }
 
 

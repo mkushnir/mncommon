@@ -65,14 +65,23 @@ typedef struct _bytes {
 }                              \
 
 
+#define BYTES_INITIALIZERA(s)  \
+{                              \
+    .nref = 0x70000000,        \
+    .sz = sizeof(s),           \
+    .hash = 0l,                \
+    .data = s                  \
+}                              \
+
+
 #define BYTES_ALLOCA(n, s)                             \
     struct {                                           \
         ssize_t nref;                                  \
         size_t sz;                                     \
         uint64_t hash;                                 \
         unsigned char data[sizeof(s)];                 \
-    } __bytes_alloca_ ## n = BYTES_INITIALIZER(s);     \
-    mnbytes_t *n = (mnbytes_t *) &__bytes_alloca_ ## n;    \
+    } __bytes_alloca_ ## n = BYTES_INITIALIZERA(s);    \
+    mnbytes_t *n = (mnbytes_t *) &__bytes_alloca_ ## n;\
 
 
 #define BYTES_INCREF(b)                        \
@@ -150,6 +159,7 @@ void bytes_brushdown(mnbytes_t *);
 mnbytes_t *bytes_base64_encode_url_str(mnbytes_t *);
 int bytes_base64_decode_url(mnbytes_t *);
 void bytes_urldecode(mnbytes_t *);
+void bytes_urlencode2(mnbytes_t *, mnbytes_t *);
 void bytes_rstrip_blanks(mnbytes_t *);
 mnbytes_t *bytes_set_lower(mnbytes_t *s);
 mnbytes_t *bytes_json_escape(mnbytes_t *);

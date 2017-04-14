@@ -1,7 +1,11 @@
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 
 //#define TRRET_DEBUG_VERBOSE
+#include <mrkcommon/bytes.h>
+#include <mrkcommon/bytestream.h>
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/json.h>
 #include <mrkcommon/util.h>
@@ -818,5 +822,257 @@ json_parse(json_ctx_t *ctx, const char *in, size_t sz)
     }
     TRRET(0);
 }
+
+
+#define MNJSON_BS_PAIR_BODY(comma)                                             \
+    ssize_t res;                                                               \
+    mnbytes_t *tmp0, *tmp1;                                                    \
+    tmp0 = bytes_new(SEOD(value) + 1);                                         \
+    (void)memcpy((char *)BDATA(tmp0), SDATA(value, 0), SEOD(value));           \
+    BDATA(tmp0)[SEOD(value)] = '\0';                                           \
+    tmp1 = bytes_json_escape(tmp0);                                            \
+    res = bytestream_nprintf(bs,                                               \
+                             BSZ(key) - 1 + 8 + BSZ(tmp1) - 1,                 \
+                             "\"%s\":\"%s\"" comma, BDATA(key), BDATA(tmp1));  \
+    BYTES_DECREF(&tmp0);                                                       \
+    BYTES_DECREF(&tmp1);                                                       \
+    return res                                                                 \
+
+
+ssize_t
+mnjson_bs_pair0(mnbytestream_t *bs, mnbytes_t *key, mnbytestream_t *value)
+{
+    MNJSON_BS_PAIR_BODY(",");
+}
+
+
+ssize_t
+mnjson_bs_pair1(mnbytestream_t *bs, mnbytes_t *key, mnbytestream_t *value)
+{
+    MNJSON_BS_PAIR_BODY("");
+}
+
+
+#define MNJSON_BS_ITEM_BODY(comma)                                     \
+    ssize_t res;                                                       \
+    mnbytes_t *tmp0, *tmp1;                                            \
+    tmp0 = bytes_new(SEOD(value) + 1);                                 \
+    (void)memcpy((char *)BDATA(tmp0), SDATA(value, 0), SEOD(value));   \
+    BDATA(tmp0)[SEOD(value)] = '\0';                                   \
+    tmp1 = bytes_json_escape(tmp0);                                    \
+    res = bytestream_nprintf(bs,                                       \
+                             4 + BSZ(tmp1) - 1,                        \
+                             "\"%s\"" comma, BDATA(tmp1));             \
+    BYTES_DECREF(&tmp0);                                               \
+    BYTES_DECREF(&tmp1);                                               \
+    return res                                                         \
+
+
+ssize_t
+mnjson_bs_item0(mnbytestream_t *bs, mnbytestream_t *value)
+{
+    MNJSON_BS_ITEM_BODY(",");
+}
+
+
+ssize_t
+mnjson_bs_item1(mnbytestream_t *bs, mnbytestream_t *value)
+{
+    MNJSON_BS_ITEM_BODY("");
+}
+
+
+
+
+#define MNJSON_BYTES_PAIR_BODY(comma)                                          \
+    ssize_t res;                                                               \
+    mnbytes_t *tmp;                                                            \
+    tmp = bytes_json_escape(value);                                            \
+    res = bytestream_nprintf(bs,                                               \
+                             BSZ(key) - 1 + 8 + BSZ(tmp) - 1,                  \
+                             "\"%s\":\"%s\"" comma, BDATA(key), BDATA(tmp));   \
+    BYTES_DECREF(&tmp);                                                        \
+    return res                                                                 \
+
+
+
+ssize_t
+mnjson_bytes_pair0(mnbytestream_t *bs, mnbytes_t *key, mnbytes_t *value)
+{
+    MNJSON_BYTES_PAIR_BODY(",");
+}
+
+
+ssize_t
+mnjson_bytes_pair1(mnbytestream_t *bs, mnbytes_t *key, mnbytes_t *value)
+{
+    MNJSON_BYTES_PAIR_BODY("");
+}
+
+
+#define MNJSON_BYTES_ITEM_BODY(comma)                          \
+    ssize_t res;                                               \
+    mnbytes_t *tmp;                                            \
+    tmp = bytes_json_escape(value);                            \
+    res = bytestream_nprintf(bs,                               \
+                             4 + BSZ(tmp) - 1,                 \
+                             "\"%s\"" comma, BDATA(tmp));      \
+    BYTES_DECREF(&tmp);                                        \
+    return res                                                 \
+
+
+ssize_t
+mnjson_bytes_item0(mnbytestream_t *bs, mnbytes_t *value)
+{
+    MNJSON_BYTES_ITEM_BODY(",");
+}
+
+
+ssize_t
+mnjson_bytes_item1(mnbytestream_t *bs, mnbytes_t *value)
+{
+    MNJSON_BYTES_ITEM_BODY("");
+}
+
+
+#define MNJSON_INT_PAIR_BODY(comma)                                    \
+    return bytestream_nprintf(bs,                                      \
+                              BSZ(key) - 1 + 64,                       \
+                              "\"%s\":%ld" comma, BDATA(key), value)   \
+
+
+ssize_t
+mnjson_int_pair0(mnbytestream_t *bs, mnbytes_t *key, intmax_t value)
+{
+    MNJSON_INT_PAIR_BODY(",");
+}
+
+
+ssize_t
+mnjson_int_pair1(mnbytestream_t *bs, mnbytes_t *key, intmax_t value)
+{
+    MNJSON_INT_PAIR_BODY("");
+}
+
+
+
+#define MNJSON_INT_ITEM_BODY(comma)                            \
+    return bytestream_nprintf(bs, 64, "%ld" comma, value)      \
+
+
+
+ssize_t
+mnjson_int_item0(mnbytestream_t *bs, intmax_t value)
+{
+    MNJSON_INT_ITEM_BODY(",");
+}
+
+
+ssize_t
+mnjson_int_item1(mnbytestream_t *bs, intmax_t value)
+{
+    MNJSON_INT_ITEM_BODY("");
+}
+
+
+
+#define MNJSON_FLOAT_PAIR_BODY(comma)                                  \
+    return bytestream_nprintf(bs,                                      \
+                              BSZ(key) - 1 + 1024,                     \
+                              "\"%s\":%lf" comma, BDATA(key), value)   \
+
+
+ssize_t
+mnjson_float_pair0(mnbytestream_t *bs, mnbytes_t *key, double value)
+{
+    MNJSON_FLOAT_PAIR_BODY(",");
+}
+
+
+ssize_t
+mnjson_float_pair1(mnbytestream_t *bs, mnbytes_t *key, double value)
+{
+    MNJSON_FLOAT_PAIR_BODY("");
+}
+
+
+
+#define MNJSON_FLOAT_ITEM_BODY(comma)                            \
+    return bytestream_nprintf(bs, 1024, "%lf" comma, value)      \
+
+
+
+ssize_t
+mnjson_float_item0(mnbytestream_t *bs, double value)
+{
+    MNJSON_FLOAT_ITEM_BODY(",");
+}
+
+
+ssize_t
+mnjson_float_item1(mnbytestream_t *bs, double value)
+{
+    MNJSON_FLOAT_ITEM_BODY("");
+}
+
+
+
+#define MNJSON_BOOL_PAIR_BODY(comma)                                   \
+    return bytestream_nprintf(bs,                                      \
+                              BSZ(key) - 1 + 8,                        \
+                              "\"%s\":%s" comma,                       \
+                              BDATA(key), value ? "true" : "flse")     \
+
+
+ssize_t
+mnjson_bool_pair0(mnbytestream_t *bs, mnbytes_t *key, bool value)
+{
+    MNJSON_BOOL_PAIR_BODY(",");
+}
+
+
+ssize_t
+mnjson_bool_pair1(mnbytestream_t *bs, mnbytes_t *key, bool value)
+{
+    MNJSON_BOOL_PAIR_BODY("");
+}
+
+
+
+#define MNJSON_BOOL_ITEM_BODY(comma)                   \
+    return bytestream_nprintf(bs, 8, "%lf" comma,      \
+                              value ? "true" : "false")\
+
+
+
+ssize_t
+mnjson_bool_item0(mnbytestream_t *bs, bool value)
+{
+    MNJSON_BOOL_ITEM_BODY(",");
+}
+
+
+ssize_t
+mnjson_bool_item1(mnbytestream_t *bs, bool value)
+{
+    MNJSON_BOOL_ITEM_BODY("");
+}
+
+
+ssize_t
+mnjson_chop_comma(mnbytestream_t *bs)
+{
+    ssize_t res;
+    res = 0;
+    if (*SDATA(bs, SEOD(bs) - 1) == ',') {
+        SADVANCEEOD(bs, -1);
+        res = -1;
+    }
+    return res;
+}
+
+
+
+
 
 // vim:list
