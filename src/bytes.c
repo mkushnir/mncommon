@@ -680,6 +680,15 @@ bytes_urlencode2(mnbytes_t *dst, mnbytes_t *src)
 
 
 void
+bytes_str_urlencode2(mnbytes_t *dst, mnbytes_t *src)
+{
+    assert(BSZ(dst) >= (BSZ(src) * 3 + 1));
+    BSZ(dst) = urlencode_reserved((char *)BDATA(dst), (char *)BDATA(src), BSZ(src) - 1);
+    dst->hash = 0;
+}
+
+
+void
 bytes_rstrip_blanks(mnbytes_t *str)
 {
     ssize_t idx;

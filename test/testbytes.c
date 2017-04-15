@@ -270,6 +270,38 @@ test5(void)
 }
 
 
+static void
+test6(void)
+{
+    mnbytes_t *dst;
+    struct {
+        long rnd;
+        const char *in;
+        const char *out;
+    } data[] = {
+        {0, "", ""},
+        {0, " ", "%20"},
+        {0, " \t\r\n", "%20%09%0D%0A"},
+        {0, "\x01\x02\x03\x04", "%01%02%03%04"},
+        {0, "\x01\x02\x03\x04", "%01%02%03%04"},
+        {0, "This is the test", "This%20is%20the%20test"},
+    };
+    UNITTEST_PROLOG_RAND;
+
+    dst = bytes_new(1024);
+    FOREACHDATA {
+        mnbytes_t *src;
+
+        BSZ(dst) = 1024;
+        src = bytes_new_from_str_len(CDATA.in, strlen(CDATA.in));
+        bytes_str_urlencode2(dst, src);
+        //TRACE("testing %s -> %s", BDATA(src), BDATA(dst));
+        assert(strcmp((char *)BDATA(dst), CDATA.out) == 0);
+    }
+    BYTES_DECREF(&dst);
+}
+
+
 int
 main(void)
 {
@@ -279,5 +311,6 @@ main(void)
     test3();
     test4();
     test5();
+    test6();
     return 0;
 }
