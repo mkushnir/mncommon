@@ -36,7 +36,8 @@ reach_nonblank(jparse_ctx_t *jctx)
         char ch;
 
         if (SNEEDMORE(&jctx->bs)) {
-            if (bytestream_consume_data(&jctx->bs, (void *)(intptr_t)jctx->fd) != 0) {
+            if (bytestream_consume_data(&jctx->bs,
+                                        (void *)(intptr_t)jctx->fd) != 0) {
                 res = REACH_NONBLANK + 1;
                 break;
             }
@@ -59,7 +60,8 @@ probe_nonblank(jparse_ctx_t *jctx)
     char ch;
 
     if (SNEEDMORE(&jctx->bs)) {
-        if (bytestream_consume_data(&jctx->bs, (void *)(intptr_t)jctx->fd) != 0) {
+        if (bytestream_consume_data(&jctx->bs,
+                                    (void *)(intptr_t)jctx->fd) != 0) {
             res = PROBE_NONBLANK + 1;
             goto end;
         }
@@ -446,7 +448,8 @@ jparse_expect_tok(jparse_ctx_t *jctx, mnbytes_t **val)
         char ch;
 
         if (SNEEDMORE(&jctx->bs)) {
-            if (bytestream_consume_data(&jctx->bs, (void *)(intptr_t)jctx->fd) != 0) {
+            if (bytestream_consume_data(&jctx->bs,
+                                        (void *)(intptr_t)jctx->fd) != 0) {
                 res = JPARSE_EXPECT_TOK + 1;
                 break;
             }
@@ -512,7 +515,8 @@ jparse_expect_int(jparse_ctx_t *jctx, long *val, UNUSED void *udata)
         char ch;
 
         if (SNEEDMORE(&jctx->bs)) {
-            if (bytestream_consume_data(&jctx->bs, (void *)(intptr_t)jctx->fd) != 0) {
+            if (bytestream_consume_data(&jctx->bs,
+                                        (void *)(intptr_t)jctx->fd) != 0) {
                 res = JPARSE_EXPECT_INT + 1;
                 break;
             }
@@ -588,7 +592,8 @@ jparse_expect_float(jparse_ctx_t *jctx, double *val, UNUSED void *udata)
         char ch;
 
         if (SNEEDMORE(&jctx->bs)) {
-            if (bytestream_consume_data(&jctx->bs, (void *)(intptr_t)jctx->fd) != 0) {
+            if (bytestream_consume_data(&jctx->bs,
+                                        (void *)(intptr_t)jctx->fd) != 0) {
                 res = JPARSE_EXPECT_FLOAT + 1;
                 break;
             }
@@ -699,7 +704,8 @@ jparse_expect_str(jparse_ctx_t *jctx, mnbytes_t **val, UNUSED void *udata)
         char ch;
 
         if (SNEEDMORE(&jctx->bs)) {
-            if (bytestream_consume_data(&jctx->bs, (void *)(intptr_t)jctx->fd) != 0) {
+            if (bytestream_consume_data(&jctx->bs,
+                                        (void *)(intptr_t)jctx->fd) != 0) {
                 res = JPARSE_EXPECT_STR + 2;
                 break;
             }
