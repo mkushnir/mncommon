@@ -6,26 +6,26 @@
 
 #include "unittest.h"
 #include "mrkcommon/dumpm.h"
-#include "mrkcommon/btrie.h"
+#include "mrkcommon/heap.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/util.h"
 #ifdef DO_MEMDEBUG
 #include "mrkcommon/memdebug.h"
-MEMDEBUG_DECLARE(testperftrie);
+MEMDEBUG_DECLARE(testperfheap);
 #endif
 
 typedef struct _key_item {
     uint64_t key;
-    mnbtrie_node_t *n;
+    void *n;
     uint64_t add_time;
     uint64_t find_time;
     uint64_t remove_time;
 } key_item_t;
 
-#define TESTPERFN (1024*1024)
+#define TESTPERFN (1024*16)
 static key_item_t keys[TESTPERFN];
 
-static mnbtrie_t tr;
+static mnheap_t heap;
 
 UNUSED static uint64_t
 new_id_random(void)
@@ -51,6 +51,14 @@ initialize_ids(void)
     }
 }
 
+
+static int
+mycmp(void **a, void **b)
+{
+    return (*a > *b) ? 1 : (*a < *b) ? -1 : 0;
+}
+
+
 static void
 test0(void)
 {
@@ -75,50 +83,42 @@ test0(void)
     p_add_node = profile_register("add_node");
     p_find_node = profile_register("find_node");
     p_remove_node = profile_register("remove_node");
-
     TRACE("Started");
     initialize_ids();
     TRACE("initialize_ids OK");
-    btrie_init(&tr);
+    heap_init(&heap,
+              sizeof(uint64_t),
+              TESTPERFN,
+              NULL,
+              NULL,
+              (array_compar_t)mycmp,
+              heap_pointer_swap);
 
     for (i = 0; i < countof(keys); ++i) {
-        mnbtrie_node_t *n;
-
         profile_start(p_add_node);
-        n = btrie_add_node(&tr, keys[i].key);
-        n->value = (void *)(uintptr_t)(keys[i].key);
+        heap_push(&heap, (void *)keys[i].key);
         keys[i].add_time = profile_stop(p_add_node);
-
-        assert(n != NULL);
     }
     TRACE("add_node OK");
 
     for (i = 0; i < countof(keys); ++i) {
-
         profile_start(p_find_node);
-        keys[i].n = btrie_find_exact(&tr, keys[i].key);
         keys[i].find_time = profile_stop(p_find_node);
-
-        assert(keys[i].n != NULL);
     }
     TRACE("find_node OK");
 
     for (i = 0; i < countof(keys); ++i) {
-
+        uint64_t v;
         profile_start(p_remove_node);
-        btrie_remove_node(&tr, keys[i].n);
+        heap_pop(&heap, (void **)&v);
         keys[i].n = NULL;
         keys[i].remove_time = profile_stop(p_remove_node);
-
-        //if ((i % 100000) == 0) {
-        //    btrie_cleanup(&tr);
-        //}
     }
 
     TRACE("remove_node OK");
 
-    btrie_fini(&tr);
-    TRACE("btrie_fini OK");
+    heap_fini(&heap);
+    TRACE("hash_fini OK");
     profile_report();
 
     for (i = 0; i < countof(keys); ++i) {
@@ -135,17 +135,19 @@ main(void)
 {
 #ifndef NDEBUG
 #ifdef DO_MEMDEBUG
-    MEMDEBUG_REGISTER(testperftrie);
-    //MEMDEBUG_REGISTER(trie);
+    MEMDEBUG_REGISTER(testperfheap);
+    //MEMDEBUG_REGISTER(heap);
 #endif
 #endif
 
     profile_init_module();
 
     test0();
+
 #ifdef DO_MEMDEBUG
     memdebug_print_stats();
 #endif
     profile_fini_module();
     return 0;
 }
+

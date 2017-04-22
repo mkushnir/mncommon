@@ -22,7 +22,8 @@ typedef struct _key_item {
     uint64_t remove_time;
 } key_item_t;
 
-static key_item_t keys[1024 * 1024];
+#define TESTPERFN (1024*1024)
+static key_item_t keys[TESTPERFN];
 
 static mnhash_t dict;
 
@@ -45,7 +46,8 @@ initialize_ids(void)
     unsigned i;
 
     for (i = 0; i < countof(keys); ++i) {
-        keys[i].key = new_id_random();
+        keys[i].key = new_id_successive();
+        //keys[i].key = new_id_random();
     }
 }
 

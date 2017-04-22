@@ -5,6 +5,18 @@
 #include "mrkcommon/util.h"
 #include "mrkcommon/btrie.h"
 
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
+#ifndef HAVE_FLSL
+#   ifdef __GNUC__
+#       define flsl(v) (v ? (TREE_DEPTH - __builtin_clzl(v)) : 0)
+#   else
+#       error "Could not find/define flsl."
+#   endif
+#endif
+
 UNUSED static void
 test0(void)
 {
@@ -50,6 +62,7 @@ test0(void)
 
     btrie_fini(&tr);
 }
+
 
 UNUSED static void
 test1(void)
@@ -122,6 +135,7 @@ test1(void)
     btrie_fini(&tr);
 }
 
+
 UNUSED static void
 test2(void)
 {
@@ -170,6 +184,7 @@ test2(void)
     //btrie_traverse(&tr, btrie_node_dump_cb, NULL);
     btrie_fini(&tr);
 }
+
 
 int
 main(void)

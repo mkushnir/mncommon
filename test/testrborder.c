@@ -14,7 +14,7 @@ typedef struct _key_item {
     struct _rb_node *n;
 } key_item_t;
 
-static key_item_t keys[10];
+static key_item_t keys[128];
 
 char *rbnodes;
 struct rb tr = RB_INITIALIZER();

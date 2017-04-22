@@ -6,17 +6,17 @@
 
 #include "unittest.h"
 #include "mrkcommon/dumpm.h"
-#include "mrkcommon/btrie.h"
+#include "mrkcommon/pbtrie.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/util.h"
 #ifdef DO_MEMDEBUG
 #include "mrkcommon/memdebug.h"
-MEMDEBUG_DECLARE(testperftrie);
+MEMDEBUG_DECLARE(testperfpbtrie);
 #endif
 
 typedef struct _key_item {
     uint64_t key;
-    mnbtrie_node_t *n;
+    mnpbtrie_node_t *n;
     uint64_t add_time;
     uint64_t find_time;
     uint64_t remove_time;
@@ -25,7 +25,7 @@ typedef struct _key_item {
 #define TESTPERFN (1024*1024)
 static key_item_t keys[TESTPERFN];
 
-static mnbtrie_t tr;
+static mnpbtrie_t tr;
 
 UNUSED static uint64_t
 new_id_random(void)
@@ -79,13 +79,13 @@ test0(void)
     TRACE("Started");
     initialize_ids();
     TRACE("initialize_ids OK");
-    btrie_init(&tr);
+    pbtrie_init(&tr);
 
     for (i = 0; i < countof(keys); ++i) {
-        mnbtrie_node_t *n;
+        mnpbtrie_node_t *n;
 
         profile_start(p_add_node);
-        n = btrie_add_node(&tr, keys[i].key);
+        n = pbtrie_add_node(&tr, keys[i].key);
         n->value = (void *)(uintptr_t)(keys[i].key);
         keys[i].add_time = profile_stop(p_add_node);
 
@@ -96,7 +96,7 @@ test0(void)
     for (i = 0; i < countof(keys); ++i) {
 
         profile_start(p_find_node);
-        keys[i].n = btrie_find_exact(&tr, keys[i].key);
+        keys[i].n = pbtrie_find_exact(&tr, keys[i].key);
         keys[i].find_time = profile_stop(p_find_node);
 
         assert(keys[i].n != NULL);
@@ -106,19 +106,15 @@ test0(void)
     for (i = 0; i < countof(keys); ++i) {
 
         profile_start(p_remove_node);
-        btrie_remove_node(&tr, keys[i].n);
+        pbtrie_remove_node(&tr, keys[i].n);
         keys[i].n = NULL;
         keys[i].remove_time = profile_stop(p_remove_node);
-
-        //if ((i % 100000) == 0) {
-        //    btrie_cleanup(&tr);
-        //}
     }
 
     TRACE("remove_node OK");
 
-    btrie_fini(&tr);
-    TRACE("btrie_fini OK");
+    pbtrie_fini(&tr);
+    TRACE("pbtrie_fini OK");
     profile_report();
 
     for (i = 0; i < countof(keys); ++i) {
@@ -135,8 +131,8 @@ main(void)
 {
 #ifndef NDEBUG
 #ifdef DO_MEMDEBUG
-    MEMDEBUG_REGISTER(testperftrie);
-    //MEMDEBUG_REGISTER(trie);
+    MEMDEBUG_REGISTER(testperfpbtrie);
+    //MEMDEBUG_REGISTER(pbtrie);
 #endif
 #endif
 

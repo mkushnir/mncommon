@@ -15,7 +15,7 @@
 
 #ifndef HAVE_FLSL
 #   ifdef __GNUC__
-#       define flsl(v) (v ? (64 - __builtin_clzl(v)) : 0)
+#       define flsl(v) (v ? (TREE_DEPTH - __builtin_clzl(v)) : 0)
 #   else
 #       error "Could not find/define flsl."
 #   endif
@@ -49,7 +49,7 @@ btrie_node_dump(mnbtrie_node_t *n)
 int
 btrie_node_dump_cb(mnbtrie_node_t *n, UNUSED uint64_t key, void *arg)
 {
-    int indent, selector;
+    unsigned indent, selector;
     int flags = (intptr_t)arg;
     test_data_t *d;
 
@@ -63,12 +63,12 @@ btrie_node_dump_cb(mnbtrie_node_t *n, UNUSED uint64_t key, void *arg)
     if (n->child[0] == NULL && n->child[1] == NULL && n->value == NULL) {
         return 0;
     }
-    if (n->digit == -1) {
+    if (n->digit == INT_MAX) {
         selector = 0;
         indent = n->digit;
     } else {
-        selector = n->digit & (1 << CHILD_SELECTOR_SHIFT);
-        indent = n->digit & ~(1 << CHILD_SELECTOR_SHIFT);
+        selector = n->digit & (1u << CHILD_SELECTOR_SHIFT);
+        indent = n->digit & ~(1u << CHILD_SELECTOR_SHIFT);
     }
     if (d == NULL) {
         if (flags) {
@@ -100,7 +100,7 @@ btrie_node_dump_cb(mnbtrie_node_t *n, UNUSED uint64_t key, void *arg)
 }
 
 void
-btrie_node_init(mnbtrie_node_t *n, mnbtrie_node_t *parent, int digit, void *value)
+btrie_node_init(mnbtrie_node_t *n, mnbtrie_node_t *parent, unsigned digit, void *value)
 {
     assert(n != NULL);
 
@@ -318,39 +318,39 @@ btrie_traverse(mnbtrie_t *tr, int (*cb)(mnbtrie_node_t *, uint64_t, void *), voi
     return 0;
 }
 
-#define BTRIE_ADD_NODE_BODY(mallocfn)                                          \
-    int idx, i, sel;                                                           \
-    mnbtrie_node_t **n;                                                          \
-    mnbtrie_node_t *cur;                                                         \
-    idx = flsl(key);                                                           \
-    cur = &tr->roots[idx];                                                     \
-    if (idx == 0) {                                                            \
-        ++idx;                                                                 \
-    }                                                                          \
-    i = 0;                                                                     \
-    do {                                                                       \
-        /*                                                                     \
-         * sel (selector):                                                     \
-         *  - 0, keys are 0x..x                                                \
-         *  - 1, keys are 1x..x                                                \
-         */                                                                    \
-        sel = (key & (1ul << (idx - 1))) >> (idx - 1);                         \
-        n = &cur->child[sel];                                                  \
-        if (*n == NULL) {                                                      \
-            if ((*n = mallocfn(sizeof(mnbtrie_node_t))) == NULL) {               \
-                FAIL("malloc");                                                \
-            }                                                                  \
-            btrie_node_init(*n,                                                \
-                           cur,                                                \
-                           (int)((unsigned)i |                                 \
-                               ((unsigned)sel << CHILD_SELECTOR_SHIFT)),       \
-                           NULL);                                              \
-            ++(tr->volume);                                                    \
-        }                                                                      \
-        cur = *n;                                                              \
-        ++i;                                                                   \
-    } while (--idx);                                                           \
-    return cur;                                                                \
+#define BTRIE_ADD_NODE_BODY(mallocfn)                                  \
+    unsigned idx, i, sel;                                              \
+    mnbtrie_node_t **n;                                                \
+    mnbtrie_node_t *cur;                                               \
+    idx = flsl(key);                                                   \
+    cur = &tr->roots[idx];                                             \
+    if (idx == 0) {                                                    \
+        ++idx;                                                         \
+    }                                                                  \
+    i = 0;                                                             \
+    do {                                                               \
+        /*                                                             \
+         * sel (selector):                                             \
+         *  - 0, keys are 0x..x                                        \
+         *  - 1, keys are 1x..x                                        \
+         */                                                            \
+        sel = (key & (1ul << (idx - 1))) >> (idx - 1);                 \
+        n = &cur->child[sel];                                          \
+        if (*n == NULL) {                                              \
+            if ((*n = mallocfn(sizeof(mnbtrie_node_t))) == NULL) {     \
+                FAIL("malloc");                                        \
+            }                                                          \
+            btrie_node_init(*n,                                        \
+                           cur,                                        \
+                           (i |                                        \
+                               (sel << CHILD_SELECTOR_SHIFT)),         \
+                           NULL);                                      \
+            ++(tr->volume);                                            \
+        }                                                              \
+        cur = *n;                                                      \
+        ++i;                                                           \
+    } while (--idx);                                                   \
+    return cur;                                                        \
 
 
 
@@ -463,7 +463,7 @@ find_closest_partial(mnbtrie_node_t *node, int idx, uintmax_t key, int direction
     //btrie_node_dump(node);
     do {
         mnbtrie_node_t **n;
-        int child_idx = (key & (1ul << (idx - 1))) >> (idx - 1);
+        unsigned child_idx = (key & (1ul << (idx - 1))) >> (idx - 1);
 
         //TRACE("idx=%d child_idx=%d", idx, child_idx);
 
@@ -504,7 +504,7 @@ find_closest_partial(mnbtrie_node_t *node, int idx, uintmax_t key, int direction
 
             /* now descend the relatives in the given direction */
             while (1) {
-                int node_idx;
+                unsigned node_idx;
                 mnbtrie_node_t *bro = NULL;
 
                 /* 2a. brother(dir, ...) */
@@ -515,8 +515,8 @@ find_closest_partial(mnbtrie_node_t *node, int idx, uintmax_t key, int direction
                         return NULL;
                     }
 
-                    node_idx = (((unsigned)(node->digit)) &
-                                (1 << CHILD_SELECTOR_SHIFT)) >>
+                    node_idx = (((node->digit)) &
+                                (1u << CHILD_SELECTOR_SHIFT)) >>
                                     CHILD_SELECTOR_SHIFT;
 
                     //TRACE("node_idx=%d", node_idx);
@@ -639,7 +639,7 @@ btrie_find_closest(mnbtrie_t *tr, uintmax_t key, int direction)
 }
 
 #define CLEANUP_ORPHANS_BODY(freefn)           \
-    mnbtrie_node_t *parent;                      \
+    mnbtrie_node_t *parent;                    \
     while (n != NULL) {                        \
         if (n->parent == NULL) {               \
             break;                             \
@@ -677,7 +677,7 @@ cleanup_orphans_mpool(mpool_ctx_t *mpool, mnbtrie_t *tr, mnbtrie_node_t *n)
 
 
 #define BTRIE_REMOVE_NODE_BODY(finifn, freefn, __a1)           \
-    mnbtrie_node_t *parent;                                      \
+    mnbtrie_node_t *parent;                                    \
     parent = n->parent;                                        \
     if (parent != NULL) {                                      \
         if (parent->child[0] == n) {                           \

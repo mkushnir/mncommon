@@ -19,7 +19,7 @@ if CONF
 noinst_PROGRAMS += testconf
 endif
 if TRIE
-noinst_PROGRAMS += testtrie testperftree testperftrie testperfrb testrborder testtrieorder testpbtrie
+noinst_PROGRAMS += testtrie testperftree testperftrie testperfpbtrie testperfrb testrborder testtrieorder testpbtrie
 endif
 if TRAVERSEDIR
 noinst_PROGRAMS += testtraversedir
@@ -50,7 +50,7 @@ noinst_PROGRAMS += testcm
 endif
 
 if HEAP
-noinst_PROGRAMS += testheap
+noinst_PROGRAMS += testheap testperfheap
 endif
 
 if BASE64
@@ -106,6 +106,10 @@ testperftree_LDFLAGS =
 testperftrie_SOURCES = ../src/btrie.c ../src/profile.c testperftrie.c
 testperftrie_CFLAGS =
 testperftrie_LDFLAGS =
+
+testperfpbtrie_SOURCES = ../src/pbtrie.c ../src/profile.c testperfpbtrie.c
+testperfpbtrie_CFLAGS =
+testperfpbtrie_LDFLAGS =
 
 testperfrb_SOURCES = rb.c ../src/profile.c testperfrb.c
 testperfrb_CFLAGS =
@@ -170,6 +174,10 @@ testcm_LDFLAGS =
 testheap_SOURCES = ../src/heap.c testheap.c
 testheap_CFLAGS =
 testheap_LDFLAGS =
+
+testperfheap_SOURCES = ../src/heap.c testperfheap.c
+testperfheap_CFLAGS =
+testperfheap_LDFLAGS =
 
 testbase64_SOURCES = ../src/base64.c testbase64.c
 testbase64_CFLAGS =

@@ -6,18 +6,22 @@
 
 #include <mrkcommon/mpool.h>
 
-#define TREE_DEPTH (sizeof(uintmax_t) * 8)
+#define TREE_DEPTH (sizeof(uint64_t) * 8)
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct _test_data {
+    uint64_t key;
+} test_data_t;
 
 typedef struct _btrie_node {
     struct _btrie_node *parent;
     struct _btrie_node *child[2];
     void *value;
 #   define CHILD_SELECTOR_SHIFT (sizeof(int) * 8 - 1)
-    int digit;
+    unsigned digit;
 } mnbtrie_node_t;
 
 typedef struct _trie {
@@ -26,10 +30,6 @@ typedef struct _trie {
     size_t volume;
     size_t nvals;
 } mnbtrie_t;
-
-typedef struct _test_data {
-    uint64_t key;
-} test_data_t;
 
 void btrie_node_dump(mnbtrie_node_t *);
 int btrie_node_dump_cb(mnbtrie_node_t *, uint64_t, void *);

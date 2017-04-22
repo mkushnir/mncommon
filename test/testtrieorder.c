@@ -18,7 +18,7 @@ typedef struct _key_item {
     mnbtrie_node_t *n;
 } key_item_t;
 
-static key_item_t keys[10];
+static key_item_t keys[128];
 
 static mnbtrie_t tr;
 
