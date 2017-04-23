@@ -58,10 +58,10 @@ extern "C" {
  * 27644437 bell number prime
  */
 
-typedef struct _hash_item {
-    struct _hash_item **bucket;
-    struct _hash_item *prev;
-    struct _hash_item *next;
+typedef struct _mnhash_item {
+    struct _mnhash_item **bucket;
+    struct _mnhash_item *prev;
+    struct _mnhash_item *next;
     void *key;
     void *value;
 } mnhash_item_t;
