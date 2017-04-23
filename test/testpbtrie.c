@@ -116,12 +116,13 @@ test2(void)
 
     for (i = 0; i < 128; ++i) {
         foo(&tr, random() << 32 | random());
+        foo(&tr, i + 1);
     }
 
     //pbtrie_dump(&tr);
 
-    //pbtrie_traverse(&tr, mycb, NULL);
-    //pbtrie_reverse(&tr, mycb, NULL);
+    pbtrie_traverse(&tr, mycb, NULL);
+    pbtrie_reverse(&tr, mycb, NULL);
 
     pbtrie_fini(&tr);
 }

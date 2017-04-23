@@ -22,7 +22,7 @@ typedef struct _key_item {
     uint64_t remove_time;
 } key_item_t;
 
-#define TESTPERFN (1024*16)
+#define TESTPERFN (1024*1024)
 static key_item_t keys[TESTPERFN];
 
 static mnheap_t heap;
@@ -95,14 +95,19 @@ test0(void)
               heap_pointer_swap);
 
     for (i = 0; i < countof(keys); ++i) {
+        void *v;
+        v = (void *)keys[i].key;
         profile_start(p_add_node);
-        heap_push(&heap, (void *)keys[i].key);
+        heap_pushpop(&heap, &v);
         keys[i].add_time = profile_stop(p_add_node);
     }
     TRACE("add_node OK");
 
     for (i = 0; i < countof(keys); ++i) {
+        void *v;
         profile_start(p_find_node);
+        /* TODO */
+        (void)heap_get(&heap, keys[i].n, &v);
         keys[i].find_time = profile_stop(p_find_node);
     }
     TRACE("find_node OK");

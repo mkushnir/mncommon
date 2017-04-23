@@ -45,7 +45,7 @@ mycb(UNUSED mnheap_t *heap, void *pval, UNUSED void *udata)
         return -1;
     }
     v = pval;
-    TRACE("val=%ld", (long)*v);
+    TRACE("val=%ld", *v);
     return 0;
 }
 
@@ -102,7 +102,6 @@ test0(void)
         //TRACE("pushed %ld", CDATA.i);
     }
 
-    //res = heap_traverse(&heap, mycb, NULL);
     //TRACE("res=%d", res);
     //heap_ify(&heap);
     res = heap_traverse(&heap, mycb, NULL);
@@ -113,7 +112,7 @@ test0(void)
         if (heap_pop(&heap, (void **)&v) != 0) {
             break;
         }
-        //TRACE("popped %ld", v);
+        TRACE("popped %ld", v);
     }
 
     heap_fini(&heap);
@@ -149,7 +148,6 @@ test1(void)
         heap_push(&heap, (void *)(intptr_t)v);
     }
 
-    //res = heap_traverse(&heap, mycb, NULL);
     //TRACE("res=%d", res);
     //heap_ify(&heap);
     res = heap_traverse(&heap, mycb, NULL);
@@ -170,6 +168,156 @@ test1(void)
 }
 
 
+static void
+test2(void)
+{
+    mnheap_t heap;
+    struct {
+        long rnd;
+        uint64_t i;
+    } data[] = {
+        {0, 0},
+        {0, 1},
+        {0, 2},
+        {0, 3},
+        {0, 4},
+        {0, 5},
+        {0, 6},
+        {0, 7},
+        {0, 8},
+        {0, 9},
+    };
+    UNITTEST_PROLOG;
+
+    heap_init(&heap,
+              sizeof(uint64_t),
+              0,
+              NULL,
+              NULL,
+              (array_compar_t)mycmp,
+              (heap_swapfn_t)myswap);
+
+    FOREACHDATA {
+        heap_push(&heap, (void *)(intptr_t)CDATA.i);
+        //TRACE("pushed %ld", CDATA.i);
+    }
+    TRACE("direct");
+    heap_traverse(&heap, mycb, NULL);
+    TRACE("---");
+    heap_traverse_seq(&heap, mycb, NULL);
+    while (1) {
+        uint64_t v;
+        if (heap_pop(&heap, (void **)&v) != 0) {
+            break;
+        }
+        TRACE("popped %ld", v);
+    }
+    heap_fini(&heap);
+}
+
+
+static void
+test3(void)
+{
+    mnheap_t heap;
+    struct {
+        long rnd;
+        uint64_t i;
+    } data[] = {
+        {0, 9},
+        {0, 8},
+        {0, 7},
+        {0, 6},
+        {0, 5},
+        {0, 4},
+        {0, 3},
+        {0, 2},
+        {0, 1},
+        {0, 0},
+    };
+    UNITTEST_PROLOG;
+
+    heap_init(&heap,
+              sizeof(uint64_t),
+              0,
+              NULL,
+              NULL,
+              (array_compar_t)mycmp,
+              (heap_swapfn_t)myswap);
+
+    FOREACHDATA {
+        heap_push(&heap, (void *)(intptr_t)CDATA.i);
+        //TRACE("pushed %ld", CDATA.i);
+    }
+    TRACE("reverse");
+    heap_traverse(&heap, mycb, NULL);
+    TRACE("---");
+    heap_traverse_seq(&heap, mycb, NULL);
+    while (1) {
+        uint64_t v;
+        if (heap_pop(&heap, (void **)&v) != 0) {
+            break;
+        }
+        TRACE("popped %ld", v);
+    }
+    heap_fini(&heap);
+}
+
+
+static void
+test4(void)
+{
+    mnheap_t heap;
+    struct {
+        long rnd;
+        uint64_t i;
+    } data[] = {
+        {0, 0},
+        {0, 1},
+        {0, 2},
+        {0, 3},
+        {0, 4},
+        {0, 5},
+        {0, 6},
+        {0, 7},
+        {0, 8},
+        {0, 9},
+    };
+    UNITTEST_PROLOG_RAND;
+    uint64_t v;
+    int res;
+
+    heap_init(&heap,
+              sizeof(uint64_t),
+              0,
+              NULL,
+              NULL,
+              (array_compar_t)mycmp,
+              (heap_swapfn_t)myswap);
+
+    FOREACHDATA {
+        heap_push(&heap, (void *)(intptr_t)CDATA.i);
+        //TRACE("pushed %ld", CDATA.i);
+    }
+    TRACE("random");
+    heap_traverse(&heap, mycb, NULL);
+    TRACE("---");
+    heap_traverse_seq(&heap, mycb, NULL);
+    for (i = 0; i < 12; ++i) {
+        v = -1;
+        res = heap_get(&heap, (void *)(intptr_t)i, (void **)&v);
+        TRACE("heap_get(%d): res=%d v=%ld", i, res, v);
+    }
+    while (1) {
+        if (heap_pop(&heap, (void **)&v) != 0) {
+            break;
+        }
+        TRACE("popped %ld", v);
+    }
+    heap_fini(&heap);
+}
+
+
 int
 main(int argc, char **argv)
 {
@@ -177,6 +325,9 @@ main(int argc, char **argv)
 
     test0();
     test1();
+    test2();
+    test3();
+    test4();
     for (i = 1; i < argc; ++i) {
         TRACE("arg=%s", argv[i]);
     }

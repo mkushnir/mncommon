@@ -199,11 +199,14 @@ xmask(uint64_t prefix, uint64_t key)
 }
 
 
-static int
+UNUSED static int
 childsel(uint64_t mask, uint64_t parent, uint64_t child)
 {
-    //assert(parent != child);
-    return (child & (0x8000000000000000 | (mask >> 1))) <= parent ? 0 : 1;
+    int64_t m;
+
+    m = (int64_t)mask;
+    return (child & (m >> 1)) <= parent ? 0 : 1;
+    //return (child & (0x8000000000000000 | (mask >> 1))) <= parent ? 0 : 1;
 }
 
 

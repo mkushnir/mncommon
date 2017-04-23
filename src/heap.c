@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdbool.h>
 
 #include <mrkcommon/heap.h>
 #include <mrkcommon/dumpm.h>
@@ -61,6 +62,69 @@ heap_ify(mnheap_t *heap)
 }
 
 
+static void *
+heap_get_at(mnheap_t *heap, int i, void *a)
+{
+    int j;
+    void *b;
+
+    b = NULL;
+    for (j = 1; j <= HEAP_D; ++j) {
+
+        if ((b = array_get(&heap->data, i * HEAP_D + j)) != NULL) {
+            int diff;
+
+            diff = heap->cmp(a, b);
+            if (diff == 0) {
+                break;
+
+            } else if (diff > 0) {
+                /* try */
+                if ((b = heap_get_at(heap, i * HEAP_D + j, a)) != NULL) {
+                    break;
+                }
+            } else {
+                /* continue */
+            }
+        }
+    }
+    if (b != NULL && heap->cmp(a, b) != 0) {
+        b = NULL;
+    }
+    return b;
+}
+
+
+int
+heap_get(mnheap_t *heap, void *a, void **rv)
+{
+    int res;
+    void **b;
+
+    if ((b = array_get(&heap->data, 0)) != NULL) {
+        int diff;
+
+        diff = heap->cmp(&a, b);
+        if (diff == 0) {
+            *rv = *b;
+            res = 0;
+        } else if (diff < 0) {
+            res = -1;
+        } else {
+            if ((b = heap_get_at(heap, 0, (void *)&a)) == NULL) {
+                res = -1;
+            } else {
+                *rv = *b;
+                res = 0;
+            }
+        }
+    } else {
+        res = -1;
+    }
+    return res;
+}
+
+
 void
 heap_push(mnheap_t *heap, void *v)
 {
@@ -78,7 +142,8 @@ heap_push(mnheap_t *heap, void *v)
 }
 
 
-int heap_pop(mnheap_t *heap, void **rv)
+int
+heap_pop(mnheap_t *heap, void **rv)
 {
     int res;
     void **pv;
@@ -106,7 +171,8 @@ int heap_pop(mnheap_t *heap, void **rv)
 }
 
 
-int heap_pushpop(mnheap_t *heap, void **rv)
+int
+heap_pushpop(mnheap_t *heap, void **rv)
 {
     int res;
     void **pv;
@@ -158,6 +224,30 @@ heap_traverse(mnheap_t *heap, heap_traverser_t cb, void *udata)
         }
     }
     return res;
+}
+
+
+static int
+heap_traverse_seq_cb(void *v, void *udata)
+{
+    struct {
+        mnheap_t *heap;
+        heap_traverser_t cb;
+        void *udata;
+    } *params = udata;
+    return params->cb(params->heap, v, params->udata);
+}
+
+
+int
+heap_traverse_seq(mnheap_t *heap, heap_traverser_t cb, void *udata)
+{
+    struct {
+        mnheap_t *heap;
+        heap_traverser_t cb;
+        void *udata;
+    } params = { heap, cb, udata };
+    return array_traverse(&heap->data, heap_traverse_seq_cb, &params);
 }
 
 

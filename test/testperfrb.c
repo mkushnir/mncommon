@@ -35,8 +35,8 @@ new_id_random(void)
 UNUSED static uint64_t
 new_id_successive(void)
 {
-    static uint64_t id = 0;
-    return ++id;
+    static uint64_t id = 0xffffffffffffffff;
+    return --id;
 }
 
 static void

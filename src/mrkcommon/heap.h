@@ -17,9 +17,11 @@ typedef struct _mnheap {
 
 typedef int (*heap_traverser_t) (mnheap_t *, void *, void *);
 int heap_traverse(mnheap_t *, heap_traverser_t, void *);
+int heap_traverse_seq(mnheap_t *, heap_traverser_t, void *);
 
 void heap_push(mnheap_t *, void *);
 int heap_pushpop(mnheap_t *, void **);
+int heap_get(mnheap_t *, void *, void **);
 int heap_pop(mnheap_t *, void **);
 void heap_ify(mnheap_t *);
 ssize_t heap_len(const mnheap_t *);
