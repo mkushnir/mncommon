@@ -12,7 +12,7 @@ lib_LTLIBRARIES = libmrkcommon.la
 dumpm_include_headers = mrkcommon/dumpm.h
 dumpm_sources = dumpm.c
 
-util_include_headers = mrkcommon/util.h mrkcommon/endian.h
+util_include_headers = mrkcommon/util.h mrkcommon/float.h mrkcommon/endian.h
 
 if ARRAY
 array_sources = array.c
