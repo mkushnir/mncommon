@@ -14,8 +14,7 @@ extern "C" {
 #define MNDBL_LTE(a, b) ((a) <= ((b) + MN_EPSILON))
 #define MNDBL_GT(a, b) ((a) > ((b) + MN_EPSILON))
 #define MNDBL_GTE(a, b) ((a) >= ((b) - MN_EPSILON))
-#define MNDBL_EQ(a, b)  \
-    (((a) >= ((b) - MN_EPSILON)) && ((a) <= ((b) + MN_EPSILON)))
+#define MNDBL_EQ(a, b) (fabs(a - b) < MN_EPSILON)
 
 
 #ifdef __cplusplus
