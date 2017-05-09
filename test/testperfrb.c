@@ -47,8 +47,8 @@ initialize_ids(void)
     rbnodes = malloc(sizeof(struct _rb_node) * countof(keys));
 
     for (i = 0; i < countof(keys); ++i) {
-        keys[i].key = new_id_successive();
-        //keys[i].key = new_id_random();
+        //keys[i].key = new_id_successive();
+        keys[i].key = new_id_random();
     }
 }
 

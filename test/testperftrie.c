@@ -7,6 +7,7 @@
 #include "unittest.h"
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/btrie.h"
+#include <mrkcommon/mpool.h>
 #include "mrkcommon/profile.h"
 #include "mrkcommon/util.h"
 #ifdef DO_MEMDEBUG
@@ -26,6 +27,12 @@ typedef struct _key_item {
 static key_item_t keys[TESTPERFN];
 
 static mnbtrie_t tr;
+static mpool_ctx_t mpool;
+
+#define btrie_fini(tr) btrie_fini_mpool(&mpool, tr)
+#define btrie_add_node(tr, key) btrie_add_node_mpool(&mpool, tr, key)
+#define btrie_remove_node(tr, n) btrie_remove_node_mpool(&mpool, tr, n)
+
 
 UNUSED static uint64_t
 new_id_random(void)
@@ -46,8 +53,8 @@ initialize_ids(void)
     unsigned i;
 
     for (i = 0; i < countof(keys); ++i) {
-        keys[i].key = new_id_successive();
-        //keys[i].key = new_id_random();
+        //keys[i].key = new_id_successive();
+        keys[i].key = new_id_random();
     }
 }
 
@@ -67,6 +74,7 @@ test0(void)
     };
     UNITTEST_PROLOG_RAND;
 
+    mpool_ctx_init(&mpool, 1024*1024);
     FOREACHDATA {
         TRACE("in=%d expected=%d", CDATA.in, CDATA.expected);
         assert(CDATA.in == CDATA.expected);
@@ -128,6 +136,8 @@ test0(void)
                (long)keys[i].find_time,
                (long)keys[i].remove_time);
     }
+
+    mpool_ctx_fini(&mpool);
 }
 
 int
