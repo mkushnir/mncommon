@@ -157,6 +157,8 @@ void hash_set_remove(mnhash_t*, void *);
 void hash_set_union2(mnhash_t *, mnhash_t *);
 void hash_set_union3(mnhash_t *, mnhash_t *, mnhash_t *);
 void hash_set_diff3(mnhash_t *, mnhash_t *, mnhash_t *);
+void hash_set_sdiff3(mnhash_t *, mnhash_t *, mnhash_t *);
+void hash_set_intersect3(mnhash_t *, mnhash_t *, mnhash_t *);
 
 #ifdef __cplusplus
 }

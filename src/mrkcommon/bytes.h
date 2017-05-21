@@ -139,6 +139,8 @@ mnbytes_t *bytes_new_from_bytes(const mnbytes_t *);
 mnbytes_t *bytes_new_from_bytes_mpool(mpool_ctx_t *, const mnbytes_t *);
 mnbytes_t *bytes_new_from_str_len(const char *, size_t);
 mnbytes_t *bytes_new_from_str_len_mpool(mpool_ctx_t *, const char *, size_t);
+mnbytes_t *bytes_new_from_buf_len(const char *, size_t);
+mnbytes_t *bytes_new_from_buf_len_mpool(mpool_ctx_t *, const char *, size_t);
 mnbytes_t * PRINTFLIKE(1, 2) bytes_printf(const char *, ...);
 mnbytes_t *bytes_vprintf(const char *, va_list);
 void bytes_incref(mnbytes_t *);

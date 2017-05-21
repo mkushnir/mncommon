@@ -756,3 +756,67 @@ hash_set_diff3(mnhash_t *res, mnhash_t *a, mnhash_t *b)
                              (hash_traverser_item_t)hash_set_diff3_cb,
                              &params);
 }
+
+
+static int
+hash_set_sdiff3_cb(UNUSED mnhash_t *b, mnhash_item_t *hit, void *udata)
+{
+    struct {
+        mnhash_t *res;
+        mnhash_t *a;
+    } *params = udata;
+    if (hash_get_item(params->a, hit->key) == NULL) {
+        void *oldkey;
+        void *oldvalue;
+
+        hash_set_item_uniq(params->res, hit->key, hit->value, &oldkey, &oldvalue);
+    }
+    return 0;
+}
+
+
+void
+hash_set_sdiff3(mnhash_t *res, mnhash_t *a, mnhash_t *b)
+{
+    struct {
+        mnhash_t *res;
+        mnhash_t *b;
+    } params0 = { res, b };
+    (void)hash_traverse_item(a,
+                             (hash_traverser_item_t)hash_set_diff3_cb,
+                             &params0);
+    struct {
+        mnhash_t *res;
+        mnhash_t *a;
+    } params1 = { res, a };
+    (void)hash_traverse_item(b,
+                             (hash_traverser_item_t)hash_set_sdiff3_cb,
+                             &params1);
+}
+
+
+static int
+hash_set_intersect3_cb(UNUSED mnhash_t *a, mnhash_item_t *hit, void *udata)
+{
+    struct {
+        mnhash_t *res;
+        mnhash_t *b;
+    } *params = udata;
+    if (hash_get_item(params->b, hit->key) != NULL) {
+        hash_set_item(params->res, hit->key, hit->value);
+    }
+    return 0;
+}
+
+
+void
+hash_set_intersect3(mnhash_t *res, mnhash_t *a, mnhash_t *b)
+{
+    struct {
+        mnhash_t *res;
+        mnhash_t *b;
+    } params = { res, b };
+    (void)hash_traverse_item(a,
+                             (hash_traverser_item_t)hash_set_intersect3_cb,
+                             &params);
+}

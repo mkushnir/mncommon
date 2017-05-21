@@ -470,10 +470,10 @@ bytes_new_from_bytes(const mnbytes_t *s)
 }
 
 
-#define BYTES_NEW_FROM_STR_LEN_BODY(malloc_fn)                 \
+#define BYTES_NEW_FROM_STR_LEN_BODY(malloc_fn, __a0)           \
     mnbytes_t *res;                                            \
     size_t mod, msz;                                           \
-    ++sz;                                                      \
+    __a0;                                                      \
     msz = sz;                                                  \
     mod = sz % 8;                                              \
     if (mod) {                                                 \
@@ -497,7 +497,14 @@ bytes_new_from_bytes(const mnbytes_t *s)
 mnbytes_t *
 bytes_new_from_str_len(const char *s, size_t sz)
 {
-    BYTES_NEW_FROM_STR_LEN_BODY(malloc);
+    BYTES_NEW_FROM_STR_LEN_BODY(malloc, ++sz);
+}
+
+
+mnbytes_t *
+bytes_new_from_buf_len(const char *s, size_t sz)
+{
+    BYTES_NEW_FROM_STR_LEN_BODY(malloc,);
 }
 
 
@@ -520,8 +527,15 @@ bytes_new_from_bytes_mpool(mpool_ctx_t *mpool, const mnbytes_t *s)
 mnbytes_t *
 bytes_new_from_str_len_mpool(mpool_ctx_t *mpool, const char *s, size_t sz)
 {
-    BYTES_NEW_FROM_STR_LEN_BODY(_malloc);
+    BYTES_NEW_FROM_STR_LEN_BODY(_malloc, ++sz);
 }
+mnbytes_t *
+bytes_new_from_buf_len_mpool(mpool_ctx_t *mpool, const char *s, size_t sz)
+{
+    BYTES_NEW_FROM_STR_LEN_BODY(_malloc,);
+}
+
+
 #undef _malloc
 
 
