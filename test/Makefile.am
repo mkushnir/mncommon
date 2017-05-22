@@ -68,7 +68,7 @@ else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
 
-CFLAGS = @_GNU_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src
+CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src
 LDFLAGS += -L../src/.libs -lmrkcommon
 
 testfoo_SOURCES =  testfoo.c
