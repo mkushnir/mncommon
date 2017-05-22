@@ -45,7 +45,7 @@ mycb(UNUSED mnheap_t *heap, void *pval, UNUSED void *udata)
         return -1;
     }
     v = pval;
-    TRACE("val=%ld", *v);
+    TRACE("val=%ld", (long)*v);
     return 0;
 }
 
@@ -112,7 +112,7 @@ test0(void)
         if (heap_pop(&heap, (void **)&v) != 0) {
             break;
         }
-        TRACE("popped %ld", v);
+        TRACE("popped %ld", (long)v);
     }
 
     heap_fini(&heap);
@@ -210,7 +210,7 @@ test2(void)
         if (heap_pop(&heap, (void **)&v) != 0) {
             break;
         }
-        TRACE("popped %ld", v);
+        TRACE("popped %ld", (long)v);
     }
     heap_fini(&heap);
 }
@@ -258,7 +258,7 @@ test3(void)
         if (heap_pop(&heap, (void **)&v) != 0) {
             break;
         }
-        TRACE("popped %ld", v);
+        TRACE("popped %ld", (long)v);
     }
     heap_fini(&heap);
 }
@@ -306,13 +306,13 @@ test4(void)
     for (i = 0; i < 12; ++i) {
         v = -1;
         res = heap_get(&heap, (void *)(intptr_t)i, (void **)&v);
-        TRACE("heap_get(%d): res=%d v=%ld", i, res, v);
+        TRACE("heap_get(%d): res=%d v=%ld", i, res, (long)v);
     }
     while (1) {
         if (heap_pop(&heap, (void **)&v) != 0) {
             break;
         }
-        TRACE("popped %ld", v);
+        TRACE("popped %ld", (long)v);
     }
     heap_fini(&heap);
 }

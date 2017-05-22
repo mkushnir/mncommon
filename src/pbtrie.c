@@ -30,10 +30,10 @@ pbtrie_node_dump_level(mnpbtrie_node_t *node, int level)
     }
 
     if (node->parent != NULL && node->parent->child[0] == node) {
-        LTRACE(level, "%016lx:%016lx", node->xmask, node->prefix);
+        LTRACE(level, "%016lx:%016lx", (unsigned long)node->xmask, (unsigned long)node->prefix);
 
     } else {
-        LTRACE(level, FRED("%016lx:%016lx"), node->xmask, node->prefix);
+        LTRACE(level, FRED("%016lx:%016lx"), (unsigned long)node->xmask, (unsigned long)node->prefix);
     }
 
     if (node->child[0] != NULL) {

@@ -98,7 +98,7 @@ foo(mnpbtrie_t *tr, uint64_t i)
 UNUSED static int
 mycb(mnpbtrie_node_t *node, UNUSED void *udata)
 {
-    TRACE("%016lx:%016lx", node->xmask, node->prefix);
+    TRACE("%016lx:%016lx", (unsigned long)node->xmask, (unsigned long)node->prefix);
     return 0;
 }
 
