@@ -131,6 +131,7 @@ _DMIN(intmax_t, mnmin_intmin)
 #endif
 
 #define UNUSED __attribute__ ((unused))
+#define DEPRECATED __attribute__ ((deprecated))
 
 #define PRINTFLIKE(i, l) __attribute__ ((format (printf, i, l)))
 
