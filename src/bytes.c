@@ -539,6 +539,23 @@ bytes_new_from_buf_len_mpool(mpool_ctx_t *mpool, const char *s, size_t sz)
 #undef _malloc
 
 
+void
+bytes_memset(mnbytes_t *s, int c)
+{
+    memset(BDATA(s), c, BSZ(s));
+    s->hash = 0;
+}
+
+
+void
+bytes_memsetz(mnbytes_t *s, int c)
+{
+    memset(BDATA(s), c, BSZ(s) - 1);
+    BDATA(s)[BSZ(s) - 1] = '\0';
+    s->hash = 0;
+}
+
+
 mnbytes_t * PRINTFLIKE(1, 2)
 bytes_printf(const char *fmt, ...)
 {
