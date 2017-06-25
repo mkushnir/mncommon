@@ -130,10 +130,27 @@ _DMIN(intmax_t, mnmin_intmin)
 #   endif
 #endif
 
-#define UNUSED __attribute__ ((unused))
-#define DEPRECATED __attribute__ ((deprecated))
+#if !defined(UNUSED)
+#define UNUSED __attribute__ ((__unused__))
+#endif
 
+#if !defined(DEPRECATED)
+#define DEPRECATED __attribute__ ((__deprecated__))
+#endif
+
+#if !defined(PRINTFLIKE)
 #define PRINTFLIKE(i, l) __attribute__ ((format (printf, i, l)))
+#endif
+
+#if defined(__dead2)
+#   define NORETURN __dead2
+#else
+#   if __STDC_VERSION__ >= 201112
+#       define NORETURN _Noreturn
+#   else
+#       define NORETURN __attribute__ ((__noreturn__))
+#   endif
+#endif
 
 #define countof(a) (sizeof(a)/sizeof(a[0]))
 
