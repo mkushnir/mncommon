@@ -291,7 +291,7 @@ bytes_hash(mnbytes_t *bytes)
 }
 
 
-#define BUTES_CMP_SAFE_BODY(cmpfn)     \
+#define BYTES_CMP_SAFE_BODY(cmpfn)     \
     if (a == NULL) {                   \
         if (b == NULL) {               \
             return 0;                  \
@@ -328,7 +328,7 @@ bytes_cmp(mnbytes_t *a, mnbytes_t *b)
 int
 bytes_cmp_safe(mnbytes_t *a, mnbytes_t *b)
 {
-    BUTES_CMP_SAFE_BODY(bytes_cmp)
+    BYTES_CMP_SAFE_BODY(bytes_cmp)
 }
 
 
@@ -344,7 +344,7 @@ bytes_cmpv(mnbytes_t *a, mnbytes_t *b)
 int
 bytes_cmpv_safe(mnbytes_t *a, mnbytes_t *b)
 {
-    BUTES_CMP_SAFE_BODY(bytes_cmpv)
+    BYTES_CMP_SAFE_BODY(bytes_cmpv)
 }
 
 
@@ -360,7 +360,7 @@ bytes_cmpi(mnbytes_t *a, mnbytes_t *b)
 int
 bytes_cmpi_safe(mnbytes_t *a, mnbytes_t *b)
 {
-    BUTES_CMP_SAFE_BODY(bytes_cmpi)
+    BYTES_CMP_SAFE_BODY(bytes_cmpi)
 }
 
 
