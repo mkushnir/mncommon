@@ -134,6 +134,10 @@ _DMIN(intmax_t, mnmin_intmin)
 #define UNUSED __attribute__ ((__unused__))
 #endif
 
+#if !defined(RESERVED)
+#define RESERVED __attribute__ ((__unused__))
+#endif
+
 #if !defined(DEPRECATED)
 #define DEPRECATED __attribute__ ((__deprecated__))
 #endif
