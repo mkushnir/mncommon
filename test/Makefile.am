@@ -34,7 +34,7 @@ if STQUEUE
 noinst_PROGRAMS += teststqueue
 endif
 if DTQUEUE
-noinst_PROGRAMS += testdtqueue
+noinst_PROGRAMS += testdtqueue testdtqueueperf
 endif
 if MEMDEBUG
 noinst_PROGRAMS += testmemdebug
@@ -154,6 +154,10 @@ teststqueue_LDFLAGS =
 testdtqueue_SOURCES = testdtqueue.c
 testdtqueue_CFLAGS =
 testdtqueue_LDFLAGS =
+
+testdtqueueperf_SOURCES = testdtqueueperf.c
+testdtqueueperf_CFLAGS =
+testdtqueueperf_LDFLAGS =
 
 testmemdebug_SOURCES = ../src/memdebug.c testmemdebug.c
 testmemdebug_CFLAGS =
