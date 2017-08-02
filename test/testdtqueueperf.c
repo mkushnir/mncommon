@@ -165,7 +165,7 @@ main(int argc, char **argv)
                 DTQUEUE_ENQUEUE(&mrkq, mrk_link, items + i);
             }
             while (!DTQUEUE_EMPTY(&mrkq)) {
-                mnitem_t *item;
+                UNUSED mnitem_t *item;
                 item = DTQUEUE_HEAD(&mrkq);
                 DTQUEUE_DEQUEUE(&mrkq, mrk_link);
             }
