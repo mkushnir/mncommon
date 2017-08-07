@@ -279,6 +279,12 @@ AC_ARG_ENABLE(base64,
               [AM_CONDITIONAL([BASE64], [enable_base64=yes])],
              )
 
+AC_ARG_WITH(cmocka,
+            AC_HELP_STRING([--with-cmocka],
+            [Build CMocka tests (default=no)]),
+            [AM_CONDITIONAL([CMOCKA], [with_cmocka=yes])],
+            [AM_CONDITIONAL([CMOCKA], [test "\$with_cmocka" = "yes"])])
+
 if test "$enable_profile" = "yes" -a "$enable_list" != "yes"
 then
     echo "ERROR: cannot disable the list feature because the profile feature requires it."

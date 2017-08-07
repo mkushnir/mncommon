@@ -57,6 +57,10 @@ if BASE64
 noinst_PROGRAMS += testbase64
 endif
 
+if CMOCKA
+noinst_PROGRAMS += testbar
+endif
+
 noinst_HEADERS = unittest.h rb.h zltan-fasthash.h fnv/fnv.h fnv/longlong.h
 
 BUILT_SOURCES = ../src/diag.c ../src/diag.h
@@ -70,6 +74,11 @@ endif
 
 CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src
 LDFLAGS += -L../src/.libs -lmrkcommon
+
+if CMOCKA
+CFLAGS += -I$(includedir)
+LDFLAGS += -L$(libdir) -lcmocka
+endif
 
 testfoo_SOURCES =  testfoo.c
 testfoo_CFLAGS =
@@ -186,6 +195,12 @@ testperfheap_LDFLAGS =
 testbase64_SOURCES = ../src/base64.c testbase64.c
 testbase64_CFLAGS =
 testbase64_LDFLAGS =
+
+if CMOCKA
+testbar_SOURCES = testbar.c
+testbar_CFLAGS =
+testbar_LDFLAGS =
+endif
 
 ../src/diag.c ../src/diag.h: ../src/diag.txt
 	$(AM_V_GEN) /bin/sh cat ../src/diag.txt | sort -u | ../gen-diag mrkcommon ../src
