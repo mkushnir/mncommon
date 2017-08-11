@@ -76,7 +76,7 @@ CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra 
 LDFLAGS += -L../src/.libs -lmrkcommon
 
 if CMOCKA
-CFLAGS += -I$(includedir)
+CFLAGS += -I$(includedir) -DCMOCKA_TESTING
 LDFLAGS += -L$(libdir) -lcmocka
 endif
 
@@ -197,7 +197,7 @@ testbase64_CFLAGS =
 testbase64_LDFLAGS =
 
 if CMOCKA
-testbar_SOURCES = testbar.c
+testbar_SOURCES = ../src/array.c testbar.c
 testbar_CFLAGS =
 testbar_LDFLAGS =
 endif

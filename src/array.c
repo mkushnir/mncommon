@@ -10,6 +10,22 @@
 #include <mrkcommon/util.h>
 #include "diag.h"
 
+#ifdef CMOCKA_TESTING
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+#undef assert
+#define assert(e) mock_assert(((e) ? 1 : 0), #e, __FILE__, __LINE__)
+#ifdef malloc
+#undef malloc
+#endif
+#define malloc(sz) test_malloc(sz)
+#define calloc(nim, sz) test_calloc(num, sz)
+#define realloc(ptr, sz) test_realloc(ptr, sz)
+#define free(ptr) test_free(ptr)
+#endif
+
 #ifdef DO_MEMDEBUG
 #include <mrkcommon/memdebug.h>
 MEMDEBUG_DECLARE(array);
@@ -184,7 +200,7 @@ void
 array_destroy(mnarray_t **ar)
 {
     if (*ar != NULL) {
-        array_fini(*ar);
+        (void)array_fini(*ar);
         free(*ar);
         *ar = NULL;
     }
@@ -195,7 +211,7 @@ void
 array_destroy_mpool(mpool_ctx_t *mpool, mnarray_t **ar)
 {
     if (*ar != NULL) {
-        array_fini_mpool(mpool, *ar);
+        (void)array_fini_mpool(mpool, *ar);
         mpool_free(mpool, *ar);
         *ar = NULL;
     }
