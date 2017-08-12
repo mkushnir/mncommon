@@ -51,17 +51,17 @@ extern "C" {
 
 #ifdef TRRET_DEBUG_VERBOSE
 #   include "diag.h"
-#   define TR(n) do { char _tr_buf[64]; mndiag_local_str(res, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } while (0)
-#   define TRRET(n) do { char _tr_buf[64]; mndiag_local_str(res, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); return (n); } while (0)
-#   define TRRETNULL(n) do { char _tr_buf[64]; mndiag_local_str(res, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); return (NULL); } while (0)
-#   define TRRETVOID(n) do { char _tr_buf[64]; mndiag_local_str(res, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); return; } while (0)
+#   define TR(n) do { char _tr_buf[64]; mndiag_local_str(n, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } while (0)
+#   define TRRET(n) do { char _tr_buf[64]; mndiag_local_str(n, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); return (n); } while (0)
+#   define TRRETNULL(n) do { char _tr_buf[64]; mndiag_local_str(n, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); return (NULL); } while (0)
+#   define TRRETVOID(n) do { char _tr_buf[64]; mndiag_local_str(n, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); return; } while (0)
 #else
 #   ifdef TRRET_DEBUG
 #       include "diag.h"
-#       define TR(n) do { if (n) { char _tr_buf[64]; mndiag_local_str(res, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } } while (0)
-#       define TRRET(n) do { if (n) { char _tr_buf[64]; mndiag_local_str(res, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } return (n); } while (0)
-#       define TRRETNULL(n) do { if(n) { char _tr_buf[64]; mndiag_local_str(res, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } return (NULL); } while (0)
-#       define TRRETVOID(n) do { if(n) { char _tr_buf[64]; mndiag_local_str(res, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } return; } while (0)
+#       define TR(n) do { if (n) { char _tr_buf[64]; mndiag_local_str(n, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } } while (0)
+#       define TRRET(n) do { if (n) { char _tr_buf[64]; mndiag_local_str(n, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } return (n); } while (0)
+#       define TRRETNULL(n) do { if(n) { char _tr_buf[64]; mndiag_local_str(n, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } return (NULL); } while (0)
+#       define TRRETVOID(n) do { if(n) { char _tr_buf[64]; mndiag_local_str(n, _tr_buf, sizeof(_tr_buf)); TRACE("%s", _tr_buf); } return; } while (0)
 #   else
 #       define TR(n)
 #       define TRRET(n) return (n)
