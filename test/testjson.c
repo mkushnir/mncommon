@@ -106,10 +106,9 @@ test0(void)
     UNITTEST_PROLOG;
 
     FOREACHDATA {
-        TRACE("in=%s", CDATA.in);
+        //TRACE("in=%s", CDATA.in);
         json_init(&ctx, mycb, NULL);
         res = json_parse(&ctx, strdup(CDATA.in), strlen(CDATA.in) + 1);
-        //TRACE("res=%s", diag_str(res));
         json_fini(&ctx);
         assert(res == 0);
     }
@@ -144,7 +143,8 @@ test1(void)
     json_set_value_cb(&ctx, valuecb, NULL);
     json_set_item_cb(&ctx, itemcb, NULL);
     res = json_parse(&ctx, buf, nread + 1);
-    TRACE("res=%s", diag_str(res));
+    mndiag_local_str(res, buf, sizeof(buf));
+    //TRACE("res=%s", buf);
     json_fini(&ctx);
 }
 

@@ -3,11 +3,13 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 noinst_HEADERS =
 
 BUILT_SOURCES = diag.c diag.h
-EXTRA_DIST = diag.txt gen-diag
+EXTRA_DIST = diag.txt
 CLEANFILES = $(BUILT_SOURCES) *.core
 #CLEANFILES += *.in
 
 lib_LTLIBRARIES = libmrkcommon.la
+
+diags = diag.txt
 
 dumpm_include_headers = mrkcommon/dumpm.h
 dumpm_sources = dumpm.c
@@ -168,13 +170,13 @@ else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
 
-libmrkcommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99
-libmrkcommon_la_LDFLAGS = -version-info 0:0:0
+libmrkcommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I$(includedir)
+libmrkcommon_la_LDFLAGS = -version-info 0:0:0 -L$(libdir) -lmndiag
 
 SUBDIRS = .
 
-diag.c diag.h: diag.txt gen-diag
-	$(AM_V_GEN) cat diag.txt | sort -u | /bin/sh ./gen-diag mrkcommon
+diag.c diag.h: $(diags)
+	$(AM_V_GEN) cat $(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L mrkcommon -H diag.h -C diag.c *.[ch]
 
 run: all
 	for i in $(bin_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;

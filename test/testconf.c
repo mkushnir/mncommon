@@ -101,7 +101,7 @@ test0(void)
                    "baz uio "
                    "baz "
                   );
-    TRACE("res=%s", diag_str(res));
+    //TRACE("res=%s", diag_str(res));
 }
 
 int

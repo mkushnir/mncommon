@@ -1,6 +1,8 @@
 AUTOMAKE_OPTIONS = foreign subdir-objects
-CLEANFILES = *.core
+CLEANFILES = $(BUILT_SOURCES) *.core
 #CLEANFILES += *.in
+
+diags = ../src/diag.txt
 
 noinst_PROGRAMS = testfoo
 if HASH
@@ -63,7 +65,7 @@ endif
 
 noinst_HEADERS = unittest.h rb.h zltan-fasthash.h fnv/fnv.h fnv/longlong.h
 
-BUILT_SOURCES = ../src/diag.c ../src/diag.h
+BUILT_SOURCES = diag.c diag.h
 
 if DEBUG
 DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
@@ -72,8 +74,8 @@ else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
 
-CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src
-LDFLAGS += -L../src/.libs -lmrkcommon
+CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src -I$(includedir)
+LDFLAGS += -L../src/.libs -lmrkcommon -L$(libdir) -lmndiag
 
 if CMOCKA
 CFLAGS += -I$(includedir) -DCMOCKA_TESTING
@@ -202,8 +204,8 @@ testbar_CFLAGS =
 testbar_LDFLAGS =
 endif
 
-../src/diag.c ../src/diag.h: ../src/diag.txt
-	$(AM_V_GEN) /bin/sh cat ../src/diag.txt | sort -u | ../gen-diag mrkcommon ../src
+diag.c diag.h: ../src/diag.txt
+	$(AM_V_GEN) cat $(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L mrkcommon -H diag.h -C diag.c ../*.[ch]
 
 testrun: all
 	for i in $(noinst_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;
