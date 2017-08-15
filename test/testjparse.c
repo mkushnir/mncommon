@@ -24,9 +24,11 @@ aempty(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res;
     long v = 0;
+    char buf[64];
 
     res = jparse_expect_item_int(jctx, &v, NULL);
-    TRACE("res=%s", mrkcommon_diag_str(res));
+    mndiag_local_str(res, buf, sizeof(buf));
+    TRACE("res=%s", buf);
     return 0;
 }
 
@@ -36,12 +38,14 @@ aint(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res, i;
     long v = 0;
+    char buf[64];
 
     res = 0;
     i = 0;
     while (res == 0) {
         res = jparse_expect_item_int(jctx, &v, NULL);
-        TRACE("res=%s val[%d]=%ld", mrkcommon_diag_str(res), i++, v);
+        mndiag_local_str(res, buf, sizeof(buf));
+        TRACE("res=%s val[%d]=%ld", buf, i++, v);
     }
     return 0;
 }
@@ -51,12 +55,14 @@ static int
 aarray(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
     int res, i;
+    char buf[64];
 
     res = 0;
     i = 0;
     while (res == 0) {
         res = jparse_expect_item_array(jctx, aint, NULL, NULL);
-        TRACE("res=%s [%d]", mrkcommon_diag_str(res), i++);
+        mndiag_local_str(res, buf, sizeof(buf));
+        TRACE("res=%s [%d]", buf, i++);
     }
     return 0;
 }
@@ -92,7 +98,6 @@ mycb1(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
     UNUSED int res;
 
     res = jparse_expect_object(jctx, o1, val, udata);
-    //TRACE("res=%s", mrkcommon_diag_str(res));
     return 0;
 }
 
@@ -102,9 +107,7 @@ mycb2(jparse_ctx_t *jctx, jparse_value_t *val, void *udata)
     UNUSED int res;
 
     res = jparse_expect_object(jctx, o1, val, udata);
-    //TRACE("res=%s", mrkcommon_diag_str(res));
     res = jparse_expect_object(jctx, o1, val, udata);
-    //TRACE("res=%s", mrkcommon_diag_str(res));
     return 0;
 }
 
