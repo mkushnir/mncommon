@@ -25,7 +25,7 @@ UNUSED static void
 test0(void)
 {
     int i;
-    vbytestream_t bs;
+    mnvbytestream_t bs;
 
     vbytestream_init(&bs, 256, 0);
 
@@ -48,7 +48,7 @@ UNUSED static void
 test1(void)
 {
     int fd;
-    vbytestream_t bs;
+    mnvbytestream_t bs;
     ssize_t nwritten;
     const char *fname = "/tmp/mysmartctl-ada0";
 
@@ -97,7 +97,7 @@ UNUSED static void
 _test2(size_t growsz, int n)
 {
     int fd;
-    vbytestream_t bs;
+    mnvbytestream_t bs;
     ssize_t nwritten;
     const char *fname = "/tmp/mysmartctl-ada0";
     char fnamebuf[1024];

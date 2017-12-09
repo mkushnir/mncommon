@@ -44,21 +44,21 @@ typedef struct _vbytestream {
     ssize_t (*write)(struct _vbytestream *, int, size_t);
     void *udata;
 
-} vbytestream_t;
+} mnvbytestream_t;
 
-void vbytestream_init(vbytestream_t *, size_t, size_t);
-void vbytestream_fini(vbytestream_t *);
+void vbytestream_init(mnvbytestream_t *, size_t, size_t);
+void vbytestream_fini(mnvbytestream_t *);
 #define VBYTESTREAM_NPRINTF_ERROR (-129)    // 0xffffffffffffff7f
 #define VBYTESTREAM_NPRINTF_NEEDMORE (-130) // 0xffffffffffffff7e
-int vbytestream_nprintf(vbytestream_t *, ssize_t, const char *, ...);
-int vbytestream_cat(vbytestream_t *, size_t, const char *);
-int vbytestream_adopt(vbytestream_t *, mnbytes_t *);
-int vbytestream_traverse(vbytestream_t *, array_traverser_t, void *);
-ssize_t vbytestream_write(vbytestream_t *, int);
-ssize_t vbytestream_read(vbytestream_t *, int, ssize_t);
-void vbytestream_rewind(vbytestream_t *);
+int vbytestream_nprintf(mnvbytestream_t *, ssize_t, const char *, ...);
+int vbytestream_cat(mnvbytestream_t *, size_t, const char *);
+int vbytestream_adopt(mnvbytestream_t *, mnbytes_t *);
+int vbytestream_traverse(mnvbytestream_t *, array_traverser_t, void *);
+ssize_t vbytestream_write(mnvbytestream_t *, int);
+ssize_t vbytestream_read(mnvbytestream_t *, int, ssize_t);
+void vbytestream_rewind(mnvbytestream_t *);
 #define VBYTESTREAM_DUMP_FULL 0x01
-void vbytestream_dump(vbytestream_t *, int);
+void vbytestream_dump(mnvbytestream_t *, int);
 
 #ifdef __cplusplus
 }

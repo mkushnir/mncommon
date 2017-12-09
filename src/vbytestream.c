@@ -73,7 +73,7 @@ iovec_dump_short(struct iovec *iov, UNUSED void *udata)
 
 
 static struct iovec *
-vbytestream_iovec_get_safe(vbytestream_t *stream, int idx)
+vbytestream_iovec_get_safe(mnvbytestream_t *stream, int idx)
 {
     struct iovec *iov;
 
@@ -87,7 +87,7 @@ vbytestream_iovec_get_safe(vbytestream_t *stream, int idx)
 
 
 void
-vbytestream_init(vbytestream_t *stream, size_t growsz, size_t iovreserve)
+vbytestream_init(mnvbytestream_t *stream, size_t growsz, size_t iovreserve)
 {
     assert(growsz > 0);
 
@@ -116,14 +116,14 @@ vbytestream_init(vbytestream_t *stream, size_t growsz, size_t iovreserve)
 
 
 void
-vbytestream_fini(vbytestream_t *stream)
+vbytestream_fini(mnvbytestream_t *stream)
 {
     array_fini(&stream->iov);
 }
 
 
 ssize_t
-vbytestream_read(vbytestream_t *stream, int fd, ssize_t sz)
+vbytestream_read(mnvbytestream_t *stream, int fd, ssize_t sz)
 {
     div_t nbuf;
     int needed, avail;
@@ -179,7 +179,7 @@ vbytestream_read(vbytestream_t *stream, int fd, ssize_t sz)
 
 
 ssize_t
-vbytestream_write(vbytestream_t *stream, int fd)
+vbytestream_write(mnvbytestream_t *stream, int fd)
 {
     size_t iovcnt;
     int next;
@@ -227,7 +227,7 @@ vbytestream_write(vbytestream_t *stream, int fd)
 
 
 int PRINTFLIKE(3, 4)
-vbytestream_nprintf(vbytestream_t *stream, ssize_t sz, const char *fmt, ...)
+vbytestream_nprintf(mnvbytestream_t *stream, ssize_t sz, const char *fmt, ...)
 {
     int avail, nused;
     struct iovec *edge;
@@ -283,7 +283,7 @@ vbytestream_nprintf(vbytestream_t *stream, ssize_t sz, const char *fmt, ...)
 
 
 int
-vbytestream_cat(UNUSED vbytestream_t *stream,
+vbytestream_cat(UNUSED mnvbytestream_t *stream,
                 UNUSED size_t sz,
                 UNUSED const char *data)
 {
@@ -292,7 +292,7 @@ vbytestream_cat(UNUSED vbytestream_t *stream,
 
 
 int
-vbytestream_adopt(vbytestream_t *stream, mnbytes_t *data)
+vbytestream_adopt(mnvbytestream_t *stream, mnbytes_t *data)
 {
     int last, next;
     struct iovec *edge;
@@ -321,7 +321,7 @@ vbytestream_adopt(vbytestream_t *stream, mnbytes_t *data)
 
 
 void *
-vbytestream_buf(vbytestream_t *stream, size_t sz)
+vbytestream_buf(mnvbytestream_t *stream, size_t sz)
 {
     void *res;
     struct iovec *edge;
@@ -372,7 +372,7 @@ _rewind(struct iovec *iov)
 
 
 void
-vbytestream_rewind(vbytestream_t *stream)
+vbytestream_rewind(mnvbytestream_t *stream)
 {
     stream->eod.idx = 0;
     stream->eod.offt = 0;
@@ -387,14 +387,14 @@ vbytestream_rewind(vbytestream_t *stream)
 
 
 int
-vbytestream_traverse(vbytestream_t *stream, array_traverser_t cb, void *udata)
+vbytestream_traverse(mnvbytestream_t *stream, array_traverser_t cb, void *udata)
 {
     return array_traverse(&stream->iov, cb, udata);
 }
 
 
 void
-vbytestream_dump(vbytestream_t *stream, int flags)
+vbytestream_dump(mnvbytestream_t *stream, int flags)
 {
     if (flags & VBYTESTREAM_DUMP_FULL) {
         (void)vbytestream_traverse(stream,
