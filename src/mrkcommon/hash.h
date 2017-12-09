@@ -13,50 +13,6 @@
 extern "C" {
 #endif
 
-/* Useful primes
- * 7
- * 11
- * 17
- * 31
- * 61
- * 127
- *
- * 251
- * 257
- *
- * 509
- * 521
- *
- * 1021
- * 1031
- *
- * 2039
- * 2053
- *
- * 4093
- * 4099
- *
- * 8191
- * 8209
- *
- * 16381
- * 16411
- *
- * 32749
- * 32771
- *
- * 65213 centered heptagonal prime
- * 65537 Fermat prime
- * 68111 chp
- * 72073 chp
- * 76147 chp
- * 84631 chp
- * 89041 chp
- * 93563 chp
- * 193939 circular prime
- * 1046527 carol prime
- * 27644437 bell number prime
- */
 
 typedef struct _mnhash_item {
     struct _mnhash_item **bucket;
@@ -159,6 +115,9 @@ void hash_set_union3(mnhash_t *, mnhash_t *, mnhash_t *);
 void hash_set_diff3(mnhash_t *, mnhash_t *, mnhash_t *);
 void hash_set_sdiff3(mnhash_t *, mnhash_t *, mnhash_t *);
 void hash_set_intersect3(mnhash_t *, mnhash_t *, mnhash_t *);
+
+
+size_t hash_next_prime(size_t);
 
 #ifdef __cplusplus
 }

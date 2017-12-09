@@ -1,5 +1,5 @@
-#ifndef MRKCOMMON_LIST_H
-#define MRKCOMMON_LIST_H
+#ifndef MRKCOMMON_BASE64_H
+#define MRKCOMMON_BASE64_H
 
 #ifdef __cplusplus
 extern "C" {

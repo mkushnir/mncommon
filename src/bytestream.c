@@ -118,18 +118,19 @@ bytestream_read_more(mnbytestream_t *stream, void *in, ssize_t sz)
     ssize_t nread;
     ssize_t need;
     int fd = (intptr_t)in;
+
     need = (stream->eod + sz) - stream->buf.sz;
+
     if (need > 0) {
-        if (bytestream_grow(stream,
-                   (need < stream->growsz) ?
-                   stream->growsz :
-                   need) != 0) {
+        if (bytestream_grow(stream, MAX(need, stream->growsz)) != 0) {
             return -1;
         }
     }
+
     if ((nread = read(fd, stream->buf.data + stream->eod, sz)) >= 0) {
         stream->eod += nread;
     }
+
     return nread;
 }
 
@@ -140,21 +141,22 @@ bytestream_recv_more(mnbytestream_t *stream, void *in, ssize_t sz)
     ssize_t nrecv;
     ssize_t need;
     int fd = (intptr_t)in;
+
     need = (stream->eod + sz) - stream->buf.sz;
+
     if (need > 0) {
-        if (bytestream_grow(stream,
-                   (need < stream->growsz) ?
-                    stream->growsz :
-                    need) != 0) {
+        if (bytestream_grow(stream, MAX(need, stream->growsz)) != 0) {
             return -1;
         }
     }
+
     if ((nrecv = recv(fd,
                       stream->buf.data + stream->eod,
                       (size_t)sz,
                       0)) >= 0) {
         stream->eod += nrecv;
     }
+
     return nrecv;
 }
 
@@ -176,6 +178,7 @@ bytestream_write(mnbytestream_t *stream, void *out, size_t sz)
     return nwritten;
 }
 
+
 ssize_t
 bytestream_stderr_write(mnbytestream_t *stream, UNUSED void *out, size_t sz)
 {
@@ -195,6 +198,7 @@ bytestream_stderr_write(mnbytestream_t *stream, UNUSED void *out, size_t sz)
     return nwritten;
 }
 
+
 ssize_t
 bytestream_send(mnbytestream_t *stream, void *out, size_t sz)
 {
@@ -211,6 +215,7 @@ bytestream_send(mnbytestream_t *stream, void *out, size_t sz)
 
     return nwritten;
 }
+
 
 int
 bytestream_consume_data(mnbytestream_t *stream, void *in)
@@ -236,6 +241,7 @@ bytestream_consume_data(mnbytestream_t *stream, void *in)
 
     return 0;
 }
+
 
 int
 bytestream_produce_data(mnbytestream_t *stream, void *out)
@@ -425,4 +431,3 @@ bytestream_destroy(mnbytestream_t **bs)
         *bs = NULL;
     }
 }
-

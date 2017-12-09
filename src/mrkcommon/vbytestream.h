@@ -16,14 +16,18 @@ extern "C" {
 
 typedef struct _vbytestream {
     /*
-     * array of mnbytes_t *
-     */
-    mnarray_t bytes;
-    /*
      * array of struct iovec
      */
     mnarray_t iov;
-    /* the current eod iovec */
+    /*
+     * the current eod iovec:
+     *  idx offt    eod iov
+     *  --- ----    -------
+     *  0   0       0-th iov, has no data
+     *  0   n       0-th iov, has data up to n-1
+     *  m   0       m-th iov, has no data (m-1-th iov has data)
+     *  m   n       m-th iov, has data up to n-1
+     */
     struct {
         int idx;
         off_t offt;
@@ -48,6 +52,7 @@ void vbytestream_fini(vbytestream_t *);
 #define VBYTESTREAM_NPRINTF_NEEDMORE (-130) // 0xffffffffffffff7e
 int vbytestream_nprintf(vbytestream_t *, ssize_t, const char *, ...);
 int vbytestream_cat(vbytestream_t *, size_t, const char *);
+int vbytestream_adopt(vbytestream_t *, mnbytes_t *);
 int vbytestream_traverse(vbytestream_t *, array_traverser_t, void *);
 ssize_t vbytestream_write(vbytestream_t *, int);
 ssize_t vbytestream_read(vbytestream_t *, int, ssize_t);
