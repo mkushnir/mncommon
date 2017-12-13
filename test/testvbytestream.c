@@ -4,15 +4,18 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <mrkcommon/array.h>
 #include <mrkcommon/bytes.h>
 #include <mrkcommon/bytestream.h>
+#include <mrkcommon/dumpm.h>
+#include <mrkcommon/util.h>
+#include <mrkcommon/profile.h>
+
+#include <mrkcommon/vbytestream.h>
 
 #include "unittest.h"
 #include "diag.h"
 
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
-#include "mrkcommon/vbytestream.h"
 
 #define MNUNIT_PARAMETRIZE(name, body) \
     for (size_t _ ## name = 0;         \
@@ -24,6 +27,11 @@
 
 #define MNUNIT_ARG(name) name[_ ## name]
 
+
+static const profile_t *vb_nprintf;
+static const profile_t *bs_nprintf;
+static const profile_t *vb_write;
+static const profile_t *bs_write;
 
 static mnbytes_t *
 randomword(size_t sz)
@@ -220,7 +228,7 @@ _test3(size_t growsz, int n)
         BYTES_DECREF(&word);
     }
 
-    (void)snprintf(fnamebuf, sizeof(fnamebuf), "b0-%08lx-%08x", growsz, n);
+    (void)snprintf(fnamebuf, sizeof(fnamebuf), "vb-%08lx-%08x", growsz, n);
     if ((fd = open(fnamebuf, O_WRONLY|O_CREAT|O_TRUNC, 0644)) < 0) {
         FAIL("open");
     }
@@ -229,7 +237,7 @@ _test3(size_t growsz, int n)
 
     //vbytestream_dump(&bs0, VBYTESTREAM_DUMP_FULL /*  */ );
 
-    (void)snprintf(fnamebuf, sizeof(fnamebuf), "b1-%08lx-%08x", growsz, n);
+    (void)snprintf(fnamebuf, sizeof(fnamebuf), "bs-%08lx-%08x", growsz, n);
     if ((fd = open(fnamebuf, O_WRONLY|O_CREAT|O_TRUNC, 0644)) < 0) {
         FAIL("open");
     }
@@ -255,13 +263,132 @@ test3(void)
 }
 
 
+static int
+word_fini(mnbytes_t **s)
+{
+    BYTES_DECREF(s);
+    return 0;
+}
+
+
+static void
+_test4(size_t growsz, int n, size_t sz)
+{
+    int fd;
+    mnvbytestream_t bs0;
+    mnbytestream_t bs1;
+    char fnamebuf[1024];
+    ssize_t nwritten;
+    mnarray_t words;
+    int i;
+
+    srandom(time(NULL));
+
+    (void)array_init(&words,
+                     sizeof(mnbytes_t *),
+                     n,
+                     NULL,
+                     (array_finalizer_t)word_fini);
+
+    for (i = 0; i < n; ++i) {
+        mnbytes_t **word;
+        size_t wsz;
+
+        if (MRKUNLIKELY((word = array_get(&words, i)) == NULL)) {
+            FAIL("array_incr");
+        }
+        wsz = random() % MIN(sz, (growsz - 8)) + 1;
+        *word = randomword(wsz);
+    }
+
+    vbytestream_init(&bs0, growsz, 0);
+    bytestream_init(&bs1, growsz);
+
+    profile_start(vb_nprintf);
+    for (i = 0; i < n; ++i) {
+        mnbytes_t **word;
+
+        if (MRKUNLIKELY((word = array_get(&words, i)) == NULL)) {
+            FAIL("array_incr");
+        }
+        if (vbytestream_nprintf(&bs0, growsz, ".%s\n", BDATA(*word)) < 0) {
+            FAIL("vbytestream_nprintf");
+        }
+    }
+    (void)profile_stop(vb_nprintf);
+
+    profile_start(bs_nprintf);
+    for (i = 0; i < n; ++i) {
+        mnbytes_t **word;
+
+        if (MRKUNLIKELY((word = array_get(&words, i)) == NULL)) {
+            FAIL("array_incr");
+        }
+        if (bytestream_nprintf(&bs1, growsz, ".%s\n", BDATA(*word)) < 0) {
+            FAIL("bytestream_nprintf");
+        }
+    }
+    (void)profile_stop(bs_nprintf);
+
+    (void)snprintf(fnamebuf, sizeof(fnamebuf), "vb-%08lx-%08x-%08lx", growsz, n, sz);
+    if ((fd = open(fnamebuf, O_WRONLY|O_CREAT|O_TRUNC, 0644)) < 0) {
+        FAIL("open");
+    }
+
+    profile_start(vb_write);
+    nwritten = vbytestream_write(&bs0, fd);
+    (void)profile_stop(vb_write);
+    (void)close(fd);
+
+    (void)snprintf(fnamebuf, sizeof(fnamebuf), "bs-%08lx-%08x-%08lx", growsz, n, sz);
+    if ((fd = open(fnamebuf, O_WRONLY|O_CREAT|O_TRUNC, 0644)) < 0) {
+        FAIL("open");
+    }
+
+    profile_start(bs_write);
+    nwritten = bytestream_write(&bs1, (void *)(intptr_t)fd, SEOD(&bs1));
+    (void)profile_stop(bs_write);
+    (void)close(fd);
+
+    vbytestream_fini(&bs0);
+    bytestream_fini(&bs1);
+
+    (void)array_fini(&words);
+}
+
+
+UNUSED static void
+test4(void)
+{
+    size_t growsz[] = { 32768, 65536, };
+    int n[] = { 1024, 2048, 4096, };
+    size_t sz[] = { 2048, 4096, 8192};
+
+    profile_init_module();
+    vb_nprintf = profile_register("vb_nprintf");
+    bs_nprintf = profile_register("bs_nprintf");
+    vb_write = profile_register("vb_write");
+    bs_write = profile_register("bs_write");
+
+    MNUNIT_PARAMETRIZE(growsz,
+    MNUNIT_PARAMETRIZE(n,
+    MNUNIT_PARAMETRIZE(sz,
+        _test4(MNUNIT_ARG(growsz), MNUNIT_ARG(n), MNUNIT_ARG(sz));
+    )));
+
+    profile_report_sec();
+    profile_fini_module();
+}
+
+
 int
 main(void)
 {
     //test0();
     //test1();
     //test2();
-    test3();
+    //test3();
+    //test4();
     return 0;
 }
 
