@@ -4,8 +4,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <mrkcommon/bytes.h>
+#include <mrkcommon/bytestream.h>
+
 #include "unittest.h"
 #include "diag.h"
+
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/util.h"
 #include "mrkcommon/vbytestream.h"
@@ -19,6 +23,22 @@
 
 
 #define MNUNIT_ARG(name) name[_ ## name]
+
+
+static mnbytes_t *
+randomword(size_t sz)
+{
+    mnbytes_t *res;
+    unsigned i;
+
+    res = bytes_new(sz + 1);
+    for (i = 0; i < sz; ++i) {
+        BDATA(res)[i] = random() % 26 + 'a';
+    }
+    BDATA(res)[sz] = '\0';
+
+    return res;
+}
 
 
 UNUSED static void
@@ -155,7 +175,7 @@ _test2(size_t growsz, int n)
 }
 
 
-static void
+UNUSED static void
 test2(void)
 {
     size_t growsz[] = { 32, 64, 128, 256, 512, 1024, 2048, 4096 };
@@ -168,12 +188,80 @@ test2(void)
 }
 
 
+static void
+_test3(size_t growsz, int n)
+{
+    int fd;
+    mnvbytestream_t bs0;
+    mnbytestream_t bs1;
+    char fnamebuf[1024];
+    ssize_t nwritten;
+    int i;
+
+    srandom(time(NULL));
+
+    vbytestream_init(&bs0, growsz, 0);
+    bytestream_init(&bs1, 1024*1024);
+
+    for (i = 0; i < n; ++i) {
+        mnbytes_t *word;
+        size_t sz;
+
+        sz = random() % (growsz - 8) + 1;
+        word = randomword(sz);
+        //TRACE("growsz=%ld n=%d sz=%ld word=%s", growsz, i, sz, BDATA(word));
+        if (vbytestream_nprintf(&bs0, growsz, ".%s\n", BDATA(word)) < 0) {
+            FAIL("vbytestream_nprintf");
+        }
+        if (bytestream_nprintf(&bs1, growsz, ".%s\n", BDATA(word)) < 0) {
+            FAIL("bytestream_nprintf");
+        }
+
+        BYTES_DECREF(&word);
+    }
+
+    (void)snprintf(fnamebuf, sizeof(fnamebuf), "b0-%08lx-%08x", growsz, n);
+    if ((fd = open(fnamebuf, O_WRONLY|O_CREAT|O_TRUNC, 0644)) < 0) {
+        FAIL("open");
+    }
+    nwritten = vbytestream_write(&bs0, fd);
+    (void)close(fd);
+
+    //vbytestream_dump(&bs0, VBYTESTREAM_DUMP_FULL /*  */ );
+
+    (void)snprintf(fnamebuf, sizeof(fnamebuf), "b1-%08lx-%08x", growsz, n);
+    if ((fd = open(fnamebuf, O_WRONLY|O_CREAT|O_TRUNC, 0644)) < 0) {
+        FAIL("open");
+    }
+    nwritten = bytestream_write(&bs1, (void *)(intptr_t)fd, SEOD(&bs1));
+    (void)close(fd);
+    TRACE("growsz=%ld n=%d nwritten=%ld", growsz, n, nwritten);
+
+    vbytestream_fini(&bs0);
+    bytestream_fini(&bs1);
+}
+
+
+UNUSED static void
+test3(void)
+{
+    size_t growsz[] = { 32, 64, 128, 256, 512, 1024, 2048, 4096, };
+    int n[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, };
+
+    MNUNIT_PARAMETRIZE(growsz,
+    MNUNIT_PARAMETRIZE(n,
+        _test3(MNUNIT_ARG(growsz), MNUNIT_ARG(n));
+    ));
+}
+
+
 int
 main(void)
 {
     //test0();
     //test1();
-    test2();
+    //test2();
+    test3();
     return 0;
 }
 
