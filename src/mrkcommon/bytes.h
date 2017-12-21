@@ -137,11 +137,20 @@ mnbytes_t *bytes_new_from_str(const char *);
 mnbytes_t *bytes_new_from_str_mpool(mpool_ctx_t *, const char *);
 mnbytes_t *bytes_new_from_bytes(const mnbytes_t *);
 mnbytes_t *bytes_new_from_bytes_mpool(mpool_ctx_t *, const mnbytes_t *);
+
+/* adding the terminating zero */
 mnbytes_t *bytes_new_from_str_len(const char *, size_t);
 mnbytes_t *bytes_new_from_str_len_mpool(mpool_ctx_t *, const char *, size_t);
+/* setting the terminating zero */
 mnbytes_t *bytes_new_from_buf_len(const char *, size_t);
 mnbytes_t *bytes_new_from_buf_len_mpool(mpool_ctx_t *, const char *, size_t);
+/* doing nothing */
+mnbytes_t *bytes_new_from_mem_len(const char *, size_t);
+mnbytes_t *bytes_new_from_mem_len_mpool(mpool_ctx_t *, const char *, size_t);
+
+/* setting the terminating zero */
 void bytes_memsetz(mnbytes_t *, int);
+/* doing nothing */
 void bytes_memset(mnbytes_t *, int);
 mnbytes_t * PRINTFLIKE(1, 2) bytes_printf(const char *, ...);
 mnbytes_t *bytes_vprintf(const char *, va_list);

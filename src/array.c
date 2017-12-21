@@ -701,8 +701,11 @@ array_decr_fast(mnarray_t *ar)
 int
 array_decr(mnarray_t *ar)
 {
-    if (array_ensure_len(ar, ar->elnum - 1, ARRAY_FLAG_SAVE) != 0) {
+    if (!ar->elnum) {
         TRRET(ARRAY_DECR + 1);
+    }
+    if (array_ensure_len(ar, ar->elnum - 1, ARRAY_FLAG_SAVE) != 0) {
+        TRRET(ARRAY_DECR + 2);
     }
     return 0;
 }
@@ -711,8 +714,11 @@ array_decr(mnarray_t *ar)
 int
 array_decr_mpool(mpool_ctx_t *mpool, mnarray_t *ar)
 {
-    if (array_ensure_len_mpool(mpool, ar, ar->elnum - 1, ARRAY_FLAG_SAVE) != 0) {
+    if (!ar->elnum) {
         TRRET(ARRAY_DECR + 1);
+    }
+    if (array_ensure_len_mpool(mpool, ar, ar->elnum - 1, ARRAY_FLAG_SAVE) != 0) {
+        TRRET(ARRAY_DECR + 2);
     }
     return 0;
 }
