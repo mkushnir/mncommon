@@ -112,11 +112,11 @@ test1(void)
     (void)close(fd);
     TRACE("pos %d/%ld/%ld eod %d/%ld/%ld",
           bs.pos.idx,
-          bs.pos.offt,
-          bs.pos.total,
+          (long)bs.pos.offt,
+          (long)bs.pos.total,
           bs.eod.idx,
-          bs.eod.offt,
-          bs.eod.total);
+          (long)bs.eod.offt,
+          (long)bs.eod.total);
     vbytestream_fini(&bs);
 }
 

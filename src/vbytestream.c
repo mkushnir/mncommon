@@ -431,11 +431,11 @@ vbytestream_dump(mnvbytestream_t *stream, int flags)
 {
     TRACE("pos %d/%ld/%ld eod %d/%ld/%ld",
           stream->pos.idx,
-          stream->pos.offt,
-          stream->pos.total,
+          (long)stream->pos.offt,
+          (long)stream->pos.total,
           stream->eod.idx,
-          stream->eod.offt,
-          stream->eod.total);
+          (long)stream->eod.offt,
+          (long)stream->eod.total);
 
     if (flags & VBYTESTREAM_DUMP_FULL) {
         (void)vbytestream_traverse(stream,

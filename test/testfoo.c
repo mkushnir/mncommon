@@ -3,9 +3,11 @@
 #include <time.h>
 
 #include "unittest.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/array.h"
-#include "mrkcommon/list.h"
+#include <mrkcommon/dumpm.h>
+#include <mrkcommon/array.h>
+#include <mrkcommon/util.h>
+
+#include "diag.h"
 
 static void
 test0(void)

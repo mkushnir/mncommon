@@ -65,6 +65,9 @@ typedef struct _bytes {
 }                              \
 
 
+#define BYTES_NREF_STATIC_INVARIANT(s) assert((s).nref == 0x40000000)
+
+
 #define BYTES_INITIALIZERA(s)  \
 {                              \
     .nref = 0x70000000,        \
@@ -72,6 +75,9 @@ typedef struct _bytes {
     .hash = 0l,                \
     .data = s                  \
 }                              \
+
+
+#define BYTES_NREF_AUTO_INVARIANT(s) assert((s).nref == 0x70000000)
 
 
 #define BYTES_ALLOCA(n, s)                             \

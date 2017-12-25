@@ -1040,7 +1040,7 @@ mnjson_bool_pair1(mnbytestream_t *bs, mnbytes_t *key, bool value)
 
 
 #define MNJSON_BOOL_ITEM_BODY(comma)                   \
-    return bytestream_nprintf(bs, 8, "%lf" comma,      \
+    return bytestream_nprintf(bs, 8, "%s" comma,       \
                               value ? "true" : "false")\
 
 
