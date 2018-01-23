@@ -41,7 +41,7 @@ static int genrandom = 0;
 
 
 static int
-btrie_node_fini(mnbtrie_node_t *trn, UNUSED uint64_t key, UNUSED void *udata)
+btrie_node_fini(mnbtrie_node_t *trn, UNUSED void *udata)
 {
     if (trn->value != NULL) {
         free(trn->value);

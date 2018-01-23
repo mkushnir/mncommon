@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
@@ -5,10 +9,6 @@
 #include <mrkcommon/util.h>
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/pbtrie.h>
-
-#ifdef HAVE_CONFIG_H
-#   include <config.h>
-#endif
 
 #ifndef HAVE_FLSL
 #   ifdef __GNUC__

@@ -50,6 +50,19 @@ siftdown(mnheap_t *heap, int i)
 }
 
 
+void
+heap_sort(mnheap_t *heap)
+{
+    (void)array_sort(&heap->data, heap->cmp);
+}
+
+
+void
+heap_sort_custom(mnheap_t *heap, array_compar_t cmp)
+{
+    (void)array_sort(&heap->data, cmp);
+}
+
 
 void
 heap_ify(mnheap_t *heap)
@@ -122,6 +135,13 @@ heap_get(mnheap_t *heap, void *a, void **rv)
         res = -1;
     }
     return res;
+}
+
+
+void *
+heap_head(mnheap_t *heap)
+{
+    return array_get(&heap->data, 0);
 }
 
 
@@ -227,6 +247,28 @@ heap_traverse(mnheap_t *heap, heap_traverser_t cb, void *udata)
 }
 
 
+int
+heap_traversea(mnheap_t *heap, array_traverser_t cb, void *udata)
+{
+    int res;
+    size_t i;
+    int j;
+
+    res = 0;
+    if ((res = cb(array_get(&heap->data, 0), udata)) != 0) {
+        return res;
+    }
+    for (i = 0; i < heap->data.elnum; ++i) {
+        for (j = 1; j <= HEAP_D; ++j) {
+            if ((res = cb(array_get(&heap->data, HEAP_D * i + j), udata)) != 0) {
+                return res;
+            }
+        }
+    }
+    return res;
+}
+
+
 static int
 heap_traverse_seq_cb(void *v, void *udata)
 {
@@ -248,6 +290,13 @@ heap_traverse_seq(mnheap_t *heap, heap_traverser_t cb, void *udata)
         void *udata;
     } params = { heap, cb, udata };
     return array_traverse(&heap->data, heap_traverse_seq_cb, &params);
+}
+
+
+int
+heap_traversea_seq(mnheap_t *heap, array_traverser_t cb, void *udata)
+{
+    return array_traverse(&heap->data, cb, udata);
 }
 
 

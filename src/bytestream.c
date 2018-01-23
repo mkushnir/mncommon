@@ -236,6 +236,7 @@ bytestream_consume_data(mnbytestream_t *stream, void *in)
         TRRET(-1);
 
     } else if (nread < 0) {
+        perror("read_more");
         TRRET(BYTESTREAM_CONSUME_DATA + 2);
     }
 

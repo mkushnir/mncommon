@@ -46,8 +46,8 @@ initialize_ids(void)
     unsigned i;
 
     for (i = 0; i < countof(keys); ++i) {
-        //keys[i].key = new_id_successive();
-        keys[i].key = new_id_random();
+        keys[i].key = new_id_successive();
+        //keys[i].key = new_id_random();
     }
 }
 
@@ -62,7 +62,7 @@ myhash(void *v)
 static int
 mycmp(void *a, void *b)
 {
-    return (a > b) ? 1 : (a < b) ? -1 : 0;
+    return MNCMP(a, b);
 }
 
 

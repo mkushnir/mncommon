@@ -46,8 +46,8 @@ initialize_ids(void)
     unsigned i;
 
     for (i = 0; i < countof(keys); ++i) {
-        //keys[i].key = new_id_successive();
-        keys[i].key = new_id_random();
+        keys[i].key = new_id_successive();
+        //keys[i].key = new_id_random();
     }
 }
 

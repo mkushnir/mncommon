@@ -1,13 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #include <assert.h>
 #include <stdlib.h>
 
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/util.h"
 #include "mrkcommon/btrie.h"
-
-#ifdef HAVE_CONFIG_H
-#   include <config.h>
-#endif
 
 #ifndef HAVE_FLSL
 #   ifdef __GNUC__
@@ -35,6 +35,10 @@ test0(void)
         test_data_t *d;
 
         n = btrie_add_node(&tr, values[i]);
+        if (values[i] == 0) {
+            assert(n == NULL);
+            continue;
+        }
         d = malloc(sizeof(test_data_t));
         d->key = values[i];
         n->value = d;
@@ -44,18 +48,24 @@ test0(void)
 
     for (i = 0; i < countof(values1); ++i) {
         //TRACE("querying: %x", values1[i]);
-        n = btrie_find_exact(&tr, values1[i]);
+        //n = btrie_find_exact(&tr, values1[i]);
         //btrie_node_dump_cb(n, NULL);
-        n = btrie_find_closest(&tr, values1[i], 0);
+
+        //TRACE("key to find: %d", values1[i] - 1);
+        //n = btrie_find_closest(&tr, values1[i] - 1, 1);
         //btrie_node_dump_cb(n, NULL);
-        n = btrie_find_closest(&tr, values1[i], 1);
-        //btrie_node_dump_cb(n, NULL);
+
+        TRACE("key to find: %d", values1[i] + 1);
+        n = btrie_find_closest(&tr, values1[i] + 1, 0);
+        btrie_node_dump_cb(n, NULL);
+
     }
 
     for (i = 0; i < countof(values1); ++i) {
         //TRACE("removing: %d", values1[i]);
         n = btrie_find_exact(&tr, values1[i]);
         if (n != NULL) {
+            n->value = NULL;
             btrie_remove_node(&tr, n);
         }
     }
@@ -82,6 +92,10 @@ test1(void)
 
     for (i = 0; i < countof(values); ++i) {
         n = btrie_add_node(&tr, values[i]);
+        if (values[i] == 0) {
+            assert(n == NULL);
+            continue;
+        }
         if (n->value == NULL) {
             test_data_t *d;
 
@@ -113,6 +127,7 @@ test1(void)
         //TRACE("found %p for %ld", n, values2[i]);
         //btrie_node_dump(n);
         if (n != NULL) {
+            n->value = NULL;
             btrie_remove_node(&tr, n);
             //TRACE("removed %ld OK", values2[i]);
         } else {
@@ -145,6 +160,7 @@ test2(void)
         0x3fffffffffffffff,
         0x1fffffffffffffff,
         0x0ffffffffffffffe,
+        0x5a5a5a5a5a5a5a5a,
     };
     unsigned i;
     mnbtrie_t tr;
@@ -166,17 +182,22 @@ test2(void)
     for (i = 0; i < countof(keys); ++i) {
         TRACE("querying: %016lx", (long)keys[i]);
         n = btrie_find_exact(&tr, keys[i]);
-        //btrie_node_dump_cb(n, keys[i], NULL);
-        n = btrie_find_closest(&tr, keys[i], 0);
-        //btrie_node_dump_cb(n, keys[i], NULL);
-        n = btrie_find_closest(&tr, keys[i], 1);
-        //btrie_node_dump_cb(n, keys[i], NULL);
+        //btrie_node_dump_cb(n, NULL);
+
+        n = btrie_find_closest(&tr, keys[i] - 1, 1);
+        btrie_node_dump_cb(n, NULL);
+        n = btrie_find_closest(&tr, keys[i] + 1, 0);
+        btrie_node_dump_cb(n, NULL);
+
+        //n = btrie_find_closest(&tr, keys[i], 1);
+        //btrie_node_dump_cb(n, NULL);
     }
 
     for (i = 0; i < countof(keys); ++i) {
         TRACE("removing: %016lx", (long)keys[i]);
         n = btrie_find_exact(&tr, keys[i]);
         if (n != NULL) {
+            n->value = NULL;
             btrie_remove_node(&tr, n);
         }
     }
@@ -186,11 +207,86 @@ test2(void)
 }
 
 
+UNUSED static int
+mydump(mnbtrie_node_t *node, UNUSED void *udata)
+{
+    btrie_node_dump(node);
+    return 0;
+}
+
+
+UNUSED static void
+test3(void)
+{
+    uintmax_t keys[] = {
+        1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31
+    };
+    uintmax_t probe;
+    unsigned i;
+    mnbtrie_t tr;
+    mnbtrie_node_t *n;
+
+    btrie_init(&tr);
+    for (i = 0; i < countof(keys); ++i) {
+        UNUSED test_data_t *d;
+        uintmax_t key;
+
+        key = keys[i] + 1024;
+        n = btrie_add_node(&tr, key);
+#if USE_TEST_DATA
+        d = malloc(sizeof(test_data_t));
+        d->key = key;
+        n->value = d;
+#else
+        n->value = (void *)key;
+#endif
+    }
+
+    //btrie_traverse(&tr, mydump, NULL);
+
+    for (probe = 0; probe < 64; ++probe) {
+        //if (probe != 2) {
+        //    continue;
+        //}
+        n = btrie_find_closest(&tr, probe, 0);
+        TRACEC("probe %02jx ", probe);
+#if USE_TEST_DATA
+        btrie_node_dump_cb(n, NULL);
+#else
+        btrie_node_dump(n);
+#endif
+    }
+
+    TRACE();
+
+    for (probe = 0; probe < 64; ++probe) {
+        //if (probe != 2) {
+        //    continue;
+        //}
+        n = btrie_find_closest(&tr, probe, 1);
+        TRACEC("probe %02jx ", probe);
+#if USE_TEST_DATA
+        btrie_node_dump_cb(n, NULL);
+#else
+        btrie_node_dump(n);
+#endif
+    }
+
+    while ((n = BTRIE_MIN(&tr)) != NULL) {
+        TRACE("reoving %p", n->value);
+        n->value = NULL;
+        btrie_remove_node(&tr, n);
+    }
+    btrie_fini(&tr);
+}
+
+
 int
 main(void)
 {
-    test0();
-    test1();
-    test2();
+    //test0();
+    //test1();
+    //test2();
+    test3();
     return 0;
 }

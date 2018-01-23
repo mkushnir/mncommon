@@ -16,10 +16,10 @@ const char *mrkcommon_diag_str(int);
 #endif
 
 #ifndef MAX
+#   define _MAX(a, b) a > b ? a : b
 #   if __STDC_VERSION__ >= 201112
-#       define _MAX(a, b) a > b ? a : b
 #       define _DMAX(ty, name) \
-    static inline ty name(const ty a, const ty b) {return _MAX(a,b);}
+static inline ty name(const ty a, const ty b) {return _MAX(a, b);}
 
 _DMAX(char, mnmax_char)
 _DMAX(unsigned char, mnmax_uchar)
@@ -37,47 +37,47 @@ _DMAX(long double, mnmax_ldouble)
 _DMAX(intmax_t, mnmax_intmax)
 
 #       define MAX(a, b)                               \
-    _Generic(a,                                        \
-             char: mnmax_char,                         \
-             unsigned char: mnmax_uchar,               \
-             short: mnmax_short,                       \
-             unsigned short: mnmax_ushort,             \
-             int: mnmax_int,                           \
-             unsigned int: mnmax_uint,                 \
-             long: mnmax_long,                         \
-             unsigned long: mnmax_ulong,               \
-             long long: mnmax_llong,                   \
-             unsigned long long: mnmax_ullong,         \
-             float: mnmax_float,                       \
-             double: mnmax_double,                     \
-             long double: mnmax_ldouble,               \
-             const char: mnmax_char,                   \
-             const unsigned char: mnmax_uchar,         \
-             const short: mnmax_short,                 \
-             const unsigned short: mnmax_ushort,       \
-             const int: mnmax_int,                     \
-             const unsigned int: mnmax_uint,           \
-             const long: mnmax_long,                   \
-             const unsigned long: mnmax_ulong,         \
-             const long long: mnmax_llong,             \
-             const unsigned long long: mnmax_ullong,   \
-             const float: mnmax_float,                 \
-             const double: mnmax_double,               \
-             const long double: mnmax_ldouble,         \
-             default: mnmax_intmax)((a),(b))           \
+_Generic(a,                                            \
+         char: mnmax_char,                             \
+         unsigned char: mnmax_uchar,                   \
+         short: mnmax_short,                           \
+         unsigned short: mnmax_ushort,                 \
+         int: mnmax_int,                               \
+         unsigned int: mnmax_uint,                     \
+         long: mnmax_long,                             \
+         unsigned long: mnmax_ulong,                   \
+         long long: mnmax_llong,                       \
+         unsigned long long: mnmax_ullong,             \
+         float: mnmax_float,                           \
+         double: mnmax_double,                         \
+         long double: mnmax_ldouble,                   \
+         const char: mnmax_char,                       \
+         const unsigned char: mnmax_uchar,             \
+         const short: mnmax_short,                     \
+         const unsigned short: mnmax_ushort,           \
+         const int: mnmax_int,                         \
+         const unsigned int: mnmax_uint,               \
+         const long: mnmax_long,                       \
+         const unsigned long: mnmax_ulong,             \
+         const long long: mnmax_llong,                 \
+         const unsigned long long: mnmax_ullong,       \
+         const float: mnmax_float,                     \
+         const double: mnmax_double,                   \
+         const long double: mnmax_ldouble,             \
+         default: mnmax_intmax)((a),(b))               \
 
 
 #   else
-#       define MAX(a,b) ((a)>(b)?(a):(b))
+#       define MAX(a, b) _MAX((a), (b))
 #   endif
 #endif
 
 
 #ifndef MIN
+#   define _MIN(a, b) a < b ? a : b
 #   if __STDC_VERSION__ >= 201112
-#       define _MIN(a, b) a < b ? a : b
 #       define _DMIN(ty, name) \
-    static inline ty name(const ty a, const ty b) {return a < b ? a : b;}
+static inline ty name(const ty a, const ty b) {return _MIN(a, b);}
 
 _DMIN(char, mnmin_char)
 _DMIN(unsigned char, mnmin_uchar)
@@ -92,41 +92,41 @@ _DMIN(unsigned long long, mnmin_ullong)
 _DMIN(float, mnmin_float)
 _DMIN(double, mnmin_double)
 _DMIN(long double, mnmin_ldouble)
-_DMIN(intmax_t, mnmin_intmin)
+_DMIN(intmax_t, mnmin_intmax)
 
 #       define MIN(a, b)                               \
-    _Generic(a,                                        \
-             char: mnmin_char,                         \
-             unsigned char: mnmin_uchar,               \
-             short: mnmin_short,                       \
-             unsigned short: mnmin_ushort,             \
-             int: mnmin_int,                           \
-             unsigned int: mnmin_uint,                 \
-             long: mnmin_long,                         \
-             unsigned long: mnmin_ulong,               \
-             long long: mnmin_llong,                   \
-             unsigned long long: mnmin_ullong,         \
-             float: mnmin_float,                       \
-             double: mnmin_double,                     \
-             long double: mnmin_ldouble,               \
-             const char: mnmin_char,                   \
-             const unsigned char: mnmin_uchar,         \
-             const short: mnmin_short,                 \
-             const unsigned short: mnmin_ushort,       \
-             const int: mnmin_int,                     \
-             const unsigned int: mnmin_uint,           \
-             const long: mnmin_long,                   \
-             const unsigned long: mnmin_ulong,         \
-             const long long: mnmin_llong,             \
-             const unsigned long long: mnmin_ullong,   \
-             const float: mnmin_float,                 \
-             const double: mnmin_double,               \
-             const long double: mnmin_ldouble,         \
-             default: mnmin_intmin)((a),(b))           \
+_Generic(a,                                            \
+         char: mnmin_char,                             \
+         unsigned char: mnmin_uchar,                   \
+         short: mnmin_short,                           \
+         unsigned short: mnmin_ushort,                 \
+         int: mnmin_int,                               \
+         unsigned int: mnmin_uint,                     \
+         long: mnmin_long,                             \
+         unsigned long: mnmin_ulong,                   \
+         long long: mnmin_llong,                       \
+         unsigned long long: mnmin_ullong,             \
+         float: mnmin_float,                           \
+         double: mnmin_double,                         \
+         long double: mnmin_ldouble,                   \
+         const char: mnmin_char,                       \
+         const unsigned char: mnmin_uchar,             \
+         const short: mnmin_short,                     \
+         const unsigned short: mnmin_ushort,           \
+         const int: mnmin_int,                         \
+         const unsigned int: mnmin_uint,               \
+         const long: mnmin_long,                       \
+         const unsigned long: mnmin_ulong,             \
+         const long long: mnmin_llong,                 \
+         const unsigned long long: mnmin_ullong,       \
+         const float: mnmin_float,                     \
+         const double: mnmin_double,                   \
+         const long double: mnmin_ldouble,             \
+         default: mnmin_intmax)((a),(b))               \
 
 
 #   else
-#       define MIN(a,b) ((a)<(b)?(a):(b))
+#       define MIN(a, b) _MIN((a), (b))
 #   endif
 #endif
 
@@ -187,6 +187,118 @@ _DMIN(intmax_t, mnmin_intmin)
 
 #define MRKLIKELY(x) __builtin_expect((x), 1)
 #define MRKUNLIKELY(x) __builtin_expect((x), 0)
+
+
+#define _MNCMP(a, b) ((a) < (b) ? -1 : (a) > (b) ? 1 : 0)
+#if __STDC_VERSION__ >= 201112
+#   define _DMNCMP(ty, name)   \
+static inline int name(const ty a, const ty b) {return _MNCMP(a, b);}
+
+_DMNCMP(char, mncmp_char)
+_DMNCMP(unsigned char, mncmp_uchar)
+_DMNCMP(short, mncmp_short)
+_DMNCMP(unsigned short, mncmp_ushort)
+_DMNCMP(int, mncmp_int)
+_DMNCMP(unsigned int, mncmp_uint)
+_DMNCMP(long, mncmp_long)
+_DMNCMP(unsigned long, mncmp_ulong)
+_DMNCMP(long long, mncmp_llong)
+_DMNCMP(unsigned long long, mncmp_ullong)
+_DMNCMP(float, mncmp_float)
+_DMNCMP(double, mncmp_double)
+_DMNCMP(long double, mncmp_ldouble)
+_DMNCMP(void *, mncmp_vptr)
+
+#       define MNCMP(a, b)                             \
+_Generic(a,                                            \
+         char: mncmp_char,                             \
+         unsigned char: mncmp_uchar,                   \
+         short: mncmp_short,                           \
+         unsigned short: mncmp_ushort,                 \
+         int: mncmp_int,                               \
+         unsigned int: mncmp_uint,                     \
+         long: mncmp_long,                             \
+         unsigned long: mncmp_ulong,                   \
+         long long: mncmp_llong,                       \
+         unsigned long long: mncmp_ullong,             \
+         float: mncmp_float,                           \
+         double: mncmp_double,                         \
+         long double: mncmp_ldouble,                   \
+         const char: mncmp_char,                       \
+         const unsigned char: mncmp_uchar,             \
+         const short: mncmp_short,                     \
+         const unsigned short: mncmp_ushort,           \
+         const int: mncmp_int,                         \
+         const unsigned int: mncmp_uint,               \
+         const long: mncmp_long,                       \
+         const unsigned long: mncmp_ulong,             \
+         const long long: mncmp_llong,                 \
+         const unsigned long long: mncmp_ullong,       \
+         const float: mncmp_float,                     \
+         const double: mncmp_double,                   \
+         const long double: mncmp_ldouble,             \
+         default: mncmp_vptr)((a),(b))                 \
+
+
+#else
+#   define MNCMP(a, b) _MNCMP((a), (b))
+#endif
+
+
+#define _MNCMPR(a, b) ((a) > (b) ? -1 : (a) < (b) ? 1 : 0)
+#if __STDC_VERSION__ >= 201112
+#   define _DMNCMPR(ty, name)   \
+static inline int name(const ty a, const ty b) {return _MNCMPR(a, b);}
+
+_DMNCMPR(char, mncmpr_char)
+_DMNCMPR(unsigned char, mncmpr_uchar)
+_DMNCMPR(short, mncmpr_short)
+_DMNCMPR(unsigned short, mncmpr_ushort)
+_DMNCMPR(int, mncmpr_int)
+_DMNCMPR(unsigned int, mncmpr_uint)
+_DMNCMPR(long, mncmpr_long)
+_DMNCMPR(unsigned long, mncmpr_ulong)
+_DMNCMPR(long long, mncmpr_llong)
+_DMNCMPR(unsigned long long, mncmpr_ullong)
+_DMNCMPR(float, mncmpr_float)
+_DMNCMPR(double, mncmpr_double)
+_DMNCMPR(long double, mncmpr_ldouble)
+_DMNCMP(void *, mncmpr_vptr)
+
+#       define MNCMPR(a, b)                            \
+_Generic(a,                                            \
+         char: mncmpr_char,                            \
+         unsigned char: mncmpr_uchar,                  \
+         short: mncmpr_short,                          \
+         unsigned short: mncmpr_ushort,                \
+         int: mncmpr_int,                              \
+         unsigned int: mncmpr_uint,                    \
+         long: mncmpr_long,                            \
+         unsigned long: mncmpr_ulong,                  \
+         long long: mncmpr_llong,                      \
+         unsigned long long: mncmpr_ullong,            \
+         float: mncmpr_float,                          \
+         double: mncmpr_double,                        \
+         long double: mncmpr_ldouble,                  \
+         const char: mncmpr_char,                      \
+         const unsigned char: mncmpr_uchar,            \
+         const short: mncmpr_short,                    \
+         const unsigned short: mncmpr_ushort,          \
+         const int: mncmpr_int,                        \
+         const unsigned int: mncmpr_uint,              \
+         const long: mncmpr_long,                      \
+         const unsigned long: mncmpr_ulong,            \
+         const long long: mncmpr_llong,                \
+         const unsigned long long: mncmpr_ullong,      \
+         const float: mncmpr_float,                    \
+         const double: mncmpr_double,                  \
+         const long double: mncmpr_ldouble,            \
+         default: mncmpr_vptr)((a),(b))                \
+
+
+#else
+#   define MNCMPR(a, b) _MNCMPR((a), (b))
+#endif
 
 #ifdef __cplusplus
 }

@@ -53,8 +53,8 @@ initialize_ids(void)
     unsigned i;
 
     for (i = 0; i < countof(keys); ++i) {
-        //keys[i].key = new_id_successive();
-        keys[i].key = new_id_random();
+        keys[i].key = new_id_successive();
+        //keys[i].key = new_id_random();
     }
 }
 
@@ -114,6 +114,7 @@ test0(void)
     for (i = 0; i < countof(keys); ++i) {
 
         profile_start(p_remove_node);
+        keys[i].n->value = NULL;
         btrie_remove_node(&tr, keys[i].n);
         keys[i].n = NULL;
         keys[i].remove_time = profile_stop(p_remove_node);

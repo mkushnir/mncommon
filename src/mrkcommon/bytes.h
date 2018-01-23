@@ -56,6 +56,19 @@ typedef struct _bytes {
 #define BSZSAFE(b) ((b) != NULL ? (b)->sz : 0)
 
 
+static inline const char *
+mnbytes_strz(mnbytes_t *s) { return (const char *)s->data; }
+
+static inline const char *
+mnvoidp_strz(const void *s) { return (const char *)s; }
+
+#define MNSTRZ(s) _Generic(s,                  \
+        mnbytes_t *: mnbytes_strz,             \
+        const mnbytes_t *: mnbytes_strz,       \
+        default: mnvoidp_strz                  \
+        )(s)                                   \
+
+
 #define BYTES_INITIALIZER(s)   \
 {                              \
     .nref = 0x40000000,        \

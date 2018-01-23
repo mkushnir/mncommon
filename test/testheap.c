@@ -21,7 +21,7 @@ const char *_malloc_options = "AJ";
 static int
 mycmp(uint64_t *a, uint64_t *b)
 {
-    return *a < *b ? -1 : *a > *b ? 1 : 0;
+    return MNCMP(*a, *b);
 }
 
 static void

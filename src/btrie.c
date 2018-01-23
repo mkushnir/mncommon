@@ -1,17 +1,18 @@
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <limits.h>
 
+#define DUMPM_INDENT_SIZE 1
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/mpool.h>
 #include <mrkcommon/util.h>
 #include <mrkcommon/btrie.h>
-
-#ifdef HAVE_CONFIG_H
-#   include <config.h>
-#endif
 
 #ifndef HAVE_FLSL
 #   ifdef __GNUC__
@@ -34,27 +35,42 @@ MEMDEBUG_DECLARE(trie);
 #define _cleanup_orphans(tr, node) cleanup_orphans_mpool(mpool, (tr), (node))
 #define _btrie_node_fini(tr, node) btrie_node_fini_mpool(mpool, (tr), (node))
 
+
+#define MNBTRIE_CHILDSEL(node, key) (((key) >> (node->idx - 1)) & 0x01)
+#define MNBTRIE_NODESEL(node, key) (((key) >> node->idx) & 0x01)
+#define MNBTRIE_NODESEL0(node) (node->digit >> CHILD_SELECTOR_SHIFT)
+
+
+static int
+mydump(mnbtrie_node_t *node, UNUSED void *udata)
+{
+    btrie_node_dump(node);
+    return 0;
+}
+
+
 void
 btrie_node_dump(mnbtrie_node_t *n)
 {
     if (n == NULL) {
-        TRACE("NULL");
+        TRACEC("NULL\n");
     } else {
         // \033[01;31m%02lx\033[00m
-        TRACE("[%p]-> %08x %p/%p %p",
-              n, n->digit, n->child[0], n->child[1], n->value);
+        TRACEC("[%p] i:%02hhd d:%04hx p:%p(%p) l:%p r:%p v:%p\n",
+              n, n->idx, n->digit, n->parent, n->pad, n->child[0], n->child[1], n->value);
     }
 }
 
+
 int
-btrie_node_dump_cb(mnbtrie_node_t *n, UNUSED uint64_t key, void *arg)
+btrie_node_dump_cb(mnbtrie_node_t *n, void *arg)
 {
-    unsigned indent, selector;
+    unsigned indent, sel;
     int flags = (intptr_t)arg;
     test_data_t *d;
 
     if (n == NULL) {
-        TRACE("NULL");
+        TRACEC("NULL\n");
         return 0;
     }
 
@@ -63,19 +79,15 @@ btrie_node_dump_cb(mnbtrie_node_t *n, UNUSED uint64_t key, void *arg)
     if (n->child[0] == NULL && n->child[1] == NULL && n->value == NULL) {
         return 0;
     }
-    if (n->digit == INT_MAX) {
-        selector = 0;
-        indent = n->digit;
-    } else {
-        selector = n->digit & (1u << CHILD_SELECTOR_SHIFT);
-        indent = n->digit & ~(1u << CHILD_SELECTOR_SHIFT);
-    }
+    sel = n->digit & (1u << CHILD_SELECTOR_SHIFT);
+    assert((sel == 0) || (sel == 1));
+    indent = n->digit & ~(1u << CHILD_SELECTOR_SHIFT);
     if (d == NULL) {
         if (flags) {
             TRACE("key=");
             //TRACE("[n=%p value=%p]", n, d);
         } else {
-            if (selector) {
+            if (sel) {
                 LTRACE(indent + 1, FRED("key="));
             } else {
                 LTRACE(indent + 1, "key=");
@@ -89,7 +101,7 @@ btrie_node_dump_cb(mnbtrie_node_t *n, UNUSED uint64_t key, void *arg)
         TRACE("key=%02lx", (unsigned long)d->key);
         //TRACE("n=%p value=%p key=%02lx", n, d, d->key);
     } else {
-        if (selector) {
+        if (sel) {
             LTRACE(indent + 1, FRED("key=%02lx"), (unsigned long)d->key);
         } else {
             LTRACE(indent + 1, "key=%02lx", (unsigned long)d->key);
@@ -99,17 +111,25 @@ btrie_node_dump_cb(mnbtrie_node_t *n, UNUSED uint64_t key, void *arg)
     return 0;
 }
 
-void
-btrie_node_init(mnbtrie_node_t *n, mnbtrie_node_t *parent, unsigned digit, void *value)
+
+static void
+btrie_node_init(mnbtrie_node_t *n,
+                mnbtrie_node_t *parent,
+                char idx,
+                unsigned short digit,
+                void *value)
 {
     assert(n != NULL);
 
+    n->pad = NULL;
     n->parent = parent;
     n->child[0] = NULL;
     n->child[1] = NULL;
+    n->idx = idx;
     n->digit = digit;
     n->value = value;
 }
+
 
 void
 btrie_init(mnbtrie_t *tr)
@@ -119,7 +139,7 @@ btrie_init(mnbtrie_t *tr)
     assert(tr != NULL);
 
     for (i = 0; i < countof(tr->roots); ++i) {
-        btrie_node_init(&tr->roots[i], NULL, -1, NULL);
+        btrie_node_init(&tr->roots[i], NULL, i, 0, NULL);
     }
     tr->volume = 0;
     tr->nvals = 0;
@@ -149,11 +169,13 @@ btrie_node_fini(mnbtrie_t *tr, mnbtrie_node_t *n)
     BTRIE_NODE_FINI_BODY(free, btrie_node_fini);
 }
 
+
 static void
 btrie_node_fini_mpool(mpool_ctx_t *mpool, mnbtrie_t *tr, mnbtrie_node_t *n)
 {
     BTRIE_NODE_FINI_BODY(_free, _btrie_node_fini);
 }
+
 
 void
 btrie_fini(mnbtrie_t *tr)
@@ -162,10 +184,12 @@ btrie_fini(mnbtrie_t *tr)
 
     assert(tr != NULL);
 
+    //btrie_traverse(tr, mydump, NULL);
     for (i = 0; i < countof(tr->roots); ++i) {
         btrie_node_fini(tr, &tr->roots[i]);
     }
 }
+
 
 void
 btrie_fini_mpool(mpool_ctx_t *mpool, mnbtrie_t *tr)
@@ -179,11 +203,11 @@ btrie_fini_mpool(mpool_ctx_t *mpool, mnbtrie_t *tr)
     }
 }
 
-static int
+
+inline static int
 btrie_node_is_orphan(mnbtrie_node_t *n)
 {
     return (n->child[0] == NULL) && (n->child[1] == NULL) && (n->value == NULL);
-
 }
 
 
@@ -260,57 +284,46 @@ btrie_cleanup_mpool(mpool_ctx_t *mpool, mnbtrie_t *tr)
 
 int
 btrie_node_traverse(mnbtrie_node_t *n,
-                   int idx,
-                   uint64_t key,
-                   int (*cb)(mnbtrie_node_t *, uint64_t, void *),
+                   int (*cb)(mnbtrie_node_t *, void *),
                    void *udata)
 {
     int res;
 
-    //TRACE("key=%016lx", key);
-    if (n == NULL) {
-        return 0;
+    if ((res = cb(n, udata)) != 0) {
+        goto end;
     }
-
-    idx = idx ? (idx - 1) : 0;
-
     if (n->child[0] != NULL) {
-        //TRACE("child[0]");
-        if ((res = btrie_node_traverse(n->child[0], idx, key, cb, udata)) != 0) {
-            return res;
+        if ((res = btrie_node_traverse(n->child[0], cb, udata)) != 0) {
+            goto end;
+        }
+    } else {
+        if ((res = cb(n->child[0], udata)) != 0) {
+            goto end;
         }
     }
-
-    //TRACE("me");
-    if ((res = cb(n, key, udata)) != 0) {
-        return res;
-    }
-
     if (n->child[1] != NULL) {
-        //TRACE("child[1]");
-        if ((res = btrie_node_traverse(n->child[1], idx, key | (1ul << idx), cb, udata)) != 0) {
-            return res;
+        if ((res = btrie_node_traverse(n->child[1], cb, udata)) != 0) {
+            goto end;
+        }
+    } else {
+        if ((res = cb(n->child[1], udata)) != 0) {
+            goto end;
         }
     }
 
-    return 0;
+end:
+    return res;
 }
 
+
 int
-btrie_traverse(mnbtrie_t *tr, int (*cb)(mnbtrie_node_t *, uint64_t, void *), void *udata)
+btrie_traverse(mnbtrie_t *tr, int (*cb)(mnbtrie_node_t *, void *), void *udata)
 {
     int res;
     unsigned i;
 
-    for (i = 0; i < (countof(tr->roots) - 0); ++i) {
-        uint64_t key;
-
-        if (i == 0) {
-            key = 0ul;
-        } else {
-            key = 1ul << (i-1);
-        }
-        if ((res = btrie_node_traverse(&tr->roots[i], i, key, cb, udata)) != 0) {
+    for (i = 0; i < countof(tr->roots); ++i) {
+        if ((res = btrie_node_traverse(&tr->roots[i], cb, udata)) != 0) {
             return res;
         }
     }
@@ -318,23 +331,27 @@ btrie_traverse(mnbtrie_t *tr, int (*cb)(mnbtrie_node_t *, uint64_t, void *), voi
     return 0;
 }
 
+
 #define BTRIE_ADD_NODE_BODY(mallocfn)                                  \
-    unsigned idx, i, sel;                                              \
+    int idx;                                                           \
+    unsigned digit, sel;                                               \
     mnbtrie_node_t **n;                                                \
     mnbtrie_node_t *cur;                                               \
     idx = flsl(key);                                                   \
-    cur = &tr->roots[idx];                                             \
     if (idx == 0) {                                                    \
-        ++idx;                                                         \
+        return NULL;                                                   \
     }                                                                  \
-    i = 0;                                                             \
-    do {                                                               \
+    --idx;                                                             \
+    cur = &tr->roots[idx];                                             \
+    --idx;                                                             \
+    for (digit = 1; idx >= 0; --idx, ++digit) {                        \
         /*                                                             \
          * sel (selector):                                             \
          *  - 0, keys are 0x..x                                        \
          *  - 1, keys are 1x..x                                        \
          */                                                            \
-        sel = (key & (1ul << (idx - 1))) >> (idx - 1);                 \
+        sel = (key & (1ul << idx)) >> idx;                             \
+    assert((sel == 0) || (sel == 1));\
         n = &cur->child[sel];                                          \
         if (*n == NULL) {                                              \
             if ((*n = mallocfn(sizeof(mnbtrie_node_t))) == NULL) {     \
@@ -342,14 +359,13 @@ btrie_traverse(mnbtrie_t *tr, int (*cb)(mnbtrie_node_t *, uint64_t, void *), voi
             }                                                          \
             btrie_node_init(*n,                                        \
                            cur,                                        \
-                           (i |                                        \
-                               (sel << CHILD_SELECTOR_SHIFT)),         \
+                           idx,                                        \
+                           (digit | (sel << CHILD_SELECTOR_SHIFT)),    \
                            NULL);                                      \
             ++(tr->volume);                                            \
         }                                                              \
         cur = *n;                                                      \
-        ++i;                                                           \
-    } while (--idx);                                                   \
+    }                                                                  \
     return cur;                                                        \
 
 
@@ -360,316 +376,345 @@ btrie_add_node(mnbtrie_t *tr, uintmax_t key)
     BTRIE_ADD_NODE_BODY(malloc);
 }
 
+
 mnbtrie_node_t *
 btrie_add_node_mpool(mpool_ctx_t *mpool, mnbtrie_t *tr, uintmax_t key)
 {
     BTRIE_ADD_NODE_BODY(_malloc);
 }
 
+
 mnbtrie_node_t *
 btrie_find_exact(mnbtrie_t *tr, uintmax_t key)
 {
     int idx;
-    mnbtrie_node_t **n;
     mnbtrie_node_t *cur;
 
     idx = flsl(key);
 
-    cur = &tr->roots[idx];
     if (idx == 0) {
-        ++idx;
+        return NULL;
     }
+    --idx;
 
-    do {
-        n = &cur->child[(key & (1ul << (idx - 1))) >> (idx - 1)];
-        if (*n == NULL) {
-            return NULL;
-        }
-        cur = *n;
-    } while (--idx);
+    cur = &tr->roots[idx];
+    for (--idx; cur != NULL && idx >= 0; --idx) {
+        int sel;
+
+        sel = (key >> idx) & 0x01;
+        assert((sel == 0) || (sel == 1));
+        cur = cur->child[sel];
+    }
 
     return cur;
 }
+
 
 /**
  * Walk down the tree until we find a node with value.
  *
  */
-UNUSED static mnbtrie_node_t *
-btrie_descend(mnbtrie_node_t *n, int bias)
-{
-    mnbtrie_node_t *res;
-
-    assert(bias == 0 || bias == 1);
-    assert(n != NULL);
-
-    if (n->child[bias] != NULL) {
-        res = btrie_descend(n->child[bias], bias);
-        if (res->value != NULL) {
-            return res;
-        }
-    }
-
-    if (n->child[1 ^ bias] != NULL) {
-        res = btrie_descend(n->child[1 ^ bias], bias);
-        if (res->value != NULL) {
-            return res;
-        }
-    }
-
-    /* couldn't descend further, return what we were passed in */
-    return n;
-}
-
-
-/**
- * An iterative version of btrie_descend()
- *
- */
 static mnbtrie_node_t *
-btrie_find_value(mnbtrie_node_t *n, int bias)
+find_value_reverse(mnbtrie_node_t *node)
 {
-    assert(bias == 0 || bias == 1);
-    assert(n != NULL);
+    mnbtrie_node_t *res = NULL;
 
-    while (1) {
-        if (n->child[bias] != NULL) {
-            n = n->child[bias];
-            continue;
-        }
-        if (n->value != NULL) {
-            break;
-        }
-        if (n->child[bias ^ 1] != NULL) {
-            n = n->child[bias ^ 1];
-            continue;
-        }
-        if (n->value != NULL) {
-            break;
-        }
-        break;
+    if (node->value != NULL) {
+        res = node;
+        goto end;
     }
 
-    return n;
-}
-
-static mnbtrie_node_t *
-find_closest_partial(mnbtrie_node_t *node, int idx, uintmax_t key, int direction)
-{
-    /*
-     * The exact match loop.
-     */
-    //TRACE("idx=%d key=%lx", idx, key);
-    //btrie_node_dump(node);
-    do {
-        mnbtrie_node_t **n;
-        unsigned child_idx = (key & (1ul << (idx - 1))) >> (idx - 1);
-
-        //TRACE("idx=%d child_idx=%d", idx, child_idx);
-
-        n = &node->child[child_idx];
-        if (*n != NULL) {
-            node = *n;
-
+    if (node->child[1] != NULL) {
+        if (node->child[1]->value != NULL) {
+            res = node->child[1];
+            goto end;
         } else {
-            /*
-             * Not an exact match, the outer do {} while () will be
-             * abandoned. We proceed with the closest match logic now.
-             *
-             * The closest match logic is to descend the part of the tree
-             * that is in the given direction. That is, if the direction is
-             * 0, we select the zeroth child, zeroth brothers, otherwise
-             * one'th child and one'th brothers.
-             *
-             * The brother(idx, node) returns the idx'th brother of either
-             * the node, or its ascendant, or NULL, if not found.
-             *
-             * In the selected part of the tree, we descend in the flipped
-             * direction. The generalized algorithm is:
-             *
-             * 1. child_idx ^ dir ? descend(node, 1 ^ dir) : (void)
-             * 2. descend(brother(dir, node), 1 ^ dir)
-             *
-             */
-            mnbtrie_node_t *res;
-
-            /* 1. first descend the other child if applicable */
-            //TRACE("child_idx ^ direction = %d", child_idx ^ direction);
-            if (child_idx ^ direction) {
-                res = btrie_find_value(node, 1 ^ direction);
-                if (res->value != NULL) {
-                    return res;
-                }
-            }
-
-            /* now descend the relatives in the given direction */
-            while (1) {
-                unsigned node_idx;
-                mnbtrie_node_t *bro = NULL;
-
-                /* 2a. brother(dir, ...) */
-                while (bro == NULL) {
-                    //btrie_node_dump(node);
-                    if (node->parent == NULL) {
-                        /* root */
-                        return NULL;
-                    }
-
-                    node_idx = (((node->digit)) &
-                                (1u << CHILD_SELECTOR_SHIFT)) >>
-                                    CHILD_SELECTOR_SHIFT;
-
-                    //TRACE("node_idx=%d", node_idx);
-
-                    if (node_idx ^ direction) {
-                        bro = node->parent->child[direction];
-                        if (bro == NULL) {
-                            node = node->parent;
-                        }
-                    } else {
-                        node = node->parent;
-                    }
-                }
-
-                /* 2b. descend(bro, 1 ^ dir) */
-                res = btrie_find_value(bro, 1 ^ direction);
-
-                if (res->value != NULL) {
-                    return res;
-                } else {
-                    bro = NULL;
-                    node = node->parent;
-                }
+            if ((res = find_value_reverse(node->child[1])) != NULL) {
+                goto end;
             }
         }
-        //TRACE("node=%p", node);
-    } while (--idx);
+    }
+
+    if (node->child[0] != NULL) {
+        if (node->child[0]->value != NULL) {
+            res = node->child[0];
+        } else {
+            res = find_value_reverse(node->child[0]);
+        }
+    }
+
+end:
+    return res;
+}
+
+
+static mnbtrie_node_t *
+find_value_traverse(mnbtrie_node_t *node)
+{
+    mnbtrie_node_t *res = NULL;
+
+    if (node->value != NULL) {
+        res = node;
+        goto end;
+    }
+
+    if (node->child[0] != NULL) {
+        if (node->child[0]->value != NULL) {
+            res = node->child[0];
+            goto end;
+        } else {
+            if ((res = find_value_traverse(node->child[0])) != NULL) {
+                goto end;
+            }
+        }
+    }
+
+    if (node->child[1] != NULL) {
+        if (node->child[1]->value != NULL) {
+            res = node->child[1];
+        } else {
+            res = find_value_traverse(node->child[1]);
+        }
+    }
+
+end:
+    return res;
+}
+
+
+static mnbtrie_node_t *
+find_value_lean_left(mnbtrie_node_t *node)
+{
+    while (node != NULL) {
+        int mysel;
+        mnbtrie_node_t *parent;
+
+        if (node->child[0] != NULL) {
+            mnbtrie_node_t *tmp;
+
+            if ((tmp = find_value_reverse(node->child[0])) != NULL) {
+                node = tmp;
+                break;
+            }
+        }
+
+        if ((parent = node->parent) == NULL) {
+            node = NULL;
+            break;
+        }
+
+        mysel = MNBTRIE_NODESEL0(node);
+        assert((mysel == 0) || (mysel == 1));
+
+        if (mysel == 1) {
+            node = parent;
+        } else {
+            while (node->parent != NULL && mysel == 0) {
+                node = node->parent;
+                mysel = MNBTRIE_NODESEL0(node);
+                assert((mysel == 0) || (mysel == 1));
+            }
+            assert(node != NULL);
+            node = node->parent;
+        }
+    }
 
     return node;
 }
 
+
+static mnbtrie_node_t *
+find_closest_partial_back(mnbtrie_node_t *node,
+                          uintmax_t key)
+{
+    //TRACE("key %02jx", key);
+    if (node->idx == 0) {
+        if (node->value == NULL) {
+            node = NULL;
+        }
+        goto end;
+    }
+
+    while (node->idx > 0) {
+        int sel;
+        mnbtrie_node_t *tmp;
+
+        sel = MNBTRIE_CHILDSEL(node, key);
+        assert((sel == 0) || (sel == 1));
+        //TRACEC("sel %d ", sel);
+        //btrie_node_dump(node);
+        if ((tmp = node->child[sel]) != NULL) {
+            node = tmp;
+        } else {
+            node = find_value_lean_left(node);
+            break;
+        }
+    }
+
+end:
+    return node;
+}
+
+
+static mnbtrie_node_t *
+find_value_lean_right(mnbtrie_node_t *node)
+{
+    while (node != NULL) {
+        int mysel;
+        mnbtrie_node_t *parent;
+
+        if (node->child[1] != NULL) {
+            mnbtrie_node_t *tmp;
+
+            if ((tmp = find_value_traverse(node->child[1])) != NULL) {
+                node = tmp;
+                break;
+            }
+        }
+
+        if ((parent = node->parent) == NULL) {
+            node = NULL;
+            break;
+        }
+
+        mysel = MNBTRIE_NODESEL0(node);
+        assert((mysel == 0) || (mysel == 1));
+
+        if (mysel == 0) {
+            node = parent;
+        } else {
+            while (node->parent != NULL && mysel == 1) {
+                node = node->parent;
+                mysel = MNBTRIE_NODESEL0(node);
+                assert((mysel == 0) || (mysel == 1));
+            }
+            assert(node != NULL);
+            node = node->parent;
+        }
+    }
+
+    return node;
+}
+
+
+static mnbtrie_node_t *
+find_closest_partial_forw(mnbtrie_node_t *node,
+                          uintmax_t key)
+{
+
+    if (node->idx == 0) {
+        if (node->value == NULL) {
+            node = NULL;
+        }
+        goto end;
+    }
+
+    while (node->idx > 0) {
+        int sel;
+        mnbtrie_node_t *tmp;
+
+        sel = MNBTRIE_CHILDSEL(node, key);
+        assert((sel == 0) || (sel == 1));
+        if ((tmp = node->child[sel]) != NULL) {
+            node = tmp;
+        } else {
+            node = find_value_lean_right(node);
+            break;
+        }
+    }
+
+end:
+    return node;
+}
+
+
 mnbtrie_node_t *
 btrie_find_closest(mnbtrie_t *tr, uintmax_t key, int direction)
 {
-    unsigned idx;
-    mnbtrie_node_t *root, *res;
+    int idx;
+    mnbtrie_node_t *root, *res = NULL;
 
     direction = direction ? 1 : 0;
 
     idx = flsl(key);
+    if (idx == 0) {
+        goto end;
+    }
+    --idx;
+    //TRACE("key %02jd idx=%d", key, idx);
+
+    root = &tr->roots[idx];
+    //TRACEC("root: ");
+    //btrie_node_dump(root);
 
     if (direction) {
-        /* exception for 0 */
-        if (idx == 0) {
-            root = &tr->roots[idx];
-            ++idx;
-            if ((res = find_closest_partial(root,
-                                            idx,
-                                            key,
-                                            direction)) != NULL) {
-                return res;
-            }
-            assert(idx == 1);
-            key = 0ul;
+        if ((res = find_closest_partial_forw(root, key)) != NULL) {
+            goto end;
         }
-        /* first, or second */
-        root = &tr->roots[idx];
-        if ((res = find_closest_partial(root,
-                                        idx,
-                                        key,
-                                        direction)) != NULL) {
-            return res;
-        }
-        key = 0ul;
         ++idx;
-        /* the rest */
-        for (; idx <= TREE_DEPTH; ++idx) {
+        for (; idx < (int)countof(tr->roots); ++idx) {
             root = &tr->roots[idx];
-            if ((res = find_closest_partial(root,
-                                            idx,
-                                            key,
-                                            direction)) != NULL) {
-                return res;
+            if ((res = find_value_traverse(root)) != NULL) {
+                break;
             }
         }
+
     } else {
-        if (idx == 0) {
+        if ((res = find_closest_partial_back(root, key)) != NULL) {
+            goto end;
+        }
+        --idx;
+        for (; idx >= 0; --idx) {
             root = &tr->roots[idx];
-            ++idx;
-            if ((res = find_closest_partial(root,
-                                            idx,
-                                            key,
-                                            direction)) != NULL) {
-                return res;
-            }
-        } else {
-            /* first */
-            root = &tr->roots[idx];
-            if ((res = find_closest_partial(root,
-                                            idx,
-                                            key,
-                                            direction)) != NULL) {
-                return res;
-            }
-            key = ULONG_MAX;
-            --idx;
-            /* the rest */
-            for (; idx > 0; --idx) {
-                root = &tr->roots[idx];
-                if ((res = find_closest_partial(root,
-                                                idx,
-                                                key,
-                                                direction)) != NULL) {
-                    return res;
-                }
-            }
-            /* exception for 0 */
-            assert(idx == 0);
-            root = &tr->roots[idx];
-            ++idx;
-            if ((res = find_closest_partial(root,
-                                            idx,
-                                            key,
-                                            direction)) != NULL) {
-                return res;
+            if ((res = find_value_reverse(root)) != NULL) {
+                break;
             }
         }
     }
-    return NULL;
+
+end:
+    return res;
 }
 
-#define CLEANUP_ORPHANS_BODY(freefn)           \
-    mnbtrie_node_t *parent;                    \
-    while (n != NULL) {                        \
-        if (n->parent == NULL) {               \
-            break;                             \
-        }                                      \
-        if (btrie_node_is_orphan(n)) {         \
-            parent = n->parent;                \
-            assert(parent != NULL);            \
-            if (parent->child[0] == n) {       \
-                parent->child[0] = NULL;       \
-            } else {                           \
-                assert(parent->child[1] == n); \
-                parent->child[1] = NULL;       \
-            }                                  \
-            freefn(n);                         \
-            --(tr->volume);                    \
-            n = parent;                        \
-        } else {                               \
-            break;                             \
-        }                                      \
-    }                                          \
+
+#define CLEANUP_ORPHANS_BODY(freefn)                   \
+    while (n != NULL) {                                \
+        if (n->parent == NULL) {                       \
+            break;                                     \
+        }                                              \
+        if (btrie_node_is_orphan(n)) {                 \
+            mnbtrie_node_t *parent;                    \
+            parent = n->parent;                        \
+            assert(parent != NULL);                    \
+            if (parent->child[0] == n) {               \
+                parent->child[0] = NULL;               \
+            } else {                                   \
+                if (parent->child[1] != n) {           \
+                    btrie_node_dump(n);                \
+                    D8(n, sizeof(*n));                 \
+                    btrie_node_dump(parent);           \
+                    btrie_traverse(tr, mydump, NULL);  \
+                }                                      \
+                assert(parent->child[1] == n);         \
+                parent->child[1] = NULL;               \
+            }                                          \
+            freefn(n);                                 \
+            --(tr->volume);                            \
+            n = parent;                                \
+        } else {                                       \
+            break;                                     \
+        }                                              \
+    }                                                  \
 
 
-UNUSED static void
+static void
 cleanup_orphans(mnbtrie_t *tr, mnbtrie_node_t *n)
 {
     CLEANUP_ORPHANS_BODY(free);
 }
 
 
-UNUSED static void
+static void
 cleanup_orphans_mpool(mpool_ctx_t *mpool, mnbtrie_t *tr, mnbtrie_node_t *n)
 {
     CLEANUP_ORPHANS_BODY(_free);
@@ -678,6 +723,7 @@ cleanup_orphans_mpool(mpool_ctx_t *mpool, mnbtrie_t *tr, mnbtrie_node_t *n)
 
 #define BTRIE_REMOVE_NODE_BODY(finifn, freefn, __a1)           \
     mnbtrie_node_t *parent;                                    \
+    assert(n->value == NULL);                                  \
     parent = n->parent;                                        \
     if (parent != NULL) {                                      \
         if (parent->child[0] == n) {                           \
@@ -689,14 +735,18 @@ cleanup_orphans_mpool(mpool_ctx_t *mpool, mnbtrie_t *tr, mnbtrie_node_t *n)
                   "parent->child[0]=%p parent->child[1]=%p",   \
                   tr, parent, n,                               \
                   parent->child[0], parent->child[1]);         \
+            D8(n, sizeof(*n));                                 \
+            btrie_traverse(tr, mydump, NULL);                  \
             FAIL("btrie_node_remove");                         \
         }                                                      \
+        finifn(tr, n);                                         \
+        freefn(n);                                             \
+        --(tr->volume);                                        \
+    } else {                                                   \
+        finifn(tr, n);                                         \
     }                                                          \
-    finifn(tr, n);                                             \
-    freefn(n);                                                 \
-    --(tr->volume);                                            \
     __a1                                                       \
-    return 0;                                                  \
+    return 0                                                   \
 
 
 int

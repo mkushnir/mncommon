@@ -77,12 +77,24 @@ array_init_mpool(mpool,        \
  */
 
 #define ARRAY_INIT_BODY(malloc_fn)                             \
+    size_t datasz;                                             \
     assert(elsz > 0);                                          \
     ar->elsz = elsz;                                           \
     ar->elnum = elnum;                                         \
     ar->init = init;                                           \
     ar->fini = fini;                                           \
-    ar->datasz = elsz * elnum;                                 \
+    datasz = elsz * elnum;                                     \
+    if (datasz >= MNARRAY_SMALL_DATASZ) {                      \
+        ar->datasz = datasz;                                   \
+    } else if (datasz > 0) {                                   \
+        ar->datasz = 1;                                        \
+        while (ar->datasz < datasz) {                          \
+            ar->datasz <<= 1;                                  \
+        }                                                      \
+    } else {                                                   \
+        assert(datasz == 0);                                   \
+        ar->datasz = 0;                                        \
+    }                                                          \
     MEMDEBUG_INIT(ar);                                         \
     MEMDEBUG_ENTER(ar);                                        \
     if (elnum > 0) {                                           \
@@ -101,7 +113,7 @@ array_init_mpool(mpool,        \
         ar->data = NULL;                                       \
     }                                                          \
     MEMDEBUG_LEAVE(ar);                                        \
-    return 0;                                                  \
+    return 0                                                   \
 
 
 int
@@ -109,7 +121,7 @@ array_init(mnarray_t *ar, size_t elsz, size_t elnum,
            array_initializer_t init,
            array_finalizer_t fini)
 {
-    ARRAY_INIT_BODY(malloc)
+    ARRAY_INIT_BODY(malloc);
 }
 
 
@@ -118,18 +130,28 @@ array_init_mpool(mpool_ctx_t *mpool, mnarray_t *ar, size_t elsz, size_t elnum,
            array_initializer_t init,
            array_finalizer_t fini)
 {
-    ARRAY_INIT_BODY(_malloc)
+    ARRAY_INIT_BODY(_malloc);
 }
 
 
 #define ARRAY_RESET_NO_FINI_BODY(free_fn, malloc_fn)           \
     ar->elnum = newelnum;                                      \
-    ar->datasz = ar->elsz * newelnum;                          \
     MEMDEBUG_ENTER(ar);                                        \
     if (ar->data != NULL) {                                    \
         free_fn(ar->data);                                     \
     }                                                          \
     if (newelnum > 0) {                                        \
+        size_t newdatasz;                                      \
+        newdatasz = ar->elsz * newelnum;                       \
+        if (newdatasz >= MNARRAY_SMALL_DATASZ) {               \
+            ar->datasz = newdatasz;                            \
+        } else {                                               \
+            ar->datasz = 1;                                    \
+            while (ar->datasz < newdatasz) {                   \
+                ar->datasz <<= 1;                              \
+            }                                                  \
+        }                                                      \
+                                                               \
         if ((ar->data = malloc_fn(ar->datasz)) == NULL) {      \
             TRRET(ARRAY_RESET_NO_FINI + 1);                    \
         }                                                      \
@@ -142,23 +164,24 @@ array_init_mpool(mpool_ctx_t *mpool, mnarray_t *ar, size_t elsz, size_t elnum,
             }                                                  \
         }                                                      \
     } else {                                                   \
+        ar->datasz = 0;                                        \
         ar->data = NULL;                                       \
     }                                                          \
     MEMDEBUG_LEAVE(ar);                                        \
-    return 0;                                                  \
+    return 0                                                   \
 
 
 
 
-#define ARRAY_NEW_BODY(malloc_fn, array_init_fn)              \
-    mnarray_t *res;                                              \
-    if ((res = malloc_fn(sizeof(mnarray_t))) == NULL) {          \
+#define ARRAY_NEW_BODY(malloc_fn, array_init_fn)               \
+    mnarray_t *res;                                            \
+    if ((res = malloc_fn(sizeof(mnarray_t))) == NULL) {        \
         FAIL("malloc");                                        \
     }                                                          \
     if (array_init_fn(res, elsz, elnum, init, fini) != 0) {    \
         FAIL("array_init");                                    \
     }                                                          \
-    return res;                                                \
+    return res                                                 \
 
 
 mnarray_t *
@@ -167,7 +190,7 @@ array_new(size_t elsz,
           array_initializer_t init,
           array_finalizer_t fini)
 {
-    ARRAY_NEW_BODY(malloc, array_init)
+    ARRAY_NEW_BODY(malloc, array_init);
 }
 
 
@@ -178,21 +201,21 @@ array_new_mpool(mpool_ctx_t *mpool,
                 array_initializer_t init,
                 array_finalizer_t fini)
 {
-    ARRAY_NEW_BODY(_malloc, _array_init)
+    ARRAY_NEW_BODY(_malloc, _array_init);
 }
 
 
 int
 array_reset_no_fini(mnarray_t *ar, size_t newelnum)
 {
-    ARRAY_RESET_NO_FINI_BODY(free, malloc)
+    ARRAY_RESET_NO_FINI_BODY(free, malloc);
 }
 
 
 int
 array_reset_no_fini_mpool(mpool_ctx_t *mpool, mnarray_t *ar, size_t newelnum)
 {
-    ARRAY_RESET_NO_FINI_BODY(_free, _malloc)
+    ARRAY_RESET_NO_FINI_BODY(_free, _malloc);
 }
 
 
@@ -226,8 +249,21 @@ array_destroy_mpool(mpool_ctx_t *mpool, mnarray_t **ar)
     MEMDEBUG_ENTER(ar);                                                        \
     if (!(flags & ARRAY_FLAG_SAVE)) {                                          \
         if (newelnum > 0) {                                                    \
-            if (ar->datasz < ar->elsz * newelnum) {                            \
-                ar->datasz = ar->elsz * newelnum;                              \
+            size_t newdatasz;                                                  \
+            newdatasz = ar->elsz * newelnum;                                   \
+            if (ar->datasz < newdatasz) {                                      \
+                if (newdatasz >= MNARRAY_SMALL_DATASZ) {                       \
+                    ar->datasz = newdatasz;                                    \
+                } else {                                                       \
+                    if ((ar->datasz == 0) ||                                   \
+                        (ar->datasz > MNARRAY_SMALL_DATASZ)) {                 \
+                        ar->datasz = 1;                                        \
+                    }                                                          \
+                    while (ar->datasz < newdatasz) {                           \
+                        ar->datasz <<= 1;                                      \
+                    }                                                          \
+                }                                                              \
+                /*ar->datasz = ar->elsz * newelnum;*/                          \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \
@@ -241,32 +277,52 @@ array_destroy_mpool(mpool_ctx_t *mpool, mnarray_t **ar)
         }                                                                      \
     } else {                                                                   \
         if (newelnum > ar->elnum) {                                            \
-            if (ar->datasz < ar->elsz * newelnum) {                            \
-                ar->datasz = ar->elsz * newelnum;                              \
+            size_t newdatasz;                                                  \
+            newdatasz = ar->elsz * newelnum;                                   \
+            if (ar->datasz < newdatasz) {                                      \
+                if (newdatasz >= MNARRAY_SMALL_DATASZ) {                       \
+                    ar->datasz = newdatasz;                                    \
+                } else {                                                       \
+                    if ((ar->datasz == 0) ||                                   \
+                        (ar->datasz > MNARRAY_SMALL_DATASZ)) {                 \
+                        ar->datasz = 1;                                        \
+                    }                                                          \
+                    while (ar->datasz < newdatasz) {                           \
+                        ar->datasz <<= 1;                                      \
+                    }                                                          \
+                }                                                              \
+                /*ar->datasz = ar->elsz * newelnum;*/                          \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \
             } else {                                                           \
                 newdata = ar->data;                                            \
             }                                                                  \
-        } else if (newelnum < ar->elnum) {                                     \
+        } else {                                                               \
             if (newelnum > 0) {                                                \
-                ar->datasz = ar->elsz * newelnum;                              \
+                /*                                                             \
+                if (ar->datasz == 0 || ar->datasz > MNARRAY_SMALL_DATASZ) {    \
+                    ar->datasz = 1;                                            \
+                }                                                              \
+                while (ar->datasz < ar->elsz * newelnum) {                     \
+                    ar->datasz <<= 1;                                          \
+                }                                                              \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \
+                */                                                             \
+                /*ar->datasz = ar->elsz * newelnum;*/                          \
+                newdata = ar->data;                                            \
             } else {                                                           \
                 ar->datasz = 0;                                                \
                 free_fn(ar->data);                                             \
                 newdata = NULL;                                                \
             }                                                                  \
-        } else {                                                               \
-            newdata = ar->data;                                                \
         }                                                                      \
     }                                                                          \
     MEMDEBUG_LEAVE(ar);                                                        \
     ar->data = newdata;                                                        \
-    __a;                                                                       \
+    __a                                                                        \
 
 
 
@@ -275,8 +331,8 @@ array_ensure_len_dirty(mnarray_t *ar, size_t newelnum, unsigned int flags)
 {
     ARRAY_ENSURE_DIRTY_BODY(realloc, free,
             ar->elnum = newelnum;
-            return 0;
-    )
+            return 0
+    );
 }
 
 
@@ -288,15 +344,15 @@ array_ensure_len_dirty_mpool(mpool_ctx_t *mpool,
 {
     ARRAY_ENSURE_DIRTY_BODY(_realloc, _free,
             ar->elnum = newelnum;
-            return 0;
-    )
+            return 0
+    );
 }
 
 
 void
 array_ensure_datasz_dirty(mnarray_t *ar, size_t newelnum, unsigned int flags)
 {
-    ARRAY_ENSURE_DIRTY_BODY(realloc, free,)
+    ARRAY_ENSURE_DIRTY_BODY(realloc, free,);
 }
 
 
@@ -306,7 +362,7 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
                                 size_t newelnum,
                                 unsigned int flags)
 {
-    ARRAY_ENSURE_DIRTY_BODY(_realloc, _free,)
+    ARRAY_ENSURE_DIRTY_BODY(_realloc, _free,);
 }
 
 
@@ -321,8 +377,21 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
             }                                                                  \
         }                                                                      \
         if (newelnum > 0) {                                                    \
-            if (ar->datasz < ar->elsz * newelnum) {                            \
-                ar->datasz = ar->elsz * newelnum;                              \
+            size_t newdatasz;                                                  \
+            newdatasz = ar->elsz * newelnum;                                   \
+            if (ar->datasz < newdatasz) {                                      \
+                if (newdatasz >= MNARRAY_SMALL_DATASZ) {                       \
+                    ar->datasz = newdatasz;                                    \
+                } else {                                                       \
+                    if ((ar->datasz == 0) ||                                   \
+                        (ar->datasz > MNARRAY_SMALL_DATASZ)) {                 \
+                        ar->datasz = 1;                                        \
+                    }                                                          \
+                    while (ar->datasz < newdatasz) {                           \
+                        ar->datasz <<= 1;                                      \
+                    }                                                          \
+                }                                                              \
+                /*ar->datasz = ar->elsz * newelnum;*/                          \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \
@@ -341,8 +410,21 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
         }                                                                      \
     } else {                                                                   \
         if (newelnum > ar->elnum) {                                            \
-            if (ar->datasz < ar->elsz * newelnum) {                            \
-                ar->datasz = ar->elsz * newelnum;                              \
+            size_t newdatasz;                                                  \
+            newdatasz = ar->elsz * newelnum;                                   \
+            if (ar->datasz < newdatasz) {                                      \
+                if (newdatasz >= MNARRAY_SMALL_DATASZ) {                       \
+                    ar->datasz = newdatasz;                                    \
+                } else {                                                       \
+                    if ((ar->datasz == 0) ||                                   \
+                        (ar->datasz > MNARRAY_SMALL_DATASZ)) {                 \
+                        ar->datasz = 1;                                        \
+                    }                                                          \
+                    while (ar->datasz < newdatasz) {                           \
+                        ar->datasz <<= 1;                                      \
+                    }                                                          \
+                }                                                              \
+                /*ar->datasz = ar->elsz * newelnum;*/                          \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \
@@ -361,10 +443,13 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
                 }                                                              \
             }                                                                  \
             if (newelnum > 0) {                                                \
+                /*                                                             \
                 ar->datasz = ar->elsz * newelnum;                              \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \
+                */                                                             \
+                newdata = ar->data;                                            \
             } else {                                                           \
                 ar->datasz = 0;                                                \
                 free_fn(ar->data);                                             \
@@ -376,7 +461,7 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
     }                                                                          \
     MEMDEBUG_LEAVE(ar);                                                        \
     ar->data = newdata;                                                        \
-    __a;                                                                       \
+    __a                                                                        \
 
 
 
@@ -386,8 +471,8 @@ array_ensure_len(mnarray_t *ar, size_t newelnum, unsigned int flags)
 {
     ARRAY_ENSURE_BODY(realloc, free,
             ar->elnum = newelnum;
-            return 0;
-    )
+            return 0
+    );
 }
 
 
@@ -399,15 +484,15 @@ array_ensure_len_mpool(mpool_ctx_t *mpool,
 {
     ARRAY_ENSURE_BODY(_realloc, _free,
             ar->elnum = newelnum;
-            return 0;
-    )
+            return 0
+    );
 }
 
 
 void
 array_ensure_datasz(mnarray_t *ar, size_t newelnum, unsigned int flags)
 {
-    ARRAY_ENSURE_BODY(realloc, free,)
+    ARRAY_ENSURE_BODY(realloc, free,);
 }
 
 
@@ -417,7 +502,7 @@ array_ensure_datasz_mpool(mpool_ctx_t *mpool,
                           size_t newelnum,
                           unsigned int flags)
 {
-    ARRAY_ENSURE_BODY(_realloc, _free,)
+    ARRAY_ENSURE_BODY(_realloc, _free,);
 }
 
 
@@ -601,10 +686,10 @@ array_fini_mpool(mpool_ctx_t *mpool, mnarray_t *ar)
 
 
 void *
-array_first(const mnarray_t *ar, mnarray_iter_t *iter)
+array_first(const mnarray_t *ar, mnarray_iter_t *it)
 {
-    iter->iter = 0;
-    if (iter->iter < ar->elnum) {
+    it->iter = 0;
+    if (it->iter < ar->elnum) {
         return ar->data;
     }
     return NULL;
@@ -612,32 +697,32 @@ array_first(const mnarray_t *ar, mnarray_iter_t *iter)
 
 
 void *
-array_last(const mnarray_t *ar, mnarray_iter_t *iter)
+array_last(const mnarray_t *ar, mnarray_iter_t *it)
 {
-    iter->iter = ar->elnum - 1;
-    if (iter->iter < ar->elnum) {
-        return ar->data + iter->iter * ar->elsz;
+    it->iter = ar->elnum - 1;
+    if (it->iter < ar->elnum) {
+        return ar->data + it->iter * ar->elsz;
     }
     return NULL;
 }
 
 
 void *
-array_next(const mnarray_t *ar, mnarray_iter_t *iter)
+array_next(const mnarray_t *ar, mnarray_iter_t *it)
 {
-    if (++iter->iter < ar->elnum) {
-        return ar->data + iter->iter * ar->elsz;
+    if (++it->iter < ar->elnum) {
+        return ar->data + it->iter * ar->elsz;
     }
     return NULL;
 }
 
 
 void *
-array_prev(const mnarray_t *ar, mnarray_iter_t *iter)
+array_prev(const mnarray_t *ar, mnarray_iter_t *it)
 {
-    --iter->iter;
-    if (iter->iter < ar->elnum) {
-        return ar->data + iter->iter * ar->elsz;
+    --it->iter;
+    if (it->iter < ar->elnum) {
+        return ar->data + it->iter * ar->elsz;
     }
     return NULL;
 }
@@ -744,6 +829,26 @@ array_find(const mnarray_t *ar, const void *key, array_compar_t compar)
 }
 
 
+void *
+array_find_linear(const mnarray_t *ar, const void *key, array_compar_t compar)
+{
+    void *item;
+    mnarray_iter_t it;
+
+    if (ar->elnum == 0) {
+        TRRETNULL(ARRAY_FIND_LINEAR + 1);
+    }
+    for (item = array_first(ar, &it);
+         item != NULL;
+         item = array_next(ar, &it)) {
+        if (compar(item, &key) == 0) {
+            break;
+        }
+    }
+    return item;
+}
+
+
 int
 array_traverse(mnarray_t *ar, array_traverser_t tr, void *udata)
 {
@@ -764,6 +869,8 @@ array_cmp(const mnarray_t *ar1, const mnarray_t *ar2, array_compar_t cmp, ssize_
     ssize_t res;
     ssize_t sz1, sz2;
     unsigned i;
+
+    assert(ar1->elnum <= ar2->elnum);
 
     if (sz > 0) {
         sz1 = MIN(sz, (ssize_t)(ar1->elnum));

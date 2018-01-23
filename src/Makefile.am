@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 noinst_HEADERS =
 
 BUILT_SOURCES = diag.c diag.h
-EXTRA_DIST = diag.txt
+EXTRA_DIST = $(diags)
 CLEANFILES = $(BUILT_SOURCES) *.core
 #CLEANFILES += *.in
 

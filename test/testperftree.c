@@ -129,6 +129,7 @@ test_trie(void)
         n = (intmax_t *) (trienodes + i * sizeof(intmax_t));
         *n = *(keys + i);
         nn = btrie_find_exact(&tr, *n);
+        nn->value = NULL;
         btrie_remove_node(&tr, nn);
     }
     PROFILE_STOP(RBT_TEST_PROF_BTRIE_REMOVE);
@@ -280,8 +281,8 @@ main(UNUSED int argc, UNUSED char *argv[])
 
     srandom(time(NULL));
     for (i = 0; i < nelem; ++i) {
-        //*(keys + i) = random();
-        *(keys + i) = i;
+        //*(keys + i) = random() + 1;
+        *(keys + i) = i + 1;
     }
 
     PROFILE_START(RBT_TEST_PROF_RB);
@@ -305,7 +306,7 @@ main(UNUSED int argc, UNUSED char *argv[])
     }
     PROFILE_STOP(RBT_TEST_PROF_TRIE);
 
-    profile_report();
+    profile_report_sec();
     profile_fini_module();
     return 0;
 }

@@ -22,6 +22,9 @@ typedef struct _mnarray {
     size_t elsz;
     size_t elnum;
     void *data;
+#ifndef MNARRAY_SMALL_DATASZ
+#   define MNARRAY_SMALL_DATASZ (0x100000ul)
+#endif
     size_t datasz;
     array_initializer_t init;
     array_finalizer_t fini;
@@ -89,8 +92,11 @@ void *array_last(const mnarray_t *, mnarray_iter_t *);
 #define ARRAY_LAST(ty, a) (((ty *)((a)->data))[(a)->elnum - 1])
 void *array_next(const mnarray_t *, mnarray_iter_t *);
 void *array_prev(const mnarray_t *, mnarray_iter_t *);
+
 int array_sort(mnarray_t *, array_compar_t);
 void *array_find(const mnarray_t *, const void *, array_compar_t);
+void * array_find_linear(const mnarray_t *, const void *, array_compar_t);
+
 int array_traverse(mnarray_t *, array_traverser_t, void *);
 int array_cmp(const mnarray_t *, const mnarray_t *, array_compar_t, ssize_t);
 
