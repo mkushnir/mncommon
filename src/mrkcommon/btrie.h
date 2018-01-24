@@ -17,7 +17,6 @@ typedef struct _test_data {
 } test_data_t;
 
 typedef struct _mnbtrie_node {
-    void *pad;
     struct _mnbtrie_node *parent;
     struct _mnbtrie_node *child[2];
     void *value;

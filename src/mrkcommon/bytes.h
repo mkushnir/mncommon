@@ -103,28 +103,31 @@ mnvoidp_strz(const void *s) { return (const char *)s; }
     mnbytes_t *n = (mnbytes_t *) &__bytes_alloca_ ## n;\
 
 
-#define BYTES_INCREF(b)                        \
-do {                                           \
-    (++(b)->nref);                             \
-    /* TRACE("B>>> %p %ld", (b), (b)->nref); */\
-} while (0)                                    \
+#define BYTES_INCREF(b)                                                \
+do {                                                                   \
+    (++(b)->nref);                                                     \
+    /*                                                                 \
+        TRACE("B>>> %p %08zx sz=%08zx", (b), (b)->nref, (b)->sz);      \
+    */                                                                 \
+} while (0)                                                            \
 
 
-#define _BYTES_DECREF(pb)                                                      \
-do {                                                                           \
-    if (*(pb) != NULL) {                                                       \
-        --(*(pb))->nref;                                                       \
-        if ((*(pb))->nref <= 0) {                                              \
-/*                                                                             \
-            TRACE("B<<< %p %ld '%s'", *(pb), (*(pb))->nref, (*(pb))->data);    \
- */                                                                            \
-            MEMDEBUG_ENTER_BYTES(*(pb));                                       \
-            free(*(pb));                                                       \
-            MEMDEBUG_LEAVE_BYTES(*(pb));                                       \
-        }                                                                      \
-        *(pb) = NULL;                                                          \
-    }                                                                          \
-} while (0)                                                                    \
+#define _BYTES_DECREF(pb)                              \
+do {                                                   \
+    if (*(pb) != NULL) {                               \
+/*                                                     \
+            TRACE("B<<< %p nref=%08zx sz=%08zx",       \
+                    *(pb), (*(pb))->nref, (*(pb))->sz);\
+ */                                                    \
+        --(*(pb))->nref;                               \
+        if ((*(pb))->nref <= 0) {                      \
+            MEMDEBUG_ENTER_BYTES(*(pb));               \
+            free(*(pb));                               \
+            MEMDEBUG_LEAVE_BYTES(*(pb));               \
+        }                                              \
+        *(pb) = NULL;                                  \
+    }                                                  \
+} while (0)                                            \
 
 
 #define _BYTES_DECREF_FAST(b)                                  \

@@ -56,8 +56,8 @@ btrie_node_dump(mnbtrie_node_t *n)
         TRACEC("NULL\n");
     } else {
         // \033[01;31m%02lx\033[00m
-        TRACEC("[%p] i:%02hhd d:%04hx p:%p(%p) l:%p r:%p v:%p\n",
-              n, n->idx, n->digit, n->parent, n->pad, n->child[0], n->child[1], n->value);
+        TRACEC("[%p] i:%02hhd d:%04hx p:%p l:%p r:%p v:%p\n",
+              n, n->idx, n->digit, n->parent, n->child[0], n->child[1], n->value);
     }
 }
 
@@ -121,7 +121,6 @@ btrie_node_init(mnbtrie_node_t *n,
 {
     assert(n != NULL);
 
-    n->pad = NULL;
     n->parent = parent;
     n->child[0] = NULL;
     n->child[1] = NULL;
