@@ -4,27 +4,13 @@
 #include <string.h>
 
 //#define TRRET_DEBUG_VERBOSE
+#include <mrkcommon/assert.h>
+#include <mrkcommon/malloc.h>
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/array.h>
 #include <mrkcommon/mpool.h>
 #include <mrkcommon/util.h>
 #include "diag.h"
-
-#ifdef CMOCKA_TESTING
-#include <stdarg.h>
-#include <stddef.h>
-#include <setjmp.h>
-#include <cmocka.h>
-#undef assert
-#define assert(e) mock_assert(((e) ? 1 : 0), #e, __FILE__, __LINE__)
-#ifdef malloc
-#undef malloc
-#endif
-#define malloc(sz) test_malloc(sz)
-#define calloc(nim, sz) test_calloc(num, sz)
-#define realloc(ptr, sz) test_realloc(ptr, sz)
-#define free(ptr) test_free(ptr)
-#endif
 
 #ifdef DO_MEMDEBUG
 #include <mrkcommon/memdebug.h>
@@ -240,6 +226,19 @@ array_destroy_mpool(mpool_ctx_t *mpool, mnarray_t **ar)
     }
 }
 
+#define ARRAY_ENSURE_SET_DATASZ(m, v)          \
+    if (v >= MNARRAY_SMALL_DATASZ) {           \
+        m = v;                                 \
+    } else {                                   \
+        if ((m == 0) ||                        \
+            (m > MNARRAY_SMALL_DATASZ)) {      \
+            m = 1;                             \
+        }                                      \
+        while (m < v) {                        \
+            m <<= 1;                           \
+        }                                      \
+    }                                          \
+
 /*
  * Make sure array is at least newelnum long.
  */
@@ -252,18 +251,7 @@ array_destroy_mpool(mpool_ctx_t *mpool, mnarray_t **ar)
             size_t newdatasz;                                                  \
             newdatasz = ar->elsz * newelnum;                                   \
             if (ar->datasz < newdatasz) {                                      \
-                if (newdatasz >= MNARRAY_SMALL_DATASZ) {                       \
-                    ar->datasz = newdatasz;                                    \
-                } else {                                                       \
-                    if ((ar->datasz == 0) ||                                   \
-                        (ar->datasz > MNARRAY_SMALL_DATASZ)) {                 \
-                        ar->datasz = 1;                                        \
-                    }                                                          \
-                    while (ar->datasz < newdatasz) {                           \
-                        ar->datasz <<= 1;                                      \
-                    }                                                          \
-                }                                                              \
-                /*ar->datasz = ar->elsz * newelnum;*/                          \
+                ARRAY_ENSURE_SET_DATASZ(ar->datasz, newdatasz);                \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \
@@ -280,18 +268,7 @@ array_destroy_mpool(mpool_ctx_t *mpool, mnarray_t **ar)
             size_t newdatasz;                                                  \
             newdatasz = ar->elsz * newelnum;                                   \
             if (ar->datasz < newdatasz) {                                      \
-                if (newdatasz >= MNARRAY_SMALL_DATASZ) {                       \
-                    ar->datasz = newdatasz;                                    \
-                } else {                                                       \
-                    if ((ar->datasz == 0) ||                                   \
-                        (ar->datasz > MNARRAY_SMALL_DATASZ)) {                 \
-                        ar->datasz = 1;                                        \
-                    }                                                          \
-                    while (ar->datasz < newdatasz) {                           \
-                        ar->datasz <<= 1;                                      \
-                    }                                                          \
-                }                                                              \
-                /*ar->datasz = ar->elsz * newelnum;*/                          \
+                ARRAY_ENSURE_SET_DATASZ(ar->datasz, newdatasz);                \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \
@@ -380,18 +357,7 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
             size_t newdatasz;                                                  \
             newdatasz = ar->elsz * newelnum;                                   \
             if (ar->datasz < newdatasz) {                                      \
-                if (newdatasz >= MNARRAY_SMALL_DATASZ) {                       \
-                    ar->datasz = newdatasz;                                    \
-                } else {                                                       \
-                    if ((ar->datasz == 0) ||                                   \
-                        (ar->datasz > MNARRAY_SMALL_DATASZ)) {                 \
-                        ar->datasz = 1;                                        \
-                    }                                                          \
-                    while (ar->datasz < newdatasz) {                           \
-                        ar->datasz <<= 1;                                      \
-                    }                                                          \
-                }                                                              \
-                /*ar->datasz = ar->elsz * newelnum;*/                          \
+                ARRAY_ENSURE_SET_DATASZ(ar->datasz, newdatasz);                \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \
@@ -413,18 +379,7 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
             size_t newdatasz;                                                  \
             newdatasz = ar->elsz * newelnum;                                   \
             if (ar->datasz < newdatasz) {                                      \
-                if (newdatasz >= MNARRAY_SMALL_DATASZ) {                       \
-                    ar->datasz = newdatasz;                                    \
-                } else {                                                       \
-                    if ((ar->datasz == 0) ||                                   \
-                        (ar->datasz > MNARRAY_SMALL_DATASZ)) {                 \
-                        ar->datasz = 1;                                        \
-                    }                                                          \
-                    while (ar->datasz < newdatasz) {                           \
-                        ar->datasz <<= 1;                                      \
-                    }                                                          \
-                }                                                              \
-                /*ar->datasz = ar->elsz * newelnum;*/                          \
+                ARRAY_ENSURE_SET_DATASZ(ar->datasz, newdatasz);                \
                 if ((newdata = realloc_fn(ar->data, ar->datasz)) == NULL) {    \
                     FAIL("realloc");                                           \
                 }                                                              \

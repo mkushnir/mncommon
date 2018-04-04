@@ -14,7 +14,7 @@ diags = diag.txt
 dumpm_include_headers = mrkcommon/dumpm.h
 dumpm_sources = dumpm.c
 
-util_include_headers = mrkcommon/util.h mrkcommon/float.h mrkcommon/endian.h
+util_include_headers = mrkcommon/util.h mrkcommon/float.h mrkcommon/endian.h mrkcommon/assert.h mrkcommon/malloc.h
 
 if ARRAY
 array_sources = array.c

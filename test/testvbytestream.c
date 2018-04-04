@@ -17,13 +17,14 @@
 #include "diag.h"
 
 
-#define MNUNIT_PARAMETRIZE(name, body) \
-    for (size_t _ ## name = 0;         \
-         _ ## name < countof(name);    \
-         ++_ ## name) {                \
-        body                           \
-    }                                  \
+#define _MNUNIT_PARAMETRIZE(name, body, sz)                    \
+    for (size_t _ ## name = 0; _ ## name < sz; ++_ ## name) {  \
+        body                                                   \
+    }                                                          \
 
+
+#define MNUNIT_PARAMETRIZE_STATIC(name, body) \
+    _MNUNIT_PARAMETRIZE(name, body, countof(name))
 
 #define MNUNIT_ARG(name) name[_ ## name]
 
@@ -189,8 +190,8 @@ test2(void)
     size_t growsz[] = { 32, 64, 128, 256, 512, 1024, 2048, 4096 };
     int n[] = { 32, 64, 128, 256, 512, 1024, 2048, 4096 };
 
-    MNUNIT_PARAMETRIZE(growsz,
-    MNUNIT_PARAMETRIZE(n,
+    MNUNIT_PARAMETRIZE_STATIC(growsz,
+    MNUNIT_PARAMETRIZE_STATIC(n,
         _test2(MNUNIT_ARG(growsz), MNUNIT_ARG(n));
     ));
 }
@@ -256,8 +257,8 @@ test3(void)
     size_t growsz[] = { 32, 64, 128, 256, 512, 1024, 2048, 4096, };
     int n[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, };
 
-    MNUNIT_PARAMETRIZE(growsz,
-    MNUNIT_PARAMETRIZE(n,
+    MNUNIT_PARAMETRIZE_STATIC(growsz,
+    MNUNIT_PARAMETRIZE_STATIC(n,
         _test3(MNUNIT_ARG(growsz), MNUNIT_ARG(n));
     ));
 }
@@ -370,9 +371,9 @@ test4(void)
     vb_write = profile_register("vb_write");
     bs_write = profile_register("bs_write");
 
-    MNUNIT_PARAMETRIZE(growsz,
-    MNUNIT_PARAMETRIZE(n,
-    MNUNIT_PARAMETRIZE(sz,
+    MNUNIT_PARAMETRIZE_STATIC(growsz,
+    MNUNIT_PARAMETRIZE_STATIC(n,
+    MNUNIT_PARAMETRIZE_STATIC(sz,
         _test4(MNUNIT_ARG(growsz), MNUNIT_ARG(n), MNUNIT_ARG(sz));
     )));
 

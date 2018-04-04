@@ -9,6 +9,7 @@
 #include <limits.h>
 
 #define DUMPM_INDENT_SIZE 1
+#include <mrkcommon/malloc.h>
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/mpool.h>
 #include <mrkcommon/util.h>

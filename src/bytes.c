@@ -6,6 +6,7 @@
 #include <string.h>
 #include <strings.h>
 
+#include <mrkcommon/malloc.h>
 #include <mrkcommon/bytes.h>
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/fasthash.h>

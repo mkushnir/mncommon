@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "diag.h"
+#include "mrkcommon/malloc.h"
 #include "mrkcommon/util.h"
 //#define TRRET_DEBUG
 #include "mrkcommon/dumpm.h"

@@ -4,6 +4,7 @@
 #include <string.h>
 
 //#define TRRET_DEBUG_VERBOSE
+#include <mrkcommon/malloc.h>
 #include <mrkcommon/bytes.h>
 #include <mrkcommon/bytestream.h>
 #include <mrkcommon/dumpm.h>

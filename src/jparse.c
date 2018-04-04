@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <fcntl.h>
 
+#include <mrkcommon/malloc.h>
 #include <mrkcommon/jparse.h>
 //#define TRRET_DEBUG
 #include <mrkcommon/dumpm.h>

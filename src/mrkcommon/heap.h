@@ -12,7 +12,6 @@ typedef struct _mnheap {
     mnarray_t data;
     array_compar_t cmp;
     heap_swapfn_t swap;
-    ssize_t sz;
 } mnheap_t;
 
 typedef int (*heap_traverser_t) (mnheap_t *, void *, void *);

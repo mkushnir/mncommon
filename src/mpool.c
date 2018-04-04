@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <mrkcommon/mpool.h>
+#include <mrkcommon/malloc.h>
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/util.h>
 

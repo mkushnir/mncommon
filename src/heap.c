@@ -153,7 +153,6 @@ heap_push(mnheap_t *heap, void *v)
 
     pv = array_incr(&heap->data);
     *pv = v;
-    ++heap->sz;
     if (heap->data.elnum > 1) {
         for (i = (int)HEAP_PARENT(heap->data.elnum - 1); i >= 0; --i) {
             (void)siftdown(heap, i);
@@ -185,7 +184,6 @@ heap_pop(mnheap_t *heap, void **rv)
             array_decr_fast(&heap->data);
         }
         res = 0;
-        --heap->sz;
     }
     return res;
 }
@@ -303,7 +301,7 @@ heap_traversea_seq(mnheap_t *heap, array_traverser_t cb, void *udata)
 ssize_t
 heap_len(const mnheap_t *heap)
 {
-    return heap->sz;
+    return heap->data.elnum;
 }
 
 
@@ -320,7 +318,6 @@ heap_init(mnheap_t *heap,
     array_ensure_datasz_dirty(&heap->data, elnum, 0);
     heap->cmp = cmp;
     heap->swap = swap;
-    heap->sz = 0;
 }
 
 
@@ -330,7 +327,6 @@ heap_fini(mnheap_t *heap)
     array_fini(&heap->data);
     heap->cmp = NULL;
     heap->swap = NULL;
-    heap->sz = 0;
 }
 
 

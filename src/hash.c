@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include <mrkcommon/malloc.h>
 #include <mrkcommon/array.h>
 #include <mrkcommon/hash.h>
 #include <mrkcommon/dumpm.h>

@@ -15,6 +15,7 @@
 #   endif
 #endif
 
+#include <mrkcommon/malloc.h>
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/util.h>
 #include <mrkcommon/pbtrie.h>

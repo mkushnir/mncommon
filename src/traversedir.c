@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 
 #include "diag.h"
+#include "mrkcommon/malloc.h"
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/util.h"
 #include "mrkcommon/traversedir.h"
