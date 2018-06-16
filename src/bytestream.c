@@ -174,7 +174,9 @@ bytestream_write(mnbytestream_t *stream, void *out, size_t sz)
     }
 
     nwritten = write(fd, stream->buf.data + stream->pos, sz);
-    stream->pos += nwritten;
+    if (nwritten >= 0) {
+        stream->pos += nwritten;
+    }
 
     return nwritten;
 }
@@ -192,7 +194,9 @@ bytestream_stderr_write(mnbytestream_t *stream, UNUSED void *out, size_t sz)
     }
 
     nwritten = write(fd, stream->buf.data + stream->pos, sz);
-    stream->pos += nwritten;
+    if (nwritten >= 0) {
+        stream->pos += nwritten;
+    }
 
     if (write(fd, "\n", 1)) {;}
 
