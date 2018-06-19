@@ -78,7 +78,7 @@ test1(void)
 {
     int fd;
     mnvbytestream_t bs;
-    ssize_t nwritten;
+    UNUSED ssize_t nwritten;
     const char *fname = "/tmp/mysmartctl-ada0";
 
     srandom(time(NULL));
@@ -127,7 +127,7 @@ _test2(size_t growsz, int n)
 {
     int fd;
     mnvbytestream_t bs;
-    ssize_t nwritten;
+    UNUSED ssize_t nwritten;
     const char *fname = "/tmp/mysmartctl-ada0";
     char fnamebuf[1024];
 
@@ -204,7 +204,7 @@ _test3(size_t growsz, int n)
     mnvbytestream_t bs0;
     mnbytestream_t bs1;
     char fnamebuf[1024];
-    ssize_t nwritten;
+    UNUSED ssize_t nwritten;
     int i;
 
     srandom(time(NULL));
@@ -279,7 +279,7 @@ _test4(size_t growsz, int n, size_t sz)
     mnvbytestream_t bs0;
     mnbytestream_t bs1;
     char fnamebuf[1024];
-    ssize_t nwritten;
+    UNUSED ssize_t nwritten;
     mnarray_t words;
     int i;
 
