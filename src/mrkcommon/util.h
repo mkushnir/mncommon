@@ -10,9 +10,47 @@ extern "C" {
 const char *mrkcommon_diag_str(int);
 
 #ifdef __GNUC__
-#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#   define GCC_VERSION (__GNUC__ * 10000 + \
+                        __GNUC_MINOR__ * 100 + \
+                        __GNUC_PATCHLEVEL__)
 #else
-#define GCC_VERSION 0
+#   define GCC_VERSION 0
+#endif
+
+// clang compatibility
+#define MRKCOMMON_FEATURE_CHECK_STUB(x) 0
+#ifndef __has_feature
+#   define __has_feature MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __has_builtin
+#   define __has_builtin MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __has_extension
+#   define __has_extension MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __has_c_attribute
+#   define __has_c_attribute MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __has_cpp_attribute
+#   define __has_cpp_attribute MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __has_attribute
+#   define __has_attribute MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __has_declspec_attribute
+#   define __has_declspec_attribute MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __is_identifier
+#   define __is_identifier MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __has_include
+#   define __has_include MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __has_include_next
+#   define __has_include_next MRKCOMMON_FEATURE_CHECK_STUB
+#endif
+#ifndef __has_warning
+#   define __has_warning MRKCOMMON_FEATURE_CHECK_STUB
 #endif
 
 #ifndef MAX
@@ -139,7 +177,7 @@ _Generic(a,                                            \
 #endif
 
 #if !defined(DEPRECATED)
-#define DEPRECATED __attribute__ ((__deprecated__))
+#define DEPRECATED(d) __attribute__ ((__deprecated__(d)))
 #endif
 
 #if !defined(PRINTFLIKE)
@@ -159,7 +197,13 @@ _Generic(a,                                            \
 #define countof(a) (sizeof(a)/sizeof(a[0]))
 
 #ifndef NDEBUG
-#   define PASTEURIZE_ADDR(a) do {if (((uintptr_t)a) == 0x5a5a5a5a5a5a5a5a || ((uintptr_t)a) == 0xa5a5a5a5a5a5a5a5) abort();} while (0)
+#   define PASTEURIZE_ADDR(a)                  \
+do {                                           \
+    if (((uintptr_t)a) == 0x5a5a5a5a5a5a5a5a ||\
+        ((uintptr_t)a) == 0xa5a5a5a5a5a5a5a5)  \
+            abort();                           \
+} while (0)                                    \
+
 #else
 #   define PASTEURIZE_ADDR(a)
 #endif
@@ -171,10 +215,6 @@ _Generic(a,                                            \
 #ifndef OUT
 #   define OUT
 #endif
-
-//#define MRKMAXASZ (16)
-//#define MRKCNT16(_, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, ...) a16
-//#define MRKASZ(...) MRKCNT16(, ## __VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
 #define MRKMAXASZ (32)
 #define MRKCNT32(_, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22, a23, a24, a25, a26, a27, a28, a29, a30, a31, a32, ...) a32

@@ -200,7 +200,7 @@ xmask(uint64_t prefix, uint64_t key)
 }
 
 
-UNUSED static int
+static int
 childsel(uint64_t mask, uint64_t parent, uint64_t child)
 {
     int64_t m;
