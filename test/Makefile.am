@@ -90,7 +90,7 @@ testhash_SOURCES = ../src/hash.c testhash.c
 testhash_CFLAGS =
 testhash_LDFLAGS =
 
-testfasthash_SOURCES = ../src/fasthash.c ../src/fnvhash.c zltan-fasthash.c fnv/hash_64a.c testfasthash.c
+testfasthash_SOURCES = ../src/fasthash.c ../src/fnvhash.c ../src/mrkcommon/fnvhash.h zltan-fasthash.c fnv/hash_64a.c testfasthash.c
 testfasthash_CFLAGS =
 testfasthash_LDFLAGS = -lz
 
