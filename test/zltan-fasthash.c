@@ -32,7 +32,8 @@
 			(h) *= 0x2127599bf4325c37ULL;	\
 			(h) ^= (h) >> 47; })
 
-#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+// N/A in gcc 4.8.5
+//#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 
 uint64_t fasthash64(const void *buf, size_t len, uint64_t seed)
 {
