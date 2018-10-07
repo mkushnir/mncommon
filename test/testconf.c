@@ -57,7 +57,7 @@ my_error_handler(conf_parser_ctx_t *ctx, UNUSED void *udata)
 static void
 test0(void)
 {
-    int res;
+    UNUSED int res;
     struct {
         long rnd;
         int in;

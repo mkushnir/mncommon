@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 void bytestream_from_bytes(mnbytestream_t *, const mnbytes_t *);
+void bytestream_from_mem(mnbytestream_t *, const char *, size_t);
 
 #ifdef __cplusplus
 }
