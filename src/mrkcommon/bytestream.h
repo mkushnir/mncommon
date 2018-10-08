@@ -69,6 +69,7 @@ ssize_t bytestream_send(mnbytestream_t *, void *, size_t);
 int bytestream_consume_data(mnbytestream_t *, void *);
 int bytestream_produce_data(mnbytestream_t *, void *);
 void bytestream_rewind(mnbytestream_t *);
+void bytestream_zero(mnbytestream_t *);
 off_t bytestream_recycle(mnbytestream_t *, int, off_t);
 #define BYTESTREAM_NPRINTF_ERROR (-129)
 #define BYTESTREAM_NPRINTF_NEEDMORE (-130)

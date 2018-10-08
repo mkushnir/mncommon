@@ -342,6 +342,15 @@ bytestream_rewind(mnbytestream_t *stream)
 }
 
 
+void
+bytestream_zero(mnbytestream_t *stream)
+{
+    memset(stream->buf.data, '\0', stream->buf.sz);
+    stream->pos = 0;
+    stream->eod = 0;
+}
+
+
 off_t
 bytestream_recycle(mnbytestream_t *stream, int ngrowsz, off_t from)
 {
