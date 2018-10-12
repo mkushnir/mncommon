@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 
+#include "util.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,10 +37,6 @@ void memdebug_print_stats_oneline(void);
 
 #define CONCAT(a, b) a##b
 
-#ifndef UNUSED
-#define UNUSED __attribute__ ((unused))
-#endif
-
 #define _DECLARE_MALLOC(n) \
 UNUSED static void *__memdebug_malloc(size_t sz) { return memdebug_malloc(CONCAT(__memdebug_id_,n), sz); }
 
@@ -62,7 +60,6 @@ UNUSED static char *__memdebug_strndup(const char *str, size_t len) { return mem
 
 #define _DECLARE_NALLOCATED(n) \
 UNUSED static size_t __memdebug_nallocated(void) { memdebug_stat_t st; memdebug_stat(CONCAT(__memdebug_id_,n), &st); return st.nallocated; }
-
 
 #define MEMDEBUG_DEFINE_ID(n)          \
 int CONCAT(__memdebug_id_, n) = 0;     \

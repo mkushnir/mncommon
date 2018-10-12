@@ -53,10 +53,12 @@ const char *mrkcommon_diag_str(int);
 #   define __has_warning MRKCOMMON_FEATURE_CHECK_STUB
 #endif
 
-#ifndef MAX
-#   define _MAX(a, b) a > b ? a : b
-#   if __STDC_VERSION__ >= 201112
-#       define _DMAX(ty, name) \
+#ifdef MAX
+#undef MAX
+#endif
+#define _MAX(a, b) a > b ? a : b
+#if __STDC_VERSION__ >= 201112
+#    define _DMAX(ty, name) \
 static inline ty name(const ty a, const ty b) {return _MAX(a, b);}
 
 _DMAX(char, mnmax_char)
@@ -74,7 +76,7 @@ _DMAX(double, mnmax_double)
 _DMAX(long double, mnmax_ldouble)
 _DMAX(intmax_t, mnmax_intmax)
 
-#       define MAX(a, b)                               \
+#   define MAX(a, b)                                   \
 _Generic(a,                                            \
          char: mnmax_char,                             \
          unsigned char: mnmax_uchar,                   \
@@ -105,16 +107,17 @@ _Generic(a,                                            \
          default: mnmax_intmax)((a),(b))               \
 
 
-#   else
-#       define MAX(a, b) _MAX((a), (b))
-#   endif
+#else
+#   define MAX(a, b) _MAX((a), (b))
 #endif
 
 
-#ifndef MIN
-#   define _MIN(a, b) a < b ? a : b
-#   if __STDC_VERSION__ >= 201112
-#       define _DMIN(ty, name) \
+#ifdef MIN
+#undef MIN
+#endif
+#define _MIN(a, b) a < b ? a : b
+#if __STDC_VERSION__ >= 201112
+#   define _DMIN(ty, name) \
 static inline ty name(const ty a, const ty b) {return _MIN(a, b);}
 
 _DMIN(char, mnmin_char)
@@ -132,7 +135,7 @@ _DMIN(double, mnmin_double)
 _DMIN(long double, mnmin_ldouble)
 _DMIN(intmax_t, mnmin_intmax)
 
-#       define MIN(a, b)                               \
+#   define MIN(a, b)                                   \
 _Generic(a,                                            \
          char: mnmin_char,                             \
          unsigned char: mnmin_uchar,                   \
@@ -163,25 +166,36 @@ _Generic(a,                                            \
          default: mnmin_intmax)((a),(b))               \
 
 
-#   else
-#       define MIN(a, b) _MIN((a), (b))
-#   endif
+#else
+#   define MIN(a, b) _MIN((a), (b))
 #endif
 
 #if !defined(UNUSED)
 #define UNUSED __attribute__ ((__unused__))
+#else
+#error UNUSED is already defined. Please un-define UNUSED before including mrkcommon/util.h
 #endif
 
 #if !defined(RESERVED)
 #define RESERVED __attribute__ ((__unused__))
+#else
+#error RESERVED is already defined. Please un-define RESERVED before including mrkcommon/util.h
 #endif
 
 #if !defined(DEPRECATED)
 #define DEPRECATED(d) __attribute__ ((__deprecated__(d)))
+#else
+#error DEPRECATED is already defined. Please un-define DEPRECATED before including mrkcommon/util.h
 #endif
 
 #if !defined(PRINTFLIKE)
 #define PRINTFLIKE(i, l) __attribute__ ((format (printf, i, l)))
+#else
+#error PRINTFLIKE is already defined. Please un-define PRINTFLIKE before including mrkcommon/util.h
+#endif
+
+#if defined(NORETURN)
+#error NORETURN is already defined. Please un-define NORETURN before including mrkcommon/util.h
 #endif
 
 #if defined(__dead2)
@@ -194,7 +208,11 @@ _Generic(a,                                            \
 #   endif
 #endif
 
+#ifndef countof
 #define countof(a) (sizeof(a)/sizeof(a[0]))
+#else
+#error countof is already defined. Please un-define countof before including mrkcommon/util.h
+#endif
 
 #ifndef NDEBUG
 #   define PASTEURIZE_ADDR(a)                  \
