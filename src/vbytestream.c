@@ -144,14 +144,15 @@ vbytestream_finalize_edge(mnvbytestream_t *stream)
 ssize_t
 vbytestream_read(mnvbytestream_t *stream, int fd, ssize_t sz)
 {
-    div_t nbuf;
-    int needed, avail;
+    div_t niov;
+    int needed, ffree;
     ssize_t nread = 0;
 
     assert(sz >= 0);
 
-    nbuf = div(sz, stream->growsz);
-    needed = nbuf.quot + (nbuf.rem > 0 ? 1 : 0);
+    niov = div(sz, stream->growsz);
+    // number of full iovs needed to fit sz into
+    needed = niov.quot + (niov.rem > 0 ? 1 : 0);
 
     if (needed == 0 || needed >= IOV_MAX) {
         return -1;
@@ -159,16 +160,18 @@ vbytestream_read(mnvbytestream_t *stream, int fd, ssize_t sz)
 
     assert(stream->eod.idx <= (int)(ssize_t)stream->iov.elnum);
 
-    avail = stream->eod.idx + (stream->eod.offt > 0 ? 1 : 0);
-    //TRACE("avail=%d needed=%d", avail, needed);
+    // "first free" iov, the one next to the last used iov.
+    ffree = stream->eod.idx + (stream->eod.offt > 0 ? 1 : 0);
+    //TRACE("ffree=%d needed=%d", ffree, needed);
 
     if (needed > 0) {
         mnarray_iter_t it;
         struct iovec *iov;
 
-        it.iter = stream->iov.elnum;
-        (void)array_ensure_len(&stream->iov, avail + needed, ARRAY_FLAG_SAVE);
+        (void)array_ensure_len(&stream->iov, ffree + needed, ARRAY_FLAG_SAVE);
 
+        // the one next to the last iov
+        it.iter = stream->iov.elnum;
         for (iov = array_get_iter(&stream->iov, &it);
              iov != NULL;
              iov = array_next(&stream->iov, &it)) {
@@ -176,19 +179,21 @@ vbytestream_read(mnvbytestream_t *stream, int fd, ssize_t sz)
             iovec_alloc(iov, stream->growsz);
         }
 
-        iov = array_get(&stream->iov, avail);
+        iov = array_get(&stream->iov, ffree);
 
         if ((nread = readv(fd, iov, needed)) > 0) {
-            nbuf = div(nread, stream->growsz);
-            stream->eod.idx += nbuf.quot;
-            stream->eod.offt = nbuf.rem;
+            // number of full iovs read
+            niov = div(nread, stream->growsz);
+            stream->eod.idx += niov.quot;
+            stream->eod.offt = niov.rem;
             stream->eod.total += nread;
-            //TRACE("sz=%ld nread=%ld %d/%d", sz, nread, nbuf.quot, nbuf.rem);
+            //TRACE("sz=%ld nread=%ld %d/%d", sz, nread, niov.quot, niov.rem);
 
-            if (nbuf.rem > 0) {
+            // finalize the last iov
+            if (niov.rem > 0) {
                 iov = array_get(&stream->iov, stream->eod.idx);
                 assert(iov != NULL);
-                iov->iov_len = nbuf.rem;
+                iov->iov_len = niov.rem;
             }
         }
     }

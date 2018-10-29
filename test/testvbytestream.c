@@ -13,20 +13,9 @@
 
 #include <mrkcommon/vbytestream.h>
 
-#include "unittest.h"
+#include <mrkcommon/unittest.h>
+
 #include "diag.h"
-
-
-#define _MNUNIT_PARAMETRIZE(name, body, sz)                    \
-    for (size_t _ ## name = 0; _ ## name < sz; ++_ ## name) {  \
-        body                                                   \
-    }                                                          \
-
-
-#define MNUNIT_PARAMETRIZE_STATIC(name, body) \
-    _MNUNIT_PARAMETRIZE(name, body, countof(name))
-
-#define MNUNIT_ARG(name) name[_ ## name]
 
 
 static const profile_t *vb_nprintf;
@@ -149,6 +138,7 @@ _test2(size_t growsz, int n)
         buf = bytes_new(sz);
         sz = read(fd, BDATA(buf), sz);
         if (sz <= 0) {
+            BYTES_DECREF(&buf);
             break;
         }
         BSZ(buf) = sz;

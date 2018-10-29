@@ -40,8 +40,8 @@ typedef struct _vbytestream {
         off_t total;
     } pos;
     size_t growsz;
-    ssize_t (*read_more)(struct _vbytestream *, int, ssize_t);
-    ssize_t (*write)(struct _vbytestream *, int, size_t);
+    ssize_t (*read_more)(struct _vbytestream *, void *, ssize_t);
+    ssize_t (*write)(struct _vbytestream *, void *, size_t);
     void *udata;
 
 } mnvbytestream_t;
