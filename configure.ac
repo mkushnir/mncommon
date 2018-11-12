@@ -91,6 +91,7 @@ AC_CHECK_HEADERS([sys/limits.h])
 AC_CHECK_HEADERS([sys/param.h])
 AC_CHECK_HEADERS([sys/socket.h])
 AC_CHECK_HEADERS([syslog.h])
+AC_CHECK_HEADERS([float.h])
 AC_CHECK_HEADER_STDBOOL
 # FreeBSD
 AC_CHECK_HEADERS([sys/tree.h])
@@ -98,6 +99,8 @@ AC_CHECK_HEADERS([sys/tree.h])
 
 AC_C_CONST
 AC_C_INLINE
+AC_C_RESTRICT
+AC_TYPE_INT16_T
 AC_TYPE_INT32_T
 AC_TYPE_INT64_T
 AC_TYPE_OFF_T
@@ -126,6 +129,9 @@ AC_CHECK_FUNCS([strtol])
 # FreeBSD specific
 AC_CHECK_FUNCS([reallocf])
 AC_CHECK_FUNCS([sysctlbyname])
+AC_CHECK_FUNCS([abort2])
+
+
 
 
 
