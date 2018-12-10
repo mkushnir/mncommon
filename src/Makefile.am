@@ -1,7 +1,6 @@
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-noinst_HEADERS =
-
+diags = diag.txt
 BUILT_SOURCES = diag.c diag.h
 EXTRA_DIST = $(diags)
 CLEANFILES = $(BUILT_SOURCES) *.core
@@ -9,7 +8,8 @@ CLEANFILES = $(BUILT_SOURCES) *.core
 
 lib_LTLIBRARIES = libmrkcommon.la
 
-diags = diag.txt
+nodist_libmrkcommon_la_SOURCES = diag.c
+noinst_HEADERS = diag.h
 
 dumpm_include_headers = mrkcommon/dumpm.h
 dumpm_sources = dumpm.c
@@ -19,11 +19,6 @@ util_include_headers = mrkcommon/util.h mrkcommon/float.h mrkcommon/endian.h mrk
 if ARRAY
 array_sources = array.c
 array_include_headers = mrkcommon/array.h
-endif
-
-if LIST
-list_sources = list.c
-list_include_headers = mrkcommon/list.h
 endif
 
 if HASH
@@ -120,7 +115,6 @@ endif
 nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(util_include_headers) \
 			 $(array_include_headers) \
-			 $(list_include_headers) \
 			 $(hash_include_headers) \
 			 $(fasthash_include_headers) \
 			 $(logging_include_headers) \
@@ -142,7 +136,6 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 
 libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(array_sources) \
-			  $(list_sources) \
 			  $(hash_sources) \
 			  $(fasthash_sources) \
 			  $(logging_sources) \
@@ -162,16 +155,27 @@ libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(heap_sources) \
 			  $(base64_sources)
 
-nodist_libmrkcommon_la_SOURCES = diag.c
-
+DEBUG_LD_FLAGS =
 if DEBUG
-DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
+DEBUG_CC_FLAGS = -g -O0 @CC_DEBUG@
+DEBUG_LD_FLAGS += -no-install
 else
-DEBUG_FLAGS = -DNDEBUG -O3
+DEBUG_CC_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
+if LTO
+DEBUG_CC_FLAGS += @CC_LTO@
+DEBUG_LD_FLAGS += @LD_LTO@
+endif
 endif
 
-libmrkcommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I$(includedir)
-libmrkcommon_la_LDFLAGS = -version-info 0:0:0 -L$(libdir) -lmndiag
+if ALLSTATIC
+libmrkcommon_la_LDFLAGS = -all-static
+else
+libmrkcommon_la_LDFLAGS =
+endif
+
+libmrkcommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I$(includedir)
+libmrkcommon_la_LDFLAGS += $(DEBUG_LD_FLAGS) -version-info 0:0:0 -L$(libdir)
+libmrkcommon_la_LIBADD = -lmndiag
 
 SUBDIRS = .
 

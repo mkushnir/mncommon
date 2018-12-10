@@ -39,6 +39,28 @@
 #define SHUFFLE _SHUFFLE(data, i)
 
 
+#define MNSHUFFLE_DATA(a, idx)                                         \
+do {                                                                   \
+    unsigned _mnshuffle_data_i;                                        \
+    for (_mnshuffle_data_i = 0;                                        \
+         _mnshuffle_data_i < countof((a));                             \
+         ++_mnshuffle_data_i) {                                        \
+        (a)[_mnshuffle_data_i].idx = _mnshuffle_data_i;                \
+    }                                                                  \
+    for (_mnshuffle_data_i = 0;                                        \
+         _mnshuffle_data_i < countof((a));                             \
+         ++_mnshuffle_data_i) {                                        \
+        int _mnshuffle_data_ii = random() % countof((a));              \
+        int _mnshuffle_data_idx = (a)[_mnshuffle_data_i].idx;          \
+        (a)[_mnshuffle_data_i].idx = (a)[_mnshuffle_data_ii].idx;      \
+        (a)[_mnshuffle_data_ii].idx = _mnshuffle_data_idx;             \
+    }                                                                  \
+} while (0)                                                            \
+
+
+#define MNSHUFFLE_VALUE(a, idx, i) ((a)[a[(i)].idx])
+
+
 #define _MNUNIT_PARAMETRIZE(name, body, sz)                    \
     for (size_t _ ## name = 0; _ ## name < sz; ++_ ## name) {  \
         body                                                   \

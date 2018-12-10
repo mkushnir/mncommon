@@ -1,22 +1,52 @@
 AC_INIT(mrkcommon, 0.1, markiyan.kushnir@gmail.com)
-if test -n "$USE_GCC"
-then
-    if test "$USE_GCC" = "46" && which gcc46
-    then
-        CC="gcc46"
-        CXX="c++46"
+
+AS_IF([test -n "$USE_GCC"],
+[
+    probe="gcc${USE_GCC}"
+    AS_IF([which $probe >/dev/null],
+    [
+        CC="gcc${USE_GCC}"
+        CXX="c++${USE_GCC}"
         CPP="cpp"
-    else
-        if which gcc
-        then
+    ],
+    [
+        AS_IF([which gcc >/dev/null],
+        [
             CC="gcc"
             CXX="g++"
             CPP="cpp"
-        else
+        ],
+        [
             echo "Cannot find gcc"
             exit 1
-        fi
-    fi
+        ])
+    ])
+    AC_SUBST(CC_DEBUG, ['-ftrapv'])
+],
+[
+    AS_IF([which clang >/dev/null],
+    [
+        CC="clang -Qunused-arguments -fcolor-diagnostics"
+        CXX="clang++ -Qunused-arguments -fcolor-diagnostics"
+        CPP="clang-cpp"
+        clang_version=`clang --version | grep version | awk '{print $4;}'`
+        clang_version_mjr=`echo $clang_version | awk -F. '{print $1;}'`
+        clang_version_mnr=`echo $clang_version | awk -F. '{print $2;}'`
+        AS_IF([test "$clang_version_mjr" = "3" -a "$clang_version_mnr" -lt 3],
+            [AC_SUBST(CC_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])],
+            [AC_SUBST(CC_DEBUG, ['-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error -fno-sanitize=alignment'])])
+        AC_SUBST(CC_LTO, ['-flto'])
+        AC_SUBST(LD_LTO, ['-Wl,--lto-O3'])
+    ],
+    [
+        CC="cc"
+        CXX="c++"
+        CPP="cpp"
+        AC_SUBST(CC_DEBUG, ['-ftrapv'])
+    ])
+])
+if test -n "$USE_GCC"
+then
 else
     if which clang >/dev/null
     then
@@ -33,6 +63,8 @@ else
             # we assume all others are 3.3+
             AC_SUBST(CLANG_DEBUG, ['-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error -fno-sanitize=alignment'])
         fi
+        AC_SUBST(CLANG_CCLTO, ['-flto'])
+        AC_SUBST(CLANG_LDLTO, ['--lto-O3'])
     else
         CC="cc"
         CXX="c++"
@@ -42,23 +74,16 @@ fi
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-case "$target_os" in
-    *linux*)
-        AC_SUBST(_GNU_SOURCE_MACRO, ['-D_GNU_SOURCE'])
-    ;;
-    *)
-        AC_SUBST(_GNU_SOURCE_MACRO)
-    ;;
-esac
 
-case "$target_os" in
-    *darwin*)
-        AC_SUBST(_XOPEN_SOURCE_MACRO, ['-D_XOPEN_SOURCE'])
-    ;;
-    *)
-        AC_SUBST(_XOPEN_SOURCE_MACRO)
-    ;;
-esac
+AS_CASE(["$target_os"],
+    [*linux*], [AC_SUBST(_GNU_SOURCE_MACRO, ['-D_GNU_SOURCE'])],
+    [AC_SUBST(_GNU_SOURCE_MACRO)]
+)
+
+AS_CASE(["$target_os"],
+    [*darwin*], [AC_SUBST(_XOPEN_SOURCE_MACRO, ['-D_XOPEN_SOURCE'])],
+    [AC_SUBST(_XOPEN_SOURCE_MACRO)]
+)
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -140,150 +165,216 @@ AC_PRESERVE_HELP_ORDER
 AC_ARG_ENABLE(debug,
               AC_HELP_STRING([--enable-debug],
                              [Enable debug build (default=no)]),
-              [AM_CONDITIONAL([DEBUG], [enable_debug=yes])],
-              [AM_CONDITIONAL([DEBUG], [test "$enable_debug" = "yes"])]
-             )
+              [AC_MSG_NOTICE([Will enable debug])],
+              [AC_MSG_NOTICE([Will not enable debug])])
+AM_CONDITIONAL([DEBUG], [test "$enable_debug" = "yes"])
+
+AC_ARG_ENABLE(allstatic,
+              AC_HELP_STRING([--enable-allstatic],
+                             [Enable all static build (default=no)]),
+              [AC_MSG_NOTICE([Will build statically])],
+              [AC_MSG_NOTICE([Will not build statically])])
+
+AM_CONDITIONAL([ALLSTATIC], [test "$enable_allstatic" = "yes"])
+
+AC_ARG_ENABLE(lto,
+              AC_HELP_STRING([--enable-lto],
+                             [Enable all static build (default=no)]),
+              [AC_MSG_NOTICE([Will enable LTO])],
+              [AC_MSG_NOTICE([Will not enable LTO])])
+
+AM_CONDITIONAL([LTO], [test "$enable_lto" = "yes"])
 
 AC_ARG_ENABLE(array,
               AC_HELP_STRING([--enable-array],
                              [Enable resizable realloc(3)-based array
                               with iterators (default=yes)]),
-              [AM_CONDITIONAL([ARRAY], [test "$enable_array" = "yes"])],
-              [AM_CONDITIONAL([ARRAY], [enable_array=yes])],
-             )
-
-AC_ARG_ENABLE(list,
-              AC_HELP_STRING([--enable-list],
-                             [Enable linked list (default=yes)]),
-              [AM_CONDITIONAL([LIST], [test "$enable_list" = "yes"])],
-              [AM_CONDITIONAL([LIST], [enable_list=yes])],
-             )
+              [enable_array=$enableval],
+              [enable_array=yes])
+AM_CONDITIONAL([ARRAY], [test "$enable_array" = "yes"])
+AS_IF([test "$enable_array" = "yes"],
+      [AC_MSG_NOTICE([Will enable array])],
+      [AC_MSG_NOTICE([Will not enable array])])
 
 AC_ARG_ENABLE(hash,
               AC_HELP_STRING([--enable-hash],
                              [Enable simple hash tables (default=yes)]),
-              [AM_CONDITIONAL([HASH], [test "$enable_hash" = "yes"])],
-              [AM_CONDITIONAL([HASH], [enable_hash=yes])],
-             )
+              [enable_hash=$enableval],
+              [enable_hash=yes])
+AM_CONDITIONAL([HASH], [test "$enable_hash" = "yes"])
+AS_IF([test "$enable_hash" = "yes"],
+      [AC_MSG_NOTICE([Will enable hash])],
+      [AC_MSG_NOTICE([Will not enable hash])])
 
 AC_ARG_ENABLE(fasthash,
               AC_HELP_STRING([--enable-fasthash],
                              [Enable fasthash (default=yes)]),
-              [AM_CONDITIONAL([FASTHASH], [test "$enable_fasthash" = "yes"])],
-              [AM_CONDITIONAL([FASTHASH], [enable_fasthash=yes])],
-             )
+              [enable_fasthash=$enableval],
+              [enable_fasthash=yes])
+AM_CONDITIONAL([FASTHASH], [test "$enable_fasthash" = "yes"])
+AS_IF([test "$enable_fasthash" = "yes"],
+      [AC_MSG_NOTICE([Will enable fasthash])],
+      [AC_MSG_NOTICE([Will not enable fasthash])])
 
 AC_ARG_ENABLE(logging,
               AC_HELP_STRING([--enable-logging],
                              [Enable logging (default=yes)]),
-              [AM_CONDITIONAL([LOGGING], [test "$enable_logging" = "yes"])],
-              [AM_CONDITIONAL([LOGGING], [enable_logging=yes])],
-             )
+              [enable_logging=$enableval],
+              [enable_logging=yes])
+AM_CONDITIONAL([LOGGING], [test "$enable_logging" = "yes"])
+AS_IF([test "$enable_logging" = "yes"],
+      [AC_MSG_NOTICE([Will enable logging])],
+      [AC_MSG_NOTICE([Will not enable logging])])
 
 AC_ARG_ENABLE(profile,
               AC_HELP_STRING([--enable-profile],
-                             [Enable profile (default=yes). Requires --enable-list]),
-              [AM_CONDITIONAL([PROFILE], [test "$enable_profile" = "yes"])],
-              [AM_CONDITIONAL([PROFILE], [enable_profile=yes])],
-             )
+                             [Enable profile (default=yes). Requires --enable-array]),
+              [enable_profile=$enableval],
+              [enable_profile=yes])
+AM_CONDITIONAL([PROFILE], [test "$enable_profile" = "yes"])
+AS_IF([test "$enable_profile" = "yes"],
+      [AC_MSG_NOTICE([Will enable profile])],
+      [AC_MSG_NOTICE([Will not enable profile])])
 
 AC_ARG_ENABLE(conf,
               AC_HELP_STRING([--enable-conf],
                              [Enable conf (default=yes). Requires --enable-array]),
-              [AM_CONDITIONAL([CONF], [test "$enable_conf" = "yes"])],
-              [AM_CONDITIONAL([CONF], [enable_conf=yes])],
-             )
+              [enable_conf=$enableval],
+              [enable_conf=yes])
+AM_CONDITIONAL([CONF], [test "$enable_conf" = "yes"])
+AS_IF([test "$enable_conf" = "yes"],
+      [AC_MSG_NOTICE([Will enable conf])],
+      [AC_MSG_NOTICE([Will not enable conf])])
 
 AC_ARG_ENABLE(trie,
               AC_HELP_STRING([--enable-trie],
                              [Enable trie (default=yes)]),
-              [AM_CONDITIONAL([TRIE], [test "$enable_trie" = "yes"])],
-              [AM_CONDITIONAL([TRIE], [enable_trie=yes])],
-             )
+              [enable_trie=$enableval],
+              [enable_trie=yes])
+AM_CONDITIONAL([TRIE], [test "$enable_trie" = "yes"])
+AS_IF([test "$enable_trie" = "yes"],
+      [AC_MSG_NOTICE([Will enable trie])],
+      [AC_MSG_NOTICE([Will not enable trie])])
 
 AC_ARG_ENABLE(rbt,
               AC_HELP_STRING([--enable-rbt],
                              [Enable rbt (default=yes)]),
-              [AM_CONDITIONAL([RBT], [test "$enable_rbt" = "yes"])],
-              [AM_CONDITIONAL([RBT], [enable_rbt=yes])],
-             )
+              [enable_rbt=$enableval],
+              [enable_rbt=yes])
+AM_CONDITIONAL([RBT], [test "$enable_rbt" = "yes"])
+AS_IF([test "$enable_rbt" = "yes"],
+      [AC_MSG_NOTICE([Will enable rbt])],
+      [AC_MSG_NOTICE([Will not enable rbt])])
 
 AC_ARG_ENABLE(traversedir,
               AC_HELP_STRING([--enable-traversedir],
                              [Enable traversedir (default=yes)]),
-              [AM_CONDITIONAL([TRAVERSEDIR], [test "$enable_traversedir" = "yes"])],
-              [AM_CONDITIONAL([TRAVERSEDIR], [enable_traversedir=yes])],
-             )
+              [enable_traversedir=$enableval],
+              [enable_traversedir=yes])
+AM_CONDITIONAL([TRAVERSEDIR], [test "$enable_traversedir" = "yes"])
+AS_IF([test "$enable_traversedir" = "yes"],
+      [AC_MSG_NOTICE([Will enable traversedir])],
+      [AC_MSG_NOTICE([Will not enable traversedir])])
 
 AC_ARG_ENABLE(bytestream,
               AC_HELP_STRING([--enable-bytestream],
                              [Enable bytestream (default=yes)]),
-              [AM_CONDITIONAL([BYTESTREAM], [test "$enable_bytestream" = "yes"])],
-              [AM_CONDITIONAL([BYTESTREAM], [enable_bytestream=yes])],
-             )
+              [enable_bytestream=$enableval],
+              [enable_bytestream=yes])
+AM_CONDITIONAL([BYTESTREAM], [test "$enable_bytestream" = "yes"])
+AS_IF([test "$enable_bytestream" = "yes"],
+      [AC_MSG_NOTICE([Will enable bytestream])],
+      [AC_MSG_NOTICE([Will not enable bytestream])])
 
 AC_ARG_ENABLE(json,
               AC_HELP_STRING([--enable-json],
                              [Enable json (default=yes)]),
-              [AM_CONDITIONAL([JSON], [test "$enable_json" = "yes"])],
-              [AM_CONDITIONAL([JSON], [enable_json=yes])],
-             )
+              [enable_json=$enableval],
+              [enable_json=yes])
+AM_CONDITIONAL([JSON], [test "$enable_json" = "yes"])
+AS_IF([test "$enable_json" = "yes"],
+      [AC_MSG_NOTICE([Will enable json])],
+      [AC_MSG_NOTICE([Will not enable json])])
 
 AC_ARG_ENABLE(stqueue,
               AC_HELP_STRING([--enable-stqueue],
                              [Enable stqueue (default=yes)]),
-              [AM_CONDITIONAL([STQUEUE], [test "$enable_stqueue" = "yes"])],
-              [AM_CONDITIONAL([STQUEUE], [enable_stqueue=yes])],
-             )
+              [enable_stqueue=$enableval],
+              [enable_stqueue=yes])
+AM_CONDITIONAL([STQUEUE], [test "$enable_stqueue" = "yes"])
+AS_IF([test "$enable_stqueue" = "yes"],
+      [AC_MSG_NOTICE([Will enable stqueue])],
+      [AC_MSG_NOTICE([Will not enable stqueue])])
 
 AC_ARG_ENABLE(dtqueue,
               AC_HELP_STRING([--enable-dtqueue],
                              [Enable dtqueue (default=yes)]),
-              [AM_CONDITIONAL([DTQUEUE], [test "$enable_dtqueue" = "yes"])],
-              [AM_CONDITIONAL([DTQUEUE], [enable_dtqueue=yes])],
-             )
+              [enable_dtqueue=$enableval],
+              [enable_dtqueue=yes])
+AM_CONDITIONAL([DTQUEUE], [test "$enable_dtqueue" = "yes"])
+AS_IF([test "$enable_dtqueue" = "yes"],
+      [AC_MSG_NOTICE([Will enable dtqueue])],
+      [AC_MSG_NOTICE([Will not enable dtqueue])])
 
 AC_ARG_ENABLE(memdebug,
               AC_HELP_STRING([--enable-memdebug],
                              [Enable memdebug (default=yes)]),
-              [AM_CONDITIONAL([MEMDEBUG], [test "$enable_memdebug" = "yes"])],
-              [AM_CONDITIONAL([MEMDEBUG], [enable_memdebug=yes])],
-             )
+              [enable_memdebug=$enableval],
+              [enable_memdebug=yes])
+AM_CONDITIONAL([MEMDEBUG], [test "$enable_memdebug" = "yes"])
+AS_IF([test "$enable_memdebug" = "yes"],
+      [AC_MSG_NOTICE([Will enable memdebug])],
+      [AC_MSG_NOTICE([Will not enable memdebug])])
 
 AC_ARG_ENABLE(mpool,
               AC_HELP_STRING([--enable-mpool],
                              [Enable mpool (default=yes)]),
-              [AM_CONDITIONAL([MPOOL], [test "$enable_mpool" = "yes"])],
-              [AM_CONDITIONAL([MPOOL], [enable_mpool=yes])],
-             )
+              [enable_mpool=$enableval],
+              [enable_mpool=yes])
+AM_CONDITIONAL([MPOOL], [test "$enable_mpool" = "yes"])
+AS_IF([test "$enable_mpool" = "yes"],
+      [AC_MSG_NOTICE([Will enable mpool])],
+      [AC_MSG_NOTICE([Will not enable mpool])])
 
 AC_ARG_ENABLE(bytes,
               AC_HELP_STRING([--enable-bytes],
                              [Enable bytes (default=yes)]),
-              [AM_CONDITIONAL([BYTES], [test "$enable_bytes" = "yes"])],
-              [AM_CONDITIONAL([BYTES], [enable_bytes=yes])],
-             )
+              [enable_bytes=$enableval],
+              [enable_bytes=yes])
+AM_CONDITIONAL([BYTES], [test "$enable_bytes" = "yes"])
+AS_IF([test "$enable_bytes" = "yes"],
+      [AC_MSG_NOTICE([Will enable bytes])],
+      [AC_MSG_NOTICE([Will not enable bytes])])
 
 AC_ARG_ENABLE(cm,
               AC_HELP_STRING([--enable-cm],
                              [Enable count-min (default=yes)]),
-              [AM_CONDITIONAL([CM], [test "$enable_cm" = "yes"])],
-              [AM_CONDITIONAL([CM], [enable_cm=yes])],
-             )
+              [enable_cm=$enableval],
+              [enable_cm=yes])
+AM_CONDITIONAL([CM], [test "$enable_cm" = "yes"])
+AS_IF([test "$enable_cm" = "yes"],
+      [AC_MSG_NOTICE([Will enable cm])],
+      [AC_MSG_NOTICE([Will not enable cm])])
 
 AC_ARG_ENABLE(heap,
               AC_HELP_STRING([--enable-heap],
                              [Enable heap (default=yes)]),
-              [AM_CONDITIONAL([HEAP], [test "$enable_heap" = "yes"])],
-              [AM_CONDITIONAL([HEAP], [enable_heap=yes])],
-             )
+              [enable_heap=$enableval],
+              [enable_heap=yes])
+AM_CONDITIONAL([HEAP], [test "$enable_heap" = "yes"])
+AS_IF([test "$enable_heap" = "yes"],
+      [AC_MSG_NOTICE([Will enable heap])],
+      [AC_MSG_NOTICE([Will not enable heap])])
 
 AC_ARG_ENABLE(base64,
               AC_HELP_STRING([--enable-base64],
                              [Enable base64 (default=yes)]),
-              [AM_CONDITIONAL([BASE64], [test "$enable_base64" = "yes"])],
-              [AM_CONDITIONAL([BASE64], [enable_base64=yes])],
-             )
+              [enable_base64=$enableval],
+              [enable_base64=yes])
+AM_CONDITIONAL([BASE64], [test "$enable_base64" = "yes"])
+AS_IF([test "$enable_base64" = "yes"],
+      [AC_MSG_NOTICE([Will enable base64])],
+      [AC_MSG_NOTICE([Will not enable base64])])
 
 AC_ARG_WITH(cmocka,
             AC_HELP_STRING([--with-cmocka],
@@ -291,22 +382,16 @@ AC_ARG_WITH(cmocka,
             [AM_CONDITIONAL([CMOCKA], [with_cmocka=yes])],
             [AM_CONDITIONAL([CMOCKA], [test "\$with_cmocka" = "yes"])])
 
-if test "$enable_profile" = "yes" -a "$enable_list" != "yes"
-then
-    echo "ERROR: cannot disable the list feature because the profile feature requires it."
-    exit 1
-fi
+AS_IF([test "$enable_conf" = "yes" -a "$enable_array" != "yes"],
+      [AC_MSG_FAILURE(
+        [Cannot disable the array feature because the conf feature requires it.])])
 
-if test "$enable_conf" = "yes" -a "$enable_array" != "yes"
-then
-    echo "ERROR: cannot disable the array feature because the conf feature requires it."
-    exit 1
-fi
+AS_IF([! test \( "$enable_hash" = "yes" -a "$enable_fasthash" = "yes" \) -o \
+        \( "$enable_hash" != "yes" -a "$enable_fasthash" != "yes" \)],
+      [AC_MSG_FAILURE(
+        [Cannot disable either of hash/fasthash feature while the other one is enabled.])])
 
-if test "$enable_cm" = "yes" -a \( "$enable_hash" != "yes" -o "$enable_fasthash" != "yes" \)
-then
-    echo "ERROR: cannot disable the hash feature because the cm feature requires it."
-    exit 1
-fi
+AS_IF([test "$enable_cm" = "yes" -a \( "$enable_hash" != "yes" -o "$enable_fasthash" != "yes" \)],
+      [AC_MSG_FAILURE([Cannot disable the hash feature because the cm feature requires it.])])
 
 AC_OUTPUT

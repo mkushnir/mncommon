@@ -1,5 +1,42 @@
 #!/bin/sh
 
+# On FreeBSD:
+#   pkg install autotools
+#
+# On Linux:
+#   apt-get update
+#   apt-get install autotools-dev autoconf libtool
+#   or apt-get install build-essential
+#
+#   yum install epel-release
+#   yum group install "Development Tools"
+#   yum install openssl-devel zlib-devel libev-devel
+#
+# Git setup:
+#   git init
+#   git add \
+#     .gitignore \
+#     AUTHORS \
+#     COPYING \
+#     ChangeLog \
+#     Makefile.am \
+#     NEWS \
+#     README \
+#     configure.ac \
+#     man/Makefile.am \
+#     setup-env \
+#     src/${pname}.c \
+#     src/${pname}.h \
+#     src/${pname}_private.h \
+#     src/Makefile.am \
+#     src/diag.txt \
+#     test/Makefile.am \
+#     test/diag.txt \
+#     test/gendata.c \
+#     test/runscripts \
+#     test/testbar.c \
+#     test/testfoo.c \
+#     test/unittest.h
 uname_s=`uname -s`
 
 sha256_cmd=/sbin/sha256
@@ -17,6 +54,7 @@ then
     export LDFLAGS=-L$HOME/lib
     export CFLAGS=-I$HOME/include
 
+    autoreconf --force
     aclocal
     autoheader
     autoreconf
@@ -25,33 +63,33 @@ then
     make distclean
     autoreconf
     ./configure --prefix=$HOME --enable-debug $linux_exclusions $MN_CONFIGURE_ARGS
-    make
+
 elif test "$1" = "dev"
 then
     export LDFLAGS=-L$HOME/lib
     export CFLAGS=-I$HOME/include
-    autoreconf
+    autoreconf --force
     ./configure --prefix=$HOME --enable-debug $linux_exclusions $MN_CONFIGURE_ARGS
-    make
+
 elif test "$1" = "dev-memdebug"
 then
     export LDFLAGS=-L$HOME/lib
     export CFLAGS="-I$HOME/include -DDO_MEMDEBUG"
-    autoreconf
+    autoreconf --force
     ./configure --prefix=$HOME --enable-debug $linux_exclusions $MN_CONFIGURE_ARGS
-    make
+
 elif test "$1" = "dev-ndebug"
 then
     export LDFLAGS=-L$HOME/lib
     export CFLAGS=-I$HOME/include
-    autoreconf
+    autoreconf --force
     ./configure --prefix=$HOME $linux_exclusions $MN_CONFIGURE_ARGS
-    make
+
 elif test "$1" = "dist"
 then
     unset LDFLAGS
     unset CFLAGS
-    autoreconf
+    autoreconf --force
     ./configure --enable-profile=no $linux_exclusions $MN_CONFIGURE_ARGS
     make dist
     if test -f port/distinfo

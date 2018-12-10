@@ -3,13 +3,13 @@
 
 #include "diag.h"
 #include "mrkcommon/dumpm.h"
-#include "mrkcommon/list.h"
+#include "mrkcommon/array.h"
 #include "mrkcommon/profile.h"
 #include "mrkcommon/util.h"
 
 /* Code profiling */
 static int initialized = 0;
-static list_t profiles;
+static mnarray_t profiles;
 static uint64_t tsc_freq;
 
 static inline uint64_t
@@ -78,10 +78,10 @@ profile_init_module(void)
         return;
     }
 
-    if (list_init(&profiles, sizeof(profile_t), 0,
-                   (list_initializer_t)profile_init,
+    if (array_init(&profiles, sizeof(profile_t), 0,
+                   (array_initializer_t)profile_init,
                    NULL) != 0) {
-        FAIL("list_init");
+        FAIL("array_init");
     }
     initialized = 1;
 }
@@ -92,7 +92,7 @@ profile_fini_module(void)
     if (!initialized) {
         return;
     }
-    list_fini(&profiles);
+    array_fini(&profiles);
     initialized = 0;
 }
 
@@ -102,8 +102,8 @@ profile_register(const char *name)
 {
     profile_t *p;
 
-    if ((p = list_incr(&profiles)) == NULL) {
-        FAIL("list_incr");
+    if ((p = array_incr(&profiles)) == NULL) {
+        FAIL("array_incr");
     }
 
     p->id = profiles.elnum - 1;
@@ -147,13 +147,13 @@ profile_stop(const profile_t *p)
 void
 profile_report(void)
 {
-    list_traverse(&profiles, (list_traverser_t)profile_dump, NULL);
+    array_traverse(&profiles, (array_traverser_t)profile_dump, NULL);
 }
 
 void
 profile_report_sec(void)
 {
-    list_traverse(&profiles, (list_traverser_t)profile_dump_sec, NULL);
+    array_traverse(&profiles, (array_traverser_t)profile_dump_sec, NULL);
 }
 
 

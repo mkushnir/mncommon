@@ -67,15 +67,20 @@ noinst_HEADERS = unittest.h rb.h zltan-fasthash.h fnv/fnv.h fnv/longlong.h
 
 BUILT_SOURCES = diag.c diag.h
 
+DEBUG_LD_FLAGS =
 if DEBUG
-DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
-#DEBUG_FLAGS = -g -O0 -ftrapv @CLANG_DEBUG@ -DTRRET_DEBUG
+DEBUG_CC_FLAGS = -g -O0 @CC_DEBUG@
+DEBUG_LD_FLAGS += -no-install
 else
-DEBUG_FLAGS = -DNDEBUG -O3
+DEBUG_CC_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
+if LTO
+DEBUG_CC_FLAGS += @CC_LTO@
+DEBUG_LD_FLAGS += @LD_LTO@
+endif
 endif
 
-CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src -I$(includedir)
-LDFLAGS += -L../src/.libs -lmrkcommon -L$(libdir) -lmndiag
+CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src -I$(includedir)
+LDFLAGS += $(DEBUG_LD_FLAGS) -L../src/.libs -lmrkcommon -L$(libdir) -lmndiag
 
 if CMOCKA
 CFLAGS += -I$(includedir) -DCMOCKA_TESTING
