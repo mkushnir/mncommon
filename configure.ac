@@ -45,32 +45,6 @@ AS_IF([test -n "$USE_GCC"],
         AC_SUBST(CC_DEBUG, ['-ftrapv'])
     ])
 ])
-if test -n "$USE_GCC"
-then
-else
-    if which clang >/dev/null
-    then
-        CC="clang -Qunused-arguments -fcolor-diagnostics"
-        CXX="clang++ -Qunused-arguments -fcolor-diagnostics"
-        CPP="clang-cpp"
-        clang_version=`clang --version | grep version | awk '{print $4;}'`
-        clang_version_mjr=`echo $clang_version | awk -F. '{print $1;}'`
-        clang_version_mnr=`echo $clang_version | awk -F. '{print $2;}'`
-        if test "$clang_version_mjr" = "3" -a "$clang_version_mnr" -lt 3
-        then
-            AC_SUBST(CLANG_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])
-        else
-            # we assume all others are 3.3+
-            AC_SUBST(CLANG_DEBUG, ['-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error -fno-sanitize=alignment'])
-        fi
-        AC_SUBST(CLANG_CCLTO, ['-flto'])
-        AC_SUBST(CLANG_LDLTO, ['--lto-O3'])
-    else
-        CC="cc"
-        CXX="c++"
-        CPP="cpp"
-    fi
-fi
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
