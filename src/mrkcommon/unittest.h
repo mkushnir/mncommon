@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <time.h>
 #include "mrkcommon/util.h"
 
 #define _R(_d, _i) _d[_i].rnd
