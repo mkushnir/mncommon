@@ -128,7 +128,8 @@ _test2(size_t growsz, int n)
     }
 
     while (true) {
-        ssize_t sz, nread;
+        ssize_t sz;
+        UNUSED ssize_t nread;
         mnbytes_t *buf;
 
         sz = random() % n;

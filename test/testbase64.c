@@ -124,7 +124,7 @@ test3(void)
                                    buf,
                                    j);
             if (res == 0) {
-                int res1;
+                UNUSED int res1;
                 unsigned char src[256];
                 size_t sz1;
 
@@ -174,7 +174,7 @@ test4(void)
                                    buf,
                                    j);
             if (res == 0) {
-                int res1;
+                UNUSED int res1;
                 size_t sz1;
 
                 sz1 = strlen(buf);

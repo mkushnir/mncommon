@@ -74,7 +74,7 @@ test3(void)
 #endif
 
     for (i = 0; i < countof(pk); ++i) {
-        uint64_t xm;
+        UNUSED uint64_t xm;
 
         xm = xmask(pk[i].prefix, pk[i].key);
         //TRACE("%016lx %016lx %016lx", pk[i].prefix, pk[i].key, xm);

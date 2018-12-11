@@ -613,7 +613,7 @@ static void
 test2(void)
 {
     jparse_ctx_t *jctx;
-    int res;
+    UNUSED int res;
 
     struct {
         long rnd;
