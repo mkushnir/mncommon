@@ -148,7 +148,7 @@ pbtrie_node_prev(mnpbtrie_node_t *node)
 int
 pbtrie_traverse(mnpbtrie_t *trie, mnpbtrie_traverser_t cb, void *udata)
 {
-    int res;
+    int res = 0;
     mnpbtrie_node_t *node;
 
     for (node = trie->head;
@@ -168,7 +168,7 @@ pbtrie_traverse(mnpbtrie_t *trie, mnpbtrie_traverser_t cb, void *udata)
 int
 pbtrie_reverse(mnpbtrie_t *trie, mnpbtrie_traverser_t cb, void *udata)
 {
-    int res;
+    int res = 0;
     mnpbtrie_node_t *node;
 
     for (node = trie->tail;
