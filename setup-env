@@ -37,6 +37,40 @@
 #     test/testbar.c \
 #     test/testfoo.c \
 #     test/unittest.h
+do_init() {
+    #autoreconf --force --install
+    autoreconf --force
+    aclocal
+    autoheader
+    autoreconf
+    automake --add-missing
+    libtoolize
+    make distclean
+    autoreconf
+    ./configure --prefix=$HOME --enable-debug
+}
+
+do_dev() {
+    autoreconf --force
+    ./configure --prefix=$HOME --enable-debug
+}
+
+do_dev_static() {
+    autoreconf --force
+    ./configure --prefix=$HOME --enable-debug --enable-allstatic
+}
+
+do_dev_ndebug() {
+    autoreconf --force
+    ./configure --prefix=$HOME
+}
+
+do_dev_ndebug_static() {
+    autoreconf --force
+    ./configure --prefix=$HOME --enable-allstatic --enable-lto
+}
+
+
 uname_s=`uname -s`
 
 sha256_cmd=/sbin/sha256
@@ -49,41 +83,62 @@ then
     linux_exclusions='--enable-memdebug=no'
 fi
 
+
+dirs="."
+R=`pwd -P`
+
+
+
+LDFLAGS=
+for i in $dirs
+do
+    LDFLAGS="$LDFLAGS -L${R}/$i/src/.libs"
+done
+LDFLAGS="$LDFLAGS -L$HOME/lib -L/usr/local/lib"
+export LDFLAGS
+
+CFLAGS=
+for i in $dirs
+do
+    CFLAGS="$CFLAGS -I${R}/$i/src"
+done
+CFLAGS="$CFLAGS -I$HOME/include -I/usr/local/include"
+export CFLAGS
+
 if test "$1" = "init"
 then
-    export LDFLAGS=-L$HOME/lib
-    export CFLAGS=-I$HOME/include
-
-    autoreconf --force
-    aclocal
-    autoheader
-    autoreconf
-    automake --add-missing
-    libtoolize
-    make distclean
-    autoreconf
-    ./configure --prefix=$HOME --enable-debug $linux_exclusions $MN_CONFIGURE_ARGS
+    for i in $dirs
+    do
+        ( cd $i && do_init )
+    done
 
 elif test "$1" = "dev"
 then
-    export LDFLAGS=-L$HOME/lib
-    export CFLAGS=-I$HOME/include
-    autoreconf --force
-    ./configure --prefix=$HOME --enable-debug $linux_exclusions $MN_CONFIGURE_ARGS
+    for i in $dirs
+    do
+        ( cd $i && do_dev )
+    done
 
-elif test "$1" = "dev-memdebug"
+elif test "$1" = "dev-static"
 then
-    export LDFLAGS=-L$HOME/lib
-    export CFLAGS="-I$HOME/include -DDO_MEMDEBUG"
-    autoreconf --force
-    ./configure --prefix=$HOME --enable-debug $linux_exclusions $MN_CONFIGURE_ARGS
+    for i in $dirs
+    do
+        ( cd $i && do_dev_static )
+    done
 
 elif test "$1" = "dev-ndebug"
 then
-    export LDFLAGS=-L$HOME/lib
-    export CFLAGS=-I$HOME/include
-    autoreconf --force
-    ./configure --prefix=$HOME $linux_exclusions $MN_CONFIGURE_ARGS
+    for i in $dirs
+    do
+        ( cd $i && do_dev_ndebug )
+    done
+
+elif test "$1" = "dev-ndebug-static"
+then
+    for i in $dirs
+    do
+        ( cd $i && do_dev_ndebug_static )
+    done
 
 elif test "$1" = "dist"
 then

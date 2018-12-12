@@ -79,19 +79,25 @@ DEBUG_LD_FLAGS += @LD_LTO@
 endif
 endif
 
+if ALLSTATIC
+LDFLAGS += -all-static
+endif
+
 CFLAGS += @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src -I$(includedir)
-LDFLAGS += $(DEBUG_LD_FLAGS) -L../src/.libs -lmrkcommon -L$(libdir) -lmndiag
+LDFLAGS += $(DEBUG_LD_FLAGS) -L../src/.libs -L$(libdir)
+LDADD = -lmrkcommon -lmndiag
 
 if CMOCKA
 CFLAGS += -I$(includedir) -DCMOCKA_TESTING
-LDFLAGS += -L$(libdir) -lcmocka
+LDFLAGS += -L$(libdir)
+LDADD += -lcmocka
 endif
 
 testfoo_SOURCES =  testfoo.c
 testfoo_CFLAGS =
 testfoo_LDFLAGS =
 
-testhash_SOURCES = ../src/hash.c testhash.c
+testhash_SOURCES = testhash.c
 testhash_CFLAGS =
 testhash_LDFLAGS =
 
@@ -210,7 +216,7 @@ testbar_LDFLAGS =
 endif
 
 diag.c diag.h: ../src/diag.txt
-	$(AM_V_GEN) cat $(diags) | sort -u >diag.txt.tmp && mndiagen -v -S diag.txt.tmp -L mrkcommon -H diag.h -C diag.c ../*.[ch]
+	$(AM_V_GEN) cat $(diags) | sort -u >diag.txt.tmp && mndiagen -v -S diag.txt.tmp -L mrkcommon -H diag.h -C diag.c ../src/*.[ch]
 
 testrun: all
 	for i in $(noinst_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;
