@@ -4,33 +4,44 @@ CLEANFILES = $(BUILT_SOURCES) *.core
 
 diags = ../src/diag.txt
 
+src_sources = ../src/dumpm.c ../src/array.c ../src/rbt.c diag.c
+
 noinst_PROGRAMS = testfoo
 if HASH
 noinst_PROGRAMS += testhash testperfhash
+src_sources += ../src/hash.c
 endif
 if FASTHASH
 noinst_PROGRAMS += testfasthash
+src_sources += ../src/fasthash.c
 endif
 if LOGGING
 noinst_PROGRAMS += testlogging
+src_sources += ../src/logging.c
 endif
 if PROFILE
 noinst_PROGRAMS += testprofile
+src_sources += ../src/profile.c
 endif
 if CONF
 noinst_PROGRAMS += testconf
+src_sources += ../src/conf.c
 endif
 if TRIE
 noinst_PROGRAMS += testtrie testperftree testperftrie testperfpbtrie testperfrb testrborder testtrieorder testpbtrie
+src_sources += ../src/btrie.c ../src/pbtrie.c
 endif
 if TRAVERSEDIR
 noinst_PROGRAMS += testtraversedir
+src_sources += ../src/traversedir.c
 endif
 if BYTESTREAM
 noinst_PROGRAMS += testvbytestream
+src_sources += ../src/bytestream.c ../src/bytestream_aux.c ../src/vbytestream.c
 endif
 if JSON
 noinst_PROGRAMS += testjson testjparse
+src_sources += ../src/json.c ../src/jparse.c
 endif
 if STQUEUE
 noinst_PROGRAMS += teststqueue
@@ -40,23 +51,29 @@ noinst_PROGRAMS += testdtqueue testdtqueueperf
 endif
 if MEMDEBUG
 noinst_PROGRAMS += testmemdebug
+src_sources += ../src/memdebug.c
 endif
 if MPOOL
 noinst_PROGRAMS += testmpool
+src_sources += ../src/mpool.c
 endif
 if BYTES
 noinst_PROGRAMS += testbytes
+src_sources += ../src/bytes.c
 endif
 if CM
 noinst_PROGRAMS += testcm
+src_sources += ../src/cm.c
 endif
 
 if HEAP
 noinst_PROGRAMS += testheap testperfheap
+src_sources += ../src/heap.c
 endif
 
 if BASE64
 noinst_PROGRAMS += testbase64
+src_sources += ../src/base64.c
 endif
 
 if CMOCKA
@@ -67,6 +84,7 @@ noinst_HEADERS = unittest.h rb.h zltan-fasthash.h fnv/fnv.h fnv/longlong.h
 
 BUILT_SOURCES = diag.c diag.h
 
+static_sources =
 DEBUG_LD_FLAGS =
 if DEBUG
 DEBUG_CC_FLAGS = -g -O0 @CC_DEBUG@
@@ -74,6 +92,7 @@ DEBUG_LD_FLAGS += -no-install
 else
 DEBUG_CC_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
 if LTO
+static_sources += $(src_sources)
 DEBUG_CC_FLAGS += @CC_LTO@
 DEBUG_LD_FLAGS += @LD_LTO@
 endif
@@ -97,47 +116,47 @@ testfoo_SOURCES =  testfoo.c
 testfoo_CFLAGS =
 testfoo_LDFLAGS =
 
-testhash_SOURCES = testhash.c
+testhash_SOURCES = $(static_sources) testhash.c
 testhash_CFLAGS =
 testhash_LDFLAGS =
 
-testfasthash_SOURCES = ../src/fasthash.c ../src/fnvhash.c ../src/mrkcommon/fnvhash.h zltan-fasthash.c fnv/hash_64a.c testfasthash.c
+testfasthash_SOURCES = $(static_sources) ../src/fnvhash.c ../src/mrkcommon/fnvhash.h zltan-fasthash.c fnv/hash_64a.c testfasthash.c
 testfasthash_CFLAGS =
-testfasthash_LDFLAGS = -lz
+testfasthash_LDADD = $(LDADD) -lz
 
 testlogging_SOURCES = ../src/logging.c testlogging.c
 testlogging_CFLAGS =
 testlogging_LDFLAGS =
 
-testprofile_SOURCES = ../src/list.c ../src/profile.c testprofile.c
+testprofile_SOURCES = $(static_sources) testprofile.c
 testprofile_CFLAGS =
 testprofile_LDFLAGS =
 
-testconf_SOURCES = ../src/array.c ../src/conf.c testconf.c
+testconf_SOURCES = $(static_sources) testconf.c
 testconf_CFLAGS =
 testconf_LDFLAGS =
 
-testtrie_SOURCES = ../src/btrie.c testtrie.c
+testtrie_SOURCES = $(static_sources) testtrie.c
 testtrie_CFLAGS =
 testtrie_LDFLAGS =
 
-testperftree_SOURCES = ../src/list.c ../src/btrie.c ../src/rbt.c ../src/profile.c rb.c testperftree.c
+testperftree_SOURCES = $(static_sources) rb.c testperftree.c
 testperftree_CFLAGS =
 testperftree_LDFLAGS =
 
-testperftrie_SOURCES = ../src/btrie.c ../src/profile.c testperftrie.c
+testperftrie_SOURCES = $(static_sources) testperftrie.c
 testperftrie_CFLAGS =
 testperftrie_LDFLAGS =
 
-testperfpbtrie_SOURCES = ../src/pbtrie.c ../src/profile.c testperfpbtrie.c
+testperfpbtrie_SOURCES = $(static_sources) testperfpbtrie.c
 testperfpbtrie_CFLAGS =
 testperfpbtrie_LDFLAGS =
 
-testperfrb_SOURCES = rb.c ../src/profile.c testperfrb.c
+testperfrb_SOURCES = $(static_sources) rb.c testperfrb.c
 testperfrb_CFLAGS =
 testperfrb_LDFLAGS =
 
-testperfhash_SOURCES = rb.c ../src/profile.c testperfhash.c
+testperfhash_SOURCES = $(static_sources) rb.c testperfhash.c
 testperfhash_CFLAGS =
 testperfhash_LDFLAGS =
 
@@ -145,27 +164,27 @@ testrborder_SOURCES = rb.c testrborder.c
 testrborder_CFLAGS =
 testrborder_LDFLAGS =
 
-testtrieorder_SOURCES = ../src/btrie.c testtrieorder.c
+testtrieorder_SOURCES = $(static_sources) testtrieorder.c
 testtrieorder_CFLAGS =
 testtrieorder_LDFLAGS =
 
-testpbtrie_SOURCES = ../src/pbtrie.c testpbtrie.c
+testpbtrie_SOURCES = $(static_sources) testpbtrie.c
 testpbtrie_CFLAGS =
 testpbtrie_LDFLAGS =
 
-testtraversedir_SOURCES = ../src/traversedir.c testtraversedir.c
+testtraversedir_SOURCES = $(static_sources) testtraversedir.c
 testtraversedir_CFLAGS =
 testtraversedir_LDFLAGS =
 
-testvbytestream_SOURCES = ../src/vbytestream.c testvbytestream.c
+testvbytestream_SOURCES = $(static_sources) testvbytestream.c
 testvbytestream_CFLAGS =
 testvbytestream_LDFLAGS =
 
-testjson_SOURCES = ../src/json.c testjson.c
+testjson_SOURCES = $(static_sources) testjson.c
 testjson_CFLAGS =
 testjson_LDFLAGS =
 
-testjparse_SOURCES = ../src/jparse.c testjparse.c
+testjparse_SOURCES = $(static_sources) testjparse.c
 testjparse_CFLAGS =
 testjparse_LDFLAGS =
 
@@ -181,36 +200,36 @@ testdtqueueperf_SOURCES = testdtqueueperf.c
 testdtqueueperf_CFLAGS =
 testdtqueueperf_LDFLAGS =
 
-testmemdebug_SOURCES = ../src/memdebug.c testmemdebug.c
+testmemdebug_SOURCES = $(static_sources) testmemdebug.c
 testmemdebug_CFLAGS =
 testmemdebug_LDFLAGS =
 
-testmpool_SOURCES = ../src/mpool.c testmpool.c
+testmpool_SOURCES = $(static_sources) testmpool.c
 testmpool_CFLAGS =
 testmpool_LDFLAGS =
 
-testbytes_SOURCES = ../src/bytes.c testbytes.c
+testbytes_SOURCES = $(static_sources) testbytes.c
 testbytes_CFLAGS =
 testbytes_LDFLAGS =
 
-testcm_SOURCES = ../src/cm.c testcm.c
+testcm_SOURCES = $(static_sources) testcm.c
 testcm_CFLAGS =
 testcm_LDFLAGS =
 
-testheap_SOURCES = ../src/heap.c testheap.c
+testheap_SOURCES = $(static_sources) testheap.c
 testheap_CFLAGS =
 testheap_LDFLAGS =
 
-testperfheap_SOURCES = ../src/heap.c testperfheap.c
+testperfheap_SOURCES = $(static_sources) testperfheap.c
 testperfheap_CFLAGS =
 testperfheap_LDFLAGS =
 
-testbase64_SOURCES = ../src/base64.c testbase64.c
+testbase64_SOURCES = $(static_sources) testbase64.c
 testbase64_CFLAGS =
 testbase64_LDFLAGS =
 
 if CMOCKA
-testbar_SOURCES = ../src/array.c testbar.c
+testbar_SOURCES = $(static_sources) testbar.c
 testbar_CFLAGS =
 testbar_LDFLAGS =
 endif
