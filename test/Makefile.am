@@ -15,17 +15,9 @@ if FASTHASH
 noinst_PROGRAMS += testfasthash
 src_sources += ../src/fasthash.c
 endif
-if LOGGING
-noinst_PROGRAMS += testlogging
-src_sources += ../src/logging.c
-endif
 if PROFILE
 noinst_PROGRAMS += testprofile
 src_sources += ../src/profile.c
-endif
-if CONF
-noinst_PROGRAMS += testconf
-src_sources += ../src/conf.c
 endif
 if TRIE
 noinst_PROGRAMS += testtrie testperftree testperftrie testperfpbtrie testperfrb testrborder testtrieorder testpbtrie
@@ -65,17 +57,14 @@ if CM
 noinst_PROGRAMS += testcm
 src_sources += ../src/cm.c
 endif
-
 if HEAP
 noinst_PROGRAMS += testheap testperfheap
 src_sources += ../src/heap.c
 endif
-
 if BASE64
 noinst_PROGRAMS += testbase64
 src_sources += ../src/base64.c
 endif
-
 if CMOCKA
 noinst_PROGRAMS += testbar
 endif
@@ -124,17 +113,9 @@ testfasthash_SOURCES = $(static_sources) ../src/fnvhash.c ../src/mrkcommon/fnvha
 testfasthash_CFLAGS =
 testfasthash_LDADD = $(LDADD) -lz
 
-testlogging_SOURCES = ../src/logging.c testlogging.c
-testlogging_CFLAGS =
-testlogging_LDFLAGS =
-
 testprofile_SOURCES = $(static_sources) testprofile.c
 testprofile_CFLAGS =
 testprofile_LDFLAGS =
-
-testconf_SOURCES = $(static_sources) testconf.c
-testconf_CFLAGS =
-testconf_LDFLAGS =
 
 testtrie_SOURCES = $(static_sources) testtrie.c
 testtrie_CFLAGS =

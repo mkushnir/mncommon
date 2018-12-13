@@ -31,20 +31,9 @@ fasthash_sources = fasthash.c
 fasthash_include_headers = mrkcommon/fasthash.h
 endif
 
-if LOGGING
-logging_sources = logging.c
-logging_include_headers = mrkcommon/logging.h
-endif
-
 if PROFILE
 profile_sources = profile.c
 profile_include_headers = mrkcommon/profile.h
-endif
-
-if CONF
-conf_sources = conf.c
-conf_include_headers = mrkcommon/conf.h
-noinst_HEADERS += conf_private.h
 endif
 
 if TRIE
@@ -117,9 +106,7 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(array_include_headers) \
 			 $(hash_include_headers) \
 			 $(fasthash_include_headers) \
-			 $(logging_include_headers) \
 			 $(profile_include_headers) \
-			 $(conf_include_headers) \
 			 $(trie_include_headers) \
 			 $(rbt_include_headers) \
 			 $(traversedir_include_headers) \
@@ -138,9 +125,7 @@ libmrkcommon_la_SOURCES = $(dumpm_sources) \
 			  $(array_sources) \
 			  $(hash_sources) \
 			  $(fasthash_sources) \
-			  $(logging_sources) \
 			  $(profile_sources) \
-			  $(conf_sources) \
 			  $(trie_sources) \
 			  $(rbt_sources) \
 			  $(traversedir_sources) \

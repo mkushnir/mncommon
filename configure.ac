@@ -190,16 +190,6 @@ AS_IF([test "$enable_fasthash" = "yes"],
       [AC_MSG_NOTICE([Will enable fasthash])],
       [AC_MSG_NOTICE([Will not enable fasthash])])
 
-AC_ARG_ENABLE(logging,
-              AC_HELP_STRING([--enable-logging],
-                             [Enable logging (default=yes)]),
-              [enable_logging=$enableval],
-              [enable_logging=yes])
-AM_CONDITIONAL([LOGGING], [test "$enable_logging" = "yes"])
-AS_IF([test "$enable_logging" = "yes"],
-      [AC_MSG_NOTICE([Will enable logging])],
-      [AC_MSG_NOTICE([Will not enable logging])])
-
 AC_ARG_ENABLE(profile,
               AC_HELP_STRING([--enable-profile],
                              [Enable profile (default=yes). Requires --enable-array]),
@@ -209,16 +199,6 @@ AM_CONDITIONAL([PROFILE], [test "$enable_profile" = "yes"])
 AS_IF([test "$enable_profile" = "yes"],
       [AC_MSG_NOTICE([Will enable profile])],
       [AC_MSG_NOTICE([Will not enable profile])])
-
-AC_ARG_ENABLE(conf,
-              AC_HELP_STRING([--enable-conf],
-                             [Enable conf (default=yes). Requires --enable-array]),
-              [enable_conf=$enableval],
-              [enable_conf=yes])
-AM_CONDITIONAL([CONF], [test "$enable_conf" = "yes"])
-AS_IF([test "$enable_conf" = "yes"],
-      [AC_MSG_NOTICE([Will enable conf])],
-      [AC_MSG_NOTICE([Will not enable conf])])
 
 AC_ARG_ENABLE(trie,
               AC_HELP_STRING([--enable-trie],
@@ -355,10 +335,6 @@ AC_ARG_WITH(cmocka,
             [Build CMocka tests (default=no)]),
             [AM_CONDITIONAL([CMOCKA], [with_cmocka=yes])],
             [AM_CONDITIONAL([CMOCKA], [test "\$with_cmocka" = "yes"])])
-
-AS_IF([test "$enable_conf" = "yes" -a "$enable_array" != "yes"],
-      [AC_MSG_FAILURE(
-        [Cannot disable the array feature because the conf feature requires it.])])
 
 AS_IF([! test \( "$enable_hash" = "yes" -a "$enable_fasthash" = "yes" \) -o \
         \( "$enable_hash" != "yes" -a "$enable_fasthash" != "yes" \)],

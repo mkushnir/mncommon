@@ -5,10 +5,7 @@
 #include "unittest.h"
 
 #include "mrkcommon/dumpm.h"
-#include "mrkcommon/logging.h"
 #include "mrkcommon/profile.h"
-
-LOGGING_DECLARE(NULL, 0, LOG_TRACE);
 
 static void
 test0(void)
@@ -35,11 +32,6 @@ test0(void)
     p2 = profile_register("P2");
 
     profile_start(p2);
-    DEBUG("1");
-    LOGGING_SETLEVEL(LOG_DEBUG);
-    DEBUG("2");
-    LOGGING_CLEARLEVEL(LOG_DEBUG);
-    DEBUG("3");
     profile_stop(p2);
 }
 
@@ -47,12 +39,8 @@ int
 main(void)
 {
     profile_init_module();
-    logging_init(stdout, "TL", LOG_PID);
     test0();
-    logging_fini();
-    logging_init(NULL, "TL", LOG_PID);
     test0();
-    logging_fini();
     profile_report();
     profile_fini_module();
     return 0;
