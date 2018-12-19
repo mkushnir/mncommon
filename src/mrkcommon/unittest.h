@@ -41,23 +41,26 @@
 #define SHUFFLE _SHUFFLE(data, i)
 
 
-#define MNSHUFFLE_DATA(a, idx)                                         \
+#define MNSHUFFLE_DATA_SZ(a, sz, idx)                                  \
 do {                                                                   \
     unsigned _mnshuffle_data_i;                                        \
     for (_mnshuffle_data_i = 0;                                        \
-         _mnshuffle_data_i < countof((a));                             \
+         _mnshuffle_data_i < (sz);                                     \
          ++_mnshuffle_data_i) {                                        \
         (a)[_mnshuffle_data_i].idx = _mnshuffle_data_i;                \
     }                                                                  \
     for (_mnshuffle_data_i = 0;                                        \
-         _mnshuffle_data_i < countof((a));                             \
+         _mnshuffle_data_i < (sz);                                     \
          ++_mnshuffle_data_i) {                                        \
-        int _mnshuffle_data_ii = random() % countof((a));              \
+        int _mnshuffle_data_ii = random() % (sz);                      \
         int _mnshuffle_data_idx = (a)[_mnshuffle_data_i].idx;          \
         (a)[_mnshuffle_data_i].idx = (a)[_mnshuffle_data_ii].idx;      \
         (a)[_mnshuffle_data_ii].idx = _mnshuffle_data_idx;             \
     }                                                                  \
 } while (0)                                                            \
+
+
+#define MNSHUFFLE_DATA(a, idx) MNSHUFFLE_DATA_SZ(a, countof(a), idx)
 
 
 #define MNSHUFFLE_VALUE(a, idx, i) ((a)[a[(i)].idx])
