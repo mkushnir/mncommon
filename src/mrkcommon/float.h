@@ -2,6 +2,7 @@
 #define MRKCOMMON_FLOAT_H
 
 #include <float.h>
+#include <math.h>
 
 #ifdef __cplusplus
 extern "C" {
