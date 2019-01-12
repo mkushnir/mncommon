@@ -152,7 +152,18 @@ traverse_dir_no_recurse(const char *path,
         }
 
         if (de->d_type == DT_DIR) {
+            newpath = path_join(path, de->d_name);
+
+            if ((res = cb(newpath, de, udata)) != 0) {
+                free(newpath);
+                closedir(d);
+                return res;
+            }
+
+            free(newpath);
+            newpath = NULL;
             continue;
+
         } else {
             struct stat sb;
 
@@ -164,7 +175,7 @@ traverse_dir_no_recurse(const char *path,
                     newpath = NULL;
                     continue;
                 } else {
-                    if ((res = cb(path, de, udata)) != 0) {
+                    if ((res = cb(newpath, de, udata)) != 0) {
                         free(newpath);
                         closedir(d);
                         return res;

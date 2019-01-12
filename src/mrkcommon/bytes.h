@@ -28,8 +28,8 @@ extern "C" {
 
 
 #else
-#define MEMDEBUG_ENTER_BYTES(seld)
-#define MEMDEBUG_LEAVE_BYTES(seld)
+#define MEMDEBUG_ENTER_BYTES(self)
+#define MEMDEBUG_LEAVE_BYTES(self)
 #endif
 /*
  * XXX check out compile_bytes_t(), lkit_compile_expr(), and ltype_compile()
