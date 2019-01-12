@@ -30,7 +30,7 @@ typedef struct _mnarray {
     array_finalizer_t fini;
 } mnarray_t;
 
-typedef struct _array_iter {
+typedef struct _mnarray_iter {
     unsigned iter;
     void *data;
 } mnarray_iter_t;
