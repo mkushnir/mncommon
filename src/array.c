@@ -120,6 +120,51 @@ array_init_mpool(mpool_ctx_t *mpool, mnarray_t *ar, size_t elsz, size_t elnum,
 }
 
 
+int
+array_init_ref(mnarray_t *ar, void *data, size_t elsz, size_t elnum,
+           array_initializer_t init,
+           array_finalizer_t fini)
+{
+    assert(elsz > 0);
+    ar->elsz = elsz;
+    ar->elnum = elnum;
+    ar->data = data;
+    ar->datasz = elsz * elnum;
+    ar->init = init;
+
+    if (ar->init != NULL) {
+        unsigned i;
+
+        for (i = 0; i < elnum; ++i) {
+            if (ar->init(ar->data + i * ar->elsz) != 0) {
+                TRRET(ARRAY_INIT + 2);
+            }
+        }
+    }
+    ar->fini = fini;
+    return 0;
+}
+
+
+int
+array_fini_ref(mnarray_t *ar)
+{
+    unsigned i;
+
+    if (ar->fini != NULL) {
+        for (i = 0; i < ar->elnum; ++i) {
+            ar->fini(ar->data + (i * ar->elsz));
+        }
+    }
+
+    ar->data = NULL;
+    ar->init = NULL;
+    ar->fini = NULL;
+    ar->elnum = 0;
+    return 0;
+}
+
+
 #define ARRAY_RESET_NO_FINI_BODY(free_fn, malloc_fn)           \
     ar->elnum = newelnum;                                      \
     MEMDEBUG_ENTER(ar);                                        \

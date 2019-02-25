@@ -44,6 +44,10 @@ int array_init_mpool(mpool_ctx_t *,
                      array_initializer_t,
                      array_finalizer_t);
 
+int array_init_ref(mnarray_t *, void *, size_t, size_t,
+                   array_initializer_t,
+                   array_finalizer_t);
+
 int array_reset_no_fini(mnarray_t *, size_t);
 int array_reset_no_fini_mpool(mpool_ctx_t *, mnarray_t *, size_t);
 
@@ -83,7 +87,8 @@ int array_decr(mnarray_t *);
 int array_decr_fast(mnarray_t *);
 int array_decr_mpool(mpool_ctx_t *, mnarray_t *);
 int array_fini(mnarray_t *);
-int array_fini_mpool(mpool_ctx_t *mpool, mnarray_t *);
+int array_fini_mpool(mpool_ctx_t *, mnarray_t *);
+int array_fini_ref(mnarray_t *);
 void array_destroy(mnarray_t **);
 void array_destroy_mpool(mpool_ctx_t *, mnarray_t **);
 void *array_first(const mnarray_t *, mnarray_iter_t *);
