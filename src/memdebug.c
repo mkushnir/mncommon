@@ -9,7 +9,9 @@
 #ifdef HAVE_MALLOC_NP_H
 #include <malloc_np.h>
 #else
-#include <malloc.h>
+#ifdef HAVE_MALLOC_H
+#   include <malloc.h>
+#endif
 #endif
 
 #ifndef HAVE_REALLOCF
