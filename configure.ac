@@ -1,4 +1,9 @@
-AC_INIT(mrkcommon, 0.1, markiyan.kushnir@gmail.com)
+AC_INIT(mrkcommon, 0.1, markiyan.kushnir@gmail.com, mrkcommon, https://github.com/mkushnir)
+
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_AUX_DIR([.ac-aux])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile])
+AC_CONFIG_HEADERS(config.h)
 
 AS_IF([test -n "$USE_GCC"],
 [
@@ -59,24 +64,18 @@ AS_CASE(["$target_os"],
     [AC_SUBST(_XOPEN_SOURCE_MACRO)]
 )
 
-AC_CONFIG_MACRO_DIR([m4])
-
 AC_LANG(C)
 
 AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_AR
-AC_PROG_RANLIB
 AC_PROG_INSTALL
 
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 LT_INIT
-AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
 
 dnl AM_MAINTAINER_MODE
-
-AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile])
-AC_CONFIG_HEADERS(config.h)
 
 AC_CHECK_HEADERS([byteswap.h])
 AC_CHECK_HEADERS([endian.h])

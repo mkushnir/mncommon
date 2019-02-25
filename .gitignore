@@ -21,6 +21,7 @@ libtool
 ltmain.sh
 missing
 stamp-h1
+.ac-aux
 .deps
 .libs
 *.l[ao]
