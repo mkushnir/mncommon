@@ -77,6 +77,7 @@ void dumpm(const void * m, size_t n, size_t l);
 #define D16(m, n) dumpm(m, n, 16)
 #define D32(m, n) dumpm(m, n, 32)
 #define D64(m, n) dumpm(m, n, 64)
+void mndump_bits(const void *, size_t);
 
 #ifndef NOFCOLOR
 #   define FCOLOR(b, c, s) "\033[0" b ";3" c "m" s "\033[00m"
