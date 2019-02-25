@@ -208,6 +208,12 @@ _Generic(a,                                            \
 #   endif
 #endif
 
+#if !defined(PACKED)
+#define PACKED __attribute__ ((__packed__))
+#else
+#error PACKED is already defined. Please un-define PACKED before including mrkcommon/util.h
+#endif
+
 #ifndef countof
 #define countof(a) (sizeof(a)/sizeof(a[0]))
 #else

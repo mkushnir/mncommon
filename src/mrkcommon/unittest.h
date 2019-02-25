@@ -13,6 +13,18 @@
 #define FOREACHDATA _FOREACHI(data)
 #define CDATA _CD(data)
 
+#define UNITTEST_DATA_BEGIN(__fields)  \
+struct {                               \
+    int rnd;                           \
+    __fields                           \
+} data[] = {                           \
+
+
+#define UNITTEST_DATA_END()    \
+}                              \
+
+
+
 #define UNITTEST_PROLOG                        \
     unsigned i;                                \
     for (i = 0; i < countof(data); ++i) {      \
