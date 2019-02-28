@@ -8,8 +8,8 @@ CLEANFILES = $(BUILT_SOURCES) *.core
 
 lib_LTLIBRARIES = libmrkcommon.la
 
-nodist_libmrkcommon_la_SOURCES = diag.c
-noinst_HEADERS = diag.h
+nodist_libmrkcommon_la_SOURCES = diag.c diag.h
+noinst_HEADERS =
 
 dumpm_include_headers = mrkcommon/dumpm.h
 dumpm_sources = dumpm.c

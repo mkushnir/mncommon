@@ -4,7 +4,7 @@ CLEANFILES = $(BUILT_SOURCES) *.core
 
 diags = ../src/diag.txt
 
-src_sources = ../src/dumpm.c ../src/array.c ../src/rbt.c diag.c
+src_sources = ../src/dumpm.c ../src/array.c ../src/rbt.c
 
 noinst_PROGRAMS = testfoo
 if HASH
