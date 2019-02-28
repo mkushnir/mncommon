@@ -17,6 +17,14 @@ const char *mrkcommon_diag_str(int);
 #   define GCC_VERSION 0
 #endif
 
+#ifdef __GNUC__
+#   if GCC_VERSION >= 40900
+#       define MRKCOMMON_GENERIC_SUPPORT
+#   endif
+#else
+#   define MRKCOMMON_GENERIC_SUPPORT
+#endif
+
 // clang compatibility
 #define MRKCOMMON_FEATURE_CHECK_STUB(x) 0
 #ifndef __has_feature
@@ -57,7 +65,7 @@ const char *mrkcommon_diag_str(int);
 #undef MAX
 #endif
 #define _MAX(a, b) a > b ? a : b
-#if __STDC_VERSION__ >= 201112
+#if __STDC_VERSION__ >= 201112 && defined(MRKCOMMON_GENERIC_SUPPORT)
 #    define _DMAX(ty, name) \
 static inline ty name(const ty a, const ty b) {return _MAX(a, b);}
 
@@ -116,7 +124,7 @@ _Generic(a,                                            \
 #undef MIN
 #endif
 #define _MIN(a, b) a < b ? a : b
-#if __STDC_VERSION__ >= 201112
+#if __STDC_VERSION__ >= 201112 && defined(MRKCOMMON_GENERIC_SUPPORT)
 #   define _DMIN(ty, name) \
 static inline ty name(const ty a, const ty b) {return _MIN(a, b);}
 
