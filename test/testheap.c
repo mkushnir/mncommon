@@ -24,7 +24,7 @@ mycmp(uint64_t *a, uint64_t *b)
     return MNCMP(*a, *b);
 }
 
-static void
+static int
 myswap(void **a, void **b)
 {
     void *tmp;
@@ -33,6 +33,7 @@ myswap(void **a, void **b)
     tmp = *a;
     *a = *b;
     *b = tmp;
+    return 0;
 }
 
 

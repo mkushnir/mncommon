@@ -110,11 +110,12 @@ my_item_destroy(my_item_t **it)
     }
 }
 
-static void
+static int
 my_item_fini(my_item_t *key, my_item_t *value)
 {
     my_item_destroy(&key);
     my_item_destroy(&value);
+    return 0;
 }
 
 static uint64_t

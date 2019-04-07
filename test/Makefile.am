@@ -110,7 +110,7 @@ testhash_CFLAGS =
 testhash_LDFLAGS =
 
 testfasthash_SOURCES = $(static_sources) ../src/fnvhash.c ../src/mrkcommon/fnvhash.h zltan-fasthash.c fnv/hash_64a.c testfasthash.c
-testfasthash_CFLAGS =
+testfasthash_CFLAGS = -Wno-implicit-fallthrough
 testfasthash_LDADD = $(LDADD) -lz
 
 testprofile_SOURCES = $(static_sources) testprofile.c

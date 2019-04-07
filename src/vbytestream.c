@@ -398,7 +398,7 @@ vbytestream_buf(mnvbytestream_t *stream, size_t sz)
 
 
 static int
-_rewind(struct iovec *iov)
+_rewind(struct iovec *iov, UNUSED void *udata)
 {
     if (iov->iov_base != NULL) {
         iov->iov_len = BSZ(VBYTESTREAM_IOV_BYTES(iov));

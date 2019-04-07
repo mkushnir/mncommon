@@ -269,7 +269,7 @@ pset_item_cmp(pset_item_t *a, pset_item_t *b)
 
 
 static int
-pset_item_fini(pset_item_t *it)
+pset_item_fini(pset_item_t *it, UNUSED void *val)
 {
     if (it != NULL) {
         mnbytes_t *s;
@@ -354,14 +354,14 @@ test2(char *fname)
 
                 s = it1->v;
                 //TRACE("deleting %s", s->data);
-                pset_item_fini(it1);
+                pset_item_fini(it1, NULL);
             }
         } else {
             UNUSED mnbytes_t *s;
 
             s = it0->v;
             //TRACE("deleting dup %s", s->data);
-            pset_item_fini(it0);
+            pset_item_fini(it0, NULL);
         }
     }
 
@@ -444,7 +444,7 @@ test3(char *fname)
 
                 //s = it1->v;
                 //TRACE("deleting %s", s->data);
-                pset_item_fini(it1);
+                pset_item_fini(it1, NULL);
             }
         } else {
             UNUSED mnbytes_t *s;
@@ -452,7 +452,7 @@ test3(char *fname)
             //s = it0->v;
             //TRACE("deleting dup %s", s->data);
             pset_item_ask_cm(it1, &cm);
-            pset_item_fini(it0);
+            pset_item_fini(it0, NULL);
         }
     }
 
