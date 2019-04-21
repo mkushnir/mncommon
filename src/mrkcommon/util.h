@@ -262,7 +262,7 @@ do {                                           \
 
 
 #define _MNCMP(a, b) ((a) < (b) ? -1 : (a) > (b) ? 1 : 0)
-#if __STDC_VERSION__ >= 201112
+#if __STDC_VERSION__ >= 201112 && defined(MRKCOMMON_GENERIC_SUPPORT)
 #   define _DMNCMP(ty, name)   \
 static inline int name(const ty a, const ty b) {return _MNCMP(a, b);}
 
@@ -318,7 +318,7 @@ _Generic(a,                                            \
 
 
 #define _MNCMPR(a, b) ((a) > (b) ? -1 : (a) < (b) ? 1 : 0)
-#if __STDC_VERSION__ >= 201112
+#if __STDC_VERSION__ >= 201112 && defined(MRKCOMMON_GENERIC_SUPPORT)
 #   define _DMNCMPR(ty, name)   \
 static inline int name(const ty a, const ty b) {return _MNCMPR(a, b);}
 
