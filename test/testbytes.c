@@ -296,7 +296,7 @@ test6(void)
         src = bytes_new_from_str_len(CDATA.in, strlen(CDATA.in));
         bytes_str_urlencode2(dst, src);
         //TRACE("testing %s -> %s", BDATA(src), BDATA(dst));
-        assert(strcmp((char *)BDATA(dst), CDATA.out) == 0);
+        assert(strcmp(BCDATA(dst), CDATA.out) == 0);
     }
     BYTES_DECREF(&dst);
 }

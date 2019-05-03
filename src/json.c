@@ -829,7 +829,7 @@ json_parse(json_ctx_t *ctx, const char *in, size_t sz)
     ssize_t res;                                                               \
     mnbytes_t *tmp0, *tmp1;                                                    \
     tmp0 = bytes_new(SEOD(value) + 1);                                         \
-    (void)memcpy((char *)BDATA(tmp0), SDATA(value, 0), SEOD(value));           \
+    (void)memcpy(BCDATA(tmp0), SDATA(value, 0), SEOD(value));                  \
     BDATA(tmp0)[SEOD(value)] = '\0';                                           \
     tmp1 = bytes_json_escape(tmp0);                                            \
     res = bytestream_nprintf(bs,                                               \
@@ -858,7 +858,7 @@ mnjson_bs_pair1(mnbytestream_t *bs, mnbytes_t *key, mnbytestream_t *value)
     ssize_t res;                                                       \
     mnbytes_t *tmp0, *tmp1;                                            \
     tmp0 = bytes_new(SEOD(value) + 1);                                 \
-    (void)memcpy((char *)BDATA(tmp0), SDATA(value, 0), SEOD(value));   \
+    (void)memcpy(BCDATA(tmp0), SDATA(value, 0), SEOD(value));          \
     BDATA(tmp0)[SEOD(value)] = '\0';                                   \
     tmp1 = bytes_json_escape(tmp0);                                    \
     res = bytestream_nprintf(bs,                                       \

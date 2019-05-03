@@ -741,7 +741,7 @@ void
 bytes_urlencode2(mnbytes_t *dst, mnbytes_t *src)
 {
     assert(BSZ(dst) >= (BSZ(src) * 3 + 1));
-    BSZ(dst) = urlencode_reserved((char *)BDATA(dst), (char *)BDATA(src), BSZ(src));
+    BSZ(dst) = urlencode_reserved(BCDATA(dst), BCDATA(src), BSZ(src));
     dst->hash = 0;
 }
 
@@ -750,7 +750,7 @@ void
 bytes_str_urlencode2(mnbytes_t *dst, mnbytes_t *src)
 {
     assert(BSZ(dst) >= (BSZ(src) * 3 + 1));
-    BSZ(dst) = urlencode_reserved((char *)BDATA(dst), (char *)BDATA(src), BSZ(src) - 1);
+    BSZ(dst) = urlencode_reserved(BCDATA(dst), BCDATA(src), BSZ(src) - 1);
     dst->hash = 0;
 }
 
@@ -851,7 +851,7 @@ bytes_base64_encode_url_str(mnbytes_t *s)
     res = bytes_new(sz1 + 1);
     if (MRKUNLIKELY(mrkbase64_encode_url_std(BDATA(s),
                     sz0,
-                    (char *)BDATA(res),
+                    BCDATA(res),
                     sz1) != 0)) {
         BYTES_DECREF(&res);
     } else {
@@ -868,7 +868,7 @@ bytes_base64_decode_url(mnbytes_t *s)
     int res;
     size_t sz = BSZ(s) - 1;
 
-    res = mrkbase64_decode_url_std_inplace((char *)BDATA(s), &sz);
+    res = mrkbase64_decode_url_std_inplace(BCDATA(s), &sz);
     BDATA(s)[sz] = '\0';
     BSZ(s) = sz + 1;
     (void)bytes_hash(s);

@@ -52,6 +52,8 @@ typedef struct _bytes {
 
 #define BDATA(b) (b)->data
 #define BDATASAFE(b) ((b) != NULL ? (b)->data : NULL)
+#define BCDATA(b) (char *)(b)->data
+#define BCDATASAFE(b) (char *)((b) != NULL ? (b)->data : NULL)
 #define BSZ(b) (b)->sz
 #define BSZSAFE(b) ((b) != NULL ? (b)->sz : 0)
 
