@@ -15,6 +15,7 @@ dumpm_include_headers = mrkcommon/dumpm.h
 dumpm_sources = dumpm.c
 
 util_include_headers = mrkcommon/util.h mrkcommon/float.h mrkcommon/endian.h mrkcommon/assert.h mrkcommon/malloc.h mrkcommon/unittest.h
+util_sources = util.c
 
 if ARRAY
 array_sources = array.c
@@ -122,6 +123,7 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(base64_include_headers)
 
 libmrkcommon_la_SOURCES = $(dumpm_sources) \
+			  $(util_sources) \
 			  $(array_sources) \
 			  $(hash_sources) \
 			  $(fasthash_sources) \

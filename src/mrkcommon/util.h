@@ -372,6 +372,11 @@ _Generic(a,                                            \
 #   define MNCMPR(a, b) _MNCMPR((a), (b))
 #endif
 
+
+#define MNTYPECHK(ty, v) _Generic((v), ty: (v), default: (ty)mn_check_type_failure(#ty))
+
+intptr_t mn_check_type_failure(const char *);
+
 #ifdef __cplusplus
 }
 #endif
