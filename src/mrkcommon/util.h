@@ -373,7 +373,11 @@ _Generic(a,                                            \
 #endif
 
 
+#if __STDC_VERSION__ >= 201112 && defined(MRKCOMMON_GENERIC_SUPPORT)
 #define MNTYPECHK(ty, v) _Generic((v), ty: (v), default: (ty)mn_check_type_failure(#ty))
+#else
+#define MNTYPECHK(ty, v) (v)
+#endif
 
 intptr_t mn_check_type_failure(const char *);
 
