@@ -114,6 +114,22 @@ bytestream_grow(mnbytestream_t *stream, size_t incr)
 }
 
 
+int
+bytestream_ensure_buf(mnbytestream_t *stream, ssize_t sz)
+{
+    int res = 0;
+    ssize_t need;
+
+    assert(sz >= 0);
+    need = (stream->eod + sz) - stream->buf.sz;
+
+    if (need > 0) {
+        res = bytestream_grow(stream, MAX(need, stream->growsz));
+    }
+    return 0;
+}
+
+
 ssize_t
 bytestream_read_more(mnbytestream_t *stream, void *in, ssize_t sz)
 {
