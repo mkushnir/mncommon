@@ -126,7 +126,7 @@ bytestream_ensure_buf(mnbytestream_t *stream, ssize_t sz)
     if (need > 0) {
         res = bytestream_grow(stream, MAX(need, stream->growsz));
     }
-    return 0;
+    return res;
 }
 
 
