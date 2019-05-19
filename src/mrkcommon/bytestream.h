@@ -59,6 +59,7 @@ mnbytestream_t *bytestream_copy(mnbytestream_t *);
 void bytestream_destroy(mnbytestream_t **);
 
 int bytestream_grow(mnbytestream_t *, size_t);
+int bytestream_ensure_buf(mnbytestream_t *, ssize_t);
 
 ssize_t bytestream_read_more(mnbytestream_t *, void *, ssize_t);
 ssize_t bytestream_recv_more(mnbytestream_t *, void *, ssize_t);

@@ -102,7 +102,7 @@ mnvoidp_strz(const void *s) { return (const char *)s; }
         uint64_t hash;                                 \
         unsigned char data[sizeof(s)];                 \
     } __bytes_alloca_ ## n = BYTES_INITIALIZERA(s);    \
-    mnbytes_t *n = (mnbytes_t *) &__bytes_alloca_ ## n;\
+    mnbytes_t *n = (mnbytes_t *) &__bytes_alloca_ ## n \
 
 
 #define BYTES_INCREF(b)                                                \
