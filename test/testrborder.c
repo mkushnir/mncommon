@@ -7,7 +7,6 @@
 #include "unittest.h"
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/array.h"
-#include "mrkcommon/list.h"
 
 typedef struct _key_item {
     uint64_t key;

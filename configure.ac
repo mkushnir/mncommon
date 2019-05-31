@@ -2,7 +2,7 @@ AC_INIT(mrkcommon, 0.1, markiyan.kushnir@gmail.com, mrkcommon, https://github.co
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([.ac-aux])
-AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile port/Makefile])
 AC_CONFIG_HEADERS(config.h)
 
 AS_IF([test -n "$USE_GCC"],

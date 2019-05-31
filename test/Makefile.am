@@ -69,7 +69,7 @@ if CMOCKA
 noinst_PROGRAMS += testbar
 endif
 
-noinst_HEADERS = unittest.h rb.h zltan-fasthash.h fnv/fnv.h fnv/longlong.h
+noinst_HEADERS = unittest.h rb.h zltan-fasthash.h fnv/fnv.h fnv/longlong.h freebsd/tree.h
 
 BUILT_SOURCES = diag.c diag.h
 
