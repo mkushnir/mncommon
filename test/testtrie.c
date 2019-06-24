@@ -10,7 +10,7 @@
 #include "mrkcommon/btrie.h"
 
 #ifndef HAVE_FLSL
-#   ifdef __GNUC__
+#   ifdef __GCC__
 #       define flsl(v) (v ? (TREE_DEPTH - __builtin_clzl(v)) : 0)
 #   else
 #       error "Could not find/define flsl."

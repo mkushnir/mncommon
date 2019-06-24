@@ -9,15 +9,19 @@ extern "C" {
 
 const char *mrkcommon_diag_str(int);
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && \
+        !defined(__clang__) && \
+        !defined(__llvm__) && \
+        !defined(__INTEL_COMPILER)
 #   define GCC_VERSION (__GNUC__ * 10000 + \
                         __GNUC_MINOR__ * 100 + \
                         __GNUC_PATCHLEVEL__)
+#   define __GCC__
 #else
 #   define GCC_VERSION 0
 #endif
 
-#ifdef __GNUC__
+#ifdef __GCC__
 #   if GCC_VERSION >= 40900
 #       define MRKCOMMON_GENERIC_SUPPORT
 #   endif
@@ -284,6 +288,7 @@ _DMNCMP(void *, mncmp_vptr)
 #       define MNCMP(a, b)                             \
 _Generic(a,                                            \
          char: mncmp_char,                             \
+         _Bool: mncmp_char,                            \
          unsigned char: mncmp_uchar,                   \
          short: mncmp_short,                           \
          unsigned short: mncmp_ushort,                 \
@@ -340,6 +345,7 @@ _DMNCMP(void *, mncmpr_vptr)
 #       define MNCMPR(a, b)                            \
 _Generic(a,                                            \
          char: mncmpr_char,                            \
+         _Bool: mncmpr_char,                           \
          unsigned char: mncmpr_uchar,                  \
          short: mncmpr_short,                          \
          unsigned short: mncmpr_ushort,                \

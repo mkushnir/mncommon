@@ -18,6 +18,28 @@ extern "C" {
 #define MNDBL_EQ(a, b) (fabs(a - b) < MN_EPSILON)
 
 
+#define MNPOW(x, y)            \
+_Generic(x,                    \
+    float: powf(x, y),         \
+    double: pow(x, y),         \
+    long double: powl(x, y))   \
+
+
+#define MNFABS(x)              \
+_Generic(x,                    \
+    float: fabsf(x),           \
+    double: fabs(x),           \
+    long double: fabsl(x))     \
+
+
+#define MNEXP(x)               \
+_Generic(x,                    \
+    float: expf(x),            \
+    double: exp(x),            \
+    long double: expl(x))      \
+
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -7,18 +7,18 @@
 #include <strings.h>
 #include <limits.h>
 
+#include <mrkcommon/malloc.h>
+#include <mrkcommon/dumpm.h>
+#include <mrkcommon/util.h>
+#include <mrkcommon/pbtrie.h>
+
 #ifndef HAVE_FLSL
-#   ifdef __GNUC__
+#   ifdef __GCC__
 #       define flsl(v) (v ? (64 - __builtin_clzl(v)) : 0)
 #   else
 #       error "Could not find/define flsl."
 #   endif
 #endif
-
-#include <mrkcommon/malloc.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/pbtrie.h>
 
 #include "diag.h"
 
