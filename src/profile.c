@@ -83,6 +83,8 @@ profile_init_module(void)
                    NULL) != 0) {
         FAIL("array_init");
     }
+    array_ensure_datasz(&profiles, 1024, 0);
+
     initialized = 1;
 }
 
@@ -121,7 +123,7 @@ profile_start(const profile_t *p)
         return;
     }
     pp->start = rdtsc();
-    //TRACE("start=%ld", pp->start);
+    //TRACE("p=%p start=%ld", pp, pp->start);
 }
 
 uint64_t
@@ -133,7 +135,7 @@ profile_stop(const profile_t *p)
 
     diff = stop - pp->start;
 
-    //TRACE("stop=%ld diff=%ld", stop, diff);
+    //TRACE("p=%p stop=%ld diff=%ld", pp, stop, diff);
 
     pp->min = MIN(pp->min, diff);
     pp->max = MAX(pp->max, diff);
