@@ -48,6 +48,8 @@ int array_init_ref(mnarray_t *, void *, size_t, size_t,
                    array_initializer_t,
                    array_finalizer_t);
 
+int array_init_from(mnarray_t * restrict, const mnarray_t * restrict, size_t);
+
 int array_reset_no_fini(mnarray_t *, size_t);
 int array_reset_no_fini_mpool(mpool_ctx_t *, mnarray_t *, size_t);
 
@@ -74,7 +76,10 @@ void *array_get(const mnarray_t *, unsigned);
 void *array_get_safe(mnarray_t *, unsigned);
 void *array_get_safe_mpool(mpool_ctx_t *, mnarray_t *, unsigned);
 int array_index(const mnarray_t *, void *);
-void array_copy(mnarray_t *, const mnarray_t *);
+void array_copy(mnarray_t * restrict, const mnarray_t * restrict);
+void arary_copy_slice(mnarray_t * restrict,
+                      const mnarray_t * restrict,
+                      unsigned);
 void *array_get_iter(const mnarray_t *, mnarray_iter_t *);
 int array_clear_item(mnarray_t *, unsigned);
 int array_clear(mnarray_t *);
@@ -103,7 +108,7 @@ void *array_find(const mnarray_t *, const void *, array_compar_t);
 void * array_find_linear(const mnarray_t *, const void *, array_compar_t);
 
 int array_traverse(mnarray_t *, array_traverser_t, void *);
-int array_cmp(const mnarray_t *, const mnarray_t *, array_compar_t, ssize_t);
+int array_cmp(const mnarray_t * restrcit, const mnarray_t * restrict, array_compar_t, ssize_t);
 
 #ifdef __cplusplus
 }

@@ -165,6 +165,51 @@ array_fini_ref(mnarray_t *ar)
 }
 
 
+#define ARRAY_INIT_FROM_BODY(malloc_fn)                        \
+    size_t datasz;                                             \
+    ar->elsz = src->elsz;                                      \
+    ar->elnum = elnum;                                         \
+    ar->init = src->init;                                      \
+    ar->fini = src->fini;                                      \
+    datasz = ar->elsz * elnum;                                 \
+    if (datasz >= MNARRAY_SMALL_DATASZ) {                      \
+        ar->datasz = datasz;                                   \
+    } else if (datasz > 0) {                                   \
+        ar->datasz = 1;                                        \
+        while (ar->datasz < datasz) {                          \
+            ar->datasz <<= 1;                                  \
+        }                                                      \
+    } else {                                                   \
+        assert(datasz == 0);                                   \
+        ar->datasz = 0;                                        \
+    }                                                          \
+    if (elnum > 0) {                                           \
+        if ((ar->data = malloc_fn(ar->datasz)) == NULL) {      \
+            TRRET(ARRAY_INIT + 1);                             \
+        }                                                      \
+        if (ar->init != NULL) {                                \
+            unsigned i;                                        \
+            for (i = 0; i < elnum; ++i) {                      \
+                if (ar->init(ar->data + (i * ar->elsz)) != 0) {\
+                    TRRET(ARRAY_INIT + 2);                     \
+                }                                              \
+            }                                                  \
+        }                                                      \
+    } else {                                                   \
+        ar->data = NULL;                                       \
+    }                                                          \
+    return 0                                                   \
+
+
+int
+array_init_from(mnarray_t * restrict ar,
+                const mnarray_t * restrict src,
+                size_t elnum)
+{
+    ARRAY_INIT_FROM_BODY(malloc);
+}
+
+
 #define ARRAY_RESET_NO_FINI_BODY(free_fn, malloc_fn)           \
     ar->elnum = newelnum;                                      \
     MEMDEBUG_ENTER(ar);                                        \
@@ -612,8 +657,6 @@ array_index(const mnarray_t *ar, void *item)
     uintptr_t s = (uintptr_t)ar->data;
     uintptr_t d = n - s;
 
-    //TRACE("elsz=%ld s=%08lx n=%08lx e=%08lx mod=%ld", ar->elsz, s, n, s * ar->elsz, d % ar->elsz);
-
     if (n >= s && n < (s * ar->elsz) && d % ar->elsz == 0) {
         return d / ar->elsz;
     }
@@ -622,12 +665,29 @@ array_index(const mnarray_t *ar, void *item)
 
 
 void
-array_copy(mnarray_t *dst, const mnarray_t *src)
+array_copy(mnarray_t * restrict dst, const mnarray_t * restrict src)
 {
     size_t sz;
     sz = dst->elnum * dst->elsz;
     assert(sz == src->elnum * src->elsz);
     memcpy(dst->data, src->data, sz);
+}
+
+
+void
+arary_copy_slice(mnarray_t * restrict dst,
+                 const mnarray_t * restrict src,
+                 unsigned idx)
+{
+    size_t sz;
+    const char *p;
+
+    assert(dst->elnum <= (src->elnum - idx));
+    assert(dst->elsz == src->elsz);
+
+    sz = dst->elnum * dst->elsz;
+    p = src->data;
+    memcpy(dst->data, p + idx * src->elsz, sz);
 }
 
 
@@ -864,7 +924,10 @@ array_traverse(mnarray_t *ar, array_traverser_t tr, void *udata)
 
 
 int
-array_cmp(const mnarray_t *ar1, const mnarray_t *ar2, array_compar_t cmp, ssize_t sz)
+array_cmp(const mnarray_t * restrict ar1,
+          const mnarray_t * restrict ar2,
+          array_compar_t cmp,
+          ssize_t sz)
 {
     ssize_t res;
     ssize_t sz1, sz2;
