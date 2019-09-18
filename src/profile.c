@@ -129,11 +129,9 @@ profile_start(const profile_t *p)
 uint64_t
 profile_stop(const profile_t *p)
 {
-    profile_t *pp = (profile_t *)p;
     uint64_t stop = rdtsc();
-    uint64_t diff;
-
-    diff = stop - pp->start;
+    profile_t *pp = (profile_t *)p;
+    uint64_t diff = stop - pp->start;
 
     //TRACE("p=%p stop=%ld diff=%ld", pp, stop, diff);
 
