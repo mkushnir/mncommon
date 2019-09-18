@@ -5,14 +5,6 @@
 extern "C" {
 #endif
 
-#ifdef MRKCOMMON_LDUMPM_H
-#error "Please use eigher this file or mrkcommon/ldumpm.h, or #include logging_private.h AFTER this file."
-#endif
-
-#ifdef MRKCOMMON_LOGGING_H
-#error "Please use either this file or mrkcommon/logging.h, or #include mrkcommon/logging.h AFTER this file."
-#endif
-
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
