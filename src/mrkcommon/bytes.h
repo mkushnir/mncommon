@@ -71,24 +71,30 @@ mnvoidp_strz(const void *s) { return (const char *)s; }
         )(s)                                   \
 
 
+/*
+ * s must be a string literal
+ */
 #define BYTES_INITIALIZER(s)   \
 {                              \
     .nref = 0x40000000,        \
     .sz = sizeof(s),           \
     .hash = 0l,                \
-    .data = s                  \
+    .data = "" s ""            \
 }                              \
 
 
 #define BYTES_NREF_STATIC_INVARIANT(s) assert((s).nref == 0x40000000)
 
 
+/*
+ * s must be a string literal
+ */
 #define BYTES_INITIALIZERA(s)  \
 {                              \
     .nref = 0x70000000,        \
     .sz = sizeof(s),           \
     .hash = 0l,                \
-    .data = s                  \
+    .data = "" s ""            \
 }                              \
 
 
