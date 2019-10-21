@@ -5,7 +5,7 @@
 #ifdef HAVE_SYS_TREE_H
 #include <sys/tree.h>
 #else
-#include <mrkcommon/freebsd/tree.h>
+#include "freebsd/tree.h"
 #endif
 
 struct _rb_node {

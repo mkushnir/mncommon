@@ -67,7 +67,9 @@ profile_init_module(void)
 #ifdef HAVE_SYSCTLBYNAME
     size_t sz = sizeof(tsc_freq);
     if (sysctlbyname("machdep.tsc_freq", &tsc_freq, &sz, NULL, 0) != 0) {
-        FAIL("sysctlbyname");
+        if (sysctlbyname("machdep.tsc.frequency", &tsc_freq, &sz, NULL, 0) != 0) {
+            FAIL("sysctlbyname");
+        }
     }
 #else
     /* fake */

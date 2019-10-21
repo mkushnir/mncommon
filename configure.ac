@@ -117,6 +117,7 @@ AC_CHECK_FUNCS([clock_gettime])
 AC_CHECK_FUNCS([flsl])
 AC_CHECK_FUNCS([getpagesize])
 AC_CHECK_FUNCS([malloc_usable_size])
+AC_CHECK_FUNCS([malloc_size])
 AC_CHECK_FUNCS([memmove])
 AC_CHECK_FUNCS([memset])
 AC_CHECK_FUNCS([strdup])
@@ -342,5 +343,9 @@ AS_IF([! test \( "$enable_hash" = "yes" -a "$enable_fasthash" = "yes" \) -o \
 
 AS_IF([test "$enable_cm" = "yes" -a \( "$enable_hash" != "yes" -o "$enable_fasthash" != "yes" \)],
       [AC_MSG_FAILURE([Cannot disable the hash feature because the cm feature requires it.])])
+
+AM_CONDITIONAL([LINUX], [echo $build_os | grep linux >/dev/null])
+AM_CONDITIONAL([FREEBSD], [echo $build_os | grep freebsd >/dev/null])
+AM_CONDITIONAL([DARWIN], [echo $build_os | grep darwin >/dev/null])
 
 AC_OUTPUT

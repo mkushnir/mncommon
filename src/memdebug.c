@@ -25,9 +25,17 @@ reallocf(void *ptr, size_t sz)
 }
 #endif
 
-#include "mrkcommon/dumpm.h"
+#include <mrkcommon/dumpm.h>
 #include <mrkcommon/util.h>
 
+#ifndef HAVE_MALLOC_USABLE_SIZE
+#   ifdef HAVE_MALLOC_SIZE
+#       include <malloc/malloc.h>
+#       define malloc_usable_size malloc_size
+#   else
+#       error   Cannot find either of malloc_usable_size or malloc_size
+#   endif
+#endif
 
 #define MEMDEBUG_BODY(ptr, op1, op2, __a1)                     \
 if ((ptr) != NULL) {                                           \
