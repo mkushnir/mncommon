@@ -145,11 +145,7 @@ libmrkcommon_la_SOURCES = $(dumpm_sources) \
 DEBUG_LD_FLAGS =
 if DEBUG
 DEBUG_CC_FLAGS = -g -O0 @CC_DEBUG@
-if DARWIN
-DEBUG_LD_FLAGS += -no-fast-install
-else
-DEBUG_LD_FLAGS += -no-install
-endif
+DEBUG_LD_FLAGS += @LIBTOOL_NO_INSTALL@
 else
 DEBUG_CC_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
 if LTO
