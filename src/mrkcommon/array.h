@@ -30,6 +30,11 @@ typedef struct _mnarray {
     array_finalizer_t fini;
 } mnarray_t;
 
+#define ARRAY_DATA(a) (a)->data
+#define ARRAY_ELNUM(a) (a)->elnum
+#define ARRAY_ELSZ(a) (a)->elsz
+#define ARRAY_SIZE(a) ((a)->elnum * (a)->elsz)
+
 typedef struct _mnarray_iter {
     unsigned iter;
     void *data;
