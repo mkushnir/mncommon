@@ -27,9 +27,6 @@ typedef int (*hash_item_comparator_t)(void *, void *);
 typedef int (*hash_item_finalizer_t)(void *, void *);
 typedef int (*hash_traverser_t)(void *, void *, void *);
 typedef struct _mnhash {
-#ifdef DO_MEMDEBUG
-    uint64_t mdtag;
-#endif
     hash_hashfn_t hashfn;
     hash_item_comparator_t cmp;
     hash_item_finalizer_t fini;

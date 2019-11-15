@@ -15,34 +15,12 @@
 extern "C" {
 #endif
 
-#ifdef DO_MEMDEBUG
-#define MEMDEBUG_ENTER_BYTES(self)                             \
-{                                                              \
-    int mdtag;                                                 \
-    mdtag = memdebug_set_runtime_scope((int)(self)-> mdtag);   \
-
-
-#define MEMDEBUG_LEAVE_BYTES(self)             \
-    (void)memdebug_set_runtime_scope(mdtag);   \
-}                                              \
-
-
-#else
-#define MEMDEBUG_ENTER_BYTES(self)
-#define MEMDEBUG_LEAVE_BYTES(self)
-#endif
 /*
  * XXX check out compile_bytes_t(), lkit_compile_expr(), and ltype_compile()
  */
 typedef struct _bytes {
-#ifdef DO_MEMDEBUG
-    uint64_t mdtag;
-#define BYTES_SZ_IDX 2
-#define BYTES_DATA_IDX 4
-#else
 #define BYTES_SZ_IDX 1
 #define BYTES_DATA_IDX 3
-#endif
     ssize_t nref;
     size_t sz;
     uint64_t hash;
@@ -74,31 +52,24 @@ mnvoidp_strz(const void *s) { return (const char *)s; }
 /*
  * s must be a string literal
  */
-#define BYTES_INITIALIZER(s)   \
-{                              \
-    .nref = 0x40000000,        \
-    .sz = sizeof(s),           \
-    .hash = 0l,                \
-    .data = "" s ""            \
-}                              \
+
+#define _BYTES_INITIALIZER(s, n)       \
+{                                      \
+    .nref = n,                         \
+    .sz = sizeof(s),                   \
+    .hash = 0l,                        \
+    .data = "" s ""                    \
+}                                      \
 
 
+#define BYTES_INITIALIZER(s) _BYTES_INITIALIZER(s, 0x40000000)
 #define BYTES_NREF_STATIC_INVARIANT(s) assert((s).nref == 0x40000000)
 
-
-/*
- * s must be a string literal
- */
-#define BYTES_INITIALIZERA(s)  \
-{                              \
-    .nref = 0x70000000,        \
-    .sz = sizeof(s),           \
-    .hash = 0l,                \
-    .data = "" s ""            \
-}                              \
-
-
+#define BYTES_INITIALIZERA(s) _BYTES_INITIALIZER(s, 0x70000000)
 #define BYTES_NREF_AUTO_INVARIANT(s) assert((s).nref == 0x70000000)
+
+#define BYTES_INITIALIZERB(s) _BYTES_INITIALIZER(s, 0x90000000)
+#define BYTES_NREF_REF_INVARIANT(s) assert((s).nref == 0x90000000)
 
 
 #define BYTES_ALLOCA(n, s)                             \
@@ -109,6 +80,15 @@ mnvoidp_strz(const void *s) { return (const char *)s; }
         unsigned char data[sizeof(s)];                 \
     } __bytes_alloca_ ## n = BYTES_INITIALIZERA(s);    \
     mnbytes_t *n = (mnbytes_t *) &__bytes_alloca_ ## n \
+
+
+#define BYTES_REF(s)                   \
+    (mnbytes_t *)(&(struct {           \
+    ssize_t nref;                      \
+    size_t sz;                         \
+    uint64_t hash;                     \
+    unsigned char data[sizeof(s)];     \
+    })BYTES_INITIALIZERB(s))           \
 
 
 #define BYTES_INCREF(b)                                                \
@@ -129,9 +109,7 @@ do {                                                   \
  */                                                    \
         --(*(pb))->nref;                               \
         if ((*(pb))->nref <= 0) {                      \
-            MEMDEBUG_ENTER_BYTES(*(pb));               \
             free(*(pb));                               \
-            MEMDEBUG_LEAVE_BYTES(*(pb));               \
         }                                              \
         *(pb) = NULL;                                  \
     }                                                  \
@@ -145,19 +123,12 @@ do {                                                           \
 /*                                                             \
         TRACE("B<<< %p %ld '%s'", b, (b)->nref, (b)->data);    \
  */                                                            \
-        MEMDEBUG_ENTER_BYTES(b);                               \
         free((b));                                             \
-        MEMDEBUG_LEAVE_BYTES(b);                               \
     }                                                          \
 } while (0)                                                    \
 
-#ifdef DO_MEMDEBUG
-#define BYTES_DECREF bytes_decref
-#define BYTES_DECREF_FAST bytes_decref_fast
-#else
 #define BYTES_DECREF _BYTES_DECREF
 #define BYTES_DECREF_FAST _BYTES_DECREF_FAST
-#endif
 
 char *strrstr(const char *, const char *);
 

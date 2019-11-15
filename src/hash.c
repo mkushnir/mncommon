@@ -9,32 +9,6 @@
 #include <mrkcommon/util.h>
 #include "diag.h"
 
-#ifdef DO_MEMDEBUG
-#include <mrkcommon/memdebug.h>
-MEMDEBUG_DECLARE(dict);
-
-#define MEMDEBUG_INIT(self)                                    \
-do {                                                           \
-    (self)->mdtag = (uint64_t)memdebug_get_runtime_scope();    \
-} while (0)                                                    \
-
-
-#define MEMDEBUG_ENTER(self)                                   \
-{                                                              \
-    int mdtag;                                                 \
-    mdtag = memdebug_set_runtime_scope((int)(self)->mdtag);    \
-
-
-#define MEMDEBUG_LEAVE(self)                   \
-    (void)memdebug_set_runtime_scope(mdtag);   \
-}                                              \
-
-
-#else
-#define MEMDEBUG_INIT(self)
-#define MEMDEBUG_ENTER(self)
-#define MEMDEBUG_LEAVE(self)
-#endif
 
 #define _malloc(sz) mpool_malloc(mpool, (sz))
 #define _free(p) mpool_free(mpool, (p))
@@ -127,11 +101,9 @@ null_init(void **v)
     if ((phit = array_get(&dict->table, idx)) == NULL) {       \
         FAIL("array_get");                                     \
     }                                                          \
-    MEMDEBUG_ENTER(dict);                                      \
     if ((hit = malloc_fn(sizeof(mnhash_item_t))) == NULL) {    \
         FAIL("malloc_fn");                                     \
     }                                                          \
-    MEMDEBUG_LEAVE(dict);                                      \
     hit->bucket = phit;                                        \
     hit->prev = NULL;                                          \
     if (*phit == NULL) {                                       \
@@ -172,11 +144,9 @@ hash_set_item_mpool(mpool_ctx_t *mpool, mnhash_t *dict, void *key, void *value)
         FAIL("array_get");                                     \
     }                                                          \
     if (*phit == NULL) {                                       \
-        MEMDEBUG_ENTER(dict);                                  \
         if ((hit = malloc_fn(sizeof(mnhash_item_t))) == NULL) {\
             FAIL("malloc_fn");                                 \
         }                                                      \
-        MEMDEBUG_LEAVE(dict);                                  \
         hit->bucket = phit;                                    \
         hit->prev = NULL;                                      \
         hit->next = NULL;                                      \
@@ -197,11 +167,9 @@ hash_set_item_mpool(mpool_ctx_t *mpool, mnhash_t *dict, void *key, void *value)
                 return;                                        \
             }                                                  \
         }                                                      \
-        MEMDEBUG_ENTER(dict);                                  \
         if ((hit = malloc_fn(sizeof(mnhash_item_t))) == NULL) {\
             FAIL("malloc_fn");                                 \
         }                                                      \
-        MEMDEBUG_LEAVE(dict);                                  \
         hit->next = *phit;                                     \
         (*phit)->prev = hit;                                   \
         (*phit)->bucket = NULL;                                \
@@ -284,9 +252,7 @@ hash_get_item(mnhash_t *dict, void *key)
         }                                                      \
         *phit = hit->next;                                     \
         value = hit->value;                                    \
-        MEMDEBUG_ENTER(dict);                                  \
         free_fn(hit);                                          \
-        MEMDEBUG_LEAVE(dict);                                  \
         --dict->elnum;                                         \
         return value;                                          \
     }                                                          \
@@ -299,9 +265,7 @@ hash_get_item(mnhash_t *dict, void *key)
                 hit->next->prev = hit->prev;                   \
             }                                                  \
             value = hit->value;                                \
-            MEMDEBUG_ENTER(dict);                              \
             free_fn(hit);                                      \
-            MEMDEBUG_LEAVE(dict);                              \
             --dict->elnum;                                     \
             return value;                                      \
         }                                                      \
@@ -339,9 +303,7 @@ hash_remove_item_mpool(mpool_ctx_t *mpool, mnhash_t *dict, void *key)
     if (dict->fini != NULL) {                  \
         dict->fini(hit->key, hit->value);      \
     }                                          \
-    MEMDEBUG_ENTER(dict);                      \
     free_fn(hit);                              \
-    MEMDEBUG_LEAVE(dict);                      \
     --dict->elnum;                             \
 
 
@@ -359,9 +321,7 @@ hash_remove_item_mpool(mpool_ctx_t *mpool, mnhash_t *dict, void *key)
             hit->next->bucket = hit->bucket;   \
         }                                      \
     }                                          \
-    MEMDEBUG_ENTER(dict);                      \
     free_fn(hit);                              \
-    MEMDEBUG_LEAVE(dict);                      \
     --dict->elnum;                             \
 
 
@@ -537,9 +497,7 @@ hash_init_mpool(mpool_ctx_t *mpool,
                 if (dict->fini(hit->key, hit->value) != 0) {   \
                     break;                                     \
                 }                                              \
-                MEMDEBUG_ENTER(dict);                          \
                 free_fn(hit);                                  \
-                MEMDEBUG_LEAVE(dict);                          \
                 --dict->elnum;                                 \
             }                                                  \
             *phit = NULL;                                      \
@@ -551,9 +509,7 @@ hash_init_mpool(mpool_ctx_t *mpool,
             phit = ARRAY_GET(mnhash_item_t *, &dict->table, i);\
             for (hit = *phit; hit != NULL; hit = next) {       \
                 next = hit->next;                              \
-                MEMDEBUG_ENTER(dict);                          \
                 free_fn(hit);                                  \
-                MEMDEBUG_LEAVE(dict);                          \
                 --dict->elnum;                                 \
             }                                                  \
             *phit = NULL;                                      \
@@ -573,10 +529,7 @@ hash_new(size_t sz,
     if ((dict = malloc(sizeof(mnhash_t))) == NULL) {
         FAIL("malloc");
     }
-    MEMDEBUG_INIT(dict);
-    MEMDEBUG_ENTER(dict);
     HASH_INIT_BODY(array_init);
-    MEMDEBUG_LEAVE(dict);
 
     return dict;
 }
@@ -594,10 +547,7 @@ hash_new_mpool(mpool_ctx_t *mpool,
     if ((dict = mpool_malloc(mpool, sizeof(mnhash_t))) == NULL) {
         FAIL("malloc");
     }
-    MEMDEBUG_INIT(dict);
-    MEMDEBUG_ENTER(dict);
     HASH_INIT_BODY(_array_init);
-    MEMDEBUG_LEAVE(dict);
 
     return dict;
 }

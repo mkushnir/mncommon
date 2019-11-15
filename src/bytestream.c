@@ -15,32 +15,6 @@
 #include "mrkcommon/dumpm.h"
 #include "mrkcommon/bytestream.h"
 
-#ifdef DO_MEMDEBUG
-#include <mrkcommon/memdebug.h>
-MEMDEBUG_DECLARE(bytestream);
-
-#define MEMDEBUG_INIT(self)                                    \
-do {                                                           \
-    (self)->mdtag = (uint64_t)memdebug_get_runtime_scope();    \
-} while (0)                                                    \
-
-
-#define MEMDEBUG_ENTER(self)                                   \
-{                                                              \
-    int mdtag;                                                 \
-    mdtag = memdebug_set_runtime_scope((int)(self)->mdtag);    \
-
-
-#define MEMDEBUG_LEAVE(self)                   \
-    (void)memdebug_set_runtime_scope(mdtag);   \
-}                                              \
-
-
-#else
-#define MEMDEBUG_INIT(self)
-#define MEMDEBUG_ENTER(self)
-#define MEMDEBUG_LEAVE(self)
-#endif
 
 int
 bytestream_dump(mnbytestream_t *stream)
@@ -60,8 +34,6 @@ bytestream_init(mnbytestream_t *stream, ssize_t growsz)
 {
     stream->buf.sz = growsz;
     stream->growsz = growsz;
-    MEMDEBUG_INIT(stream);
-    MEMDEBUG_ENTER(stream);
     if (growsz > 0) {
         if ((stream->buf.data = malloc(stream->buf.sz)) == NULL) {
             TRRET(BYTESTREAM_INIT + 1);
@@ -69,7 +41,6 @@ bytestream_init(mnbytestream_t *stream, ssize_t growsz)
     } else {
         stream->buf.data = NULL;
     }
-    MEMDEBUG_LEAVE(stream);
     stream->eod = 0;
     stream->pos = 0;
     stream->read_more = NULL;
@@ -102,12 +73,10 @@ int
 bytestream_grow(mnbytestream_t *stream, size_t incr)
 {
     char *tmp;
-    MEMDEBUG_ENTER(stream);
     if ((tmp = realloc(stream->buf.data,
                          stream->buf.sz + incr)) == NULL) {
         TRRET(BYTESTREAM_GROW + 1);
     }
-    MEMDEBUG_LEAVE(stream);
     stream->buf.data = tmp;
     stream->buf.sz += incr;
     return 0;
@@ -396,12 +365,10 @@ bytestream_recycle(mnbytestream_t *stream, int ngrowsz, off_t from)
 void
 bytestream_fini(mnbytestream_t *stream)
 {
-    MEMDEBUG_ENTER(stream);
     if (stream->buf.data != NULL) {
         free(stream->buf.data);
         stream->buf.data = NULL;
     }
-    MEMDEBUG_LEAVE(stream);
     stream->read_more = NULL;
     stream->write = NULL;
     stream->udata = NULL;
@@ -432,8 +399,6 @@ bytestream_copy(mnbytestream_t *bs)
 
     res->buf.sz = bs->buf.sz;
     res->growsz = bs->growsz;
-    MEMDEBUG_INIT(res);
-    MEMDEBUG_ENTER(res);
     if (bs->buf.data != NULL) {
         assert(res->buf.sz > 0);
         if ((res->buf.data = malloc(res->buf.sz)) == NULL) {
@@ -443,7 +408,6 @@ bytestream_copy(mnbytestream_t *bs)
     } else {
         res->buf.data = NULL;
     }
-    MEMDEBUG_LEAVE(res);
     res->eod = bs->eod;
     res->pos = bs->pos;
     res->read_more = bs->read_more;

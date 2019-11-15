@@ -12,34 +12,6 @@
 #include <mrkcommon/util.h>
 #include "diag.h"
 
-#ifdef DO_MEMDEBUG
-#include <mrkcommon/memdebug.h>
-MEMDEBUG_DECLARE(array);
-
-#define MEMDEBUG_INIT(self)                                    \
-do {                                                           \
-    (self)->mdtag = (uint64_t)memdebug_get_runtime_scope();    \
-} while (0)                                                    \
-
-
-#define MEMDEBUG_ENTER(self)                                   \
-{                                                              \
-    int mdtag;                                                 \
-    mdtag = memdebug_set_runtime_scope((int)(self)->mdtag);    \
-
-
-#define MEMDEBUG_LEAVE(self)                   \
-    (void)memdebug_set_runtime_scope(mdtag);   \
-}                                              \
-
-
-#else
-#define MEMDEBUG_INIT(self)
-#define MEMDEBUG_ENTER(self)
-#define MEMDEBUG_LEAVE(self)
-#endif
-
-
 #define _malloc(sz) mpool_malloc(mpool, (sz))
 #define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
 #define _free(p) mpool_free(mpool, (p))
@@ -81,8 +53,6 @@ array_init_mpool(mpool,        \
         assert(datasz == 0);                                   \
         ar->datasz = 0;                                        \
     }                                                          \
-    MEMDEBUG_INIT(ar);                                         \
-    MEMDEBUG_ENTER(ar);                                        \
     if (elnum > 0) {                                           \
         if ((ar->data = malloc_fn(ar->datasz)) == NULL) {      \
             TRRET(ARRAY_INIT + 1);                             \
@@ -98,7 +68,6 @@ array_init_mpool(mpool,        \
     } else {                                                   \
         ar->data = NULL;                                       \
     }                                                          \
-    MEMDEBUG_LEAVE(ar);                                        \
     return 0                                                   \
 
 
@@ -212,7 +181,6 @@ array_init_from(mnarray_t * restrict ar,
 
 #define ARRAY_RESET_NO_FINI_BODY(free_fn, malloc_fn)           \
     ar->elnum = newelnum;                                      \
-    MEMDEBUG_ENTER(ar);                                        \
     if (ar->data != NULL) {                                    \
         free_fn(ar->data);                                     \
     }                                                          \
@@ -243,7 +211,6 @@ array_init_from(mnarray_t * restrict ar,
         ar->datasz = 0;                                        \
         ar->data = NULL;                                       \
     }                                                          \
-    MEMDEBUG_LEAVE(ar);                                        \
     return 0                                                   \
 
 
@@ -335,7 +302,6 @@ array_destroy_mpool(mpool_ctx_t *mpool, mnarray_t **ar)
 
 #define ARRAY_ENSURE_DIRTY_BODY(realloc_fn, free_fn, __a)                      \
     void *newdata;                                                             \
-    MEMDEBUG_ENTER(ar);                                                        \
     if (!(flags & ARRAY_FLAG_SAVE)) {                                          \
         if (newelnum > 0) {                                                    \
             size_t newdatasz;                                                  \
@@ -387,7 +353,6 @@ array_destroy_mpool(mpool_ctx_t *mpool, mnarray_t **ar)
             }                                                                  \
         }                                                                      \
     }                                                                          \
-    MEMDEBUG_LEAVE(ar);                                                        \
     ar->data = newdata;                                                        \
     __a                                                                        \
 
@@ -436,7 +401,6 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
 #define ARRAY_ENSURE_BODY(realloc_fn, free_fn, __a)                            \
     void *newdata;                                                             \
     unsigned i;                                                                \
-    MEMDEBUG_ENTER(ar);                                                        \
     if (!(flags & ARRAY_FLAG_SAVE)) {                                          \
         if (ar->fini != NULL) {                                                \
             for (i = 0; i < ar->elnum; ++i) {                                  \
@@ -504,7 +468,6 @@ array_ensure_datasz_dirty_mpool(mpool_ctx_t *mpool,
             newdata = ar->data;                                                \
         }                                                                      \
     }                                                                          \
-    MEMDEBUG_LEAVE(ar);                                                        \
     ar->data = newdata;                                                        \
     __a                                                                        \
 
@@ -705,7 +668,6 @@ int
 array_fini(mnarray_t *ar)
 {
     unsigned i;
-    MEMDEBUG_ENTER(ar);
     if (ar->data != NULL) {
         if (ar->fini != NULL) {
             for (i = 0; i < ar->elnum; ++i) {
@@ -714,7 +676,6 @@ array_fini(mnarray_t *ar)
         }
         free(ar->data);
     }
-    MEMDEBUG_LEAVE(ar);
     ar->data = NULL;
     ar->init = NULL;
     ar->fini = NULL;
@@ -727,7 +688,6 @@ int
 array_fini_mpool(mpool_ctx_t *mpool, mnarray_t *ar)
 {
     unsigned i;
-    MEMDEBUG_ENTER(ar);
     if (ar->data != NULL) {
         if (ar->fini != NULL) {
             for (i = 0; i < ar->elnum; ++i) {
@@ -736,7 +696,6 @@ array_fini_mpool(mpool_ctx_t *mpool, mnarray_t *ar)
         }
         mpool_free(mpool, ar->data);
     }
-    MEMDEBUG_LEAVE(ar);
     ar->data = NULL;
     ar->init = NULL;
     ar->fini = NULL;

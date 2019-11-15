@@ -15,34 +15,6 @@
 
 #include "diag.h"
 
-#ifdef DO_MEMDEBUG
-#include <mrkcommon/memdebug.h>
-MEMDEBUG_DECLARE(bytes);
-
-#define MEMDEBUG_INIT(self)                                    \
-do {                                                           \
-    (self)->mdtag = (uint64_t)memdebug_get_runtime_scope();    \
-} while (0)                                                    \
-
-
-#define MEMDEBUG_ENTER(self)                                   \
-{                                                              \
-    int mdtag;                                                 \
-    mdtag = memdebug_set_runtime_scope((int)(self)->mdtag);    \
-
-
-#define MEMDEBUG_LEAVE(self)                   \
-    (void)memdebug_set_runtime_scope(mdtag);   \
-}                                              \
-
-
-#else
-#define MEMDEBUG_INIT(self)
-#define MEMDEBUG_ENTER(self)
-#define MEMDEBUG_LEAVE(self)
-#endif
-
-
 #define RFC3986_RESEVED 0x01
 #define RFC3986_OTHERS  0x02
 #define RFC3986_UNRESERVED  0x04
@@ -387,7 +359,7 @@ bytes_containsi(mnbytes_t *a, mnbytes_t *b)
 
 #define BYTES_NEW_BODY(malloc_fn)                              \
     size_t mod, msz;                                           \
-    mnbytes_t *res;                                              \
+    mnbytes_t *res;                                            \
     assert(sz > 0);                                            \
     msz = sz;                                                  \
     mod = sz % 8;                                              \
@@ -396,17 +368,16 @@ bytes_containsi(mnbytes_t *a, mnbytes_t *b)
     } else {                                                   \
         msz += 8;                                              \
     }                                                          \
-    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {    \
+    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {  \
         FAIL("malloc");                                        \
     }                                                          \
-    MEMDEBUG_INIT(res);                                        \
     res->nref = 0;                                             \
     res->sz = sz;                                              \
     res->hash = 0;                                             \
     return res
 
 #define BYTES_NEW_FROM_STR_BODY(malloc_fn)                     \
-    mnbytes_t *res;                                              \
+    mnbytes_t *res;                                            \
     size_t mod, msz;                                           \
     size_t sz;                                                 \
     sz = strlen(s) + 1;                                        \
@@ -417,10 +388,9 @@ bytes_containsi(mnbytes_t *a, mnbytes_t *b)
     } else {                                                   \
         msz += 8;                                              \
     }                                                          \
-    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {    \
+    if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {  \
         FAIL("malloc");                                        \
     }                                                          \
-    MEMDEBUG_INIT(res);                                        \
     memcpy(res->data, s, sz);                                  \
     res->nref = 0;                                             \
     res->sz = sz;                                              \
@@ -456,7 +426,6 @@ bytes_new_from_str(const char *s)
     if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {  \
         FAIL("malloc");                                        \
     }                                                          \
-    MEMDEBUG_INIT(res);                                        \
     memcpy(res->data, s->data, s->sz);                         \
     res->nref = 0;                                             \
     res->sz = s->sz;                                           \
@@ -485,7 +454,6 @@ bytes_new_from_bytes(const mnbytes_t *s)
     if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {  \
         FAIL("malloc");                                        \
     }                                                          \
-    MEMDEBUG_INIT(res);                                        \
     memcpy(res->data, s, sz);                                  \
     res->data[sz - 1] = '\0';                                  \
     res->nref = 0;                                             \
@@ -523,7 +491,6 @@ bytes_new_from_buf_len(const char *s, size_t sz)
     if ((res = malloc_fn(sizeof(mnbytes_t) + msz)) == NULL) {  \
         FAIL("malloc");                                        \
     }                                                          \
-    MEMDEBUG_INIT(res);                                        \
     memcpy(res->data, s, sz);                                  \
     res->nref = 0;                                             \
     res->sz = sz;                                              \

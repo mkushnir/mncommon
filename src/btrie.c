@@ -25,10 +25,6 @@
 
 #include "diag.h"
 
-#ifdef DO_MEMDEBUG
-#include "mrkcommon/memdebug.h"
-MEMDEBUG_DECLARE(trie);
-#endif
 
 #define _malloc(sz) mpool_malloc(mpool, (sz))
 #define _free(ptr) mpool_free(mpool, (ptr))

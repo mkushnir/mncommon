@@ -9,33 +9,6 @@
 
 #include "diag.h"
 
-#ifdef DO_MEMDEBUG
-#include <mrkcommon/memdebug.h>
-MEMDEBUG_DECLARE(mpool);
-
-#define MEMDEBUG_INIT(self)                                    \
-do {                                                           \
-    (self)->mdtag = (uint64_t)memdebug_get_runtime_scope();    \
-} while (0)                                                    \
-
-
-#define MEMDEBUG_ENTER(self)                                   \
-{                                                              \
-    int mdtag;                                                 \
-    mdtag = memdebug_set_runtime_scope((int)(self)->mdtag);    \
-
-
-#define MEMDEBUG_LEAVE(self)                   \
-    (void)memdebug_set_runtime_scope(mdtag);   \
-}                                              \
-
-
-#else
-#define MEMDEBUG_INIT(self)
-#define MEMDEBUG_ENTER(self)
-#define MEMDEBUG_LEAVE(self)
-#endif
-
 
 //#define MPOOL_USE_STD_MALLOC
 
@@ -60,16 +33,12 @@ new_chunk(mpool_ctx_t *mpool, size_t sz)
         ++mpool->current_chunk;
         if (mpool->current_chunk * sizeof(void *) == mpool->arenasz) {
             mpool->arenasz *= 2;
-            MEMDEBUG_ENTER(mpool);
             mpool->arena = realloc(mpool->arena, mpool->arenasz);
-            MEMDEBUG_LEAVE(mpool);
             assert(mpool->arena != NULL);
         }
 
         chunk = mpool->arena + mpool->current_chunk;
-        MEMDEBUG_ENTER(mpool);
         *chunk = malloc(sz);
-        MEMDEBUG_LEAVE(mpool);
         assert(*chunk != NULL);
     } else {
         ++mpool->current_chunk;
@@ -198,17 +167,14 @@ mpool_free(UNUSED mpool_ctx_t *mpool, UNUSED void *o)
 int
 mpool_ctx_init(mpool_ctx_t *mpool, size_t chunksz)
 {
-    MEMDEBUG_INIT(mpool);
     mpool->chunksz = chunksz;
     mpool->current_chunk = 0;
     mpool->last_chunk = 0;
     mpool->current_pos = 0;
     mpool->arenasz = sizeof(void *);
-    MEMDEBUG_ENTER(mpool);
     mpool->arena = malloc(mpool->arenasz);
     assert(mpool->arena != NULL);
     mpool->arena[0] = malloc(mpool->chunksz);
-    MEMDEBUG_LEAVE(mpool);
     assert(mpool->arena[0] != NULL);
     return 0;
 }
@@ -277,7 +243,6 @@ mpool_ctx_fini(mpool_ctx_t *mpool)
 
     mpool->last_chunk = MAX(mpool->last_chunk, mpool->current_chunk);
 
-    MEMDEBUG_ENTER(mpool);
     for (i = mpool->last_chunk; i >= 0; --i) {
         void *chunk;
         chunk = mpool->arena[i];
@@ -285,7 +250,6 @@ mpool_ctx_fini(mpool_ctx_t *mpool)
         free(chunk);
     }
     free(mpool->arena);
-    MEMDEBUG_LEAVE(mpool);
     mpool->arena = NULL;
     return 0;
 }

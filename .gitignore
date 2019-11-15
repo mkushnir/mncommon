@@ -1,7 +1,6 @@
 m4
 INSTALL
 Makefile
-Makefile.in
 aclocal.m4
 ar-lib
 autom4te.cache

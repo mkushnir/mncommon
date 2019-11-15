@@ -17,9 +17,6 @@ struct _mpool_item {
     char data[];
 };
 typedef struct _mpool_ctx {
-#ifdef DO_MEMDEBUG
-    uint64_t mdtag;
-#endif
     size_t arenasz;
     size_t chunksz;
     int current_chunk;
