@@ -128,7 +128,10 @@ hash_set_item(mnhash_t *dict, void *key, void *value)
 
 
 void
-hash_set_item_mpool(mpool_ctx_t *mpool, mnhash_t *dict, void *key, void *value)
+hash_set_item_mpool(mpool_ctx_t *mpool,
+                    mnhash_t *dict,
+                    void *key,
+                    void *value)
 {
     HASH_SET_ITEM_BODY(_malloc);
 }
@@ -206,7 +209,7 @@ hash_set_item_uniq_mpool(mpool_ctx_t *mpool,
 
 
 mnhash_item_t *
-hash_get_item(mnhash_t *dict, void *key)
+hash_get_item(mnhash_t *dict, const void *key)
 {
     uint64_t idx;
     mnhash_item_t **phit, *hit;
@@ -274,14 +277,14 @@ hash_get_item(mnhash_t *dict, void *key)
 
 
 void *
-hash_remove_item(mnhash_t *dict, void *key)
+hash_remove_item(mnhash_t *dict, const void *key)
 {
     HASH_REMOVE_ITEM_BODY(free);
 }
 
 
 void *
-hash_remove_item_mpool(mpool_ctx_t *mpool, mnhash_t *dict, void *key)
+hash_remove_item_mpool(mpool_ctx_t *mpool, mnhash_t *dict, const void *key)
 {
     HASH_REMOVE_ITEM_BODY(_free);
 }
@@ -637,7 +640,7 @@ hash_set_add(mnhash_t *hash, void *key)
 }
 
 void
-hash_set_remove(mnhash_t *hash, void *key)
+hash_set_remove(mnhash_t *hash, const void *key)
 {
     (void)hash_remove_item(hash, key);
 }

@@ -22,8 +22,8 @@ typedef struct _mnhash_item {
     void *value;
 } mnhash_item_t;
 
-typedef uint64_t (*hash_hashfn_t)(void *);
-typedef int (*hash_item_comparator_t)(void *, void *);
+typedef uint64_t (*hash_hashfn_t)(const void *);
+typedef int (*hash_item_comparator_t)(const void *, const void *);
 typedef int (*hash_item_finalizer_t)(void *, void *);
 typedef int (*hash_traverser_t)(void *, void *, void *);
 typedef struct _mnhash {
@@ -55,9 +55,9 @@ void hash_set_item_uniq_mpool(mpool_ctx_t *,
                               void *,
                               void **,
                               void **);
-mnhash_item_t *hash_get_item(mnhash_t *, void *);
-void *hash_remove_item(mnhash_t *, void *);
-void *hash_remove_item_mpool(mpool_ctx_t *, mnhash_t *, void *);
+mnhash_item_t *hash_get_item(mnhash_t *, const void *);
+void *hash_remove_item(mnhash_t *, const void *);
+void *hash_remove_item_mpool(mpool_ctx_t *, mnhash_t *, const void *);
 void hash_delete_pair(mnhash_t *, mnhash_item_t *);
 void hash_delete_pair_no_fini(mnhash_t *, mnhash_item_t *);
 void hash_delete_pair_mpool(mpool_ctx_t *, mnhash_t *, mnhash_item_t *);
@@ -106,7 +106,7 @@ void hash_dump_stats(mnhash_t *);
  * set
  */
 void hash_set_add(mnhash_t *, void *);
-void hash_set_remove(mnhash_t*, void *);
+void hash_set_remove(mnhash_t*, const void *);
 void hash_set_union2(mnhash_t *, mnhash_t *);
 void hash_set_union3(mnhash_t *, mnhash_t *, mnhash_t *);
 void hash_set_diff3(mnhash_t *, mnhash_t *, mnhash_t *);

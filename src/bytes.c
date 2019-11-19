@@ -112,7 +112,7 @@ bytes_is_null_or_empty(const mnbytes_t *s)
 
 
 mnbytes_t *
-bytes_json_escape(mnbytes_t *src)
+bytes_json_escape(const mnbytes_t *src)
 {
     size_t i, j;
     mnbytes_t *dest;
@@ -215,7 +215,7 @@ void bytes_tr(mnbytes_t * restrict s,
 
 
 bool
-bytes_is_ascii(mnbytes_t *s)
+bytes_is_ascii(const mnbytes_t *s)
 {
     size_t i, sz;
     char mod;
@@ -255,10 +255,10 @@ bytes_set_lower(mnbytes_t *s)
 }
 
 uint64_t
-bytes_hash(mnbytes_t *bytes)
+bytes_hash(const mnbytes_t *bytes)
 {
     if (bytes->hash == 0) {
-        bytes->hash = fasthash(0, bytes->data, bytes->sz);
+        ((mnbytes_t *)bytes)->hash = fasthash(0, bytes->data, bytes->sz);
     }
     return bytes->hash;
 }
@@ -280,7 +280,7 @@ bytes_hash(mnbytes_t *bytes)
 
 
 int
-bytes_cmp(mnbytes_t *a, mnbytes_t *b)
+bytes_cmp(const mnbytes_t *a, const mnbytes_t *b)
 {
     uint64_t ha, hb;
     int64_t diff;
@@ -299,14 +299,14 @@ bytes_cmp(mnbytes_t *a, mnbytes_t *b)
 
 
 int
-bytes_cmp_safe(mnbytes_t *a, mnbytes_t *b)
+bytes_cmp_safe(const mnbytes_t *a, const mnbytes_t *b)
 {
     BYTES_CMP_SAFE_BODY(bytes_cmp)
 }
 
 
 int
-bytes_cmpv(mnbytes_t *a, mnbytes_t *b)
+bytes_cmpv(const mnbytes_t *a, const mnbytes_t *b)
 {
     return strncmp((char *)a->data,
                    (char *)b->data,
@@ -315,14 +315,14 @@ bytes_cmpv(mnbytes_t *a, mnbytes_t *b)
 
 
 int
-bytes_cmpv_safe(mnbytes_t *a, mnbytes_t *b)
+bytes_cmpv_safe(const mnbytes_t *a, const mnbytes_t *b)
 {
     BYTES_CMP_SAFE_BODY(bytes_cmpv)
 }
 
 
 int
-bytes_cmpi(mnbytes_t *a, mnbytes_t *b)
+bytes_cmpi(const mnbytes_t *a, const mnbytes_t *b)
 {
     return strncasecmp((char *)a->data,
                        (char *)b->data,
@@ -331,14 +331,14 @@ bytes_cmpi(mnbytes_t *a, mnbytes_t *b)
 
 
 int
-bytes_cmpi_safe(mnbytes_t *a, mnbytes_t *b)
+bytes_cmpi_safe(const mnbytes_t *a, const mnbytes_t *b)
 {
     BYTES_CMP_SAFE_BODY(bytes_cmpi)
 }
 
 
 bool
-bytes_contains(mnbytes_t *a, mnbytes_t *b)
+bytes_contains(const mnbytes_t *a, const mnbytes_t *b)
 {
     if (a->data[a->sz - 1] != '\0' || b->data[b->sz - 1] != '\0') {
         return false;
@@ -348,7 +348,7 @@ bytes_contains(mnbytes_t *a, mnbytes_t *b)
 
 
 bool
-bytes_containsi(mnbytes_t *a, mnbytes_t *b)
+bytes_containsi(const mnbytes_t *a, const mnbytes_t *b)
 {
     if (a->data[a->sz - 1] != '\0' || b->data[b->sz - 1] != '\0') {
         return false;
@@ -604,7 +604,7 @@ bytes_vprintf(const char *fmt, va_list ap0)
 
 
 void
-bytes_copy(mnbytes_t * restrict dst, mnbytes_t * restrict src, size_t off)
+bytes_copy(mnbytes_t * restrict dst, const mnbytes_t * restrict src, size_t off)
 {
     assert((off + src->sz) <= dst->sz);
     memcpy(dst->data + off, src->data, src->sz);
@@ -612,7 +612,7 @@ bytes_copy(mnbytes_t * restrict dst, mnbytes_t * restrict src, size_t off)
 
 
 void
-bytes_copyz(mnbytes_t * restrict dst, mnbytes_t * restrict src, size_t off)
+bytes_copyz(mnbytes_t * restrict dst, const mnbytes_t * restrict src, size_t off)
 {
     assert((off + src->sz - 1) <= dst->sz);
     memcpy(dst->data + off, src->data, src->sz - 1);
@@ -670,7 +670,7 @@ bytes_urldecode(mnbytes_t *str)
 
 
 static size_t
-urlencode_reserved(char *dst, const char *src, size_t sz)
+urlencode_reserved(char * restrict dst, const char * restrict src, size_t sz)
 {
     unsigned char c;
     unsigned int i, j;
@@ -705,7 +705,7 @@ urlencode_reserved(char *dst, const char *src, size_t sz)
 
 
 void
-bytes_urlencode2(mnbytes_t *dst, mnbytes_t *src)
+bytes_urlencode2(mnbytes_t * restrict dst, const mnbytes_t * restrict src)
 {
     assert(BSZ(dst) >= (BSZ(src) * 3 + 1));
     BSZ(dst) = urlencode_reserved(BCDATA(dst), BCDATA(src), BSZ(src));
@@ -714,7 +714,7 @@ bytes_urlencode2(mnbytes_t *dst, mnbytes_t *src)
 
 
 void
-bytes_str_urlencode2(mnbytes_t *dst, mnbytes_t *src)
+bytes_str_urlencode2(mnbytes_t * restrict dst, const mnbytes_t * restrict src)
 {
     assert(BSZ(dst) >= (BSZ(src) * 3 + 1));
     BSZ(dst) = urlencode_reserved(BCDATA(dst), BCDATA(src), BSZ(src) - 1);
@@ -801,7 +801,7 @@ bytes_brushdown(mnbytes_t *str)
 
 
 mnbytes_t *
-bytes_base64_encode_url_str(mnbytes_t *s)
+bytes_base64_encode_url_str(const mnbytes_t *s)
 {
     mnbytes_t *res;
     size_t sz0, sz1;
@@ -844,7 +844,7 @@ bytes_base64_decode_url(mnbytes_t *s)
 
 
 int
-bytes_split_iter(mnbytes_t *str, char *delim, bytes_split_cb cb, void *udata)
+bytes_split_iter(const mnbytes_t *str, char *delim, bytes_split_cb cb, void *udata)
 {
     int res = 0;
     mnbytes_t *tmp = NULL;

@@ -9,7 +9,7 @@
 #include "mrkcommon/util.h"
 
 static uint64_t
-myhash(UNUSED void *key)
+myhash(UNUSED const void *key)
 {
     return (uint64_t)key;
 }
@@ -22,7 +22,7 @@ myfini(void *key, void *value)
 }
 
 static int
-mycmp(void *a, void *b)
+mycmp(const void *a, const void *b)
 {
     return (int)((intptr_t)a - (intptr_t)b);
 }
