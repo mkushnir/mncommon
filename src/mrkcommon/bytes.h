@@ -187,7 +187,7 @@ bool bytes_is_ascii(const mnbytes_t *);
 bool bytes_startswith(const mnbytes_t *, const mnbytes_t *);
 bool bytes_endswith(const mnbytes_t *, const mnbytes_t *);
 bool bytes_is_null_or_empty(const mnbytes_t *);
-typedef int (*bytes_split_cb)(mnbytes_t *, void *);
+typedef int (*bytes_split_cb)(const mnbytes_t *, void *);
 int bytes_split_iter(const mnbytes_t *, char *, bytes_split_cb, void *);
 
 #ifdef __cplusplus
