@@ -2,6 +2,8 @@
 #define MRKCOMMON_UTIL_H
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -386,6 +388,38 @@ _Generic(a,                                            \
 #endif
 
 intptr_t mn_check_type_failure(const char *);
+
+
+#if __STDC_VERSION__ >= 201112 && defined(MRKCOMMON_GENERIC_SUPPORT)
+#define MNIDIV(num, denom)                     \
+_Generic(num,                                  \
+         char: div,                            \
+         const char: div,                      \
+         unsigned char: div,                   \
+         const unsigned char: div,             \
+         short: div,                           \
+         const short: div,                     \
+         unsigned short: div,                  \
+         const unsigned short: div,            \
+         int: div,                             \
+         const int: div,                       \
+         unsigned int: div,                    \
+         const unsigned int: div,              \
+         long: ldiv,                           \
+         const long: ldiv,                     \
+         unsigned long: ldiv,                  \
+         const unsigned long: ldiv,            \
+         long long: lldiv,                     \
+         const long long: lldiv,               \
+         unsigned long long: lldiv,            \
+         const unsigned long long: lldiv,      \
+         default: imaxdiv)(num, denom)         \
+
+#else
+#define MNIDIV(num, denom) imaxdiv(num, denom)
+#endif
+
+
 
 #ifdef __cplusplus
 }
