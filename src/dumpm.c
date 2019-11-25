@@ -145,14 +145,16 @@ mndump_bits(const void *mem, size_t sz)
     bytesz = sz / 8; // number of full bytes
 
     if (bytesz > 0) {
-        if (bytesz >= MNDUMP_LINESZ_BITS / 8) {
+        if (bytesz >= (MNDUMP_LINESZ_BITS / 8)) {
             for (byteidx = 0;
-                 byteidx < bytesz;
+                 (byteidx + MNDUMP_LINESZ_BITS / 8) <= bytesz;
                  byteidx += (MNDUMP_LINESZ_BITS / 8)) {
                 mndump_bits_one_line(&m[byteidx], MNDUMP_LINESZ_BITS);
             }
         }
-        mndump_bits_one_line(&m[byteidx], sz % MNDUMP_LINESZ_BITS);
+        if (sz % MNDUMP_LINESZ_BITS) {
+            mndump_bits_one_line(&m[byteidx], sz % MNDUMP_LINESZ_BITS);
+        }
     } else {
         mndump_bits_one_line(&m[byteidx], sz);
     }
