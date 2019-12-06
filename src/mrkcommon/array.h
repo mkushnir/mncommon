@@ -74,7 +74,7 @@ void array_ensure_datasz_mpool(mpool_ctx_t *, mnarray_t *, size_t, unsigned int)
 void array_ensure_datasz_dirty(mnarray_t *, size_t, unsigned int);
 void array_ensure_datasz_dirty_mpool(mpool_ctx_t *, mnarray_t *, size_t, unsigned int);
 void *array_get(const mnarray_t *, unsigned);
-#define ARRAY_GET(ty, a, i) (((ty *)((a)->data)) + i)
+#define ARRAY_GET(ty, a, i) (((ty *)((a)->data)) + (i))
 void *array_get_safe(mnarray_t *, unsigned);
 void *array_get_safe_mpool(mpool_ctx_t *, mnarray_t *, unsigned);
 int array_index(const mnarray_t *, void *);
