@@ -9,11 +9,11 @@
 #include <unistd.h>
 
 #include "diag.h"
-#include "mrkcommon/malloc.h"
-#include "mrkcommon/util.h"
+#include "mncommon/malloc.h"
+#include "mncommon/util.h"
 //#define TRRET_DEBUG
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/bytestream.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/bytestream.h"
 
 
 int

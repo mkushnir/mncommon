@@ -7,10 +7,10 @@
 #include <strings.h>
 #include <limits.h>
 
-#include <mrkcommon/malloc.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/pbtrie.h>
+#include <mncommon/malloc.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
+#include <mncommon/pbtrie.h>
 
 #ifndef HAVE_FLSL
 #   ifdef __GCC__
@@ -60,7 +60,7 @@ pbtrie_node_new(void)
 {
     mnpbtrie_node_t *res;
 
-    if (MRKUNLIKELY((res = malloc(sizeof(mnpbtrie_node_t))) == NULL)) {
+    if (MNUNLIKELY((res = malloc(sizeof(mnpbtrie_node_t))) == NULL)) {
         FAIL("malloc");
     }
     pbtrie_node_init(res);

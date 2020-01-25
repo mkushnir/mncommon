@@ -1,13 +1,13 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/list.h"
-#include "mrkcommon/util.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/list.h"
+#include "mncommon/util.h"
 #include "diag.h"
 
 #ifdef DO_MEMDEBUG
-#include "mrkcommon/memdebug.h"
+#include "mncommon/memdebug.h"
 MEMDEBUG_DECLARE(list);
 #endif
 

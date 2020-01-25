@@ -3,9 +3,9 @@
 #include <time.h>
 
 #include "unittest.h"
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/array.h>
-#include <mrkcommon/util.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/array.h>
+#include <mncommon/util.h>
 
 #include "diag.h"
 

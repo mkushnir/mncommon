@@ -6,100 +6,100 @@ EXTRA_DIST = $(diags)
 CLEANFILES = $(BUILT_SOURCES) *.core
 #CLEANFILES += *.in
 
-lib_LTLIBRARIES = libmrkcommon.la
+lib_LTLIBRARIES = libmncommon.la
 
-nodist_libmrkcommon_la_SOURCES = diag.c diag.h
+nodist_libmncommon_la_SOURCES = diag.c diag.h
 noinst_HEADERS =
 
-dumpm_include_headers = mrkcommon/dumpm.h
+dumpm_include_headers = mncommon/dumpm.h
 dumpm_sources = dumpm.c
 
-util_include_headers = mrkcommon/util.h mrkcommon/float.h mrkcommon/endian.h mrkcommon/assert.h mrkcommon/malloc.h mrkcommon/unittest.h
+util_include_headers = mncommon/util.h mncommon/float.h mncommon/endian.h mncommon/assert.h mncommon/malloc.h mncommon/unittest.h
 util_sources = util.c
 
 if ARRAY
 array_sources = array.c
-array_include_headers = mrkcommon/array.h
+array_include_headers = mncommon/array.h
 endif
 
 if HASH
 hash_sources = hash.c
-hash_include_headers = mrkcommon/hash.h
+hash_include_headers = mncommon/hash.h
 endif
 
 if FASTHASH
 fasthash_sources = fasthash.c
-fasthash_include_headers = mrkcommon/fasthash.h
+fasthash_include_headers = mncommon/fasthash.h
 endif
 
 if PROFILE
 profile_sources = profile.c
-profile_include_headers = mrkcommon/profile.h
+profile_include_headers = mncommon/profile.h
 endif
 
 if TRIE
 trie_sources = btrie.c pbtrie.c
-trie_include_headers = mrkcommon/btrie.h mrkcommon/pbtrie.h
+trie_include_headers = mncommon/btrie.h mncommon/pbtrie.h
 endif
 
 if RBT
 rbt_sources = rbt.c
-rbt_include_headers = mrkcommon/rbt.h
+rbt_include_headers = mncommon/rbt.h
 endif
 
 if TRAVERSEDIR
 traversedir_sources = traversedir.c
-traversedir_include_headers = mrkcommon/traversedir.h
+traversedir_include_headers = mncommon/traversedir.h
 endif
 
 if BYTESTREAM
 bytestream_sources = bytestream.c bytestream_aux.c vbytestream.c
-bytestream_include_headers = mrkcommon/bytestream.h mrkcommon/bytestream_aux.h mrkcommon/vbytestream.h
+bytestream_include_headers = mncommon/bytestream.h mncommon/bytestream_aux.h mncommon/vbytestream.h
 endif
 
 if JSON
 json_sources = json.c jparse.c
-json_include_headers = mrkcommon/json.h mrkcommon/jparse.h
+json_include_headers = mncommon/json.h mncommon/jparse.h
 endif
 
 if STQUEUE
 stqueue_sources =
-stqueue_include_headers = mrkcommon/stqueue.h
+stqueue_include_headers = mncommon/stqueue.h
 endif
 
 if DTQUEUE
 dtqueue_sources =
-dtqueue_include_headers = mrkcommon/dtqueue.h
+dtqueue_include_headers = mncommon/dtqueue.h
 endif
 
 if MEMDEBUG
 memdebug_sources = memdebug.c
-memdebug_include_headers = mrkcommon/memdebug.h
+memdebug_include_headers = mncommon/memdebug.h
 endif
 
 if MPOOL
 mpool_sources = mpool.c
-mpool_include_headers = mrkcommon/mpool.h
+mpool_include_headers = mncommon/mpool.h
 endif
 
 if BYTES
 bytes_sources = bytes.c
-bytes_include_headers = mrkcommon/bytes.h
+bytes_include_headers = mncommon/bytes.h
 endif
 
 if CM
 cm_sources = cm.c
-cm_include_headers = mrkcommon/cm.h
+cm_include_headers = mncommon/cm.h
 endif
 
 if HEAP
 heap_sources = heap.c
-heap_include_headers = mrkcommon/heap.h
+heap_include_headers = mncommon/heap.h
 endif
 
 if BASE64
 base64_sources = base64.c
-base64_include_headers = mrkcommon/base64.h
+base64_include_headers = mncommon/base64.h
 endif
 
 nobase_include_HEADERS = $(dumpm_include_headers) \
@@ -122,7 +122,7 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(heap_include_headers) \
 			 $(base64_include_headers)
 
-libmrkcommon_la_SOURCES = $(dumpm_sources) \
+libmncommon_la_SOURCES = $(dumpm_sources) \
 			  $(util_sources) \
 			  $(array_sources) \
 			  $(hash_sources) \
@@ -155,19 +155,19 @@ endif
 endif
 
 if ALLSTATIC
-libmrkcommon_la_LDFLAGS = -all-static
+libmncommon_la_LDFLAGS = -all-static
 else
-libmrkcommon_la_LDFLAGS =
+libmncommon_la_LDFLAGS =
 endif
 
-libmrkcommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I$(includedir)
-libmrkcommon_la_LDFLAGS += $(DEBUG_LD_FLAGS) -version-info 0:0:0 -L$(libdir)
-libmrkcommon_la_LIBADD = -lmndiag
+libmncommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I$(includedir)
+libmncommon_la_LDFLAGS += $(DEBUG_LD_FLAGS) -version-info 0:0:0 -L$(libdir)
+libmncommon_la_LIBADD = -lmndiag
 
 SUBDIRS = .
 
 diag.c diag.h: $(diags)
-	$(AM_V_GEN) cat $(diags) | sort -u >diag.txt.tmp && mndiagen -v -S diag.txt.tmp -L mrkcommon -H diag.h -C diag.c *.[ch]
+	$(AM_V_GEN) cat $(diags) | sort -u >diag.txt.tmp && mndiagen -v -S diag.txt.tmp -L mncommon -H diag.h -C diag.c *.[ch]
 
 run: all
 	for i in $(bin_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;

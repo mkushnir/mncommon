@@ -7,11 +7,11 @@
 #include <sys/uio.h>
 
 #include "diag.h"
-#include <mrkcommon/util.h>
+#include <mncommon/util.h>
 //#define TRRET_DEBUG
-#include <mrkcommon/bytes.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/vbytestream.h>
+#include <mncommon/bytes.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/vbytestream.h>
 
 
 #define VBYTESTREAM_IOV_BYTES(iov)  \
@@ -334,7 +334,7 @@ vbytestream_adopt(mnvbytestream_t *stream, mnbytes_t *data)
 
     (void)array_ensure_len(&stream->iov, last + 1, ARRAY_FLAG_SAVE);
 
-    if (MRKUNLIKELY((edge = array_get(&stream->iov, last)) == NULL)) {
+    if (MNUNLIKELY((edge = array_get(&stream->iov, last)) == NULL)) {
         FAIL("array_get");
     }
 

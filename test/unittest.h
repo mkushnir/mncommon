@@ -1,4 +1,4 @@
-#include "mrkcommon/util.h"
+#include "mncommon/util.h"
 
 #define _R(_d, _i) _d[_i].rnd
 #define _RD(_d, _i) _d[R(_i)]

@@ -5,12 +5,12 @@
 #include <err.h>
 
 #include "unittest.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/pbtrie.h"
-#include "mrkcommon/profile.h"
-#include "mrkcommon/util.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/pbtrie.h"
+#include "mncommon/profile.h"
+#include "mncommon/util.h"
 #ifdef DO_MEMDEBUG
-#include "mrkcommon/memdebug.h"
+#include "mncommon/memdebug.h"
 MEMDEBUG_DECLARE(testperfpbtrie);
 #endif
 

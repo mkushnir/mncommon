@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#include <mrkcommon/heap.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
+#include <mncommon/heap.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
 
 /*
  * min D-heap

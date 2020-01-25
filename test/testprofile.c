@@ -4,8 +4,8 @@
 
 #include "unittest.h"
 
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/profile.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/profile.h"
 
 static void
 test0(void)

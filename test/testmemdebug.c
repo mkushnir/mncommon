@@ -3,9 +3,9 @@
 #include <time.h>
 
 #include "unittest.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/array.h"
-#include "mrkcommon/memdebug.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/array.h"
+#include "mncommon/memdebug.h"
 
 MEMDEBUG_DECLARE(qwe);
 

@@ -1,8 +1,8 @@
-#include <mrkcommon/malloc.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/fasthash.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/cm.h>
+#include <mncommon/malloc.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/fasthash.h>
+#include <mncommon/util.h>
+#include <mncommon/cm.h>
 
 #include "diag.h"
 

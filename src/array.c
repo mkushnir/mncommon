@@ -4,12 +4,12 @@
 #include <string.h>
 
 //#define TRRET_DEBUG_VERBOSE
-#include <mrkcommon/assert.h>
-#include <mrkcommon/malloc.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/array.h>
-#include <mrkcommon/mpool.h>
-#include <mrkcommon/util.h>
+#include <mncommon/assert.h>
+#include <mncommon/malloc.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/array.h>
+#include <mncommon/mpool.h>
+#include <mncommon/util.h>
 #include "diag.h"
 
 #define _malloc(sz) mpool_malloc(mpool, (sz))

@@ -1,7 +1,7 @@
 #include <stdlib.h>
-#include <mrkcommon/fasthash.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
+#include <mncommon/fasthash.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
 
 /**
  * http://www.cse.yorku.ca/~oz/hash.html

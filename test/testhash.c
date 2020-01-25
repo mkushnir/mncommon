@@ -4,9 +4,9 @@
 
 #include "unittest.h"
 
-#include "mrkcommon/hash.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
+#include "mncommon/hash.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/util.h"
 
 static uint64_t
 myhash(UNUSED const void *key)

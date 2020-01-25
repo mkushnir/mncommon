@@ -93,7 +93,7 @@ endif
 
 CFLAGS += @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src -I$(includedir)
 LDFLAGS += $(DEBUG_LD_FLAGS) -L../src/.libs -L$(libdir)
-LDADD = -lmrkcommon -lmndiag
+LDADD = -lmncommon -lmndiag
 
 if CMOCKA
 CFLAGS += -I$(includedir) -DCMOCKA_TESTING
@@ -109,7 +109,7 @@ testhash_SOURCES = $(static_sources) testhash.c
 testhash_CFLAGS =
 testhash_LDFLAGS =
 
-testfasthash_SOURCES = $(static_sources) ../src/fnvhash.c ../src/mrkcommon/fnvhash.h zltan-fasthash.c fnv/hash_64a.c testfasthash.c
+testfasthash_SOURCES = $(static_sources) ../src/fnvhash.c ../src/mncommon/fnvhash.h zltan-fasthash.c fnv/hash_64a.c testfasthash.c
 testfasthash_CFLAGS = -Wno-implicit-fallthrough
 testfasthash_LDADD = $(LDADD) -lz
 
@@ -216,7 +216,7 @@ testbar_LDFLAGS =
 endif
 
 diag.c diag.h: ../src/diag.txt
-	$(AM_V_GEN) cat $(diags) | sort -u >diag.txt.tmp && mndiagen -v -S diag.txt.tmp -L mrkcommon -H diag.h -C diag.c ../src/*.[ch]
+	$(AM_V_GEN) cat $(diags) | sort -u >diag.txt.tmp && mndiagen -v -S diag.txt.tmp -L mncommon -H diag.h -C diag.c ../src/*.[ch]
 
 testrun: all
 	for i in $(noinst_PROGRAMS); do if test -x ./$$i; then LD_LIBRARY_PATH=$(libdir) ./$$i; fi; done;

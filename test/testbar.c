@@ -3,10 +3,10 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
 
-#include <mrkcommon/array.h>
+#include <mncommon/array.h>
 
 
 #ifndef NDEBUG

@@ -7,12 +7,12 @@
 
 #include <zlib.h>
 
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/btrie.h>
-#include <mrkcommon/bytes.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/fasthash.h>
-#include <mrkcommon/fnvhash.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/btrie.h>
+#include <mncommon/bytes.h>
+#include <mncommon/util.h>
+#include <mncommon/fasthash.h>
+#include <mncommon/fnvhash.h>
 
 #include "diag.h"
 #include "unittest.h"

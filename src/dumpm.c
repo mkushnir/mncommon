@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include <mrkcommon/util.h>
+#include <mncommon/util.h>
 
 static
 void dumpl(const char *m, size_t n, size_t l) {

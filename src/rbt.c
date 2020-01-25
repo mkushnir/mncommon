@@ -5,9 +5,9 @@
 #include <stdlib.h>
 
 #include "diag.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
-#include "mrkcommon/rbt.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/util.h"
+#include "mncommon/rbt.h"
 
 int
 rbt_node_init(mnrbt_node_t *node, uintptr_t key, void *data)

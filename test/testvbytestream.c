@@ -4,16 +4,16 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <mrkcommon/array.h>
-#include <mrkcommon/bytes.h>
-#include <mrkcommon/bytestream.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/profile.h>
+#include <mncommon/array.h>
+#include <mncommon/bytes.h>
+#include <mncommon/bytestream.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
+#include <mncommon/profile.h>
 
-#include <mrkcommon/vbytestream.h>
+#include <mncommon/vbytestream.h>
 
-#include <mrkcommon/unittest.h>
+#include <mncommon/unittest.h>
 
 #include "diag.h"
 
@@ -286,7 +286,7 @@ _test4(size_t growsz, int n, size_t sz)
         mnbytes_t **word;
         size_t wsz;
 
-        if (MRKUNLIKELY((word = array_get(&words, i)) == NULL)) {
+        if (MNUNLIKELY((word = array_get(&words, i)) == NULL)) {
             FAIL("array_incr");
         }
         wsz = random() % MIN(sz, (growsz - 8)) + 1;
@@ -300,7 +300,7 @@ _test4(size_t growsz, int n, size_t sz)
     for (i = 0; i < n; ++i) {
         mnbytes_t **word;
 
-        if (MRKUNLIKELY((word = array_get(&words, i)) == NULL)) {
+        if (MNUNLIKELY((word = array_get(&words, i)) == NULL)) {
             FAIL("array_incr");
         }
         if (vbytestream_nprintf(&bs0, growsz, ".%s\n", BDATA(*word)) < 0) {
@@ -313,7 +313,7 @@ _test4(size_t growsz, int n, size_t sz)
     for (i = 0; i < n; ++i) {
         mnbytes_t **word;
 
-        if (MRKUNLIKELY((word = array_get(&words, i)) == NULL)) {
+        if (MNUNLIKELY((word = array_get(&words, i)) == NULL)) {
             FAIL("array_incr");
         }
         if (bytestream_nprintf(&bs1, growsz, ".%s\n", BDATA(*word)) < 0) {

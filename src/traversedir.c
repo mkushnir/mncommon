@@ -4,10 +4,10 @@
 #include <sys/stat.h>
 
 #include "diag.h"
-#include "mrkcommon/malloc.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
-#include "mrkcommon/traversedir.h"
+#include "mncommon/malloc.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/util.h"
+#include "mncommon/traversedir.h"
 
 UNUSED static void
 dumpdir(struct dirent *de)

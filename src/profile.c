@@ -2,10 +2,10 @@
 #include <sys/sysctl.h>
 
 #include "diag.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/array.h"
-#include "mrkcommon/profile.h"
-#include "mrkcommon/util.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/array.h"
+#include "mncommon/profile.h"
+#include "mncommon/util.h"
 
 /* Code profiling */
 static int initialized = 0;

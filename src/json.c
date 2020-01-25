@@ -4,12 +4,12 @@
 #include <string.h>
 
 //#define TRRET_DEBUG_VERBOSE
-#include <mrkcommon/malloc.h>
-#include <mrkcommon/bytes.h>
-#include <mrkcommon/bytestream.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/json.h>
-#include <mrkcommon/util.h>
+#include <mncommon/malloc.h>
+#include <mncommon/bytes.h>
+#include <mncommon/bytestream.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/json.h>
+#include <mncommon/util.h>
 
 #include "diag.h"
 

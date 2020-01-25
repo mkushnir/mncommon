@@ -1,11 +1,11 @@
 #include <assert.h>
 #include <fcntl.h>
 
-#include <mrkcommon/malloc.h>
-#include <mrkcommon/jparse.h>
+#include <mncommon/malloc.h>
+#include <mncommon/jparse.h>
 //#define TRRET_DEBUG
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
 #include "diag.h"
 
 

@@ -3,9 +3,9 @@
 
 #include "unittest.h"
 #include "diag.h"
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/stqueue.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
+#include <mncommon/stqueue.h>
 
 typedef struct _asd {
     STQUEUE_ENTRY(_asd, link);

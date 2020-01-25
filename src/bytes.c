@@ -6,12 +6,12 @@
 #include <string.h>
 #include <strings.h>
 
-#include <mrkcommon/malloc.h>
-#include <mrkcommon/bytes.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/fasthash.h>
-#include <mrkcommon/mpool.h>
-#include <mrkcommon/util.h>
+#include <mncommon/malloc.h>
+#include <mncommon/bytes.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/fasthash.h>
+#include <mncommon/mpool.h>
+#include <mncommon/util.h>
 
 #include "diag.h"
 
@@ -816,7 +816,7 @@ bytes_base64_encode_url_str(const mnbytes_t *s)
     sz1 = (sz0 + (m ? (3 - m) : 0)) * 4 / 3;
 
     res = bytes_new(sz1 + 1);
-    if (MRKUNLIKELY(mrkbase64_encode_url_std(BDATA(s),
+    if (MNUNLIKELY(mnbase64_encode_url_std(BDATA(s),
                     sz0,
                     BCDATA(res),
                     sz1) != 0)) {
@@ -835,7 +835,7 @@ bytes_base64_decode_url(mnbytes_t *s)
     int res;
     size_t sz = BSZ(s) - 1;
 
-    res = mrkbase64_decode_url_std_inplace(BCDATA(s), &sz);
+    res = mnbase64_decode_url_std_inplace(BCDATA(s), &sz);
     BDATA(s)[sz] = '\0';
     BSZ(s) = sz + 1;
     (void)bytes_hash(s);

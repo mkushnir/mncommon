@@ -1,21 +1,21 @@
 #include <assert.h>
 #include <sys/types.h>
-#include <mrkcommon/util.h>
+#include <mncommon/util.h>
 
-#include <mrkcommon/base64.h>
-#include <mrkcommon/dumpm.h>
+#include <mncommon/base64.h>
+#include <mncommon/dumpm.h>
 
 
-#define MRK_BASE64_ALPHABET(c62, c63)                                          \
+#define MN_BASE64_ALPHABET(c62, c63)                                          \
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c62 #c63     \
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c62 #c63     \
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c62 #c63     \
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" #c62 #c63 "=" \
 
 
-static char *alphabet_mime = MRK_BASE64_ALPHABET(+, /);
+static char *alphabet_mime = MN_BASE64_ALPHABET(+, /);
 
-static char *alphabet_url_std = MRK_BASE64_ALPHABET(-, _);
+static char *alphabet_url_std = MN_BASE64_ALPHABET(-, _);
 
 
 static char codes_mime[256] = {
@@ -173,7 +173,7 @@ encode1(const char a[64 * 4 + 1], const unsigned char i[1], char o[4])
 }
 
 
-#define MRKBASE64_ENCODE_BODY(alphabet)                                        \
+#define MNBASE64_ENCODE_BODY(alphabet)                                        \
     size_t i, sz;                                                              \
 /*                                                                             \
     TRACE("dstsz=%ld srcsz=%ld srcsz / 3 + 1 = %ld (srcsz / 3 + 1) * 4 = %ld", \
@@ -182,7 +182,7 @@ encode1(const char a[64 * 4 + 1], const unsigned char i[1], char o[4])
           (srcsz / 3 + 1),                                                     \
           (srcsz / 3 + 1) * 4);                                                \
  */                                                                            \
-    if (MRKUNLIKELY(dstsz < ((srcsz / 3 + 1) * 4))) {                          \
+    if (MNUNLIKELY(dstsz < ((srcsz / 3 + 1) * 4))) {                          \
         return -1;                                                             \
     }                                                                          \
     sz = srcsz / 3;                                                            \
@@ -203,26 +203,26 @@ encode1(const char a[64 * 4 + 1], const unsigned char i[1], char o[4])
 
 
 int
-mrkbase64_encode_mime(const unsigned char *src,
+mnbase64_encode_mime(const unsigned char *src,
                  size_t srcsz,
                  char *dst,
                  size_t dstsz)
 {
-    MRKBASE64_ENCODE_BODY(alphabet_mime);
+    MNBASE64_ENCODE_BODY(alphabet_mime);
 }
 
 
 int
-mrkbase64_encode_url_std(const unsigned char *src,
+mnbase64_encode_url_std(const unsigned char *src,
                  size_t srcsz,
                  char *dst,
                  size_t dstsz)
 {
-    MRKBASE64_ENCODE_BODY(alphabet_url_std);
+    MNBASE64_ENCODE_BODY(alphabet_url_std);
 }
 
 
-#define MRKBASE64_DECODE_LOOP(codes)                                           \
+#define MNBASE64_DECODE_LOOP(codes)                                           \
     union {                                                                    \
         uint32_t *i;                                                           \
         const char *c;                                                         \
@@ -254,64 +254,64 @@ mrkbase64_encode_url_std(const unsigned char *src,
 
 
 int
-mrkbase64_decode_mime(const char *src,
+mnbase64_decode_mime(const char *src,
                       size_t srcsz,
                       unsigned char *dst,
                       size_t *dstsz)
 {
     size_t m = srcsz % 4, sz, i;
-    if (MRKUNLIKELY((m != 0) || (*dstsz / 3) * 4 < srcsz)) {
+    if (MNUNLIKELY((m != 0) || (*dstsz / 3) * 4 < srcsz)) {
         return -1;
     }
     *dstsz = 0;
     sz = (srcsz + (m ? 4 - m : 0)) / 4;
     for (i = 0; i < sz; ++i) {
-        MRKBASE64_DECODE_LOOP(codes_mime);
+        MNBASE64_DECODE_LOOP(codes_mime);
     }
     return 0;
 }
 
 
 int
-mrkbase64_decode_url_std(const char *src,
+mnbase64_decode_url_std(const char *src,
                          size_t srcsz,
                          unsigned char *dst,
                          size_t *dstsz)
 {
     size_t m = srcsz % 4, sz, i;
-    if (MRKUNLIKELY((m != 0) || (*dstsz / 3) * 4 < srcsz)) {
+    if (MNUNLIKELY((m != 0) || (*dstsz / 3) * 4 < srcsz)) {
         return -1;
     }
     *dstsz = 0;
     sz = (srcsz + (m ? 4 - m : 0)) / 4;
     for (i = 0; i < sz; ++i) {
-        MRKBASE64_DECODE_LOOP(codes_url_std);
+        MNBASE64_DECODE_LOOP(codes_url_std);
     }
     return 0;
 }
 
 
 int
-mrkbase64_decode_mime_inplace(char *s, size_t *sz)
+mnbase64_decode_mime_inplace(char *s, size_t *sz)
 {
     unsigned char *dst = (unsigned char *)s;
     size_t srcsz = *sz;
-    return mrkbase64_decode_mime(s, srcsz, dst, sz);
+    return mnbase64_decode_mime(s, srcsz, dst, sz);
 }
 
 
 int
-mrkbase64_decode_url_std_inplace(char *s, size_t *sz)
+mnbase64_decode_url_std_inplace(char *s, size_t *sz)
 {
     unsigned char *dst = (unsigned char *)s;
     size_t srcsz = *sz;
-    return mrkbase64_decode_url_std(s, srcsz, dst, sz);
+    return mnbase64_decode_url_std(s, srcsz, dst, sz);
 }
 
 
 
 void
-mrkbase64_test0(void)
+mnbase64_test0(void)
 {
     int i;
     union {
@@ -336,11 +336,11 @@ mrkbase64_test0(void)
 
 
 void
-mrkbase64_test1(void)
+mnbase64_test1(void)
 {
     int i;
 
-#define MRKBASE64_TEST1_BODY(codes, alphabet)          \
+#define MNBASE64_TEST1_BODY(codes, alphabet)          \
     for (i = 0; i < 64; ++i) {                         \
         codes[(int)alphabet[i]] = i;                   \
     }                                                  \
@@ -354,8 +354,8 @@ mrkbase64_test1(void)
     }                                                  \
     TRACEC("};\n\n")                                   \
 
-    MRKBASE64_TEST1_BODY(codes_mime, alphabet_mime);
-    MRKBASE64_TEST1_BODY(codes_url_std, alphabet_url_std);
+    MNBASE64_TEST1_BODY(codes_mime, alphabet_mime);
+    MNBASE64_TEST1_BODY(codes_url_std, alphabet_url_std);
 }
 
 

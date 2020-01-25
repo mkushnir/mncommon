@@ -3,13 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/fasthash.h>
-#include <mrkcommon/bytes.h>
-#include <mrkcommon/hash.h>
-#include <mrkcommon/util.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/fasthash.h>
+#include <mncommon/bytes.h>
+#include <mncommon/hash.h>
+#include <mncommon/util.h>
 
-#include <mrkcommon/base64.h>
+#include <mncommon/base64.h>
 
 #include "diag.h"
 #include "unittest.h"
@@ -40,7 +40,7 @@ test0(void)
         int res;
 
         memset(buf, '\0', sizeof(buf));
-        res = mrkbase64_encode_mime((unsigned char *)ss[i],
+        res = mnbase64_encode_mime((unsigned char *)ss[i],
                                strlen(ss[i]),
                                buf,
                                sizeof(buf));
@@ -74,7 +74,7 @@ test1(void)
 
         for (j = 0; j < ((int)strlen(ss[i]) / 3 + 1) * 4 + 4; ++j) {
             memset(buf, '\0', sizeof(buf));
-            res = mrkbase64_encode_mime((unsigned char *)ss[i],
+            res = mnbase64_encode_mime((unsigned char *)ss[i],
                                    strlen(ss[i]),
                                    buf,
                                    j);
@@ -88,7 +88,7 @@ test1(void)
 static void
 test2(void)
 {
-    mrkbase64_test1();
+    mnbase64_test1();
 }
 
 
@@ -119,7 +119,7 @@ test3(void)
 
             memset(buf, '\0', sizeof(buf));
             sz = strlen(ss[i]);
-            res = mrkbase64_encode_mime((unsigned char *)ss[i],
+            res = mnbase64_encode_mime((unsigned char *)ss[i],
                                    sz,
                                    buf,
                                    j);
@@ -130,7 +130,7 @@ test3(void)
 
                 memset(src, '\0', sizeof(src));
                 sz1 = sz + (3 - sz % 3);
-                res1 = mrkbase64_decode_mime(buf, strlen(buf), src, &sz1);
+                res1 = mnbase64_decode_mime(buf, strlen(buf), src, &sz1);
                 assert(res1 == 0);
                 assert(memcmp(ss[i], src, sz) == 0);
             }
@@ -169,7 +169,7 @@ test4(void)
 
             memset(buf, '\0', sizeof(buf));
             sz = strlen(ss[i]);
-            res = mrkbase64_encode_mime((unsigned char *)ss[i],
+            res = mnbase64_encode_mime((unsigned char *)ss[i],
                                    sz,
                                    buf,
                                    j);
@@ -179,7 +179,7 @@ test4(void)
 
                 sz1 = strlen(buf);
                 TRACE("buf=%s", buf);
-                res1 = mrkbase64_decode_mime_inplace(buf, &sz1);
+                res1 = mnbase64_decode_mime_inplace(buf, &sz1);
                 buf[sz1] = '\0';
                 TRACE("buf=%s", buf);
                 assert(res1 == 0);

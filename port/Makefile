@@ -1,5 +1,5 @@
 # $FreeBSD$
-PORTNAME=	mrkcommon
+PORTNAME=	mncommon
 PORTVERSION=	0.1
 CATEGORIES=	devel
 MASTER_SITES=	file:///data0/mkushnir/distfiles
@@ -27,41 +27,41 @@ CONFIGURE_ENV=	LDFLAGS="-L${LOCALBASE}/lib -L${HOME}/lib" CFLAGS=-I${HOME}/inclu
 
 CONFIGURE_ARGS+= --enable-debug
 
-PLIST_FILES = include/mrkcommon/array.h \
-	      include/mrkcommon/assert.h \
-	      include/mrkcommon/base64.h \
-	      include/mrkcommon/btrie.h \
-	      include/mrkcommon/bytes.h \
-	      include/mrkcommon/bytestream.h \
-	      include/mrkcommon/bytestream_aux.h \
-	      include/mrkcommon/cm.h \
-	      include/mrkcommon/dtqueue.h \
-	      include/mrkcommon/dumpm.h \
-	      include/mrkcommon/endian.h \
-	      include/mrkcommon/fasthash.h \
-	      include/mrkcommon/float.h \
-	      include/mrkcommon/hash.h \
-	      include/mrkcommon/heap.h \
-	      include/mrkcommon/jparse.h \
-	      include/mrkcommon/json.h \
-	      include/mrkcommon/malloc.h \
-	      include/mrkcommon/memdebug.h \
-	      include/mrkcommon/mpool.h \
-	      include/mrkcommon/pbtrie.h \
-	      include/mrkcommon/profile.h \
-	      include/mrkcommon/rbt.h \
-	      include/mrkcommon/stqueue.h \
-	      include/mrkcommon/traversedir.h \
-	      include/mrkcommon/unittest.h \
-	      include/mrkcommon/util.h \
-	      include/mrkcommon/vbytestream.h \
-	      lib/libmrkcommon.so.0.0.0 \
-	      lib/libmrkcommon.so.0 \
-	      lib/libmrkcommon.so \
-	      lib/libmrkcommon.la \
-	      lib/libmrkcommon.a \
+PLIST_FILES = include/mncommon/array.h \
+	      include/mncommon/assert.h \
+	      include/mncommon/base64.h \
+	      include/mncommon/btrie.h \
+	      include/mncommon/bytes.h \
+	      include/mncommon/bytestream.h \
+	      include/mncommon/bytestream_aux.h \
+	      include/mncommon/cm.h \
+	      include/mncommon/dtqueue.h \
+	      include/mncommon/dumpm.h \
+	      include/mncommon/endian.h \
+	      include/mncommon/fasthash.h \
+	      include/mncommon/float.h \
+	      include/mncommon/hash.h \
+	      include/mncommon/heap.h \
+	      include/mncommon/jparse.h \
+	      include/mncommon/json.h \
+	      include/mncommon/malloc.h \
+	      include/mncommon/memdebug.h \
+	      include/mncommon/mpool.h \
+	      include/mncommon/pbtrie.h \
+	      include/mncommon/profile.h \
+	      include/mncommon/rbt.h \
+	      include/mncommon/stqueue.h \
+	      include/mncommon/traversedir.h \
+	      include/mncommon/unittest.h \
+	      include/mncommon/util.h \
+	      include/mncommon/vbytestream.h \
+	      lib/libmncommon.so.0.0.0 \
+	      lib/libmncommon.so.0 \
+	      lib/libmncommon.so \
+	      lib/libmncommon.la \
+	      lib/libmncommon.a \
 
-PLIST_DIRS = lib include/mrkcommon include
+PLIST_DIRS = lib include/mncommon include
 
 
 

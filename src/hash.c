@@ -1,12 +1,12 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <mrkcommon/malloc.h>
-#include <mrkcommon/array.h>
-#include <mrkcommon/hash.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/mpool.h>
-#include <mrkcommon/util.h>
+#include <mncommon/malloc.h>
+#include <mncommon/array.h>
+#include <mncommon/hash.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/mpool.h>
+#include <mncommon/util.h>
 #include "diag.h"
 
 

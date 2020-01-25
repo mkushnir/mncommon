@@ -4,8 +4,8 @@
 
 #include "unittest.h"
 #include "diag.h"
-#include <mrkcommon/bytes.h>
-#include <mrkcommon/dumpm.h>
+#include <mncommon/bytes.h>
+#include <mncommon/dumpm.h>
 
 #ifndef NDEBUG
 const char *_malloc_options = "AJ";

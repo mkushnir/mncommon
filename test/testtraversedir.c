@@ -7,10 +7,10 @@
 
 #include "unittest.h"
 #include "diag.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
-#include "mrkcommon/array.h"
-#include "mrkcommon/traversedir.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/util.h"
+#include "mncommon/array.h"
+#include "mncommon/traversedir.h"
 
 typedef struct _file_info {
     long rnd;

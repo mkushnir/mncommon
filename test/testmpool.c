@@ -3,9 +3,9 @@
 
 #include "unittest.h"
 
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/mpool.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
+#include <mncommon/mpool.h>
 
 #define MAXITEM (1024)
 mpool_ctx_t mpool;

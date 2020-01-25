@@ -5,8 +5,8 @@
 #include "rb.h"
 
 #include "unittest.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/array.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/array.h"
 
 typedef struct _key_item {
     uint64_t key;

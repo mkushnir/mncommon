@@ -4,10 +4,10 @@
 #include "unittest.h"
 #include "diag.h"
 #define TRRET_DEBUG
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
-#include "mrkcommon/jparse.h"
-#include "mrkcommon/bytes.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/util.h"
+#include "mncommon/jparse.h"
+#include "mncommon/bytes.h"
 
 
 static int

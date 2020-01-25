@@ -5,11 +5,11 @@
 #include <err.h>
 
 #include "unittest.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/btrie.h"
-#include "mrkcommon/util.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/btrie.h"
+#include "mncommon/util.h"
 #ifdef DO_MEMDEBUG
-#include "mrkcommon/memdebug.h"
+#include "mncommon/memdebug.h"
 MEMDEBUG_DECLARE(testtrieorder);
 #endif
 

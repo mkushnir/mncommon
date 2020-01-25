@@ -3,13 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/fasthash.h>
-#include <mrkcommon/bytes.h>
-#include <mrkcommon/hash.h>
-#include <mrkcommon/util.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/fasthash.h>
+#include <mncommon/bytes.h>
+#include <mncommon/hash.h>
+#include <mncommon/util.h>
 
-#include <mrkcommon/heap.h>
+#include <mncommon/heap.h>
 
 #include "diag.h"
 #include "unittest.h"

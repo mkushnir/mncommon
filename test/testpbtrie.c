@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <mrkcommon/util.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/pbtrie.h>
+#include <mncommon/util.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/pbtrie.h>
 
 #ifndef HAVE_FLSL
 #   ifdef __GCC__

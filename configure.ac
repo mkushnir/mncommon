@@ -1,4 +1,4 @@
-AC_INIT(mrkcommon, 0.1, markiyan.kushnir@gmail.com, mrkcommon, https://github.com/mkushnir)
+AC_INIT(mncommon, 0.1, markiyan.kushnir@gmail.com, mncommon, https://github.com/mkushnir)
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([.ac-aux])
@@ -76,6 +76,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_AR
 AC_PROG_INSTALL
+AC_PROG_RANLIB
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 LT_INIT
@@ -135,7 +136,7 @@ AC_CHECK_FUNCS([strtol])
 AC_CHECK_FUNCS([reallocf])
 AC_CHECK_FUNCS([sysctlbyname])
 AC_CHECK_FUNCS([abort2])
-
+AC_CHECK_FUNCS([pow])
 
 
 

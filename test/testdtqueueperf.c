@@ -5,9 +5,9 @@
 
 #include "unittest.h"
 #include "diag.h"
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/dtqueue.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
+#include <mncommon/dtqueue.h>
 
 
 #ifndef NDEBUG
@@ -120,10 +120,10 @@ struct ngx_queue_s {
 
 typedef struct _mnitem {
     ngx_queue_t ngx_link;
-    DTQUEUE_ENTRY(_mnitem, mrk_link);
+    DTQUEUE_ENTRY(_mnitem, mn_link);
 } mnitem_t;
 
-DTQUEUE(_mnitem, mrkq) = DTQUEUE_INITIALIZER;
+DTQUEUE(_mnitem, mnq) = DTQUEUE_INITIALIZER;
 ngx_queue_t ngxq;
 
 
@@ -137,7 +137,7 @@ main(int argc, char **argv)
 
     //srandom(time(NULL));
 
-    DTQUEUE_INIT(&mrkq);
+    DTQUEUE_INIT(&mnq);
     ngx_queue_init(&ngxq);
 
     if ((items = malloc(sizeof(mnitem_t) * N)) == NULL) {
@@ -157,20 +157,20 @@ main(int argc, char **argv)
                 qe = ngx_queue_head(&ngxq);
                 ngx_queue_remove(qe);
             }
-        } else if (strcmp(argv[1], "mrk") == 0) {
+        } else if (strcmp(argv[1], "mn") == 0) {
             for (i = 0; i < N; ++i) {
-                DTQUEUE_ENTRY_INIT(mrk_link, items + i);
+                DTQUEUE_ENTRY_INIT(mn_link, items + i);
             }
             for (i = 0; i < N; ++i) {
-                DTQUEUE_ENQUEUE(&mrkq, mrk_link, items + i);
+                DTQUEUE_ENQUEUE(&mnq, mn_link, items + i);
             }
-            while (!DTQUEUE_EMPTY(&mrkq)) {
+            while (!DTQUEUE_EMPTY(&mnq)) {
                 UNUSED mnitem_t *item;
-                item = DTQUEUE_HEAD(&mrkq);
-                DTQUEUE_DEQUEUE(&mrkq, mrk_link);
+                item = DTQUEUE_HEAD(&mnq);
+                DTQUEUE_DEQUEUE(&mnq, mn_link);
             }
         } else {
-            errx(1, "arg can be one of ngx/mrk\n");
+            errx(1, "arg can be one of ngx/mn\n");
         }
     }
 

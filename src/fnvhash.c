@@ -1,4 +1,4 @@
-#include <mrkcommon/fnvhash.h>
+#include <mncommon/fnvhash.h>
 
 #define FNV_PRIME64 (1099511628211ul)
 

@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign
 CLEANFILES = *.core
 #CLEANFILES += *.in
 
-man_MANS = mrkcommon.3
+man_MANS = mncommon.3
 EXTRA_DIST = $(man_MANS)
 
 run:

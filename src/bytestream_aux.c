@@ -1,6 +1,6 @@
-#include <mrkcommon/bytestream.h>
-#include <mrkcommon/bytes.h>
-#include <mrkcommon/util.h>
+#include <mncommon/bytestream.h>
+#include <mncommon/bytes.h>
+#include <mncommon/util.h>
 
 static ssize_t
 bytestream_read_more_bytes(mnbytestream_t *bs, UNUSED void * fd, ssize_t sz)

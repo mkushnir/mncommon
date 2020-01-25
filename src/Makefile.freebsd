@@ -1,6 +1,6 @@
 # Created by make-project
-LIB=mrkcommon
-SHLIB_NAME=libmrkcommon.so
+LIB=mncommon
+SHLIB_NAME=libmncommon.so
 
 LIBOWN=$(USER)
 LIBGRP=$(USER)
@@ -25,7 +25,7 @@ CFLAGS+= -Wall -Werror  -g
 CFLAGS+= -shared
 .endif
 
-SRCS=	diag.c mrkcommon.c foo.c dumpm.c
+SRCS=	diag.c mncommon.c foo.c dumpm.c
 
 SUBDIR=test
 

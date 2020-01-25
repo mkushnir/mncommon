@@ -4,12 +4,12 @@
 #include <time.h>
 
 #include "unittest.h"
-#include "mrkcommon/dumpm.h"
+#include "mncommon/dumpm.h"
 #include "rb.h"
-#include "mrkcommon/profile.h"
-#include "mrkcommon/util.h"
+#include "mncommon/profile.h"
+#include "mncommon/util.h"
 #ifdef DO_MEMDEBUG
-#include "mrkcommon/memdebug.h"
+#include "mncommon/memdebug.h"
 MEMDEBUG_DECLARE(testperfrb);
 #endif
 

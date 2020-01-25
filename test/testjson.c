@@ -4,9 +4,9 @@
 #include "unittest.h"
 #include "diag.h"
 //#define TRRET_DEBUG_VERBOSE
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
-#include "mrkcommon/json.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/util.h"
+#include "mncommon/json.h"
 
 UNUSED static int
 mycb(json_ctx_t *ctx, UNUSED void *udata)

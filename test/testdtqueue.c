@@ -3,9 +3,9 @@
 
 #include "unittest.h"
 #include "diag.h"
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/dtqueue.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
+#include <mncommon/dtqueue.h>
 
 typedef struct _asd {
     DTQUEUE_ENTRY(_asd, link);

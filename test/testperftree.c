@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
-#include "mrkcommon/profile.h"
-#include "mrkcommon/rbt.h"
-#include "mrkcommon/btrie.h"
+#include "mncommon/dumpm.h"
+#include "mncommon/util.h"
+#include "mncommon/profile.h"
+#include "mncommon/rbt.h"
+#include "mncommon/btrie.h"
 #include "rb.h"
 
 static unsigned niter = 10;

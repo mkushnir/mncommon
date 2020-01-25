@@ -9,11 +9,11 @@
 #include <limits.h>
 
 #define DUMPM_INDENT_SIZE 1
-#include <mrkcommon/malloc.h>
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/mpool.h>
-#include <mrkcommon/util.h>
-#include <mrkcommon/btrie.h>
+#include <mncommon/malloc.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/mpool.h>
+#include <mncommon/util.h>
+#include <mncommon/btrie.h>
 
 #ifndef HAVE_FLSL
 #   ifdef __GCC__

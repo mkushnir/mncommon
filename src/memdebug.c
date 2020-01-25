@@ -25,8 +25,8 @@ reallocf(void *ptr, size_t sz)
 }
 #endif
 
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
+#include <mncommon/dumpm.h>
+#include <mncommon/util.h>
 
 #ifndef HAVE_MALLOC_USABLE_SIZE
 #   ifdef HAVE_MALLOC_SIZE
@@ -79,7 +79,7 @@ typedef struct _memdebug_ctx {
     size_t nitems;
 } memdebug_ctx_t;
 
-/* copied from mrkcommon/memdebug.h, sigh ... */
+/* copied from mncommon/memdebug.h, sigh ... */
 
 typedef struct _memdebug_stat {
     const char *name;
