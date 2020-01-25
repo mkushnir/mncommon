@@ -37,16 +37,34 @@
 #     test/testbar.c \
 #     test/testfoo.c \
 #     test/unittest.h
+
+_run() {
+    echo "running $@ ..."
+    eval "$@" >/dev/null 2>&1
+}
+
+die() {
+    echo $*
+    exit 1
+}
+
+
 do_init() {
-    #autoreconf --force --install
-    autoreconf --force
-    aclocal
-    autoheader
-    autoreconf
-    automake --add-missing
-    libtoolize
-    make distclean
-    autoreconf
+    _run autoreconf --force
+    if test $? -ne 0
+    then
+        if test -e .ac-aux/missing
+        then
+            die fix your errors
+        fi
+    fi
+    _run aclocal
+    _run autoheader
+    _run autoreconf
+    _run automake --add-missing
+    _run libtoolize
+    _run make distclean
+    _run autoreconf
     ./configure --prefix=$HOME --enable-debug
 }
 
