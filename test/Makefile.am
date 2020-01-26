@@ -1,6 +1,8 @@
 AUTOMAKE_OPTIONS = foreign subdir-objects
 CLEANFILES = $(BUILT_SOURCES) *.core
 #CLEANFILES += *.in
+AM_MAKEFLAGS = -s
+AM_LIBTOOLFLAGS = --silent
 
 diags = ../src/diag.txt
 
