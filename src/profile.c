@@ -1,5 +1,12 @@
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #include <sys/types.h>
+
+#ifdef HAVE_SYS_SYSCTL_H
 #include <sys/sysctl.h>
+#endif
 
 #include "diag.h"
 #include "mncommon/dumpm.h"

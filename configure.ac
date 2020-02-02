@@ -95,6 +95,7 @@ AC_CHECK_HEADERS([sys/endian.h])
 AC_CHECK_HEADERS([sys/limits.h])
 AC_CHECK_HEADERS([sys/param.h])
 AC_CHECK_HEADERS([sys/socket.h])
+AC_CHECK_HEADERS([sys/sysctl.h])
 AC_CHECK_HEADERS([syslog.h])
 AC_CHECK_HEADERS([float.h])
 AC_CHECK_HEADER_STDBOOL
