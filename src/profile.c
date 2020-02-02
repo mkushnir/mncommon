@@ -4,7 +4,7 @@
 
 #include <sys/types.h>
 
-#ifdef HAVE_SYS_SYSCTL_H
+#if defined(HAVE_SYS_SYSCTL_H) && defined (HAVE_SYSCTLBYNAME)
 #include <sys/sysctl.h>
 #endif
 
