@@ -267,7 +267,8 @@ do {                                           \
 #define MNUNLIKELY(x) __builtin_expect((x), 0)
 
 
-#define _MNCMP(a, b) ((a) < (b) ? -1 : (a) > (b) ? 1 : 0)
+#define _MNCMP(a, b) (((a) > (b)) - ((a) < (b)))
+//#define _MNCMP(a, b) ((a) < (b) ? -1 : (a) > (b) ? 1 : 0)
 #if __STDC_VERSION__ >= 201112 && defined(MNCOMMON_GENERIC_SUPPORT)
 #   define _DMNCMP(ty, name)   \
 static inline int name(const ty a, const ty b) {return _MNCMP(a, b);}

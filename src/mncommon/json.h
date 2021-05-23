@@ -22,24 +22,24 @@ extern "C" {
 #define MN_JCAT_CONST(bs, s) bytestream_cat(bs, sizeof(s) - 1, s)
 
 
-#define MN_JPRINTF_PAIR_BS00(bs, key, value, comma)                   \
+#define MN_JPRINTF_PAIR_BS00(bs, key, value, comma)                    \
 do {                                                                   \
-    mnbytes_t *_mn_jprintf_pair_bytes_tmp0;                           \
-    mnbytes_t *_mn_jprintf_pair_bytes_tmp1;                           \
-    _mn_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1);         \
-    (void)memcpy((char *)_mn_jprintf_pair_bytes_tmp0->data,           \
+    mnbytes_t *_mn_jprintf_pair_bytes_tmp0;                            \
+    mnbytes_t *_mn_jprintf_pair_bytes_tmp1;                            \
+    _mn_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1);          \
+    (void)memcpy((char *)_mn_jprintf_pair_bytes_tmp0->data,            \
                  SDATA(value, 0),                                      \
                  SEOD(value));                                         \
-    _mn_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';            \
-    _mn_jprintf_pair_bytes_tmp1 =                                     \
-        bytes_json_escape(_mn_jprintf_pair_bytes_tmp0);               \
+    _mn_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';             \
+    _mn_jprintf_pair_bytes_tmp1 =                                      \
+        bytes_json_escape(_mn_jprintf_pair_bytes_tmp0);                \
     (void)bytestream_nprintf(                                          \
             bs,                                                        \
-            sizeof(key) - 1 + 8 + _mn_jprintf_pair_bytes_tmp1->sz - 1,\
+            sizeof(key) - 1 + 8 + _mn_jprintf_pair_bytes_tmp1->sz - 1, \
             "\"" key "\":\"%s\"" comma,                                \
-            _mn_jprintf_pair_bytes_tmp1->data);                       \
-    BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp0);                       \
-    BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp1);                       \
+            _mn_jprintf_pair_bytes_tmp1->data);                        \
+    BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp0);                        \
+    BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp1);                        \
 } while (false)                                                        \
 
 
@@ -50,24 +50,24 @@ do {                                                                   \
     MN_JPRINTF_PAIR_BS00(bs, key, value, "")
 
 
-#define MN_JPRINTF_ITEM_BS00(bs, value, comma)                \
+#define MN_JPRINTF_ITEM_BS00(bs, value, comma)                 \
 do {                                                           \
-    mnbytes_t *_mn_jprintf_pair_bytes_tmp0;                   \
-    mnbytes_t *_mn_jprintf_pair_bytes_tmp1;                   \
-    _mn_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1); \
-    (void)memcpy((char *)_mn_jprintf_pair_bytes_tmp0->data,   \
+    mnbytes_t *_mn_jprintf_pair_bytes_tmp0;                    \
+    mnbytes_t *_mn_jprintf_pair_bytes_tmp1;                    \
+    _mn_jprintf_pair_bytes_tmp0 = bytes_new(SEOD(value) + 1);  \
+    (void)memcpy((char *)_mn_jprintf_pair_bytes_tmp0->data,    \
                  SDATA(value, 0),                              \
                  SEOD(value));                                 \
-    _mn_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';    \
-    _mn_jprintf_pair_bytes_tmp1 =                             \
-        bytes_json_escape(_mn_jprintf_pair_bytes_tmp0);       \
+    _mn_jprintf_pair_bytes_tmp0->data[SEOD(value)] = '\0';     \
+    _mn_jprintf_pair_bytes_tmp1 =                              \
+        bytes_json_escape(_mn_jprintf_pair_bytes_tmp0);        \
     (void)bytestream_nprintf(                                  \
             bs,                                                \
-            8 + _mn_jprintf_pair_bytes_tmp1->sz - 1,          \
+            8 + _mn_jprintf_pair_bytes_tmp1->sz - 1,           \
             "\"%s\"" comma,                                    \
-            _mn_jprintf_pair_bytes_tmp1->data);               \
-    BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp0);               \
-    BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp1);               \
+            _mn_jprintf_pair_bytes_tmp1->data);                \
+    BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp0);                \
+    BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp1);                \
 } while (false)                                                \
 
 
@@ -78,17 +78,17 @@ do {                                                           \
     MN_JPRINTF_ITEM_BS00(bs, value, "")
 
 
-#define MN_JPRINTF_PAIR_BYTES00(bs, key, value, comma)                        \
+#define MN_JPRINTF_PAIR_BYTES00(bs, key, value, comma)                         \
 do {                                                                           \
     if (value != NULL) {                                                       \
-        mnbytes_t *_mn_jprintf_pair_bytes_tmp;                                \
-        _mn_jprintf_pair_bytes_tmp = bytes_json_escape(value);                \
+        mnbytes_t *_mn_jprintf_pair_bytes_tmp;                                 \
+        _mn_jprintf_pair_bytes_tmp = bytes_json_escape(value);                 \
         (void)bytestream_nprintf(                                              \
                 bs,                                                            \
-                sizeof(key) - 1 + 8 + _mn_jprintf_pair_bytes_tmp->sz - 1,     \
+                sizeof(key) - 1 + 8 + _mn_jprintf_pair_bytes_tmp->sz - 1,      \
                 "\"" key "\":\"%s\"" comma,                                    \
-                _mn_jprintf_pair_bytes_tmp->data);                            \
-        BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp);                            \
+                _mn_jprintf_pair_bytes_tmp->data);                             \
+        BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp);                             \
     } else {                                                                   \
         (void)bytestream_nprintf(                                              \
                 bs,                                                            \
@@ -105,17 +105,17 @@ do {                                                                           \
     MN_JPRINTF_PAIR_BYTES00(bs, key, value, "")
 
 
-#define MN_JPRINTF_ITEM_BYTES00(bs, value, comma)             \
+#define MN_JPRINTF_ITEM_BYTES00(bs, value, comma)              \
 do {                                                           \
     if (value != NULL) {                                       \
-        mnbytes_t *_mn_jprintf_pair_bytes_tmp;                \
-        _mn_jprintf_pair_bytes_tmp = bytes_json_escape(value);\
+        mnbytes_t *_mn_jprintf_pair_bytes_tmp;                 \
+        _mn_jprintf_pair_bytes_tmp = bytes_json_escape(value); \
         (void)bytestream_nprintf(                              \
                 bs,                                            \
-                8 + _mn_jprintf_pair_bytes_tmp->sz - 1,       \
+                8 + _mn_jprintf_pair_bytes_tmp->sz - 1,        \
                 "\"%s\"" comma,                                \
-                _mn_jprintf_pair_bytes_tmp->data);            \
-        BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp);            \
+                _mn_jprintf_pair_bytes_tmp->data);             \
+        BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp);             \
     } else {                                                   \
         (void)bytestream_nprintf( bs, 8, "null" comma);        \
     }                                                          \
@@ -129,7 +129,7 @@ do {                                                           \
     MN_JPRINTF_ITEM_BYTES00(bs, value, "")
 
 
-#define MN_JPRINTF_PAIR_INT00(bs, key, value, comma)  \
+#define MN_JPRINTF_PAIR_INT00(bs, key, value, comma)   \
     (void)bytestream_nprintf(                          \
             bs,                                        \
             sizeof(key) - 1 + 8 + 1024,                \
@@ -143,7 +143,7 @@ do {                                                           \
     MN_JPRINTF_PAIR_INT00(bs, key, value, "")
 
 
-#define MN_JPRINTF_ITEM_INT00(bs, value, comma)                       \
+#define MN_JPRINTF_ITEM_INT00(bs, value, comma)                        \
     (void)bytestream_nprintf( bs, 1024, "%ld" comma, (intmax_t)value)  \
 
 
@@ -155,7 +155,7 @@ do {                                                           \
 
 
 
-#define MN_JPRINTF_PAIR_FLOAT00(bs, key, value, comma)\
+#define MN_JPRINTF_PAIR_FLOAT00(bs, key, value, comma) \
     (void)bytestream_nprintf(                          \
             bs,                                        \
             sizeof(key) - 1 + 4 + 1024,                \
@@ -169,7 +169,7 @@ do {                                                           \
     MN_JPRINTF_PAIR_FLOAT00(bs, key, value, "")
 
 
-#define MN_JPRINTF_ITEM_FLOAT00(bs, value, comma)                     \
+#define MN_JPRINTF_ITEM_FLOAT00(bs, value, comma)                      \
     (void)bytestream_nprintf( bs, 1024, "%lf" comma, (double)value)    \
 
 
@@ -180,7 +180,7 @@ do {                                                           \
     MN_JPRINTF_ITEM_FLOAT00(bs, value, "")
 
 
-#define MN_JPRINTF_PAIR_BOOL00(bs, key, value, comma)         \
+#define MN_JPRINTF_PAIR_BOOL00(bs, key, value, comma)          \
     (void)bytestream_nprintf(                                  \
             bs,                                                \
             sizeof(key) - 1 + 32,                              \
@@ -194,7 +194,7 @@ do {                                                           \
     MN_JPRINTF_PAIR_BOOL00(bs, key, value, "")
 
 
-#define MN_JPRINTF_ITEM_BOOL00(bs, value, comma)                              \
+#define MN_JPRINTF_ITEM_BOOL00(bs, value, comma)                               \
     (void)bytestream_nprintf( bs, 16, "%s" comma, value ? "true" : "false")    \
 
 
@@ -207,7 +207,7 @@ do {                                                           \
 
 
 
-#define MN_JPRINTF_PAIR_CB0(bs, key, cb, udata)       \
+#define MN_JPRINTF_PAIR_CB0(bs, key, cb, udata)        \
 do {                                                   \
     (void)bytestream_nprintf((bs),                     \
                              sizeof(key) - 1 + 8,      \
@@ -217,7 +217,7 @@ do {                                                   \
 } while (false)                                        \
 
 
-#define MN_JPRINTF_PAIR_CB1(bs, key, cb, udata)       \
+#define MN_JPRINTF_PAIR_CB1(bs, key, cb, udata)        \
 do {                                                   \
     (void)bytestream_nprintf((bs),                     \
                              sizeof(key) - 1 + 8,      \
@@ -226,7 +226,7 @@ do {                                                   \
 } while (false)                                        \
 
 
-#define MN_JPRINTF_BPAIR_CB0(bs, key, cb, udata)      \
+#define MN_JPRINTF_BPAIR_CB0(bs, key, cb, udata)       \
 do {                                                   \
     (void)bytestream_nprintf((bs),                     \
                              BSZ(key) - 1 + 8,         \
@@ -236,7 +236,7 @@ do {                                                   \
 } while (false)                                        \
 
 
-#define MN_JPRINTF_BPAIR_CB1(bs, key, cb, udata)      \
+#define MN_JPRINTF_BPAIR_CB1(bs, key, cb, udata)       \
 do {                                                   \
     (void)bytestream_nprintf((bs),                     \
                              BSZ(key) - 1 + 8,         \
@@ -245,7 +245,7 @@ do {                                                   \
 } while (false)                                        \
 
 
-#define MN_JCHOP_COMMA(bs)                                    \
+#define MN_JCHOP_COMMA(bs)                                     \
 if (*SDATA(bs, SEOD(bs) - 1) == ',') SADVANCEEOD(bs, -1)       \
 
 
@@ -304,28 +304,28 @@ typedef struct _json_ctx {
 #   define JPS_ENEXT    (1<<19)
 #   define JPS_EVALUE   (1<<20)
 #   define JPS_OUT      (JPS_STROUT | JPS_NUMOUT | JPS_TOKOUT | JPS_OEND | JPS_AEND)
-#   define JPS_TOSTR(st) ( \
-        (st) == JPS_START ? "START" : \
-        (st) == JPS_OSTART ? "OSTART" : \
-        (st) == JPS_OEND ? "OEND" : \
-        (st) == JPS_ASTART ? "ASTART" : \
-        (st) == JPS_AEND ? "AEND" : \
-        (st) == JPS_KEYIN ? "KEYIN" : \
-        (st) == JPS_KEYESC ? "KEYESC" : \
-        (st) == JPS_KEY ? "KEY" : \
-        (st) == JPS_KEYOUT ? "KEYOUT" : \
-        (st) == JPS_STRIN ? "STRIN" : \
-        (st) == JPS_STRESC ? "STRESC" : \
-        (st) == JPS_STR ? "STR" : \
-        (st) == JPS_STROUT ? "STROUT" : \
-        (st) == JPS_NUMIN ? "NUMIN" : \
-        (st) == JPS_NUM ? "NUM" : \
-        (st) == JPS_NUMOUT ? "NUMOUT" : \
-        (st) == JPS_TOKIN ? "TOKIN" : \
-        (st) == JPS_TOK ? "TOK" : \
-        (st) == JPS_TOKOUT ? "TOKOUT" : \
-        (st) == JPS_ENEXT ? "ENEXT" : \
-        (st) == JPS_EVALUE ? "EVALUE" : \
+#   define JPS_TOSTR(st) (             \
+        (st) == JPS_START ? "START" :  \
+        (st) == JPS_OSTART ? "OSTART" :\
+        (st) == JPS_OEND ? "OEND" :    \
+        (st) == JPS_ASTART ? "ASTART" :\
+        (st) == JPS_AEND ? "AEND" :    \
+        (st) == JPS_KEYIN ? "KEYIN" :  \
+        (st) == JPS_KEYESC ? "KEYESC" :\
+        (st) == JPS_KEY ? "KEY" :      \
+        (st) == JPS_KEYOUT ? "KEYOUT" :\
+        (st) == JPS_STRIN ? "STRIN" :  \
+        (st) == JPS_STRESC ? "STRESC" :\
+        (st) == JPS_STR ? "STR" :      \
+        (st) == JPS_STROUT ? "STROUT" :\
+        (st) == JPS_NUMIN ? "NUMIN" :  \
+        (st) == JPS_NUM ? "NUM" :      \
+        (st) == JPS_NUMOUT ? "NUMOUT" :\
+        (st) == JPS_TOKIN ? "TOKIN" :  \
+        (st) == JPS_TOK ? "TOK" :      \
+        (st) == JPS_TOKOUT ? "TOKOUT" :\
+        (st) == JPS_ENEXT ? "ENEXT" :  \
+        (st) == JPS_EVALUE ? "EVALUE" :\
         "<unknown>")
     int st;
 #   define JPS_FNEEDUNESCAPE    0x01

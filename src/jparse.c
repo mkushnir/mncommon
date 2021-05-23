@@ -2124,7 +2124,10 @@ jparse_ctx_destroy(jparse_ctx_t **pjctx)
 {
     if (*pjctx != NULL) {
         if ((*pjctx)->fd >= 0) {
-            close((*pjctx)->fd);
+            // do not close stdin
+            if ((*pjctx)->fd > 0) {
+                close((*pjctx)->fd);
+            }
             (*pjctx)->fd = -1;
         }
         bytestream_fini(&(*pjctx)->bs);

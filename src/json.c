@@ -142,6 +142,7 @@ json_fini(json_ctx_t *ctx)
     return 0;
 }
 
+
 inline int
 json_parse_str(json_ctx_t *ctx)
 {
@@ -188,6 +189,7 @@ json_parse_str(json_ctx_t *ctx)
 
     TRRET(JSON_PARSE_NEEDMORE);
 }
+
 
 inline int
 json_parse_num(json_ctx_t *ctx)

@@ -81,7 +81,7 @@ mnvoidp_strz(const void *s) { return (const char *)s; }
 
 
 #define BYTES_REF(s)                   \
-    (mnbytes_t *)(&(struct {           \
+    (const mnbytes_t *)(&(struct {     \
     ssize_t nref;                      \
     size_t sz;                         \
     uint64_t hash;                     \
