@@ -145,14 +145,14 @@ AC_CHECK_FUNCS([pow])
 AC_PRESERVE_HELP_ORDER
 
 AC_ARG_ENABLE(debug,
-              AC_HELP_STRING([--enable-debug],
+              AS_HELP_STRING([--enable-debug],
                              [Enable debug build (default=no)]),
               [AC_MSG_NOTICE([Will enable debug])],
               [AC_MSG_NOTICE([Will not enable debug])])
 AM_CONDITIONAL([DEBUG], [test "$enable_debug" = "yes"])
 
 AC_ARG_ENABLE(allstatic,
-              AC_HELP_STRING([--enable-allstatic],
+              AS_HELP_STRING([--enable-allstatic],
                              [Enable all static build (default=no)]),
               [AC_MSG_NOTICE([Will build statically])],
               [AC_MSG_NOTICE([Will not build statically])])
@@ -160,7 +160,7 @@ AC_ARG_ENABLE(allstatic,
 AM_CONDITIONAL([ALLSTATIC], [test "$enable_allstatic" = "yes"])
 
 AC_ARG_ENABLE(lto,
-              AC_HELP_STRING([--enable-lto],
+              AS_HELP_STRING([--enable-lto],
                              [Enable all static build (default=no)]),
               [AC_MSG_NOTICE([Will enable LTO])],
               [AC_MSG_NOTICE([Will not enable LTO])])
@@ -168,7 +168,7 @@ AC_ARG_ENABLE(lto,
 AM_CONDITIONAL([LTO], [test "$enable_lto" = "yes"])
 
 AC_ARG_ENABLE(array,
-              AC_HELP_STRING([--enable-array],
+              AS_HELP_STRING([--enable-array],
                              [Enable resizable realloc(3)-based array
                               with iterators (default=yes)]),
               [enable_array=$enableval],
@@ -179,7 +179,7 @@ AS_IF([test "$enable_array" = "yes"],
       [AC_MSG_NOTICE([Will not enable array])])
 
 AC_ARG_ENABLE(hash,
-              AC_HELP_STRING([--enable-hash],
+              AS_HELP_STRING([--enable-hash],
                              [Enable simple hash tables (default=yes)]),
               [enable_hash=$enableval],
               [enable_hash=yes])
@@ -189,7 +189,7 @@ AS_IF([test "$enable_hash" = "yes"],
       [AC_MSG_NOTICE([Will not enable hash])])
 
 AC_ARG_ENABLE(fasthash,
-              AC_HELP_STRING([--enable-fasthash],
+              AS_HELP_STRING([--enable-fasthash],
                              [Enable fasthash (default=yes)]),
               [enable_fasthash=$enableval],
               [enable_fasthash=yes])
@@ -199,7 +199,7 @@ AS_IF([test "$enable_fasthash" = "yes"],
       [AC_MSG_NOTICE([Will not enable fasthash])])
 
 AC_ARG_ENABLE(profile,
-              AC_HELP_STRING([--enable-profile],
+              AS_HELP_STRING([--enable-profile],
                              [Enable profile (default=yes). Requires --enable-array]),
               [enable_profile=$enableval],
               [enable_profile=yes])
@@ -209,7 +209,7 @@ AS_IF([test "$enable_profile" = "yes"],
       [AC_MSG_NOTICE([Will not enable profile])])
 
 AC_ARG_ENABLE(trie,
-              AC_HELP_STRING([--enable-trie],
+              AS_HELP_STRING([--enable-trie],
                              [Enable trie (default=yes)]),
               [enable_trie=$enableval],
               [enable_trie=yes])
@@ -219,7 +219,7 @@ AS_IF([test "$enable_trie" = "yes"],
       [AC_MSG_NOTICE([Will not enable trie])])
 
 AC_ARG_ENABLE(rbt,
-              AC_HELP_STRING([--enable-rbt],
+              AS_HELP_STRING([--enable-rbt],
                              [Enable rbt (default=yes)]),
               [enable_rbt=$enableval],
               [enable_rbt=yes])
@@ -229,7 +229,7 @@ AS_IF([test "$enable_rbt" = "yes"],
       [AC_MSG_NOTICE([Will not enable rbt])])
 
 AC_ARG_ENABLE(traversedir,
-              AC_HELP_STRING([--enable-traversedir],
+              AS_HELP_STRING([--enable-traversedir],
                              [Enable traversedir (default=yes)]),
               [enable_traversedir=$enableval],
               [enable_traversedir=yes])
@@ -239,7 +239,7 @@ AS_IF([test "$enable_traversedir" = "yes"],
       [AC_MSG_NOTICE([Will not enable traversedir])])
 
 AC_ARG_ENABLE(bytestream,
-              AC_HELP_STRING([--enable-bytestream],
+              AS_HELP_STRING([--enable-bytestream],
                              [Enable bytestream (default=yes)]),
               [enable_bytestream=$enableval],
               [enable_bytestream=yes])
@@ -249,7 +249,7 @@ AS_IF([test "$enable_bytestream" = "yes"],
       [AC_MSG_NOTICE([Will not enable bytestream])])
 
 AC_ARG_ENABLE(json,
-              AC_HELP_STRING([--enable-json],
+              AS_HELP_STRING([--enable-json],
                              [Enable json (default=yes)]),
               [enable_json=$enableval],
               [enable_json=yes])
@@ -259,7 +259,7 @@ AS_IF([test "$enable_json" = "yes"],
       [AC_MSG_NOTICE([Will not enable json])])
 
 AC_ARG_ENABLE(stqueue,
-              AC_HELP_STRING([--enable-stqueue],
+              AS_HELP_STRING([--enable-stqueue],
                              [Enable stqueue (default=yes)]),
               [enable_stqueue=$enableval],
               [enable_stqueue=yes])
@@ -269,7 +269,7 @@ AS_IF([test "$enable_stqueue" = "yes"],
       [AC_MSG_NOTICE([Will not enable stqueue])])
 
 AC_ARG_ENABLE(dtqueue,
-              AC_HELP_STRING([--enable-dtqueue],
+              AS_HELP_STRING([--enable-dtqueue],
                              [Enable dtqueue (default=yes)]),
               [enable_dtqueue=$enableval],
               [enable_dtqueue=yes])
@@ -279,7 +279,7 @@ AS_IF([test "$enable_dtqueue" = "yes"],
       [AC_MSG_NOTICE([Will not enable dtqueue])])
 
 AC_ARG_ENABLE(memdebug,
-              AC_HELP_STRING([--enable-memdebug],
+              AS_HELP_STRING([--enable-memdebug],
                              [Enable memdebug (default=yes)]),
               [enable_memdebug=$enableval],
               [enable_memdebug=yes])
@@ -289,7 +289,7 @@ AS_IF([test "$enable_memdebug" = "yes"],
       [AC_MSG_NOTICE([Will not enable memdebug])])
 
 AC_ARG_ENABLE(mpool,
-              AC_HELP_STRING([--enable-mpool],
+              AS_HELP_STRING([--enable-mpool],
                              [Enable mpool (default=yes)]),
               [enable_mpool=$enableval],
               [enable_mpool=yes])
@@ -299,7 +299,7 @@ AS_IF([test "$enable_mpool" = "yes"],
       [AC_MSG_NOTICE([Will not enable mpool])])
 
 AC_ARG_ENABLE(bytes,
-              AC_HELP_STRING([--enable-bytes],
+              AS_HELP_STRING([--enable-bytes],
                              [Enable bytes (default=yes)]),
               [enable_bytes=$enableval],
               [enable_bytes=yes])
@@ -309,7 +309,7 @@ AS_IF([test "$enable_bytes" = "yes"],
       [AC_MSG_NOTICE([Will not enable bytes])])
 
 AC_ARG_ENABLE(cm,
-              AC_HELP_STRING([--enable-cm],
+              AS_HELP_STRING([--enable-cm],
                              [Enable count-min (default=yes)]),
               [enable_cm=$enableval],
               [enable_cm=yes])
@@ -319,7 +319,7 @@ AS_IF([test "$enable_cm" = "yes"],
       [AC_MSG_NOTICE([Will not enable cm])])
 
 AC_ARG_ENABLE(heap,
-              AC_HELP_STRING([--enable-heap],
+              AS_HELP_STRING([--enable-heap],
                              [Enable heap (default=yes)]),
               [enable_heap=$enableval],
               [enable_heap=yes])
@@ -329,7 +329,7 @@ AS_IF([test "$enable_heap" = "yes"],
       [AC_MSG_NOTICE([Will not enable heap])])
 
 AC_ARG_ENABLE(base64,
-              AC_HELP_STRING([--enable-base64],
+              AS_HELP_STRING([--enable-base64],
                              [Enable base64 (default=yes)]),
               [enable_base64=$enableval],
               [enable_base64=yes])
@@ -339,7 +339,7 @@ AS_IF([test "$enable_base64" = "yes"],
       [AC_MSG_NOTICE([Will not enable base64])])
 
 AC_ARG_WITH(cmocka,
-            AC_HELP_STRING([--with-cmocka],
+            AS_HELP_STRING([--with-cmocka],
             [Build CMocka tests (default=no)]),
             [AM_CONDITIONAL([CMOCKA], [with_cmocka=yes])],
             [AM_CONDITIONAL([CMOCKA], [test "\$with_cmocka" = "yes"])])

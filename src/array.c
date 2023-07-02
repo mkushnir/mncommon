@@ -248,6 +248,18 @@ array_new_mpool(mpool_ctx_t *mpool,
 }
 
 
+const mnarray_t *
+array_ref_from(mnarray_t *ref, const mnarray_t *src)
+{
+    ref->elsz = src->elsz;
+    ref->elnum = src->elnum;
+    ref->init = NULL;
+    ref->fini = NULL;
+    ref->data = src->data;
+    return (const mnarray_t *)ref;
+}
+
+
 int
 array_reset_no_fini(mnarray_t *ar, size_t newelnum)
 {
@@ -910,4 +922,3 @@ array_cmp(const mnarray_t * restrict ar1,
 
     return (int)res;
 }
-

@@ -160,7 +160,7 @@ int jparse_expect_array_iter(jparse_ctx_t *,
  * any
  */
 int jparse_expect_kvp_any(jparse_ctx_t *,
-                          mnbytes_t *,
+                          const mnbytes_t *,
                           jparse_value_t *,
                           void *);
 
@@ -182,7 +182,7 @@ int jparse_expect_anykvp_ignore(jparse_ctx_t *,
 
 //jparse_expect_anykvp_cb_t jparse_expect_anykvp_any;
 int jparse_expect_anykvp_any(jparse_ctx_t *,
-                             mnbytes_t**,
+                             mnbytes_t **,
                              jparse_value_t *,
                              void *);
 
@@ -191,7 +191,7 @@ int jparse_expect_anykvp_any(jparse_ctx_t *,
  * bool
  */
 int jparse_expect_kvp_bool(jparse_ctx_t *,
-                           mnbytes_t *,
+                           const mnbytes_t *,
                            char *,
                            void *);
 int jparse_expect_skvp_bool(jparse_ctx_t *,
@@ -200,7 +200,7 @@ int jparse_expect_skvp_bool(jparse_ctx_t *,
                             void *);
 
 int jparse_expect_anykvp_bool(jparse_ctx_t *,
-                              mnbytes_t**,
+                              mnbytes_t **,
                               char *,
                               void *);
 
@@ -208,7 +208,7 @@ int jparse_expect_anykvp_bool(jparse_ctx_t *,
  * int
  */
 int jparse_expect_kvp_int(jparse_ctx_t *,
-                          mnbytes_t *,
+                          const mnbytes_t *,
                           long *,
                           void *);
 
@@ -226,7 +226,7 @@ int jparse_expect_anykvp_int(jparse_ctx_t *,
  * float
  */
 int jparse_expect_kvp_float(jparse_ctx_t *,
-                            mnbytes_t *,
+                            const mnbytes_t *,
                             double *,
                             void *);
 
@@ -236,7 +236,7 @@ int jparse_expect_skvp_float(jparse_ctx_t *,
                              void *);
 
 int jparse_expect_anykvp_float(jparse_ctx_t *,
-                               mnbytes_t**,
+                               mnbytes_t **,
                                double *,
                                void *);
 
@@ -244,7 +244,7 @@ int jparse_expect_anykvp_float(jparse_ctx_t *,
  * str
  */
 int jparse_expect_kvp_str(jparse_ctx_t *,
-                          mnbytes_t *,
+                          const mnbytes_t *,
                           mnbytes_t **,
                           void *);
 
@@ -254,7 +254,7 @@ int jparse_expect_skvp_str(jparse_ctx_t *,
                            void *);
 
 int jparse_expect_anykvp_str(jparse_ctx_t *,
-                             mnbytes_t**,
+                             mnbytes_t **,
                              mnbytes_t **,
                              void *);
 
@@ -262,13 +262,13 @@ int jparse_expect_anykvp_str(jparse_ctx_t *,
  * array
  */
 int jparse_expect_kvp_array(jparse_ctx_t *,
-                            mnbytes_t *,
+                            const mnbytes_t *,
                             jparse_expect_cb_t,
                             jparse_value_t *,
                             void *);
 
 int jparse_expect_kvp_array_iter(jparse_ctx_t *,
-                                 mnbytes_t *,
+                                 const mnbytes_t *,
                                  jparse_expect_cb_t,
                                  jparse_value_t *,
                                  void *);
@@ -286,13 +286,13 @@ int jparse_expect_skvp_array_iter(jparse_ctx_t *,
                                   void *);
 
 int jparse_expect_anykvp_array(jparse_ctx_t *,
-                               mnbytes_t**,
+                               mnbytes_t **,
                                jparse_expect_cb_t,
                                jparse_value_t *,
                                void *);
 
 int jparse_expect_anykvp_array_iter(jparse_ctx_t *,
-                                    mnbytes_t**,
+                                    mnbytes_t **,
                                     jparse_expect_cb_t,
                                     jparse_value_t *,
                                     void *);
@@ -301,13 +301,13 @@ int jparse_expect_anykvp_array_iter(jparse_ctx_t *,
  * object
  */
 int jparse_expect_kvp_object(jparse_ctx_t *,
-                             mnbytes_t *,
+                             const mnbytes_t *,
                              jparse_expect_cb_t,
                              jparse_value_t *,
                              void *);
 
 int jparse_expect_kvp_object_iter(jparse_ctx_t *,
-                                  mnbytes_t *,
+                                  const mnbytes_t *,
                                   jparse_expect_cb_t,
                                   jparse_value_t *,
                                   void *);
@@ -325,13 +325,13 @@ int jparse_expect_skvp_object_iter(jparse_ctx_t *,
                                    void *);
 
 int jparse_expect_anykvp_object(jparse_ctx_t *,
-                                mnbytes_t**,
+                                mnbytes_t **,
                                 jparse_expect_cb_t,
                                 jparse_value_t *,
                                 void *);
 
 int jparse_expect_anykvp_object_iter(jparse_ctx_t *,
-                                     mnbytes_t**,
+                                     mnbytes_t **,
                                      jparse_expect_cb_t,
                                      jparse_value_t *,
                                      void *);
@@ -427,6 +427,7 @@ void jparse_dump_current_pos(jparse_ctx_t *, ssize_t);
 #define JPARSE_DEP_FCLEAR (0x01)
 void jparse_dump_error_pos(jparse_ctx_t *, ssize_t, int);
 jparse_ctx_t *jparse_ctx_new(size_t, size_t);
+void jparse_ctx_complete(jparse_ctx_t *);
 void jparse_ctx_destroy(jparse_ctx_t **);
 int jparse_ctx_parse(jparse_ctx_t *,
                      const char *,

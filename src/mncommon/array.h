@@ -64,6 +64,8 @@ mnarray_t *array_new_mpool(mpool_ctx_t *,
                          array_initializer_t,
                          array_finalizer_t);
 
+const mnarray_t *array_ref_from(mnarray_t *, const mnarray_t *);
+
 #define ARRAY_FLAG_SAVE 0x01
 int array_ensure_len(mnarray_t *, size_t, unsigned int);
 int array_ensure_len_dirty(mnarray_t *, size_t, unsigned int);

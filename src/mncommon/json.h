@@ -332,8 +332,6 @@ typedef struct _json_ctx {
 #   define JPS_FFLOAT           0x02
 #   define JPS_FSCIENTIFIC      0x04
     unsigned flags;
-    unsigned obj_level;
-    unsigned array_level;
     json_type_t ty;
     union {
         long i;
@@ -342,12 +340,12 @@ typedef struct _json_ctx {
             size_t start;
             size_t end;
         } s;
-        //char *s;
         char b:1;
     } v;
 
-    char *buf;
+    const char *buf;
     size_t idx;
+    int nest;
 
     json_cb cb;
     void *udata;
@@ -368,6 +366,7 @@ typedef struct _json_ctx {
 } json_ctx_t;
 
 int json_init(json_ctx_t *, json_cb, void *);
+void json_reset(json_ctx_t *);
 void json_set_ostart_cb(json_ctx_t *, json_cb, void *);
 void json_set_oend_cb(json_ctx_t *, json_cb, void *);
 void json_set_astart_cb(json_ctx_t *, json_cb, void *);
@@ -387,24 +386,24 @@ int json_parse_tok(json_ctx_t *);
 
 
 
-ssize_t mnjson_bs_pair0(mnbytestream_t *, mnbytes_t *, mnbytestream_t *);
-ssize_t mnjson_bs_pair1(mnbytestream_t *, mnbytes_t *, mnbytestream_t *);
+ssize_t mnjson_bs_pair0(mnbytestream_t *, const mnbytes_t *, mnbytestream_t *);
+ssize_t mnjson_bs_pair1(mnbytestream_t *, const mnbytes_t *, mnbytestream_t *);
 ssize_t mnjson_bs_item0(mnbytestream_t *, mnbytestream_t *);
 ssize_t mnjson_bs_item1(mnbytestream_t *, mnbytestream_t *);
-ssize_t mnjson_bytes_pair0(mnbytestream_t *, mnbytes_t *, mnbytes_t *);
-ssize_t mnjson_bytes_pair1(mnbytestream_t *, mnbytes_t *, mnbytes_t *);
-ssize_t mnjson_bytes_item0(mnbytestream_t *, mnbytes_t *);
-ssize_t mnjson_bytes_item1(mnbytestream_t *, mnbytes_t *);
-ssize_t mnjson_int_pair0(mnbytestream_t *, mnbytes_t *, intmax_t);
-ssize_t mnjson_int_pair1(mnbytestream_t *, mnbytes_t *, intmax_t);
+ssize_t mnjson_bytes_pair0(mnbytestream_t *, const mnbytes_t *, const mnbytes_t *);
+ssize_t mnjson_bytes_pair1(mnbytestream_t *, const mnbytes_t *, const mnbytes_t *);
+ssize_t mnjson_bytes_item0(mnbytestream_t *, const mnbytes_t *);
+ssize_t mnjson_bytes_item1(mnbytestream_t *, const mnbytes_t *);
+ssize_t mnjson_int_pair0(mnbytestream_t *, const mnbytes_t *, intmax_t);
+ssize_t mnjson_int_pair1(mnbytestream_t *, const mnbytes_t *, intmax_t);
 ssize_t mnjson_int_item0(mnbytestream_t *, intmax_t);
 ssize_t mnjson_int_item1(mnbytestream_t *, intmax_t);
-ssize_t mnjson_float_pair0(mnbytestream_t *, mnbytes_t *, double);
-ssize_t mnjson_float_pair1(mnbytestream_t *, mnbytes_t *, double);
+ssize_t mnjson_float_pair0(mnbytestream_t *, const mnbytes_t *, double);
+ssize_t mnjson_float_pair1(mnbytestream_t *, const mnbytes_t *, double);
 ssize_t mnjson_float_item0(mnbytestream_t *, double);
 ssize_t mnjson_float_item1(mnbytestream_t *, double);
-ssize_t mnjson_bool_pair0(mnbytestream_t *, mnbytes_t *, bool);
-ssize_t mnjson_bool_pair1(mnbytestream_t *, mnbytes_t *, bool);
+ssize_t mnjson_bool_pair0(mnbytestream_t *, const mnbytes_t *, bool);
+ssize_t mnjson_bool_pair1(mnbytestream_t *, const mnbytes_t *, bool);
 ssize_t mnjson_bool_item0(mnbytestream_t *, bool);
 ssize_t mnjson_bool_item1(mnbytestream_t *, bool);
 ssize_t mnjson_chop_comma(mnbytestream_t *);
