@@ -181,16 +181,16 @@ probe_ostart(jparse_ctx_t *jctx)
 
 
 static int
-reach_oend(jparse_ctx_t *jctx)
+reach_ostop(jparse_ctx_t *jctx)
 {
-    REACH_BODY('}', REACH_OEND)
+    REACH_BODY('}', REACH_OSTOP)
 }
 
 
 UNUSED static int
-probe_oend(jparse_ctx_t *jctx)
+probe_ostop(jparse_ctx_t *jctx)
 {
-    PROBE_BODY('}', PROBE_OEND)
+    PROBE_BODY('}', PROBE_OSTOP)
 }
 
 
@@ -209,16 +209,16 @@ probe_astart(jparse_ctx_t *jctx)
 
 
 static int
-reach_aend(jparse_ctx_t *jctx)
+reach_astop(jparse_ctx_t *jctx)
 {
-    REACH_BODY(']', REACH_AEND)
+    REACH_BODY(']', REACH_ASTOP)
 }
 
 
 UNUSED static int
-probe_aend(jparse_ctx_t *jctx)
+probe_astop(jparse_ctx_t *jctx)
 {
-    PROBE_BODY(']', PROBE_AEND)
+    PROBE_BODY(']', PROBE_ASTOP)
 }
 
 
@@ -1539,7 +1539,7 @@ jparse_expect_object(jparse_ctx_t *jctx,
         SPOS(&jctx->bs) = spos;
         return res;
     }
-    if (reach_oend(jctx) != 0) {
+    if (reach_ostop(jctx) != 0) {
         if (jctx->errorpos == -1) {
             jctx->errorpos = SPOS(&jctx->bs);
         }
@@ -1574,7 +1574,7 @@ jparse_expect_object_iter(jparse_ctx_t *jctx,
     }
     if (res == JPARSE_EOS || (res != 0 && spos == SPOS(&jctx->bs))) {
         res = 0;
-        if (reach_oend(jctx) != 0) {
+        if (reach_ostop(jctx) != 0) {
             if (jctx->errorpos == -1) {
                 jctx->errorpos = SPOS(&jctx->bs);
             }
@@ -1620,7 +1620,7 @@ jparse_expect_array(jparse_ctx_t *jctx,
         SPOS(&jctx->bs) = spos;
         return res;
     }
-    if (reach_aend(jctx) != 0) {
+    if (reach_astop(jctx) != 0) {
         if (jctx->errorpos == -1) {
             jctx->errorpos = SPOS(&jctx->bs);
         }
@@ -1656,7 +1656,7 @@ jparse_expect_array_iter(jparse_ctx_t *jctx,
     }
     if (res == JPARSE_EOS || (res != 0 && spos == SPOS(&jctx->bs))) {
         res = 0;
-        if (reach_aend(jctx) != 0) {
+        if (reach_astop(jctx) != 0) {
             if (jctx->errorpos == -1) {
                 jctx->errorpos = SPOS(&jctx->bs);
             }

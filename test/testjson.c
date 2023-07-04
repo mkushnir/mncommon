@@ -23,7 +23,7 @@ ostartcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 }
 
 UNUSED static int
-oendcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
+ostopcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
@@ -37,7 +37,7 @@ astartcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 }
 
 UNUSED static int
-aendcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
+astopcb(UNUSED json_ctx_t *ctx, UNUSED void *udata)
 {
     json_dump(ctx);
     TRRET(0);
@@ -136,9 +136,9 @@ test1(void)
 
     json_init(&ctx, NULL, NULL);
     json_set_ostart_cb(&ctx, ostartcb, NULL);
-    json_set_oend_cb(&ctx, oendcb, NULL);
+    json_set_ostop_cb(&ctx, ostopcb, NULL);
     json_set_astart_cb(&ctx, astartcb, NULL);
-    json_set_aend_cb(&ctx, aendcb, NULL);
+    json_set_astop_cb(&ctx, astopcb, NULL);
     json_set_key_cb(&ctx, keycb, NULL);
     json_set_value_cb(&ctx, valuecb, NULL);
     json_set_item_cb(&ctx, itemcb, NULL);
@@ -148,11 +148,155 @@ test1(void)
     json_fini(&ctx);
 }
 
+
+#pragma clang diagnostic ignored "-Wunused-value"
+//#pragma clang diagnostic ignored "-Wincompatible-pointer-types"
+
+UNUSED static void
+test2 (void)
+{
+    JSON_NODE_DEF(n, NULL, 12, NULL);
+    JSON_NODE_DEF(nn, NULL, 13, NULL, &n);
+    D16(&n, sizeof(n));
+    D16(&nn, sizeof(nn));
+    TRACE("ty %d 0.ty %d", nn.ty, ((json_node_t **)(nn.c))[0]->ty);
+
+    JSON_NODE_DEF(
+        nnn,
+        NULL,
+        14,
+        NULL,
+        &JSON_NODE_INITIALIZER(NULL, 120, NULL),
+        &JSON_NODE_INITIALIZER(NULL, 130, NULL),
+        &JSON_NODE_INITIALIZER(
+            NULL,
+            15,
+            NULL,
+            &JSON_NODE_INITIALIZER(
+                NULL,
+                16,
+                NULL,
+                &JSON_NODE_INITIALIZER(NULL, 20, NULL),
+                &JSON_NODE_INITIALIZER(NULL, 21, NULL),
+                &JSON_NODE_INITIALIZER(NULL, 22, NULL)
+            )
+
+        )
+    );
+
+    json_node_t nnnn = JSON_NODE_INITIALIZER(NULL, 20, NULL, &JSON_NODE_INITIALIZER(NULL, 200, NULL));
+
+
+    json_node_t obdiff = JSON_NODE_OBJECT(
+        NULL,
+        &JSON_NODE_OITEM_STRING(NULL, "e"),
+        &JSON_NODE_OITEM_STRING(NULL, "E"),
+        &JSON_NODE_OITEM_STRING(NULL, "s"),
+        &JSON_NODE_OITEM_INT(NULL, "U"),
+        &JSON_NODE_OITEM_INT(NULL, "u"),
+        &JSON_NODE_OITEM_ARRAY(NULL, "a",
+            &JSON_NODE_AITEM_ARRAY(
+                NULL,
+                &JSON_NODE_AITEM_STRING(NULL)
+            ),
+        ),
+        &JSON_NODE_OITEM_ARRAY(NULL, "b",
+            &JSON_NODE_AITEM_ARRAY(
+                NULL,
+                &JSON_NODE_AITEM_STRING(NULL)
+            ),
+        )
+    );
+
+    json_node_t apiresp = JSON_NODE_OBJECT(
+        NULL,
+        &JSON_NODE_OITEM_INT(NULL, "id"),
+        &JSON_NODE_OITEM_ANY(NULL, "result")
+    );
+
+    json_node_t root = JSON_NODE_ONEOF(
+        NULL,
+        &obdiff,
+        &apiresp
+    );
+
+    D16(&nnn, sizeof(nnn));
+    D16(&nnnn, sizeof(nnnn));
+    D16(&obdiff, sizeof(obdiff));
+    D16(&apiresp, sizeof(apiresp));
+    D16(&root, sizeof(root));
+
+    TRACE("ty %d 0.ty %d 1.ty %d 2.ty %d 2.0.ty %d 2.0.1.ty %d",
+        nnn.ty,
+        JSON_NODE_CHILD_REF(nnn, 0)->ty,
+        JSON_NODE_CHILD_REF(nnn, 1)->ty,
+        JSON_NODE_CHILD_REF(nnn, 2)->ty,
+        JSON_NODE_CHILD_REF(*(JSON_NODE_CHILD_REF(nnn, 2)), 0)->ty,
+        JSON_NODE_CHILD_REF(*(JSON_NODE_CHILD_REF(*(JSON_NODE_CHILD_REF(nnn, 2)), 0)), 1)->ty
+    );
+
+    TRACE("csz %zd 0.csz %zd 1.csz %zd 2.csz %zd 2.0.csz %zd 2.0.1.csz %zd",
+        nnn.csz,
+        JSON_NODE_CHILD_REF(nnn, 0)->csz,
+        JSON_NODE_CHILD_REF(nnn, 1)->csz,
+        JSON_NODE_CHILD_REF(nnn, 2)->csz,
+        JSON_NODE_CHILD_REF(*(JSON_NODE_CHILD_REF(nnn, 2)), 0)->csz,
+        JSON_NODE_CHILD_REF(*(JSON_NODE_CHILD_REF(*(JSON_NODE_CHILD_REF(nnn, 2)), 0)), 1)->csz
+    );
+
+    TRACE("ty %s 0.ty %s 1.ty %s 2.ty %s 2.0.ty %s 2.0.1.ty %s",
+        json_type_hint_str(&nnn),
+        json_type_hint_str(JSON_NODE_CHILD_REF(nnn, 0)),
+        json_type_hint_str(JSON_NODE_CHILD_REF(nnn, 1)),
+        json_type_hint_str(JSON_NODE_CHILD_REF(nnn, 2)),
+        json_type_hint_str(JSON_NODE_CHILD_REF(*(JSON_NODE_CHILD_REF(nnn, 2)), 0)),
+        json_type_hint_str(JSON_NODE_CHILD_REF(*(JSON_NODE_CHILD_REF(*(JSON_NODE_CHILD_REF(nnn, 2)), 0)), 1))
+    );
+
+    TRACE("0.5.0.0 %s",
+        json_type_hint_str(
+            JSON_NODE_CHILD_REF(
+                *JSON_NODE_CHILD_REF(
+                    *JSON_NODE_CHILD_REF(
+                        *JSON_NODE_CHILD_REF(root, 0),
+                        5),
+                    0),
+                0)
+        )
+    );
+
+    TRACE("0.5.0 %s",
+        json_type_hint_str(
+            JSON_NODE_CHILD_REF(
+                *JSON_NODE_CHILD_REF(
+                    *JSON_NODE_CHILD_REF(root, 0),
+                    5),
+                0)
+        )
+    );
+
+    TRACE("0.5 %s",
+        json_type_hint_str(
+            JSON_NODE_CHILD_REF(
+                *JSON_NODE_CHILD_REF(root, 0),
+                5)
+        )
+    );
+
+    TRACE("0 %s",
+        json_type_hint_str(
+            JSON_NODE_CHILD_REF(root, 0)
+        )
+    );
+}
+
+
 int
 main(void)
 {
-    test0();
+    //test0();
     //test1();
+    test2();
     return 0;
 }
 

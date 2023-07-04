@@ -25,12 +25,12 @@ json_init(json_ctx_t *ctx, json_cb cb, void *udata)
     ctx->udata = udata;
     ctx->ostart_cb = cb;
     ctx->ostart_udata = udata;
-    ctx->oend_cb = cb;
-    ctx->oend_udata = udata;
+    ctx->ostop_cb = cb;
+    ctx->ostop_udata = udata;
     ctx->astart_cb = cb;
     ctx->astart_udata = udata;
-    ctx->aend_cb = cb;
-    ctx->aend_udata = udata;
+    ctx->astop_cb = cb;
+    ctx->astop_udata = udata;
     ctx->key_cb = cb;
     ctx->key_udata = udata;
     ctx->value_cb = cb;
@@ -63,10 +63,10 @@ json_set_ostart_cb(json_ctx_t *ctx, json_cb cb, void *udata)
 }
 
 void
-json_set_oend_cb(json_ctx_t *ctx, json_cb cb, void *udata)
+json_set_ostop_cb(json_ctx_t *ctx, json_cb cb, void *udata)
 {
-    ctx->oend_cb = cb;
-    ctx->oend_udata = udata;
+    ctx->ostop_cb = cb;
+    ctx->ostop_udata = udata;
 }
 
 void
@@ -77,10 +77,10 @@ json_set_astart_cb(json_ctx_t *ctx, json_cb cb, void *udata)
 }
 
 void
-json_set_aend_cb(json_ctx_t *ctx, json_cb cb, void *udata)
+json_set_astop_cb(json_ctx_t *ctx, json_cb cb, void *udata)
 {
-    ctx->aend_cb = cb;
-    ctx->aend_udata = udata;
+    ctx->astop_cb = cb;
+    ctx->astop_udata = udata;
 }
 
 void
@@ -107,7 +107,7 @@ json_set_item_cb(json_ctx_t *ctx, json_cb cb, void *udata)
 void
 json_dump(json_ctx_t *ctx)
 {
-    TRACEN("% 2d[]idx=% 4ld st=%s", ctx->nest, ctx->idx, JPS_TOSTR(ctx->st));
+    TRACEN("[% 4ld] % 2d:%s", ctx->idx, ctx->nest, JPS_TOSTR(ctx->st));
     if (ctx->ty == JSON_STRING) {
         char *tmp;
         size_t sz = ctx->v.s.end - ctx->v.s.start;
@@ -135,6 +135,82 @@ json_dump(json_ctx_t *ctx)
         TRACEC("\t???");
     }
 }
+
+
+const char *
+json_type_hint_str (json_node_t *n)
+{
+#define JSON_TYPE_HINT_STR_BUFSZ (256)
+    static char bufs[16][JSON_TYPE_HINT_STR_BUFSZ];
+    char *buf;
+    static unsigned idx = 0;
+    int nwritten = 0;
+    ssize_t sz;
+    ssize_t tmp0, tmp1;
+
+
+    if (idx >= countof(bufs)) {
+        idx = 0;
+    }
+    buf = bufs[idx];
+
+    nwritten += snprintf(buf, JSON_TYPE_HINT_STR_BUFSZ, "% 3d:", n->nest);
+
+#define _COPY_ONE(s)                                           \
+    sz = strlen(s);                                            \
+    tmp0 = MIN(nwritten, (JSON_TYPE_HINT_STR_BUFSZ - 1));      \
+    tmp1 = JSON_TYPE_HINT_STR_BUFSZ - tmp0;                    \
+    sz = MIN(sz, tmp1);                                        \
+    (void)memcpy(buf + nwritten, s, sz);                       \
+    nwritten += sz
+
+    if (n->ty & JSON_TYPE_HINT_OBJECT) {
+        _COPY_ONE("object|");
+    }
+    if (n->ty & JSON_TYPE_HINT_ARRAY) {
+        _COPY_ONE("array|");
+    }
+    if (n->ty & JSON_TYPE_HINT_STRING) {
+        _COPY_ONE("string|");
+    }
+    if (n->ty & JSON_TYPE_HINT_INT) {
+        _COPY_ONE("int|");
+    }
+    if (n->ty & JSON_TYPE_HINT_FLOAT) {
+        _COPY_ONE("float|");
+    }
+    if (n->ty & JSON_TYPE_HINT_BOOLEAN) {
+        _COPY_ONE("boolean|");
+    }
+    if (n->ty & JSON_TYPE_HINT_NULL) {
+        _COPY_ONE("null|");
+    }
+    if (n->ty & JSON_TYPE_HINT_ANY) {
+        _COPY_ONE("any|");
+    }
+    if (n->ty & JSON_TYPE_HINT_ONEOF) {
+        _COPY_ONE("oneof|");
+    }
+    if (n->ty & JSON_TYPE_HINT_ITEM) {
+        if (n->v != NULL) {
+            _COPY_ONE("item(");
+            _COPY_ONE((const char *)(n->v));
+            _COPY_ONE(")|");
+        } else {
+            _COPY_ONE("item|");
+        }
+    }
+
+    if ((nwritten > 0) && buf[nwritten - 1] == '|') {
+        --nwritten;
+    }
+    buf[nwritten] = '\0';
+
+    ++idx;
+
+    return buf;
+}
+
 
 
 int
@@ -309,15 +385,15 @@ json_parse_obj(json_ctx_t *ctx)
 
         if (ctx->st == JPS_OSTART) {
             if (ch == '}') {
-                ctx->st = JPS_OEND;
+                ctx->st = JPS_OSTOP;
                 ctx->ty = JSON_OBJECT;
-                --ctx->nest;
 
-                if (ctx->oend_cb != NULL &&
-                    ctx->oend_cb(ctx, ctx->oend_udata) != 0) {
+                if (ctx->ostop_cb != NULL &&
+                    ctx->ostop_cb(ctx, ctx->ostop_udata) != 0) {
 
                     TRRET(-1);
                 }
+                --ctx->nest;
 
                 break;
 
@@ -333,10 +409,12 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->st = JPS_KEYOUT;
                 ctx->v.s.end = ctx->idx;
 
+                ++ctx->nest;
                 if (ctx->key_cb != NULL &&
                     ctx->key_cb(ctx, ctx->key_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
             } else if (JSN_ISSPACE(ch)) {
                 continue;
@@ -363,13 +441,13 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->ty = JSON_OBJECT;
                 ++ctx->nest;
 
-                if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
+                if (ctx->ostart_cb != NULL &&
+                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
                     TRRET(-1);
                 }
 
-                if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
+                if (ctx->value_cb != NULL &&
+                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
                     TRRET(-1);
                 }
 
@@ -384,13 +462,13 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->ty = JSON_ARRAY;
                 ++ctx->nest;
 
-                if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
+                if (ctx->astart_cb != NULL &&
+                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
                     TRRET(-1);
                 }
 
-                if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
+                if (ctx->value_cb != NULL &&
+                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
                     TRRET(-1);
                 }
 
@@ -411,10 +489,12 @@ json_parse_obj(json_ctx_t *ctx)
 
                 ctx->v.s.end = ctx->idx;
 
+                ++ctx->nest;
                 if (ctx->value_cb != NULL &&
                     ctx->value_cb(ctx, ctx->value_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
             } else if (JSN_ISDIGIT(ch) || ch == '-') {
                 const char *tmp;
@@ -434,10 +514,12 @@ json_parse_obj(json_ctx_t *ctx)
                     TRRET(JSON_PARSE_OBJ + 3);
                 }
 
+                ++ctx->nest;
                 if (ctx->value_cb != NULL &&
                     ctx->value_cb(ctx, ctx->value_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
             } else if (JSN_ISALPHA(ch)) {
                 const char *tmp;
@@ -462,10 +544,12 @@ json_parse_obj(json_ctx_t *ctx)
                     ctx->ty = JSON_NULL;
                 }
 
+                ++ctx->nest;
                 if (ctx->value_cb != NULL &&
                     ctx->value_cb(ctx, ctx->value_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
             } else if (JSN_ISSPACE(ch)) {
                 continue;
@@ -480,14 +564,14 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->st = JPS_ENEXT;
 
             } else if (ch == '}') {
-                ctx->st = JPS_OEND;
+                ctx->st = JPS_OSTOP;
                 ctx->ty = JSON_OBJECT;
-                --ctx->nest;
 
-                if (ctx->oend_cb != NULL &&
-                    ctx->oend_cb(ctx, ctx->oend_udata) != 0) {
+                if (ctx->ostop_cb != NULL &&
+                    ctx->ostop_cb(ctx, ctx->ostop_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
                 break;
 
@@ -512,10 +596,12 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->st = JPS_KEYOUT;
                 ctx->v.s.end = ctx->idx;
 
+                ++ctx->nest;
                 if (ctx->key_cb != NULL &&
                     ctx->key_cb(ctx, ctx->key_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
             } else if (JSN_ISSPACE(ch)) {
                 continue;
@@ -553,14 +639,14 @@ json_parse_array(json_ctx_t *ctx)
 
         if (ctx->st & (JPS_ASTART | JPS_ENEXT)) {
             if (ch == ']') {
-                ctx->st = JPS_AEND;
+                ctx->st = JPS_ASTOP;
                 ctx->ty = JSON_ARRAY;
-                --ctx->nest;
 
-                if (ctx->aend_cb != NULL &&
-                    ctx->aend_cb(ctx, ctx->aend_udata) != 0) {
+                if (ctx->astop_cb != NULL &&
+                    ctx->astop_cb(ctx, ctx->astop_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
                 break;
 
@@ -569,13 +655,13 @@ json_parse_array(json_ctx_t *ctx)
                 ctx->ty = JSON_ARRAY;
                 ++ctx->nest;
 
-                if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
+                if (ctx->astart_cb != NULL &&
+                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
                     TRRET(-1);
                 }
 
-                if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
+                if (ctx->item_cb != NULL &&
+                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
                     TRRET(-1);
                 }
 
@@ -590,13 +676,13 @@ json_parse_array(json_ctx_t *ctx)
                 ctx->ty = JSON_OBJECT;
                 ++ctx->nest;
 
-                if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
+                if (ctx->ostart_cb != NULL &&
+                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
                     TRRET(-1);
                 }
 
-                if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
+                if (ctx->item_cb != NULL &&
+                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
                     TRRET(-1);
                 }
 
@@ -618,10 +704,12 @@ json_parse_array(json_ctx_t *ctx)
 
                 ctx->v.s.end = ctx->idx;
 
+                ++ctx->nest;
                 if (ctx->item_cb != NULL &&
                     ctx->item_cb(ctx, ctx->item_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
             } else if (JSN_ISDIGIT(ch) || ch == '-') {
                 const char *tmp;
@@ -641,10 +729,12 @@ json_parse_array(json_ctx_t *ctx)
                     TRRET(JSON_PARSE_ARRAY + 2);
                 }
 
+                ++ctx->nest;
                 if (ctx->item_cb != NULL &&
                     ctx->item_cb(ctx, ctx->item_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
             } else if (JSN_ISALPHA(ch)) {
                 const char *tmp;
@@ -669,10 +759,12 @@ json_parse_array(json_ctx_t *ctx)
                     ctx->ty = JSON_NULL;
                 }
 
+                ++ctx->nest;
                 if (ctx->item_cb != NULL &&
                     ctx->item_cb(ctx, ctx->item_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
             } else if (JSN_ISSPACE(ch)) {
                 continue;
@@ -687,14 +779,14 @@ json_parse_array(json_ctx_t *ctx)
                 ctx->st = JPS_ENEXT;
 
             } else if (ch == ']') {
-                ctx->st = JPS_AEND;
+                ctx->st = JPS_ASTOP;
                 ctx->ty = JSON_ARRAY;
-                --ctx->nest;
 
-                if (ctx->aend_cb != NULL &&
-                    ctx->aend_cb(ctx, ctx->aend_udata) != 0) {
+                if (ctx->astop_cb != NULL &&
+                    ctx->astop_cb(ctx, ctx->astop_udata) != 0) {
                     TRRET(-1);
                 }
+                --ctx->nest;
 
                 break;
 
@@ -738,13 +830,13 @@ json_parse(json_ctx_t *ctx, const char *in, size_t sz)
                 ctx->ty = JSON_OBJECT;
                 ++ctx->nest;
 
-                if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->item_udata) != 0) {
+                if (ctx->ostart_cb != NULL &&
+                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
                     TRRET(-1);
                 }
 
-                if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
+                if (ctx->value_cb != NULL &&
+                    ctx->value_cb(ctx, ctx->item_udata) != 0) {
                     TRRET(-1);
                 }
 
@@ -759,13 +851,13 @@ json_parse(json_ctx_t *ctx, const char *in, size_t sz)
                 ctx->ty = JSON_ARRAY;
                 ++ctx->nest;
 
-                if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
+                if (ctx->astart_cb != NULL &&
+                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
                     TRRET(-1);
                 }
 
-                if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
+                if (ctx->item_cb != NULL &&
+                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
                     TRRET(-1);
                 }
 

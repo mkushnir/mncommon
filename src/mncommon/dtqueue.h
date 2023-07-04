@@ -93,6 +93,24 @@ struct {                       \
     } while (0)                                                \
 
 
+#define DTQUEUE_POP(q, link)                                   \
+    do {                                                       \
+        if ((q)->dtq_tail != NULL) {                           \
+            PASTEURIZE_ADDR((q)->dtq_tail);                    \
+            (q)->dtq_tail = (q)->dtq_tail->link.dtq_prev;      \
+            PASTEURIZE_ADDR((q)->dtq_tail);                    \
+            if ((q)->dtq_tail == NULL) {                       \
+                (q)->dtq_head = NULL;                          \
+            } else {                                           \
+                (q)->dtq_tail->link.dtq_next = NULL;           \
+            }                                                  \
+            --((q)->nelems);                                   \
+        } else {                                               \
+            (q)->dtq_head = NULL;                              \
+        }                                                      \
+    } while (0)                                                \
+
+
 /*
  * XXX DANGEROUS! No check for NULL. Can only be used in:
  *
@@ -110,6 +128,16 @@ struct {                       \
         (q)->dtq_head = (q)->dtq_head->link.dtq_next;  \
         if ((q)->dtq_head != NULL) {                   \
             (q)->dtq_head->link.dtq_prev = NULL;       \
+        }                                              \
+        --((q)->nelems);                               \
+    } while (0)                                        \
+
+
+#define DTQUEUE_POP_FAST(q, link)                      \
+    do {                                               \
+        (q)->dtq_tail = (q)->dtq_tail->link.dtq_prev;  \
+        if ((q)->dtq_tail != NULL) {                   \
+            (q)->dtq_tail->link.dtq_next = NULL;       \
         }                                              \
         --((q)->nelems);                               \
     } while (0)                                        \
