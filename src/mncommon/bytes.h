@@ -175,6 +175,7 @@ void bytes_urlencode2(mnbytes_t * restrict , const mnbytes_t * restrict);
 void bytes_str_urlencode2(mnbytes_t * restrict, const mnbytes_t * restrict);
 void bytes_rstrip_blanks(mnbytes_t *);
 mnbytes_t *bytes_set_lower(mnbytes_t *s);
+mnbytes_t *bytes_set_upper(mnbytes_t *s);
 mnbytes_t *bytes_json_escape(const mnbytes_t *);
 void bytes_json_unescape(mnbytes_t *);
 void bytes_tr(mnbytes_t * restrict,

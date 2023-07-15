@@ -17,7 +17,7 @@
 #define JSN_ISALPHA(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
 #define JSN_ISSPACE(c) ((c) == ' ' || (c) == '\t' || (c) == '\n')
 int
-json_init(json_ctx_t *ctx, json_cb cb, void *udata)
+json_init(json_ctx_t *ctx, json_cb_t cb, void *udata)
 {
     ctx->in = NULL;
     ctx->sz = 0;
@@ -41,12 +41,22 @@ json_init(json_ctx_t *ctx, json_cb cb, void *udata)
     ctx->flags = 0;
     ctx->idx = 0;
     ctx->nest = -1;
+    if (MNUNLIKELY(
+            array_init(&ctx->stack, sizeof(void *), 0, NULL, NULL) != 0)) {
+        FFAIL("array_init");
+    }
+    array_ensure_datasz_dirty(&ctx->stack, 8, 0);
+    ctx->current_key = NULL;
     return 0;
 }
 
 void
 json_reset(json_ctx_t *ctx)
 {
+    BYTES_DECREF(&ctx->current_key);
+    if (MNUNLIKELY(array_clear(&ctx->stack) != 0)) {
+        FFAIL("array_clear");
+    }
     ctx->in = NULL;
     ctx->sz = 0;
     ctx->st = JPS_START;
@@ -56,49 +66,49 @@ json_reset(json_ctx_t *ctx)
 }
 
 void
-json_set_ostart_cb(json_ctx_t *ctx, json_cb cb, void *udata)
+json_set_ostart_cb(json_ctx_t *ctx, json_cb_t cb, void *udata)
 {
     ctx->ostart_cb = cb;
     ctx->ostart_udata = udata;
 }
 
 void
-json_set_ostop_cb(json_ctx_t *ctx, json_cb cb, void *udata)
+json_set_ostop_cb(json_ctx_t *ctx, json_cb_t cb, void *udata)
 {
     ctx->ostop_cb = cb;
     ctx->ostop_udata = udata;
 }
 
 void
-json_set_astart_cb(json_ctx_t *ctx, json_cb cb, void *udata)
+json_set_astart_cb(json_ctx_t *ctx, json_cb_t cb, void *udata)
 {
     ctx->astart_cb = cb;
     ctx->astart_udata = udata;
 }
 
 void
-json_set_astop_cb(json_ctx_t *ctx, json_cb cb, void *udata)
+json_set_astop_cb(json_ctx_t *ctx, json_cb_t cb, void *udata)
 {
     ctx->astop_cb = cb;
     ctx->astop_udata = udata;
 }
 
 void
-json_set_key_cb(json_ctx_t *ctx, json_cb cb, void *udata)
+json_set_key_cb(json_ctx_t *ctx, json_cb_t cb, void *udata)
 {
     ctx->key_cb = cb;
     ctx->key_udata = udata;
 }
 
 void
-json_set_value_cb(json_ctx_t *ctx, json_cb cb, void *udata)
+json_set_value_cb(json_ctx_t *ctx, json_cb_t cb, void *udata)
 {
     ctx->value_cb = cb;
     ctx->value_udata = udata;
 }
 
 void
-json_set_item_cb(json_ctx_t *ctx, json_cb cb, void *udata)
+json_set_item_cb(json_ctx_t *ctx, json_cb_t cb, void *udata)
 {
     ctx->item_cb = cb;
     ctx->item_udata = udata;
@@ -107,7 +117,7 @@ json_set_item_cb(json_ctx_t *ctx, json_cb cb, void *udata)
 void
 json_dump(json_ctx_t *ctx)
 {
-    TRACEN("[% 4ld] % 2d:%s", ctx->idx, ctx->nest, JPS_TOSTR(ctx->st));
+    TRACEN("[% 6ld] % 2d:%s", ctx->idx, ctx->nest, JPS_TOSTR(ctx->st));
     if (ctx->ty == JSON_STRING) {
         char *tmp;
         size_t sz = ctx->v.s.end - ctx->v.s.start;
@@ -138,7 +148,7 @@ json_dump(json_ctx_t *ctx)
 
 
 const char *
-json_type_hint_str (json_node_t *n)
+json_type_hint_str (const json_node_t *n)
 {
 #define JSON_TYPE_HINT_STR_BUFSZ (256)
     static char bufs[16][JSON_TYPE_HINT_STR_BUFSZ];
@@ -212,10 +222,99 @@ json_type_hint_str (json_node_t *n)
 }
 
 
+void
+json_ctx_push(json_ctx_t *ctx, void *o)
+{
+    void **p;
+    if (MNUNLIKELY((p = array_incr(&ctx->stack)) == NULL)) {
+        FFAIL("array_incr");
+    }
+    *p = o;
+}
+
+
+void *
+json_ctx_pop(json_ctx_t *ctx)
+{
+    void **v;
+
+    if (ARRAY_ELNUM(&ctx->stack) == 0) {
+        return NULL;
+    }
+
+    v = ARRAY_GET(void *, &ctx->stack, ARRAY_ELNUM(&ctx->stack) - 1);
+
+    (void)array_decr_fast(&ctx->stack);
+
+    return *v;
+}
+
+
+void *
+json_ctx_top(const json_ctx_t *ctx)
+{
+    void **v;
+
+    if (ARRAY_ELNUM(&ctx->stack) == 0) {
+        return NULL;
+    }
+
+    v = ARRAY_GET(void *, &ctx->stack, ARRAY_ELNUM(&ctx->stack) - 1);
+
+    return *v;
+}
+
+
+unsigned
+json_ctx_consistent(const json_ctx_t *ctx)
+{
+    unsigned res = 0;
+
+    if (ctx->idx != ctx->sz) {
+        res |= JSON_CTX_INCONSISTENT_IDX_SZ;
+    }
+
+    if (!(ctx->st & JPS_OUT)) {
+        res |= JSON_CTX_INCONSISTENT_STATE;
+    }
+
+    if (ctx->nest >= 0) {
+        res |= JSON_CTX_INCONSISTENT_NEST;
+    }
+
+    if (ARRAY_ELNUM(&ctx->stack) > 0) {
+        res |= JSON_CTX_INCONSISTENT_STACK;
+    }
+
+    return res;
+}
+
+
+int
+json_ctx_notice_key(json_ctx_t *ctx, UNUSED void *udata)
+{
+    BYTES_DECREF(&ctx->current_key);
+    ctx->current_key = bytes_new_from_str_len(
+        ctx->in + ctx->v.s.start,
+        ctx->v.s.end - ctx->v.s.start);
+    return 0;
+}
+
+
+mnbytes_t *
+json_ctx_bytes_from_value(const json_ctx_t *ctx)
+{
+    return bytes_new_from_str_len(
+        ctx->in + ctx->v.s.start,
+        ctx->v.s.end - ctx->v.s.start);
+}
+
 
 int
 json_fini(json_ctx_t *ctx)
 {
+    BYTES_DECREF(&ctx->current_key);
+    array_fini(&ctx->stack);
     ctx->cb = NULL;
     ctx->udata = NULL;
     ctx->in = NULL;
@@ -435,7 +534,6 @@ json_parse_obj(json_ctx_t *ctx)
             }
 
         } else if (ctx->st & (JPS_EVALUE)) {
-
             if (ch == '{') {
                 ctx->st = JPS_OSTART;
                 ctx->ty = JSON_OBJECT;
@@ -559,7 +657,6 @@ json_parse_obj(json_ctx_t *ctx)
             }
 
         } else if (ctx->st & JPS_OUT) {
-
             if (ch == ',') {
                 ctx->st = JPS_ENEXT;
 
@@ -581,7 +678,6 @@ json_parse_obj(json_ctx_t *ctx)
             } else {
                 TRRET(JSON_PARSE_OBJ + 5);
             }
-
 
         } else if (ctx->st == JPS_ENEXT) {
             if (ch == '"') {
@@ -609,7 +705,6 @@ json_parse_obj(json_ctx_t *ctx)
             } else {
                 TRRET(JSON_PARSE_OBJ + 6);
             }
-
 
         } else {
             //TRACE("st=%s", JPS_TOSTR(ctx->st));
@@ -774,7 +869,6 @@ json_parse_array(json_ctx_t *ctx)
             }
 
         } else if (ctx->st & JPS_OUT) {
-
             if (ch == ',') {
                 ctx->st = JPS_ENEXT;
 

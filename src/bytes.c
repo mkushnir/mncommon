@@ -254,6 +254,21 @@ bytes_set_lower(mnbytes_t *s)
     return s;
 }
 
+
+mnbytes_t *
+bytes_set_upper(mnbytes_t *s)
+{
+    ssize_t sz;
+
+    s->hash = 0;
+    sz = s->sz;
+    while (--sz >= 0) {
+        s->data[sz] = (unsigned char)toupper((int)s->data[sz]);
+    }
+    return s;
+}
+
+
 uint64_t
 bytes_hash(const mnbytes_t *bytes)
 {

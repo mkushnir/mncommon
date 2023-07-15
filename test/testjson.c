@@ -155,8 +155,8 @@ test1(void)
 UNUSED static void
 test2 (void)
 {
-    JSON_NODE_DEF(n, NULL, 12, NULL);
-    JSON_NODE_DEF(nn, NULL, 13, NULL, &n);
+    JSON_NODE_DEF(n, NULL, NULL, 1, 12, NULL);
+    JSON_NODE_DEF(nn, NULL, NULL, 1, 13, NULL, &n);
     D16(&n, sizeof(n));
     D16(&nn, sizeof(nn));
     TRACE("ty %d 0.ty %d", nn.ty, ((json_node_t **)(nn.c))[0]->ty);
@@ -164,58 +164,74 @@ test2 (void)
     JSON_NODE_DEF(
         nnn,
         NULL,
+        NULL,
+        1,
         14,
         NULL,
-        &JSON_NODE_INITIALIZER(NULL, 120, NULL),
-        &JSON_NODE_INITIALIZER(NULL, 130, NULL),
+        &JSON_NODE_INITIALIZER(NULL, NULL, 1, 120, NULL),
+        &JSON_NODE_INITIALIZER(NULL, NULL, 1, 130, NULL),
         &JSON_NODE_INITIALIZER(
             NULL,
+            NULL,
+            1,
             15,
             NULL,
             &JSON_NODE_INITIALIZER(
                 NULL,
+                NULL,
+                1,
                 16,
                 NULL,
-                &JSON_NODE_INITIALIZER(NULL, 20, NULL),
-                &JSON_NODE_INITIALIZER(NULL, 21, NULL),
-                &JSON_NODE_INITIALIZER(NULL, 22, NULL)
+                &JSON_NODE_INITIALIZER(NULL, NULL, 1, 20, NULL),
+                &JSON_NODE_INITIALIZER(NULL, NULL, 1, 21, NULL),
+                &JSON_NODE_INITIALIZER(NULL, NULL, 1, 22, NULL)
             )
 
         )
     );
 
-    json_node_t nnnn = JSON_NODE_INITIALIZER(NULL, 20, NULL, &JSON_NODE_INITIALIZER(NULL, 200, NULL));
+    json_node_t nnnn = JSON_NODE_INITIALIZER(NULL, NULL, 1, 20, NULL, &JSON_NODE_INITIALIZER(NULL, NULL, 1, 200, NULL));
 
 
     json_node_t obdiff = JSON_NODE_OBJECT(
+        "obdiff",
         NULL,
-        &JSON_NODE_OITEM_STRING(NULL, "e"),
-        &JSON_NODE_OITEM_STRING(NULL, "E"),
-        &JSON_NODE_OITEM_STRING(NULL, "s"),
-        &JSON_NODE_OITEM_INT(NULL, "U"),
-        &JSON_NODE_OITEM_INT(NULL, "u"),
-        &JSON_NODE_OITEM_ARRAY(NULL, "a",
+        1,
+        &JSON_NODE_OITEM_STRING("e", NULL, 1, "e"),
+        &JSON_NODE_OITEM_STRING("E", NULL, 1, "E"),
+        &JSON_NODE_OITEM_STRING("s", NULL, 1,  "s"),
+        &JSON_NODE_OITEM_INT("U", NULL, 1, "U"),
+        &JSON_NODE_OITEM_INT("u", NULL, 1, "u"),
+        &JSON_NODE_OITEM_ARRAY("a", NULL, 1, "a",
             &JSON_NODE_AITEM_ARRAY(
+                "a.pxqty",
                 NULL,
-                &JSON_NODE_AITEM_STRING(NULL)
+                1,
+                &JSON_NODE_AITEM_STRING(NULL, NULL, 1)
             ),
         ),
-        &JSON_NODE_OITEM_ARRAY(NULL, "b",
+        &JSON_NODE_OITEM_ARRAY("b", NULL, 1, "b",
             &JSON_NODE_AITEM_ARRAY(
+                "b.pxqty",
                 NULL,
-                &JSON_NODE_AITEM_STRING(NULL)
+                1,
+                &JSON_NODE_AITEM_STRING(NULL, NULL, 1)
             ),
         )
     );
 
     json_node_t apiresp = JSON_NODE_OBJECT(
+        "apiresp",
         NULL,
-        &JSON_NODE_OITEM_INT(NULL, "id"),
-        &JSON_NODE_OITEM_ANY(NULL, "result")
+        1,
+        &JSON_NODE_OITEM_INT("apiresp.id", NULL, 1, "id"),
+        &JSON_NODE_OITEM_ANY("apiresp.result", NULL, 1, "result")
     );
 
     json_node_t root = JSON_NODE_ONEOF(
         NULL,
+        NULL,
+        1,
         &obdiff,
         &apiresp
     );
