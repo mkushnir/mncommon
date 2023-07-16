@@ -61,7 +61,7 @@ do_init() {
     _run aclocal
     _run autoheader
     _run autoreconf
-    _run automake --add-missing
+    _run automake --add-missing --force-missing
     _run libtoolize
     _run make distclean
     _run autoreconf

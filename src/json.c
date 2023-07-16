@@ -739,7 +739,7 @@ json_parse_array(json_ctx_t *ctx)
 
                 if (ctx->astop_cb != NULL &&
                     ctx->astop_cb(ctx, ctx->astop_udata) != 0) {
-                    TRRET(-1);
+                    TRRET(JSON_PARSE_ARRAY + 1);
                 }
                 --ctx->nest;
 
@@ -752,18 +752,18 @@ json_parse_array(json_ctx_t *ctx)
 
                 if (ctx->astart_cb != NULL &&
                     ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
-                    TRRET(-1);
+                    TRRET(JSON_PARSE_ARRAY + 2);
                 }
 
                 if (ctx->item_cb != NULL &&
                     ctx->item_cb(ctx, ctx->item_udata) != 0) {
-                    TRRET(-1);
+                    TRRET(JSON_PARSE_ARRAY + 3);
                 }
 
                 ++ctx->idx;
 
                 if ((res = json_parse_array(ctx)) != 0) {
-                    TRRET(JSON_PARSE_ARRAY + 1);
+                    TRRET(JSON_PARSE_ARRAY + 4);
                 }
 
             } else if (ch == '{') {
@@ -773,12 +773,12 @@ json_parse_array(json_ctx_t *ctx)
 
                 if (ctx->ostart_cb != NULL &&
                     ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
-                    TRRET(-1);
+                    TRRET(JSON_PARSE_ARRAY + 5);
                 }
 
                 if (ctx->item_cb != NULL &&
                     ctx->item_cb(ctx, ctx->item_udata) != 0) {
-                    TRRET(-1);
+                    TRRET(JSON_PARSE_ARRAY + 6);
                 }
 
                 ++ctx->idx;
@@ -802,7 +802,7 @@ json_parse_array(json_ctx_t *ctx)
                 ++ctx->nest;
                 if (ctx->item_cb != NULL &&
                     ctx->item_cb(ctx, ctx->item_udata) != 0) {
-                    TRRET(-1);
+                    TRRET(JSON_PARSE_ARRAY + 7);
                 }
                 --ctx->nest;
 
@@ -821,13 +821,13 @@ json_parse_array(json_ctx_t *ctx)
                 } else if (ctx->ty == JSON_FLOAT) {
                     ctx->v.f = strtod(tmp, NULL);
                 } else {
-                    TRRET(JSON_PARSE_ARRAY + 2);
+                    TRRET(JSON_PARSE_ARRAY + 8);
                 }
 
                 ++ctx->nest;
                 if (ctx->item_cb != NULL &&
                     ctx->item_cb(ctx, ctx->item_udata) != 0) {
-                    TRRET(-1);
+                    TRRET(JSON_PARSE_ARRAY + 9);
                 }
                 --ctx->nest;
 
@@ -857,7 +857,7 @@ json_parse_array(json_ctx_t *ctx)
                 ++ctx->nest;
                 if (ctx->item_cb != NULL &&
                     ctx->item_cb(ctx, ctx->item_udata) != 0) {
-                    TRRET(-1);
+                    TRRET(JSON_PARSE_ARRAY + 10);
                 }
                 --ctx->nest;
 
@@ -865,7 +865,7 @@ json_parse_array(json_ctx_t *ctx)
                 continue;
 
             } else {
-                TRRET(JSON_PARSE_ARRAY + 3);
+                TRRET(JSON_PARSE_ARRAY + 11);
             }
 
         } else if (ctx->st & JPS_OUT) {
@@ -878,7 +878,7 @@ json_parse_array(json_ctx_t *ctx)
 
                 if (ctx->astop_cb != NULL &&
                     ctx->astop_cb(ctx, ctx->astop_udata) != 0) {
-                    TRRET(-1);
+                    TRRET(JSON_PARSE_ARRAY + 12);
                 }
                 --ctx->nest;
 
@@ -888,12 +888,12 @@ json_parse_array(json_ctx_t *ctx)
                 continue;
 
             } else {
-                TRRET(JSON_PARSE_ARRAY + 4);
+                TRRET(JSON_PARSE_ARRAY + 13);
             }
 
         } else {
             //TRACE("st=%s", JPS_TOSTR(ctx->st));
-            TRRET(JSON_PARSE_ARRAY + 5);
+            TRRET(JSON_PARSE_ARRAY + 14);
         }
     }
 
