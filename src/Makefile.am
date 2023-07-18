@@ -24,6 +24,11 @@ array_sources = array.c
 array_include_headers = mncommon/array.h
 endif
 
+if RING
+ring_sources = ring.c
+ring_include_headers = mncommon/ring.h
+endif
+
 if HASH
 hash_sources = hash.c
 hash_include_headers = mncommon/hash.h
@@ -107,6 +112,7 @@ endif
 nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(util_include_headers) \
 			 $(array_include_headers) \
+			 $(ring_include_headers) \
 			 $(hash_include_headers) \
 			 $(fasthash_include_headers) \
 			 $(profile_include_headers) \
@@ -127,6 +133,7 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 libmncommon_la_SOURCES = $(dumpm_sources) \
 			  $(util_sources) \
 			  $(array_sources) \
+			  $(ring_sources) \
 			  $(hash_sources) \
 			  $(fasthash_sources) \
 			  $(profile_sources) \

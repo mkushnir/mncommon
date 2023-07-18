@@ -9,6 +9,10 @@ diags = ../src/diag.txt
 src_sources = ../src/dumpm.c ../src/array.c ../src/rbt.c
 
 noinst_PROGRAMS = testfoo
+if RING
+noinst_PROGRAMS += testring
+src_sources += ../src/ring.c
+endif
 if HASH
 noinst_PROGRAMS += testhash testperfhash
 src_sources += ../src/hash.c

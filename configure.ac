@@ -178,6 +178,17 @@ AS_IF([test "$enable_array" = "yes"],
       [AC_MSG_NOTICE([Will enable array])],
       [AC_MSG_NOTICE([Will not enable array])])
 
+AC_ARG_ENABLE(ring,
+              AS_HELP_STRING([--enable-ring],
+                             [Enable resizable mnarray-based ring
+                              with iterators (default=yes)]),
+              [enable_ring=$enableval],
+              [enable_ring=yes])
+AM_CONDITIONAL([RING], [test "$enable_ring" = "yes"])
+AS_IF([test "$enable_ring" = "yes"],
+      [AC_MSG_NOTICE([Will enable ring])],
+      [AC_MSG_NOTICE([Will not enable ring])])
+
 AC_ARG_ENABLE(hash,
               AS_HELP_STRING([--enable-hash],
                              [Enable simple hash tables (default=yes)]),
