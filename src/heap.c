@@ -145,6 +145,12 @@ heap_head(mnheap_t *heap)
 }
 
 
+mnarray_t *
+heap_data(mnheap_t *heap)
+{
+    return &heap->data;
+}
+
 void
 heap_push(mnheap_t *heap, void *v)
 {
@@ -327,6 +333,13 @@ heap_fini(mnheap_t *heap)
     array_fini(&heap->data);
     heap->cmp = NULL;
     heap->swap = NULL;
+}
+
+
+void
+heap_cleanup(mnheap_t *heap)
+{
+    (void)array_clear(&heap->data);
 }
 
 

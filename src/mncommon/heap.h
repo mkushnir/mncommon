@@ -25,6 +25,7 @@ int heap_pushpop(mnheap_t *, void **);
 int heap_get(mnheap_t *, void *, void **);
 int heap_pop(mnheap_t *, void **);
 void *heap_head(mnheap_t *);
+mnarray_t *heap_data(mnheap_t *);
 void heap_sort(mnheap_t *);
 void heap_sort_custom(mnheap_t *, array_compar_t);
 void heap_ify(mnheap_t *);
@@ -40,6 +41,7 @@ void heap_init(mnheap_t *,
                heap_swapfn_t);
 
 void heap_fini(mnheap_t *);
+void heap_cleanup(mnheap_t *);
 int heap_pointer_swap(void *, void *);
 int heap_pointer_null(void *);
 #ifdef __cplusplus
