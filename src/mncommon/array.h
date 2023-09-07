@@ -37,6 +37,8 @@ typedef struct _mnarray_iter {
     void *data;
 } mnarray_iter_t;
 
+typedef int (*array_traverser_iter_t) (mnarray_iter_t *, void *);
+
 int array_init(mnarray_t *, size_t, size_t,
                array_initializer_t,
                array_finalizer_t);
@@ -112,6 +114,7 @@ void *array_find(const mnarray_t *, const void *, array_compar_t);
 void * array_find_linear(const mnarray_t *, const void *, array_compar_t);
 
 int array_traverse(mnarray_t *, array_traverser_t, void *);
+int array_traverse_iter(mnarray_t *, array_traverser_iter_t, mnarray_iter_t *it, void *);
 int array_cmp(const mnarray_t * restrcit, const mnarray_t * restrict, array_compar_t, ssize_t);
 
 #ifdef __cplusplus

@@ -18,6 +18,10 @@ extern "C" {
 #   define DUMPM_INDENT_SIZE 4
 #endif
 
+#ifndef DUMPM_OUTFILE
+#   define DUMPM_OUTFILE stderr
+#endif
+
 #ifdef USE_SYSLOG
 # define TRACEN(s, ...)     (syslog(LOG_DEBUG,    "[T]%s:%d:%s() " s,      __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define TRACEC(s, ...)     (syslog(LOG_DEBUG,                     s,                                    ##__VA_ARGS__))
@@ -29,15 +33,15 @@ extern "C" {
 # define LTRACE(lvl, s, ...) (syslog(LOG_DEBUG,   "%*c"            s "\n", DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__))
 # define LTRACEN(lvl, s, ...) (syslog(LOG_DEBUG,  "%*c"            s,      DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__))
 #else
-# define TRACEN(s, ...) (fprintf(stderr, "[%5d] %s:%d:%s() " s, getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
-# define TRACEC(s, ...) (fprintf(stderr, s, ##__VA_ARGS__))
-# define TRACE(s, ...) (fprintf(stderr, "[%5d] %s:%d:%s() " s "\n", getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
+# define TRACEN(s, ...) (fprintf(DUMPM_OUTFILE, "[%5d] %s:%d:%s() " s, getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
+# define TRACEC(s, ...) (fprintf(DUMPM_OUTFILE, s, ##__VA_ARGS__))
+# define TRACE(s, ...) (fprintf(DUMPM_OUTFILE, "[%5d] %s:%d:%s() " s "\n", getpid(), __FILE__, __LINE__, __func__, ##__VA_ARGS__))
 # define DEBUG   TRACE
 # define INFO    TRACE
 # define WARNING TRACE
 # define ERROR   TRACE
-# define LTRACE(lvl, s, ...) fprintf(stderr, "%*c" s "\n", DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__)
-# define LTRACEN(lvl, s, ...) fprintf(stderr, "%*c" s, DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__)
+# define LTRACE(lvl, s, ...) fprintf(DUMPM_OUTFILE, "%*c" s "\n", DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__)
+# define LTRACEN(lvl, s, ...) fprintf(DUMPM_OUTFILE, "%*c" s, DUMPM_INDENT_SIZE * (lvl), ' ', ##__VA_ARGS__)
 
 #endif
 

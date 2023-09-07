@@ -895,6 +895,24 @@ array_traverse(mnarray_t *ar, array_traverser_t tr, void *udata)
 
 
 int
+array_traverse_iter(mnarray_t *ar,
+                    array_traverser_iter_t tr,
+                    mnarray_iter_t *it,
+                    void *udata)
+{
+    for (; it->iter < ar->elnum; ++it->iter) {
+        int res;
+
+        it->data = ar->data + it->iter * ar->elsz;
+        if ((res = tr(it, udata)) != 0) {
+            return res;
+        }
+    }
+    return 0;
+}
+
+
+int
 array_cmp(const mnarray_t * restrict ar1,
           const mnarray_t * restrict ar2,
           array_compar_t cmp,
