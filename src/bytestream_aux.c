@@ -45,62 +45,52 @@ bytestream_from_mem(mnbytestream_t *bs, const char *s, size_t sz)
 
 int
 bytestream_consume_lines(
+        mnbytestream_t *bs,
         int fd,
         int (*linecb) (const mnbytestream_t *, const byterange_t *, void *),
         void *udata)
 {
     int res = 0;
-    mnbytestream_t bs;
     byterange_t line = {0, 0};
 
-    (void)bytestream_init(&bs,
-#ifdef PAGE_SIZE
-        PAGE_SIZE
-#else
-        4096
-#endif
-    );
-    bs.read_more = bytestream_read_more;
-
-    line.start = SPOS(&bs);
+    line.start = SPOS(bs);
 
     while (true) {
-        if (SNEEDMORE(&bs)) {
-            if (bytestream_consume_data(&bs, (void *)(intptr_t)fd) != 0) {
+        if (SNEEDMORE(bs)) {
+            if (bytestream_consume_data(bs, (void *)(intptr_t)fd) != 0) {
                 break;
             }
         }
 
-        //assert(SAVAIL(&bs) > 0);
+        //assert(SAVAIL(bs) > 0);
 
-        while (SAVAIL(&bs) > 0) {
+        while (SAVAIL(bs) > 0) {
             char ch;
 
-            ch = *SPDATA(&bs);
+            ch = *SPDATA(bs);
 
             switch (ch) {
             case '\n':
-                line.end = SPOS(&bs);
+                line.end = SPOS(bs);
 
-                if ((res = linecb(&bs, &line, udata)) != 0) {
+                if ((res = linecb(bs, &line, udata)) != 0) {
                     goto end;
                 }
 
-                SADVANCEPOS(&bs, 1);
-                line.start = SPOS(&bs);
+                SADVANCEPOS(bs, 1);
+                line.start = SPOS(bs);
                 break;
 
             default:
-                SADVANCEPOS(&bs, 1);
+                SADVANCEPOS(bs, 1);
                 break;
             }
         }
 
-        (void)bytestream_recycle(&bs, 2, SPOS(&bs) - (SPOS(&bs) % bs.growsz));
+        (void)bytestream_recycle(bs, 2, SPOS(bs) - (SPOS(bs) % bs->growsz));
     }
 
 end:
-    bytestream_fini(&bs);
 
     return res;
 }
