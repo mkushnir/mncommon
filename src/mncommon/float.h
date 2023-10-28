@@ -42,6 +42,29 @@ _Generic(x,                    \
 #define MNDBL_GT(a, b) ((a) > ((b) + MN_EPSILON))
 #define MNDBL_GTE(a, b) ((a) >= ((b) - MN_EPSILON))
 
+#define MN_MANTISSA_WIDTH_FLOAT (FLT_MANT_DIG - 1)
+#define MN_MANTISSA_MASK_FLOAT ((((uint32_t)1) << MN_MANTISSA_WIDTH_FLOAT) - 1)
+
+#define MN_EXPONENT_WIDTH_FLOAT ((int)(sizeof(float) * 8 - MN_MANTISSA_WIDTH_FLOAT - 1))
+#define _MN_EXPONENT_MASK_FLOAT ((((uint32_t)1) << MN_EXPONENT_WIDTH_FLOAT) - 1)
+#define MN_EXPONENT_MASK_FLOAT (_MN_EXPONENT_MASK_FLOAT << MN_MANTISSA_WIDTH_FLOAT)
+
+#define MN_MANTISSA_WIDTH_DOUBLE (DBL_MANT_DIG - 1)
+#define MN_MANTISSA_MASK_DOUBLE ((((uint64_t)1) << MN_MANTISSA_WIDTH_DOUBLE) - 1)
+#define MN_MANTISSA_DOUBLE(i) ((i) & MN_MANTISSA_MASK_DOUBLE | ((1ul) << MN_MANTISSA_WIDTH_DOUBLE))
+
+
+#define MN_EXPONENT_WIDTH_DOUBLE ((int)(sizeof(double) * 8 - MN_MANTISSA_WIDTH_DOUBLE - 1))
+#define _MN_EXPONENT_MASK_DOUBLE ((((uint64_t)1) << MN_EXPONENT_WIDTH_DOUBLE) - 1)
+#define MN_EXPONENT_MASK_DOUBLE (_MN_EXPONENT_MASK_DOUBLE << MN_MANTISSA_WIDTH_DOUBLE)
+#define _MN_EXPONENT_DOUBLE(i) ((int)(((i) & MN_EXPONENT_MASK_DOUBLE) >> MN_MANTISSA_WIDTH_DOUBLE))
+#define MN_EXPONENT_DOUBLE(i) (_MN_EXPONENT_DOUBLE(i) - (DBL_MAX_EXP - 1))
+
+#define MN_SIGN_MASK_DOUBLE ((1ul) << (sizeof(double) * 8 - 1))
+
+
+double mnfloord (double, double);
+double mnceild (double, double);
 
 
 #ifdef __cplusplus

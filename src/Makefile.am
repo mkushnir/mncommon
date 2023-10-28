@@ -17,7 +17,7 @@ dumpm_include_headers = mncommon/dumpm.h
 dumpm_sources = dumpm.c
 
 util_include_headers = mncommon/util.h mncommon/float.h mncommon/endian.h mncommon/assert.h mncommon/malloc.h mncommon/unittest.h
-util_sources = util.c
+util_sources = util.c float.c
 
 if ARRAY
 array_sources = array.c
@@ -171,7 +171,7 @@ endif
 
 libmncommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I$(includedir)
 libmncommon_la_LDFLAGS += $(DEBUG_LD_FLAGS) -version-info 0:0:0 -L$(libdir)
-libmncommon_la_LIBADD = -lmndiag
+libmncommon_la_LIBADD = -lmndiag -lm
 
 SUBDIRS = .
 
