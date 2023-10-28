@@ -50,7 +50,7 @@ dumpm(const char *m, size_t n, size_t l) {
 #define MNDUMP_EOL() MNDUMP_PAD('\n')
 #define MNDUMP_BYTE(idx) buf[j++] = isprint(m[(idx)]) ? m[(idx)] : ' ';
 
-#define MNDUMP_BITS(idx)       \
+#define MNDUMP_BITS_BE(idx)    \
     MNDUMP_BIT(idx, 0x80);     \
     MNDUMP_BIT(idx, 0x40);     \
     MNDUMP_BIT(idx, 0x20);     \
@@ -59,6 +59,19 @@ dumpm(const char *m, size_t n, size_t l) {
     MNDUMP_BIT(idx, 0x04);     \
     MNDUMP_BIT(idx, 0x02);     \
     MNDUMP_BIT(idx, 0x01);     \
+    MNDUMP_PAD(' ');           \
+
+
+#define MNDUMP_BITS_LE(idx)    \
+    MNDUMP_BIT(idx, 0x01);     \
+    MNDUMP_BIT(idx, 0x02);     \
+    MNDUMP_BIT(idx, 0x04);     \
+    MNDUMP_BIT(idx, 0x08);     \
+    MNDUMP_PAD(' ');           \
+    MNDUMP_BIT(idx, 0x10);     \
+    MNDUMP_BIT(idx, 0x20);     \
+    MNDUMP_BIT(idx, 0x40);     \
+    MNDUMP_BIT(idx, 0x80);     \
     MNDUMP_PAD(' ');           \
 
 
@@ -97,7 +110,7 @@ mndump_bits_one_line(const char *m, int sz)
 
     // full bytes
     for (byteidx = 0; byteidx < bytesz; ++byteidx) {
-        MNDUMP_BITS(byteidx);
+        MNDUMP_BITS_LE(byteidx);
     }
 
     // remaining bits

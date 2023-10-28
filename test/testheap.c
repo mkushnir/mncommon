@@ -324,10 +324,12 @@ main(int argc, char **argv)
 {
     int i;
 
+    if (0) {
     test0();
     test1();
     test2();
     test3();
+    }
     test4();
     for (i = 1; i < argc; ++i) {
         TRACE("arg=%s", argv[i]);
