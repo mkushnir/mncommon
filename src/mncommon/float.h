@@ -64,7 +64,24 @@ _Generic(x,                    \
 
 
 double mnfloord (double, double);
+float mnfloorf (float, float);
+
+#define mnfloor(a, m)                          \
+_Generic(a,                                    \
+    float: mnfloorf(a, m),                     \
+    double: mnfloord(a, m),                    \
+    default: mnfloorf((float)a, (float)m))     \
+
+
 double mnceild (double, double);
+float mnceilf (float, float);
+
+#define mnceil(a, m)                           \
+_Generic(a,                                    \
+    float: mnceilf(a, m),                      \
+    double: mnceild(a, m),                     \
+    default: mnceilf((float)a, (float)m))      \
+
 
 
 #ifdef __cplusplus

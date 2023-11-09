@@ -47,10 +47,24 @@ mnfloord (double a, double m)
 #endif
 }
 
+float
+mnfloorf (float a, float m)
+{
+    return a - fmodf(a, m);
+}
+
 
 double
 mnceild (double a, double m)
 {
     double r = fmod(a, m);
+    return a - r + ((r != 0.0) ? m : 0.0);
+}
+
+
+float
+mnceilf (float a, float m)
+{
+    float r = fmodf(a, m);
     return a - r + ((r != 0.0) ? m : 0.0);
 }
