@@ -66,7 +66,7 @@ _Generic(x,                    \
 double mnfloord (double, double);
 float mnfloorf (float, float);
 
-#define mnfloor(a, m)                          \
+#define MNFLOOR(a, m)                          \
 _Generic(a,                                    \
     float: mnfloorf(a, m),                     \
     double: mnfloord(a, m),                    \
@@ -76,7 +76,7 @@ _Generic(a,                                    \
 double mnceild (double, double);
 float mnceilf (float, float);
 
-#define mnceil(a, m)                           \
+#define MNCEIL(a, m)                           \
 _Generic(a,                                    \
     float: mnceilf(a, m),                      \
     double: mnceild(a, m),                     \
