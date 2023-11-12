@@ -292,7 +292,7 @@ mycb (mnbtrie_node_t *node, UNUSED void *udata)
     if (node != NULL) {
         u.i = (uint64_t)(uintptr_t)node->value;
         if (u.d != 0.0) {
-            TRACE("d %lf (%016lx)", u.d, u.i);
+            TRACE("d %lf (%016lx)", u.d, (unsigned long)u.i);
         }
     }
     return 0;
@@ -325,7 +325,7 @@ test4 (void)
 
     u.d = INFINITY;
     u.i = ULONG_MAX;
-    TRACE(">>> %016lx", u.i);
+    TRACE(">>> %016lx", (unsigned long)u.i);
     while ((n = btrie_find_closest(&tr, u.i, 0)) != NULL) {
         (void)mycb(n, NULL);
         u.i = ((uintmax_t)(uintptr_t)n->value) - 1;
