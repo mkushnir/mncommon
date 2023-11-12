@@ -597,7 +597,6 @@ static mnbtrie_node_t *
 find_closest_partial_forw(mnbtrie_node_t *node,
                           uintmax_t key)
 {
-
     if (node->idx == 0) {
         if (node->value == NULL) {
             node = NULL;

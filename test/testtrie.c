@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "mncommon/dumpm.h"
 #include "mncommon/util.h"
@@ -281,12 +282,65 @@ test3(void)
 }
 
 
+static int
+mycb (mnbtrie_node_t *node, UNUSED void *udata)
+{
+    union {
+        uint64_t i;
+        double d;
+    } u;
+    if (node != NULL) {
+        u.i = (uint64_t)(uintptr_t)node->value;
+        if (u.d != 0.0) {
+            TRACE("d %lf (%016lx)", u.d, u.i);
+        }
+    }
+    return 0;
+}
+
+
+static void
+test4 (void)
+{
+    mnbtrie_t tr;
+    mnbtrie_node_t *n;
+    union {
+        uint64_t i;
+        double d;
+    } u;
+
+    srandomdev();
+
+    btrie_init(&tr);
+
+    for (int i = 0; i < 20; ++i) {
+        long l = random() % 1000000;
+        u.d = ((double)l) / 1000;
+        n = btrie_add_node(&tr, u.i);
+        n->value = (void *)(uintptr_t)u.i;
+
+    }
+
+    btrie_traverse(&tr, mycb, NULL);
+
+    u.d = INFINITY;
+    u.i = ULONG_MAX;
+    TRACE(">>> %016lx", u.i);
+    while ((n = btrie_find_closest(&tr, u.i, 0)) != NULL) {
+        (void)mycb(n, NULL);
+        u.i = ((uintmax_t)(uintptr_t)n->value) - 1;
+    }
+
+    btrie_fini(&tr);
+}
+
 int
 main(void)
 {
     //test0();
     //test1();
     //test2();
-    test3();
+    //test3();
+    test4();
     return 0;
 }
