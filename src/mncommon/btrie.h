@@ -28,7 +28,7 @@ typedef struct _mnbtrie_node {
     char idx;
 } mnbtrie_node_t;
 
-typedef struct _mntrie {
+typedef struct _mnbtrie {
     /* flsl(3) can return TREE_DEPTH + 1 values for any of its input */
     struct _mnbtrie_node roots[TREE_DEPTH];
     size_t volume;
