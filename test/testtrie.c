@@ -324,7 +324,7 @@ test4 (void)
     btrie_traverse(&tr, mycb, NULL);
 
     u.d = INFINITY;
-    u.i = ULONG_MAX;
+    u.i = UINTMAX_MAX;
     TRACE(">>> %016lx", (unsigned long)u.i);
     while ((n = btrie_find_closest(&tr, u.i, 0)) != NULL) {
         (void)mycb(n, NULL);

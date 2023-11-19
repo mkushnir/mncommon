@@ -141,7 +141,6 @@ btrie_init(mnbtrie_t *tr)
     tr->nvals = 0;
 }
 
-                                               \
 #define BTRIE_NODE_FINI_BODY(freefn, finifn)   \
     assert(n != NULL);                         \
     if (n->child[0] != NULL) {                 \
@@ -158,6 +157,7 @@ btrie_init(mnbtrie_t *tr)
     }                                          \
     n->parent = NULL                           \
                                                \
+
 
 static void
 btrie_node_fini(mnbtrie_t *tr, mnbtrie_node_t *n)
@@ -347,7 +347,7 @@ btrie_traverse(mnbtrie_t *tr, int (*cb)(mnbtrie_node_t *, void *), void *udata)
          *  - 1, keys are 1x..x                                        \
          */                                                            \
         sel = (key & (1ul << idx)) >> idx;                             \
-    assert((sel == 0) || (sel == 1));\
+        assert((sel == 0) || (sel == 1));                              \
         n = &cur->child[sel];                                          \
         if (*n == NULL) {                                              \
             if ((*n = mallocfn(sizeof(mnbtrie_node_t))) == NULL) {     \

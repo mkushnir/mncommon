@@ -1,6 +1,8 @@
+#include <assert.h>
 #include <mncommon/bytestream.h>
 #include <mncommon/bytes.h>
 #include <mncommon/util.h>
+
 
 static ssize_t
 bytestream_read_more_bytes(mnbytestream_t *bs, UNUSED void * fd, ssize_t sz)
@@ -56,6 +58,8 @@ bytestream_consume_lines(
     line.start = SPOS(bs);
 
     while (true) {
+        off_t recyclepos, shiftback;
+
         if (SNEEDMORE(bs)) {
             if (bytestream_consume_data(bs, (void *)(intptr_t)fd) != 0) {
                 break;
@@ -87,7 +91,13 @@ bytestream_consume_lines(
             }
         }
 
-        (void)bytestream_recycle(bs, 2, SPOS(bs) - (SPOS(bs) % bs->growsz));
+        recyclepos = line.start - (line.start % bs->growsz);
+        assert(INB0(0, recyclepos, SPOS(bs)));
+
+        shiftback = bytestream_recycle(bs, 2, recyclepos);
+
+        assert(shiftback <= line.start);
+        line.start -= shiftback;
     }
 
 end:
