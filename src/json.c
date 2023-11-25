@@ -310,6 +310,20 @@ json_ctx_bytes_from_value(const json_ctx_t *ctx)
 }
 
 
+double
+json_ctx_strtod (const json_ctx_t *ctx)
+{
+    return strtod(ctx->in + ctx->v.s.start, NULL);
+}
+
+
+intmax_t
+json_ctx_strtoimax (const json_ctx_t *ctx, int base)
+{
+    return strtoimax(ctx->in + ctx->v.s.start, NULL, base);
+}
+
+
 int
 json_fini(json_ctx_t *ctx)
 {
