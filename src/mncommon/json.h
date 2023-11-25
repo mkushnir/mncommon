@@ -189,6 +189,39 @@ do {                                                           \
             "\"" key "\":%s" comma, value ? "true" : "false")  \
 
 
+
+#define MN_JPRINTF_PAIR_QFLOAT00(bs, key, value, precision, comma)     \
+    (void)bytestream_nprintf(                                          \
+            bs,                                                        \
+            sizeof(key) - 1 + 4 + 1024,                                \
+            "\"" key "\":\"%.0" #precision "lf\"" comma, (double)value)
+
+#define MN_JPRINTF_PAIR_QFLOAT0(bs, key, value, precision)  \
+    MN_JPRINTF_PAIR_QFLOAT00(bs, key, value, precision, ",")
+
+#define MN_JPRINTF_PAIR_QFLOAT1(bs, key, value, precision)  \
+    MN_JPRINTF_PAIR_QFLOAT00(bs, key, value, precision, "")
+
+#define MN_JPRINTF_ITEM_QFLOAT00(bs, value, precision, comma)          \
+    (void)bytestream_nprintf(                                          \
+            bs, 1024, "\"%.0" #precision "lf\"" comma, (double)value)
+
+
+#define MN_JPRINTF_ITEM_QFLOAT0(bs, value, precision)   \
+    MN_JPRINTF_ITEM_QFLOAT00(bs, value, precision, ",")
+
+#define MN_JPRINTF_ITEM_QFLOAT1(bs, value, precision)   \
+    MN_JPRINTF_ITEM_QFLOAT00(bs, value, precision, "")
+
+
+#define MN_JPRINTF_PAIR_BOOL00(bs, key, value, comma)          \
+    (void)bytestream_nprintf(                                  \
+            bs,                                                \
+            sizeof(key) - 1 + 32,                              \
+            "\"" key "\":%s" comma, value ? "true" : "false")  \
+
+
+
 #define MN_JPRINTF_PAIR_BOOL0(bs, key, value) \
     MN_JPRINTF_PAIR_BOOL00(bs, key, value, ",")
 
