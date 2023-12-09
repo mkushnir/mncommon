@@ -109,6 +109,10 @@ base64_sources = base64.c
 base64_include_headers = mncommon/base64.h
 endif
 
+if PTHREAD
+pthread_include_headers = mncommon/pthread.h
+endif
+
 nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(util_include_headers) \
 			 $(array_include_headers) \
@@ -128,7 +132,8 @@ nobase_include_HEADERS = $(dumpm_include_headers) \
 			 $(bytes_include_headers) \
 			 $(cm_include_headers) \
 			 $(heap_include_headers) \
-			 $(base64_include_headers)
+			 $(base64_include_headers) \
+			 $(pthread_include_headers)
 
 libmncommon_la_SOURCES = $(dumpm_sources) \
 			  $(util_sources) \
@@ -172,6 +177,10 @@ endif
 libmncommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I$(includedir)
 libmncommon_la_LDFLAGS += $(DEBUG_LD_FLAGS) -version-info 0:0:0 -L$(libdir)
 libmncommon_la_LIBADD = -lmndiag -lm
+
+if PTHREAD
+libmncommon_la_LIBADD += -lpthread
+endif
 
 SUBDIRS = .
 

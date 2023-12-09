@@ -502,9 +502,9 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->ostop_cb != NULL &&
-                    ctx->ostop_cb(ctx, ctx->ostop_udata) != 0) {
+                    (res = ctx->ostop_cb(ctx, ctx->ostop_udata)) != 0) {
 
-                    TRRET(-1);
+                    TRRET(res);
                 }
                 --ctx->nest;
 
@@ -524,8 +524,8 @@ json_parse_obj(json_ctx_t *ctx)
 
                 ++ctx->nest;
                 if (ctx->key_cb != NULL &&
-                    ctx->key_cb(ctx, ctx->key_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->key_cb(ctx, ctx->key_udata)) != 0) {
+                    TRRET(res);
                 }
                 --ctx->nest;
 
@@ -554,13 +554,13 @@ json_parse_obj(json_ctx_t *ctx)
                 ++ctx->nest;
 
                 if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->ostart_cb(ctx, ctx->ostart_udata)) != 0) {
+                    TRRET(res);
                 }
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->value_cb(ctx, ctx->value_udata)) != 0) {
+                    TRRET(res);
                 }
 
                 ++ctx->idx;
@@ -575,13 +575,13 @@ json_parse_obj(json_ctx_t *ctx)
                 ++ctx->nest;
 
                 if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->astart_cb(ctx, ctx->astart_udata)) != 0) {
+                    TRRET(res);
                 }
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->value_cb(ctx, ctx->value_udata)) != 0) {
+                    TRRET(res);
                 }
 
                 ++ctx->idx;
@@ -603,8 +603,8 @@ json_parse_obj(json_ctx_t *ctx)
 
                 ++ctx->nest;
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->value_cb(ctx, ctx->value_udata)) != 0) {
+                    TRRET(res);
                 }
                 --ctx->nest;
 
@@ -628,8 +628,8 @@ json_parse_obj(json_ctx_t *ctx)
 
                 ++ctx->nest;
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->value_cb(ctx, ctx->value_udata)) != 0) {
+                    TRRET(res);
                 }
                 --ctx->nest;
 
@@ -658,8 +658,8 @@ json_parse_obj(json_ctx_t *ctx)
 
                 ++ctx->nest;
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->value_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->value_cb(ctx, ctx->value_udata)) != 0) {
+                    TRRET(res);
                 }
                 --ctx->nest;
 
@@ -679,8 +679,8 @@ json_parse_obj(json_ctx_t *ctx)
                 ctx->ty = JSON_OBJECT;
 
                 if (ctx->ostop_cb != NULL &&
-                    ctx->ostop_cb(ctx, ctx->ostop_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->ostop_cb(ctx, ctx->ostop_udata)) != 0) {
+                    TRRET(res);
                 }
                 --ctx->nest;
 
@@ -708,8 +708,8 @@ json_parse_obj(json_ctx_t *ctx)
 
                 ++ctx->nest;
                 if (ctx->key_cb != NULL &&
-                    ctx->key_cb(ctx, ctx->key_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->key_cb(ctx, ctx->key_udata)) != 0) {
+                    TRRET(res);
                 }
                 --ctx->nest;
 
@@ -939,13 +939,13 @@ json_parse(json_ctx_t *ctx, const char *in, size_t sz)
                 ++ctx->nest;
 
                 if (ctx->ostart_cb != NULL &&
-                    ctx->ostart_cb(ctx, ctx->ostart_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->ostart_cb(ctx, ctx->ostart_udata)) != 0) {
+                    TRRET(res);
                 }
 
                 if (ctx->value_cb != NULL &&
-                    ctx->value_cb(ctx, ctx->item_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->value_cb(ctx, ctx->item_udata)) != 0) {
+                    TRRET(res);
                 }
 
                 ++ctx->idx;
@@ -960,13 +960,13 @@ json_parse(json_ctx_t *ctx, const char *in, size_t sz)
                 ++ctx->nest;
 
                 if (ctx->astart_cb != NULL &&
-                    ctx->astart_cb(ctx, ctx->astart_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->astart_cb(ctx, ctx->astart_udata)) != 0) {
+                    TRRET(res);
                 }
 
                 if (ctx->item_cb != NULL &&
-                    ctx->item_cb(ctx, ctx->item_udata) != 0) {
-                    TRRET(-1);
+                    (res = ctx->item_cb(ctx, ctx->item_udata)) != 0) {
+                    TRRET(res);
                 }
 
                 ++ctx->idx;

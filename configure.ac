@@ -349,6 +349,16 @@ AS_IF([test "$enable_base64" = "yes"],
       [AC_MSG_NOTICE([Will enable base64])],
       [AC_MSG_NOTICE([Will not enable base64])])
 
+AC_ARG_ENABLE(pthread,
+              AS_HELP_STRING([--enable-pthread],
+                             [Enable pthread macros (default=yes)]),
+              [enable_pthread=$enableval],
+              [enable_pthread=yes])
+AM_CONDITIONAL([PTHREAD], [test "$enable_pthread" = "yes"])
+AS_IF([test "$enable_pthread" = "yes"],
+      [AC_MSG_NOTICE([Will enable pthread macros])],
+      [AC_MSG_NOTICE([Will not enable pthread macros])])
+
 AC_ARG_WITH(cmocka,
             AS_HELP_STRING([--with-cmocka],
             [Build CMocka tests (default=no)]),
