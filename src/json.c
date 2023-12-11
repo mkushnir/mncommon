@@ -130,7 +130,7 @@ json_dump(json_ctx_t *ctx)
         TRACEC("\t\"%s\"%s", tmp, (ctx->st & JPS_KEYOUT ? ":" : ""));
         free(tmp);
     } else if (ctx->ty == JSON_INT) {
-        TRACEC("\t%ld", ctx->v.i);
+        TRACEC("\t%jd", ctx->v.i);
     } else if (ctx->ty == JSON_FLOAT) {
         TRACEC("\t%lf", ctx->v.f);
     } else if (ctx->ty == JSON_BOOLEAN) {
@@ -1213,6 +1213,65 @@ ssize_t
 mnjson_bool_item1(mnbytestream_t *bs, bool value)
 {
     MNJSON_BOOL_ITEM_BODY("");
+}
+
+
+#define MNJSON_CB_PAIR_BODY(_comma)                    \
+    ssize_t res;                                       \
+    res = bytestream_nprintf(bs,                       \
+                             BSZ(key) - 1 + 4,         \
+                             "\"%s\":", BDATA(key));   \
+    res += cb(bs, udata);                              \
+    _comma                                             \
+    return res                                         \
+
+
+ssize_t
+mnjson_cb_pair0 (mnbytestream_t *bs,
+                 const mnbytes_t *key,
+                 ssize_t (*cb) (mnbytestream_t *, void *udata),
+                 void *udata)
+{
+    MNJSON_CB_PAIR_BODY(
+        res += bytestream_cat(bs, 1, ",");
+    );
+}
+
+
+ssize_t
+mnjson_cb_pair1 (mnbytestream_t *bs,
+                 const mnbytes_t *key,
+                 ssize_t (*cb) (mnbytestream_t *, void *udata),
+                 void *udata)
+{
+    MNJSON_CB_PAIR_BODY(;);
+}
+
+
+#define MNJSON_CB_ITEM_BODY(_comma)    \
+    ssize_t res;                       \
+    res = cb(bs, udata);               \
+    _comma                             \
+    return res                         \
+
+
+ssize_t
+mnjson_cb_item0 (mnbytestream_t *bs,
+                 ssize_t (*cb) (mnbytestream_t *, void *udata),
+                 void *udata)
+{
+    MNJSON_CB_ITEM_BODY(
+        res += bytestream_cat(bs, 1, ",");
+    );
+}
+
+
+ssize_t
+mnjson_cb_item1 (mnbytestream_t *bs,
+                 ssize_t (*cb) (mnbytestream_t *, void *udata),
+                 void *udata)
+{
+    MNJSON_CB_ITEM_BODY(;);
 }
 
 

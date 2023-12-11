@@ -547,6 +547,10 @@ ssize_t mnjson_bool_pair0(mnbytestream_t *, const mnbytes_t *, bool);
 ssize_t mnjson_bool_pair1(mnbytestream_t *, const mnbytes_t *, bool);
 ssize_t mnjson_bool_item0(mnbytestream_t *, bool);
 ssize_t mnjson_bool_item1(mnbytestream_t *, bool);
+ssize_t mnjson_cb_pair0(mnbytestream_t *, const mnbytes_t *, ssize_t (*) (mnbytestream_t *, void *), void *);
+ssize_t mnjson_cb_pair1(mnbytestream_t *, const mnbytes_t *, ssize_t (*) (mnbytestream_t *, void *), void *);
+ssize_t mnjson_cb_item0(mnbytestream_t *, ssize_t (*) (mnbytestream_t *, void *), void *);
+ssize_t mnjson_cb_item1(mnbytestream_t *, ssize_t (*) (mnbytestream_t *, void *), void *);
 ssize_t mnjson_chop_comma(mnbytestream_t *);
 
 #ifdef __cplusplus
