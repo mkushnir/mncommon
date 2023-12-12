@@ -2,6 +2,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+// strptime
+#include <time.h>
+// struct timeval
+#include <sys/time.h>
 
 //#define TRRET_DEBUG_VERBOSE
 #include <mncommon/malloc.h>
@@ -321,6 +325,37 @@ intmax_t
 json_ctx_strtoimax (const json_ctx_t *ctx, int base)
 {
     return strtoimax(ctx->in + ctx->v.s.start, NULL, base);
+}
+
+
+int
+json_ctx_strptime_from_value (const json_ctx_t *ctx,
+                              const char * restrict fmt,
+                              struct timeval * restrict tv)
+{
+    int res = 0;
+    struct tm tm;
+    char *dot;
+
+    if ((dot = strptime(ctx->buf + ctx->v.s.start, fmt, &tm)) == NULL) {
+        res = JSON_CTX + 1;
+        goto end;
+    }
+
+    if ((tv->tv_sec = timegm(&tm)) == -1) {
+        res = JSON_CTX + 2;
+        goto end;
+    }
+
+    if (*dot == '.') {
+        tv->tv_usec =
+            (suseconds_t)(strtod(dot, NULL) * 1000000.0);
+    } else {
+        tv->tv_usec = 0;
+    }
+
+end:
+    return res;
 }
 
 

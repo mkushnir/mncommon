@@ -511,6 +511,11 @@ int json_ctx_notice_key(json_ctx_t *, void *);
 mnbytes_t *json_ctx_bytes_from_value(const json_ctx_t *);
 double json_ctx_strtod (const json_ctx_t *);
 intmax_t json_ctx_strtoimax (const json_ctx_t *, int);
+int json_ctx_strptime_from_value (
+        const json_ctx_t *,
+        const char * restrict,
+        struct timeval * restrict);
+
 int json_fini(json_ctx_t *);
 void json_dump(json_ctx_t *);
 #define JSON_PARSE_NEEDMORE (-2)
