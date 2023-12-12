@@ -1254,7 +1254,7 @@ mnjson_bool_item1(mnbytestream_t *bs, bool value)
 #define MNJSON_CB_PAIR_BODY(_comma)                    \
     ssize_t res;                                       \
     res = bytestream_nprintf(bs,                       \
-                             BSZ(key) - 1 + 4,         \
+                             BSZ(key) - 1 + 8,         \
                              "\"%s\":", BDATA(key));   \
     res += cb(bs, udata);                              \
     _comma                                             \
