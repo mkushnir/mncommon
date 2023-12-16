@@ -337,7 +337,7 @@ json_ctx_strptime_from_value (const json_ctx_t *ctx,
     struct tm tm;
     char *dot;
 
-    if ((dot = strptime(ctx->buf + ctx->v.s.start, fmt, &tm)) == NULL) {
+    if ((dot = strptime(ctx->in + ctx->v.s.start, fmt, &tm)) == NULL) {
         res = JSON_CTX + 1;
         goto end;
     }
