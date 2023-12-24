@@ -17,35 +17,45 @@ siftdown(mnheap_t *heap, int i)
 {
     int res;
     void *a, *b, *minb;
-    int d, minj;
+    int d;
     int j;
 
     res = 0;
+
     a = array_get(&heap->data, i);
+
     d = 1;
-    j = HEAP_D * i + d;
+    j = i * HEAP_D + d;
     minb = array_get(&heap->data, j);
-    minj = j;
 
     if (minb != NULL) {
+        int minj;
+
+        minj = j;
+
         for (d = 2; d <= HEAP_D; ++d) {
             j = HEAP_D * i + d;
+
             b = array_get(&heap->data, j);
+
             if (b != NULL) {
                 if (heap->cmp(minb, b) > 0) {
                     minb = b;
                     minj = j;
                 }
+
             } else {
                 break;
             }
         }
+
         if (heap->cmp(a, minb) > 0) {
             (void)heap->swap(a, minb);
             (void)siftdown(heap, minj);
             res = 1;
         }
     }
+
     return res;
 }
 
