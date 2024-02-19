@@ -1,5 +1,10 @@
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <mncommon/ring.h>
 
@@ -52,7 +57,11 @@ main (void)
 {
     mnring_t ring;
 
+#ifdef HAVE_SRANDOMDEV
     srandomdev();
+#else
+    srandom(time(NULL));
+#endif
 
     mnring_init(&ring, sizeof(int), 7, NULL, NULL);
 

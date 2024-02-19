@@ -149,7 +149,9 @@ test1(void)
 }
 
 
+#ifdef __clang__
 #pragma clang diagnostic ignored "-Wunused-value"
+#endif
 //#pragma clang diagnostic ignored "-Wincompatible-pointer-types"
 
 UNUSED static void
