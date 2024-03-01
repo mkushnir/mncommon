@@ -18,7 +18,7 @@ extern "C" {
 /*
  * XXX check out compile_bytes_t(), lkit_compile_expr(), and ltype_compile()
  */
-typedef struct _bytes {
+typedef struct _mnbytes {
     ssize_t nref;
     size_t sz;
     uint64_t hash;
