@@ -12,63 +12,112 @@
 #include <mncommon/util.h>
 #include "diag.h"
 
-#define _malloc(sz) mpool_malloc(mpool, (sz))
 #define _realloc(p, sz) mpool_realloc(mpool, (p), (sz))
 #define _free(p) mpool_free(mpool, (p))
-
-#define _array_init(ar,        \
-                    elsz,      \
-                    elnum,     \
-                    init,      \
-                    fini)      \
-array_init_mpool(mpool,        \
-                 (ar),         \
-                 (elsz),       \
-                 (elnum),      \
-                 (init),       \
-                 (fini))       \
-
 
 /*
  * Initialize array structure.
  *
  */
+inline static void *
+malloc_fn_std (size_t sz, UNUSED mpool_ctx_t *mpool)
+{
+    return malloc(sz);
+}
 
-#define ARRAY_INIT_BODY(malloc_fn)                             \
-    size_t datasz;                                             \
-    assert(elsz > 0);                                          \
-    ar->elsz = elsz;                                           \
-    ar->elnum = elnum;                                         \
-    ar->init = init;                                           \
-    ar->fini = fini;                                           \
-    datasz = elsz * elnum;                                     \
-    if (datasz >= MNARRAY_SMALL_DATASZ) {                      \
-        ar->datasz = datasz;                                   \
-    } else if (datasz > 0) {                                   \
-        ar->datasz = 1;                                        \
-        while (ar->datasz < datasz) {                          \
-            ar->datasz <<= 1;                                  \
-        }                                                      \
-    } else {                                                   \
-        assert(datasz == 0);                                   \
-        ar->datasz = 0;                                        \
-    }                                                          \
-    if (elnum > 0) {                                           \
-        if ((ar->data = malloc_fn(ar->datasz)) == NULL) {      \
-            TRRET(ARRAY_INIT + 1);                             \
-        }                                                      \
-        if (ar->init != NULL) {                                \
-            unsigned i;                                        \
-            for (i = 0; i < elnum; ++i) {                      \
-                if (ar->init(ar->data + (i * ar->elsz)) != 0) {\
-                    TRRET(ARRAY_INIT + 2);                     \
-                }                                              \
-            }                                                  \
-        }                                                      \
-    } else {                                                   \
-        ar->data = NULL;                                       \
-    }                                                          \
-    return 0                                                   \
+
+inline static void *
+malloc_fn_mpool (size_t sz, mpool_ctx_t *mpool)
+{
+    return mpool_malloc(mpool, sz);
+}
+
+
+UNUSED inline static void *
+realloc_fn_std (void *o, size_t sz, UNUSED mpool_ctx_t *mpool)
+{
+    return realloc(o, sz);
+}
+
+
+UNUSED inline static void *
+realloc_fn_mpool (void *o, size_t sz, mpool_ctx_t *mpool)
+{
+    return mpool_realloc(mpool, o, sz);
+}
+
+
+inline static void
+free_fn_std (void *o, UNUSED mpool_ctx_t *mpool)
+{
+    free(o);
+}
+
+
+inline static void
+free_fn_mpool (void *o, mpool_ctx_t *mpool)
+{
+    mpool_free(mpool, o);
+}
+
+
+
+inline static mnarray_t
+_array_init_body (mnarray_t ar,
+                  size_t elsz,
+                  size_t elnum,
+                  array_initializer_t init,
+                  array_finalizer_t fini,
+                  void * (malloc_fn) (size_t, mpool_ctx_t *),
+                  mpool_ctx_t *mpool)
+{
+    size_t datasz;
+
+    assert(elsz > 0);
+
+    ar.elsz = elsz;
+    ar.elnum = elnum;
+    ar.init = init;
+    ar.fini = fini;
+    datasz = elsz * elnum;
+
+    if (datasz >= MNARRAY_SMALL_DATASZ) {
+        ar.datasz = datasz;
+
+    } else if (datasz > 0) {
+        ar.datasz = 1;
+
+        while (ar.datasz < datasz) {
+            ar.datasz <<= 1;
+        }
+
+    } else {
+        assert(datasz == 0);
+        ar.datasz = 0;
+    }
+
+    if (elnum > 0) {
+        if ((ar.data = malloc_fn(ar.datasz, mpool)) == NULL) {
+            TR(ARRAY_INIT + 1);
+            goto end;
+        }
+
+        if (ar.init != NULL) {
+            for (unsigned i = 0; i < elnum; ++i) {
+                if (ar.init(ar.data + (i * ar.elsz)) != 0) {
+                    TR(ARRAY_INIT + 2);
+                    goto end;
+                }
+            }
+        }
+
+    } else {
+        ar.data = NULL;
+    }
+
+end:
+    return ar;
+}
 
 
 int
@@ -76,7 +125,8 @@ array_init(mnarray_t *ar, size_t elsz, size_t elnum,
            array_initializer_t init,
            array_finalizer_t fini)
 {
-    ARRAY_INIT_BODY(malloc);
+    *ar = _array_init_body(*ar, elsz, elnum, init, fini, malloc_fn_std, NULL);
+    return ((elnum > 0) && ar->data == NULL) ? (ARRAY_INIT + 3) : 0;
 }
 
 
@@ -85,7 +135,8 @@ array_init_mpool(mpool_ctx_t *mpool, mnarray_t *ar, size_t elsz, size_t elnum,
            array_initializer_t init,
            array_finalizer_t fini)
 {
-    ARRAY_INIT_BODY(_malloc);
+    *ar = _array_init_body(*ar, elsz, elnum, init, fini, malloc_fn_mpool, mpool);
+    return ((elnum > 0) && ar->data == NULL) ? (ARRAY_INIT + 4) : 0;
 }
 
 
@@ -106,7 +157,7 @@ array_init_ref(mnarray_t *ar, void *data, size_t elsz, size_t elnum,
 
         for (i = 0; i < elnum; ++i) {
             if (ar->init(ar->data + i * ar->elsz) != 0) {
-                TRRET(ARRAY_INIT + 2);
+                TRRET(ARRAY_INIT + 5);
             }
         }
     }
@@ -134,97 +185,53 @@ array_fini_ref(mnarray_t *ar)
 }
 
 
-#define ARRAY_INIT_FROM_BODY(malloc_fn)                        \
-    size_t datasz;                                             \
-    ar->elsz = src->elsz;                                      \
-    ar->elnum = elnum;                                         \
-    ar->init = src->init;                                      \
-    ar->fini = src->fini;                                      \
-    datasz = ar->elsz * elnum;                                 \
-    if (datasz >= MNARRAY_SMALL_DATASZ) {                      \
-        ar->datasz = datasz;                                   \
-    } else if (datasz > 0) {                                   \
-        ar->datasz = 1;                                        \
-        while (ar->datasz < datasz) {                          \
-            ar->datasz <<= 1;                                  \
-        }                                                      \
-    } else {                                                   \
-        assert(datasz == 0);                                   \
-        ar->datasz = 0;                                        \
-    }                                                          \
-    if (elnum > 0) {                                           \
-        if ((ar->data = malloc_fn(ar->datasz)) == NULL) {      \
-            TRRET(ARRAY_INIT + 1);                             \
-        }                                                      \
-        if (ar->init != NULL) {                                \
-            unsigned i;                                        \
-            for (i = 0; i < elnum; ++i) {                      \
-                if (ar->init(ar->data + (i * ar->elsz)) != 0) {\
-                    TRRET(ARRAY_INIT + 2);                     \
-                }                                              \
-            }                                                  \
-        }                                                      \
-    } else {                                                   \
-        ar->data = NULL;                                       \
-    }                                                          \
-    return 0                                                   \
-
-
 int
 array_init_from(mnarray_t * restrict ar,
                 const mnarray_t * restrict src,
                 size_t elnum)
 {
-    ARRAY_INIT_FROM_BODY(malloc);
+    size_t datasz;
+
+    ar->elsz = src->elsz;
+    ar->elnum = elnum;
+    ar->init = src->init;
+    ar->fini = src->fini;
+
+    datasz = ar->elsz * elnum;
+
+    if (datasz >= MNARRAY_SMALL_DATASZ) {
+        ar->datasz = datasz;
+
+    } else if (datasz > 0) {
+        ar->datasz = 1;
+
+        while (ar->datasz < datasz) {
+            ar->datasz <<= 1;
+        }
+
+    } else {
+        assert(datasz == 0);
+        ar->datasz = 0;
+    }
+
+    if (elnum > 0) {
+        if ((ar->data = malloc(ar->datasz)) == NULL) {
+            TRRET(ARRAY_INIT + 1);
+        }
+
+        if (ar->init != NULL) {
+            for (unsigned i = 0; i < elnum; ++i) {
+                if (ar->init(ar->data + (i * ar->elsz)) != 0) {
+                    TRRET(ARRAY_INIT + 2);
+                }
+            }
+        }
+    } else {
+        ar->data = NULL;
+    }
+
+    return 0;
 }
-
-
-#define ARRAY_RESET_NO_FINI_BODY(free_fn, malloc_fn)           \
-    ar->elnum = newelnum;                                      \
-    if (ar->data != NULL) {                                    \
-        free_fn(ar->data);                                     \
-    }                                                          \
-    if (newelnum > 0) {                                        \
-        size_t newdatasz;                                      \
-        newdatasz = ar->elsz * newelnum;                       \
-        if (newdatasz >= MNARRAY_SMALL_DATASZ) {               \
-            ar->datasz = newdatasz;                            \
-        } else {                                               \
-            ar->datasz = 1;                                    \
-            while (ar->datasz < newdatasz) {                   \
-                ar->datasz <<= 1;                              \
-            }                                                  \
-        }                                                      \
-                                                               \
-        if ((ar->data = malloc_fn(ar->datasz)) == NULL) {      \
-            TRRET(ARRAY_RESET_NO_FINI + 1);                    \
-        }                                                      \
-        if (ar->init != NULL) {                                \
-            unsigned i;                                        \
-            for (i = 0; i < newelnum; ++i) {                   \
-                if (ar->init(ar->data + (i * ar->elsz)) != 0) {\
-                    TRRET(ARRAY_RESET_NO_FINI + 2);            \
-                }                                              \
-            }                                                  \
-        }                                                      \
-    } else {                                                   \
-        ar->datasz = 0;                                        \
-        ar->data = NULL;                                       \
-    }                                                          \
-    return 0                                                   \
-
-
-
-
-#define ARRAY_NEW_BODY(malloc_fn, array_init_fn)               \
-    mnarray_t *res;                                            \
-    if ((res = malloc_fn(sizeof(mnarray_t))) == NULL) {        \
-        FAIL("malloc");                                        \
-    }                                                          \
-    if (array_init_fn(res, elsz, elnum, init, fini) != 0) {    \
-        FAIL("array_init");                                    \
-    }                                                          \
-    return res                                                 \
 
 
 mnarray_t *
@@ -233,7 +240,17 @@ array_new(size_t elsz,
           array_initializer_t init,
           array_finalizer_t fini)
 {
-    ARRAY_NEW_BODY(malloc, array_init);
+    mnarray_t *res;
+
+    if ((res = malloc(sizeof(mnarray_t))) == NULL) {
+        FAIL("malloc");
+    }
+
+    if (array_init(res, elsz, elnum, init, fini) != 0) {
+        FAIL("array_init");
+    }
+
+    return res;
 }
 
 
@@ -244,7 +261,17 @@ array_new_mpool(mpool_ctx_t *mpool,
                 array_initializer_t init,
                 array_finalizer_t fini)
 {
-    ARRAY_NEW_BODY(_malloc, _array_init);
+    mnarray_t *res;
+
+    if ((res = mpool_malloc(mpool, sizeof(mnarray_t))) == NULL) {
+        FAIL("malloc");
+    }
+
+    if (array_init_mpool(mpool, res, elsz, elnum, init, fini) != 0) {
+        FAIL("array_init");
+    }
+
+    return res;
 }
 
 
@@ -260,17 +287,68 @@ array_ref_from(mnarray_t *ref, const mnarray_t *src)
 }
 
 
+inline static int
+_array_reset_no_fini_body (mnarray_t *ar,
+                           size_t newelnum,
+                           void (free_fn) (void *, mpool_ctx_t *),
+                           void * (malloc_fn) (size_t, mpool_ctx_t *),
+                           mpool_ctx_t *mpool)
+{
+    ar->elnum = newelnum;
+
+    if (ar->data != NULL) {
+        free_fn(ar->data, mpool);
+    }
+
+    if (newelnum > 0) {
+        size_t newdatasz;
+
+        newdatasz = ar->elsz * newelnum;
+
+        if (newdatasz >= MNARRAY_SMALL_DATASZ) {
+            ar->datasz = newdatasz;
+        } else {
+            ar->datasz = 1;
+
+            while (ar->datasz < newdatasz) {
+                ar->datasz <<= 1;
+            }
+        }
+
+        if ((ar->data = malloc_fn(ar->datasz, mpool)) == NULL) {
+            TRRET(ARRAY_RESET_NO_FINI + 1);
+        }
+
+        if (ar->init != NULL) {
+            for (unsigned i = 0; i < newelnum; ++i) {
+                if (ar->init(ar->data + (i * ar->elsz)) != 0) {
+                    TRRET(ARRAY_RESET_NO_FINI + 2);
+                }
+            }
+        }
+
+    } else {
+        ar->datasz = 0;
+        ar->data = NULL;
+    }
+
+    return 0;
+}
+
+
 int
 array_reset_no_fini(mnarray_t *ar, size_t newelnum)
 {
-    ARRAY_RESET_NO_FINI_BODY(free, malloc);
+    return _array_reset_no_fini_body(
+            ar, newelnum, free_fn_std, malloc_fn_std, NULL);
 }
 
 
 int
 array_reset_no_fini_mpool(mpool_ctx_t *mpool, mnarray_t *ar, size_t newelnum)
 {
-    ARRAY_RESET_NO_FINI_BODY(_free, _malloc);
+    return _array_reset_no_fini_body(
+            ar, newelnum, free_fn_mpool, malloc_fn_mpool, mpool);
 }
 
 
