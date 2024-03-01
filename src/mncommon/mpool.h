@@ -11,11 +11,10 @@ extern "C" {
 
 struct _mpool_item {
     size_t sz;
-#ifndef NDEBUG
-    uint64_t flags;
-#endif
     char data[];
 };
+
+
 typedef struct _mpool_ctx {
     size_t arenasz;
     size_t chunksz;

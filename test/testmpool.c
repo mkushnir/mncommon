@@ -104,7 +104,7 @@ run_mpool_realloc(void)
 }
 
 
-static void
+UNUSED static void
 test1(void)
 {
     void *p;

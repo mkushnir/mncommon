@@ -23,7 +23,7 @@ mpool_ctx_reset(mpool_ctx_t *mpool)
 
 #ifdef MPOOL_USE_STD_MALLOC
 UNUSED
-#endif
+#endif /* MPOOL_USE_STD_MALLOC */
 static void **
 new_chunk(mpool_ctx_t *mpool, size_t sz)
 {
@@ -31,6 +31,7 @@ new_chunk(mpool_ctx_t *mpool, size_t sz)
 
     if (mpool->current_chunk >= mpool->last_chunk) {
         ++mpool->current_chunk;
+
         if (mpool->current_chunk * sizeof(void *) == mpool->arenasz) {
             mpool->arenasz *= 2;
             mpool->arena = realloc(mpool->arena, mpool->arenasz);
@@ -40,13 +41,17 @@ new_chunk(mpool_ctx_t *mpool, size_t sz)
         chunk = mpool->arena + mpool->current_chunk;
         *chunk = malloc(sz);
         assert(*chunk != NULL);
+
     } else {
         ++mpool->current_chunk;
         chunk = mpool->arena + mpool->current_chunk;
     }
+
     mpool->current_pos = 0;
+
     return chunk;
 }
+
 
 void *
 mpool_malloc(UNUSED mpool_ctx_t *mpool, size_t sz)
@@ -69,9 +74,7 @@ mpool_malloc(UNUSED mpool_ctx_t *mpool, size_t sz)
         chunk = new_chunk(mpool, sz1);
         res = (struct _mpool_item *)*chunk;
         res->sz = sz;
-#ifndef NDEBUG
-        res->flags = 1;
-#endif
+        // XXX waste previous chunk ...
         (void)new_chunk(mpool, mpool->chunksz);
 
     } else {
@@ -89,33 +92,20 @@ mpool_malloc(UNUSED mpool_ctx_t *mpool, size_t sz)
         res = (struct _mpool_item *)(*chunk + mpool->current_pos);
         res->sz = sz;
         mpool->current_pos += sz1;
-#ifndef NDEBUG
-
-        struct _mpool_item *tmp;
-        res->flags = 1;
-        if (mpool->current_pos + sizeof(struct _mpool_item) <= mpool->chunksz) {
-            tmp = (struct _mpool_item *)(*chunk + mpool->current_pos);
-            tmp->flags = 0;
-        }
-#endif
     }
 #ifndef NDEBUG
     memset(res->data, 0xa5, res->sz);
-#endif
+#endif /* NDEBUG */
     //TRACE("m>>> %p sz=%ld in chunk %d pool %p",
     //      res->data,
     //      res->sz,
     //      mpool->current_chunk,
     //      mpool);
     return res->data;
-#endif
+#endif /* MPOOL_USE_STD_MALLOC */
 }
 
-#ifndef NDEBUG
-#define DATA_TO_MPOOL_ITEM(d) ((struct _mpool_item *)(((char *)(d)) - sizeof(uint64_t) - sizeof(size_t)))
-#else
 #define DATA_TO_MPOOL_ITEM(d) ((struct _mpool_item *)(((char *)(d)) - sizeof(size_t)))
-#endif
 
 void *
 mpool_realloc(UNUSED mpool_ctx_t *mpool, void *p, size_t sz)
@@ -138,11 +128,11 @@ mpool_realloc(UNUSED mpool_ctx_t *mpool, void *p, size_t sz)
         } else {
 #ifndef NDEBUG
             memset(mpi->data + sz, 0xa5, mpi->sz - sz);
-#endif
+#endif /* NDEBUG */
         }
     }
     return p;
-#endif
+#endif /* MPOOL_USE_STD_MALLOC */
 }
 
 
@@ -192,19 +182,17 @@ mpool_ctx_chunk_dump_info(mpool_ctx_t *mpool)
         TRACE(" chunk %ld", i);
         chunk = mpool->arena[i];
 
-        for (j = 0; j < mpool->chunksz;) {
+        for (j = 0; j < (mpool->chunksz - sizeof(struct _mpool_item));) {
             struct _mpool_item *mpi;
             size_t sz0, sz1;
 
             mpi = (struct _mpool_item *)(chunk + j);
-#ifndef NDEBUG
-            if (mpi->flags == 0) {
-                break;
-            }
-#endif
+
             TRACE("  item %p sz %ld", mpi, mpi->sz);
+
             sz0 = mpi->sz + 8 - (mpi->sz % 8);
             sz1 = sz0 + sizeof(struct _mpool_item);
+
             j += sz1;
         }
     }
@@ -249,8 +237,10 @@ mpool_ctx_fini(mpool_ctx_t *mpool)
         assert(chunk != NULL);
         free(chunk);
     }
+
     free(mpool->arena);
+
     mpool->arena = NULL;
+
     return 0;
 }
-
