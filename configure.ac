@@ -138,6 +138,7 @@ AC_CHECK_FUNCS([reallocf])
 AC_CHECK_FUNCS([sysctlbyname])
 AC_CHECK_FUNCS([abort2])
 AC_CHECK_FUNCS([pow])
+AC_CHECK_FUNCS([srandomdev])
 
 
 

@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include "mncommon/dumpm.h"
 #include "mncommon/util.h"
@@ -309,7 +310,11 @@ test4 (void)
         double d;
     } u;
 
+#ifdef HAVE_SRANDOMDEV
     srandomdev();
+#else
+    srandom(time(NULL));
+#endif
 
     btrie_init(&tr);
 

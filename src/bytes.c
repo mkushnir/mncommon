@@ -218,7 +218,7 @@ bool
 bytes_is_ascii(const mnbytes_t *s)
 {
     size_t i, sz;
-    char mod;
+    int mod;
 
     mod = s->sz % sizeof(uint64_t);
     sz = s->sz - mod;
