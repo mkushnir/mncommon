@@ -7,6 +7,7 @@
 #include <assert.h>
 
 #include <mncommon/util.h>
+#include <mncommon/bytestream.h>
 
 static
 void dumpl(const char *m, size_t n, size_t l) {
@@ -40,6 +41,60 @@ dumpm(const char *m, size_t n, size_t l) {
   }
   fprintf(stderr, "\n\n");
 }
+
+
+
+static
+void bytestream_dumpl(mnbytestream_t *bs, const char *m, size_t n, size_t l) {
+    size_t i;
+    assert(l >= n);
+    for (i = 0; i < n; ++i) {
+        (void)bytestream_nprintf(bs, 8, " %02x", *((unsigned char *)(m + i)));
+        //fprintf(stderr, " %02x", *((unsigned char *)(m + i)));
+    }
+
+    for (i = 0; i < (l - n); ++i) {
+        (void)bytestream_cat(bs, 3, "   ");
+        //fprintf(stderr, "   ");
+    }
+
+    if (n > 0) {
+        (void)bytestream_cat(bs, 1, "|");
+        for (i = 0; i < n; ++i) {
+            unsigned char c = *((unsigned char *)(m + i));
+            (void)bytestream_nprintf(bs, 2, "%c", isprint(c) ? c : ' ');
+            //fprintf(stderr, "%c", isprint(c) ? c : ' ');
+        }
+    } else {
+        (void)bytestream_nprintf(bs, 2, "|");
+    }
+    //fprintf(stderr, "|");
+
+}
+
+void
+bytestream_dumpm(mnbytestream_t *bs, const char *m, size_t n, size_t l) {
+    div_t d = div(n, l);
+    int i;
+
+    for (i = 0; i < d.quot; ++i) {
+        (void)bytestream_nprintf(bs, 32, "%016lx:", (intptr_t)(m+(i * l)));
+        //fprintf(stderr, "%016lx:", (intptr_t)(m+(i * l)));
+        bytestream_dumpl(bs, m + (i * l), l, l);
+        (void)bytestream_cat(bs, 1, "\n");
+        //fprintf(stderr, "\n");
+    }
+
+    if (d.rem > 0) {
+        (void)bytestream_nprintf(bs, 32, "%016lx:", (intptr_t)(m+(i * l)));
+        //fprintf(stderr, "%016lx:", (intptr_t)(m+(i * l)));
+        bytestream_dumpl(bs, m + (i * l), d.rem, l);
+    }
+
+    (void)bytestream_cat(bs, 3, "\n\n");
+    //fprintf(stderr, "\n\n");
+}
+
 
 
 

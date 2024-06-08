@@ -683,7 +683,7 @@ json_parse_obj(json_ctx_t *ctx)
 
                 if (toklen == 4 && memcmp(tmp, "true", 4) == 0) {
                     ctx->ty = JSON_BOOLEAN;
-                    ctx->v.b = 1;
+                    ctx->v.b = true;
                 } else if (toklen == 5 && memcmp(tmp, "false", 5) == 0) {
                     ctx->ty = JSON_BOOLEAN;
                     ctx->v.b = 0;
@@ -895,7 +895,7 @@ json_parse_array(json_ctx_t *ctx)
 
                 if (toklen == 4 && memcmp(tmp, "true", 4) == 0) {
                     ctx->ty = JSON_BOOLEAN;
-                    ctx->v.b = 1;
+                    ctx->v.b = true;
                 } else if (toklen == 5 && memcmp(tmp, "false", 5) == 0) {
                     ctx->ty = JSON_BOOLEAN;
                     ctx->v.b = 0;

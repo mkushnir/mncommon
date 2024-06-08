@@ -14,6 +14,8 @@ extern "C" {
 #include <time.h>
 #include <unistd.h>
 
+#include <mncommon/bytestream.h>
+
 #ifndef DUMPM_INDENT_SIZE
 #   define DUMPM_INDENT_SIZE 4
 #endif
@@ -69,10 +71,15 @@ extern "C" {
 #   endif
 #endif
 void dumpm(const void * m, size_t n, size_t l);
+void bytestream_dumpm(mnbytestream_t *bs, const void * m, size_t n, size_t l);
 #define D8(m, n) dumpm(m, n, 8)
 #define D16(m, n) dumpm(m, n, 16)
 #define D32(m, n) dumpm(m, n, 32)
 #define D64(m, n) dumpm(m, n, 64)
+#define BSD8(bs, m, n) bytestream_dumpm((bs), m, n, 8)
+#define BSD16(bs, m, n) bytestream_dumpm((bs), m, n, 16)
+#define BSD32(bs, m, n) bytestream_dumpm((bs), m, n, 32)
+#define BSD64(bs, m, n) bytestream_dumpm((bs), m, n, 64)
 void mndump_bits(const void *, size_t);
 
 #ifndef NOFCOLOR
