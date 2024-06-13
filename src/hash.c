@@ -87,9 +87,10 @@ hash_rehash_mpool(mpool_ctx_t *mpool, mnhash_t *dict, size_t sz)
 
 
 static int
-null_init(void **v)
+null_init(void *v)
 {
-    *v = NULL;
+    void **pv = (void **)v;
+    *pv = NULL;
     return 0;
 }
 

@@ -105,19 +105,6 @@ _Generic(a,                                            \
          float: mnmax_float,                           \
          double: mnmax_double,                         \
          long double: mnmax_ldouble,                   \
-         const char: mnmax_char,                       \
-         const unsigned char: mnmax_uchar,             \
-         const short: mnmax_short,                     \
-         const unsigned short: mnmax_ushort,           \
-         const int: mnmax_int,                         \
-         const unsigned int: mnmax_uint,               \
-         const long: mnmax_long,                       \
-         const unsigned long: mnmax_ulong,             \
-         const long long: mnmax_llong,                 \
-         const unsigned long long: mnmax_ullong,       \
-         const float: mnmax_float,                     \
-         const double: mnmax_double,                   \
-         const long double: mnmax_ldouble,             \
          default: mnmax_intmax)((a),(b))               \
 
 
@@ -164,19 +151,6 @@ _Generic(a,                                            \
          float: mnmin_float,                           \
          double: mnmin_double,                         \
          long double: mnmin_ldouble,                   \
-         const char: mnmin_char,                       \
-         const unsigned char: mnmin_uchar,             \
-         const short: mnmin_short,                     \
-         const unsigned short: mnmin_ushort,           \
-         const int: mnmin_int,                         \
-         const unsigned int: mnmin_uint,               \
-         const long: mnmin_long,                       \
-         const unsigned long: mnmin_ulong,             \
-         const long long: mnmin_llong,                 \
-         const unsigned long long: mnmin_ullong,       \
-         const float: mnmin_float,                     \
-         const double: mnmin_double,                   \
-         const long double: mnmin_ldouble,             \
          default: mnmin_intmax)((a),(b))               \
 
 
@@ -304,19 +278,6 @@ _Generic(a,                                            \
          float: mncmp_float,                           \
          double: mncmp_double,                         \
          long double: mncmp_ldouble,                   \
-         const char: mncmp_char,                       \
-         const unsigned char: mncmp_uchar,             \
-         const short: mncmp_short,                     \
-         const unsigned short: mncmp_ushort,           \
-         const int: mncmp_int,                         \
-         const unsigned int: mncmp_uint,               \
-         const long: mncmp_long,                       \
-         const unsigned long: mncmp_ulong,             \
-         const long long: mncmp_llong,                 \
-         const unsigned long long: mncmp_ullong,       \
-         const float: mncmp_float,                     \
-         const double: mncmp_double,                   \
-         const long double: mncmp_ldouble,             \
          default: mncmp_vptr)((a),(b))                 \
 
 
@@ -361,19 +322,6 @@ _Generic(a,                                            \
          float: mncmpr_float,                          \
          double: mncmpr_double,                        \
          long double: mncmpr_ldouble,                  \
-         const char: mncmpr_char,                      \
-         const unsigned char: mncmpr_uchar,            \
-         const short: mncmpr_short,                    \
-         const unsigned short: mncmpr_ushort,          \
-         const int: mncmpr_int,                        \
-         const unsigned int: mncmpr_uint,              \
-         const long: mncmpr_long,                      \
-         const unsigned long: mncmpr_ulong,            \
-         const long long: mncmpr_llong,                \
-         const unsigned long long: mncmpr_ullong,      \
-         const float: mncmpr_float,                    \
-         const double: mncmpr_double,                  \
-         const long double: mncmpr_ldouble,            \
          default: mncmpr_vptr)((a),(b))                \
 
 
@@ -395,25 +343,15 @@ intptr_t mn_check_type_failure(const char *);
 #define MNIDIV(num, denom)                     \
 _Generic(num,                                  \
          char: div,                            \
-         const char: div,                      \
          unsigned char: div,                   \
-         const unsigned char: div,             \
          short: div,                           \
-         const short: div,                     \
          unsigned short: div,                  \
-         const unsigned short: div,            \
          int: div,                             \
-         const int: div,                       \
          unsigned int: div,                    \
-         const unsigned int: div,              \
          long: ldiv,                           \
-         const long: ldiv,                     \
          unsigned long: ldiv,                  \
-         const unsigned long: ldiv,            \
          long long: lldiv,                     \
-         const long long: lldiv,               \
          unsigned long long: lldiv,            \
-         const unsigned long long: lldiv,      \
          default: imaxdiv)(num, denom)         \
 
 #else
