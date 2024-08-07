@@ -73,6 +73,11 @@ do_dev() {
     ./configure --prefix=$HOME --enable-debug
 }
 
+do_dev_notest() {
+    autoreconf --force
+    ./configure --prefix=$HOME --enable-debug --with-tests=no
+}
+
 do_dev_static() {
     autoreconf --force
     ./configure --prefix=$HOME --enable-debug --enable-allstatic
@@ -135,6 +140,13 @@ then
     for i in $dirs
     do
         ( cd $i && do_dev )
+    done
+
+elif test "$1" = "dev-notest"
+then
+    for i in $dirs
+    do
+        ( cd $i && do_dev_notest )
     done
 
 elif test "$1" = "dev-static"

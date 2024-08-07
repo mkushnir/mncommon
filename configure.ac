@@ -366,6 +366,12 @@ AC_ARG_WITH(cmocka,
             [AM_CONDITIONAL([CMOCKA], [with_cmocka=yes])],
             [AM_CONDITIONAL([CMOCKA], [test "\$with_cmocka" = "yes"])])
 
+AC_ARG_WITH(tests,
+            AS_HELP_STRING([--with-tests],
+            [Build tests (default=yes)]),
+            [AM_CONDITIONAL([TESTS], [test "\$with_tests" = "yes"])],
+            [AM_CONDITIONAL([TESTS], [with_tests=yes])])
+
 AS_IF([! test \( "$enable_hash" = "yes" -a "$enable_fasthash" = "yes" \) -o \
         \( "$enable_hash" != "yes" -a "$enable_fasthash" != "yes" \)],
       [AC_MSG_FAILURE(
