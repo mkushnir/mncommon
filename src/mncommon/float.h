@@ -3,6 +3,7 @@
 
 #include <float.h>
 #include <math.h>
+#include <tgmath.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,12 +21,17 @@ _Generic(x,                    \
     long double: powl(x, y))   \
 
 
+#if 0
 #define MNFABS(x)              \
 _Generic(x,                    \
     float: fabsf(x),           \
     double: fabs(x),           \
     long double: fabsl(x))     \
 
+#endif
+
+
+#define MNFABS(x) fabs(x)
 
 #define MNEXP(x)               \
 _Generic(x,                    \

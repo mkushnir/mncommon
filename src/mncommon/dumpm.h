@@ -10,7 +10,9 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
+#ifdef USE_SYSLOG
 #include <syslog.h>
+#endif
 #include <time.h>
 #include <unistd.h>
 
