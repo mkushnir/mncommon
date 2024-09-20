@@ -14,6 +14,7 @@ extern "C" {
 #pragma clang diagnostic ignored "-Wabsolute-value"
 #endif
 
+#if 0
 #define MNPOW(x, y)            \
 _Generic(x,                    \
     float: powf(x, y),         \
@@ -21,23 +22,26 @@ _Generic(x,                    \
     long double: powl(x, y))   \
 
 
-#if 0
 #define MNFABS(x)              \
 _Generic(x,                    \
     float: fabsf(x),           \
     double: fabs(x),           \
     long double: fabsl(x))     \
 
-#endif
-
-
-#define MNFABS(x) fabs(x)
 
 #define MNEXP(x)               \
 _Generic(x,                    \
     float: expf(x),            \
     double: exp(x),            \
     long double: expl(x))      \
+
+#endif
+
+
+// tgmath
+#define MNFABS(x) fabs(x)
+#define MNPOW(x) pow(x)
+#define MNEXP(x) exp(x)
 
 
 #define MN_EPSILON FLT_EPSILON
