@@ -40,7 +40,7 @@ _Generic(x,                    \
 
 // tgmath
 #define MNFABS(x) fabs(x)
-#define MNPOW(x) pow(x)
+#define MNPOW(x, y) pow(x, y)
 #define MNEXP(x) exp(x)
 
 
