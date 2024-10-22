@@ -161,7 +161,7 @@ _Generic(a,                                            \
 #if !defined(UNUSED)
 #define UNUSED __attribute__ ((__unused__))
 #else
-#error UNUSED is already defined. Please un-define UNUSED before including mncommon/util.h
+//#error UNUSED is already defined. Please un-define UNUSED before including mncommon/util.h
 #endif
 
 #if !defined(RESERVED)

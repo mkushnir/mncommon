@@ -84,6 +84,18 @@ void bytestream_dumpm(mnbytestream_t *bs, const void * m, size_t n, size_t l);
 #define BSD64(bs, m, n) bytestream_dumpm((bs), m, n, 64)
 void mndump_bits(const void *, size_t);
 
+#   define TRACEBINLSB(c)                      \
+for (uint8_t i = 0; i < 8; ++i) {              \
+    TRACEC((c & (0x01 << i)) ? "1" : "0");     \
+}                                              \
+
+
+#   define TRACEBINMSB(c)              \
+for (uint8_t i = 0; i < 8; ++i) {      \
+    TRACEC((c & (0x01 << (7 - i)))     \
+            ? "1" : "0");              \
+}                                      \
+
 #ifndef NOFCOLOR
 #   define FCOLOR(b, c, s) "\033[0" b ";3" c "m" s "\033[00m"
 #else
