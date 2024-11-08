@@ -202,6 +202,12 @@ _Generic(a,                                            \
 #error PACKED is already defined. Please un-define PACKED before including mncommon/util.h
 #endif
 
+#if !defined(ALIGNED)
+#define ALIGNED(n) __attribute__ ((__aligned__(n)))
+#else
+#error ALIGNED is already defined. Please un-define ALIGNED before including mncommon/util.h
+#endif
+
 #ifndef countof
 #define countof(a) (sizeof(a)/sizeof(a[0]))
 #else
