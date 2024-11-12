@@ -16,7 +16,7 @@ noinst_HEADERS =
 dumpm_include_headers = mncommon/dumpm.h
 dumpm_sources = dumpm.c
 
-util_include_headers = mncommon/util.h mncommon/float.h mncommon/endian.h mncommon/assert.h mncommon/malloc.h mncommon/unittest.h
+util_include_headers = mncommon/util.h mncommon/float.h mncommon/endian.h mncommon/assert.h mncommon/malloc.h mncommon/unittest.h mncommon/time.h
 util_sources = util.c float.c
 
 if ARRAY

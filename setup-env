@@ -65,32 +65,32 @@ do_init() {
     _run libtoolize
     _run make distclean
     _run autoreconf
-    ./configure --prefix=$HOME/.local --enable-debug
+    ./configure --prefix=$HOME/ --enable-debug
 }
 
 do_dev() {
     autoreconf --force
-    ./configure --prefix=$HOME/.local --enable-debug
+    ./configure --prefix=$HOME/ --enable-debug
 }
 
 do_dev_notest() {
     autoreconf --force
-    ./configure --prefix=$HOME/.local --enable-debug --with-tests=no
+    ./configure --prefix=$HOME/ --enable-debug --with-tests=no
 }
 
 do_dev_static() {
     autoreconf --force
-    ./configure --prefix=$HOME/.local --enable-debug --enable-allstatic
+    ./configure --prefix=$HOME/ --enable-debug --enable-allstatic
 }
 
 do_dev_ndebug() {
     autoreconf --force
-    ./configure --prefix=$HOME/.local
+    ./configure --prefix=$HOME/
 }
 
 do_dev_ndebug_static() {
     autoreconf --force
-    ./configure --prefix=$HOME/.local --enable-allstatic --enable-lto
+    ./configure --prefix=$HOME/ --enable-allstatic --enable-lto
 }
 
 
