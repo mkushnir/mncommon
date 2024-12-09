@@ -96,6 +96,17 @@ for (uint8_t i = 0; i < 8; ++i) {      \
             ? "1" : "0");              \
 }                                      \
 
+
+#define MINIHEX(__minihex_pre, __minihex_s, __minihex_len)                     \
+do {                                                                           \
+    TRACEC("%s %p: ", __minihex_pre, __minihex_s);                             \
+    for (int __minihex_i = 0; __minihex_i < __minihex_len; ++__minihex_i) {    \
+        TRACEC("%02x ", __minihex_s[__minihex_i]);                             \
+    }                                                                          \
+    TRACEC("\n");                                                              \
+} while (0)                                                                    \
+
+
 #ifndef NOFCOLOR
 #   define FCOLOR(b, c, s) "\033[0" b ";3" c "m" s "\033[00m"
 #else
