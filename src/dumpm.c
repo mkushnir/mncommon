@@ -148,7 +148,7 @@ mndump_bits_one_line(char const *m, int sz)
     int nwritten;
     char buf[MNDUMP_LINESZ_BITS * 2];
     unsigned bytesz, byteidx, bitidx;
-    int rembits;
+    unsigned rembits;
     int j;
 
     assert(sz <= MNDUMP_LINESZ_BITS);
