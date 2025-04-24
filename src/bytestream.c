@@ -20,7 +20,7 @@ int
 bytestream_dump(mnbytestream_t *stream)
 {
     TRACE("stream pos=%ld eod=%ld sz=%ld",
-          (long)stream->pos, (long)stream->eod, stream->buf.sz);
+          (long)stream->pos, (long)stream->eod, (long)stream->buf.sz);
     TRACE("stream start");
     D16(stream->buf.data, MIN(stream->eod, 128));
     return 0;

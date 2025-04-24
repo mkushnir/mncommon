@@ -31,12 +31,12 @@ dumpm(const char *m, size_t n, size_t l) {
   div_t d = div(n, l);
   int i;
   for (i = 0; i < d.quot; ++i) {
-    fprintf(stderr, "%016lx:", (intptr_t)(m+(i * l)));
+    fprintf(stderr, "%016" PRIx64 ":", (uint64_t)(uintptr_t)(m+(i * l)));
     dumpl(m+(i * l), l, l);
     fprintf(stderr, "\n");
   }
   if (d.rem > 0) {
-    fprintf(stderr, "%016lx:", (intptr_t)(m+(i * l)));
+    fprintf(stderr, "%016" PRIx64 ":", (uint64_t)(uintptr_t)(m+(i * l)));
     dumpl(m+(i * l), d.rem, l);
   }
   fprintf(stderr, "\n\n");
@@ -78,7 +78,7 @@ bytestream_dumpm(mnbytestream_t *bs, const char *m, size_t n, size_t l) {
     int i;
 
     for (i = 0; i < d.quot; ++i) {
-        (void)bytestream_nprintf(bs, 32, "%016lx:", (intptr_t)(m+(i * l)));
+        (void)bytestream_nprintf(bs, 32, "%016" PRIx64 ":", (uint64_t)(uintptr_t)(m+(i * l)));
         //fprintf(stderr, "%016lx:", (intptr_t)(m+(i * l)));
         bytestream_dumpl(bs, m + (i * l), l, l);
         (void)bytestream_cat(bs, 1, "\n");
@@ -86,7 +86,7 @@ bytestream_dumpm(mnbytestream_t *bs, const char *m, size_t n, size_t l) {
     }
 
     if (d.rem > 0) {
-        (void)bytestream_nprintf(bs, 32, "%016lx:", (intptr_t)(m+(i * l)));
+        (void)bytestream_nprintf(bs, 32, "%016" PRIx64 ":", (uint64_t)(uintptr_t)(m+(i * l)));
         //fprintf(stderr, "%016lx:", (intptr_t)(m+(i * l)));
         bytestream_dumpl(bs, m + (i * l), d.rem, l);
     }
@@ -103,7 +103,7 @@ bytestream_dumpm(mnbytestream_t *bs, const char *m, size_t n, size_t l) {
 #define MNDUMP_PAD(c) buf[j++] = (c)
 #define MNDUMP_BAR() MNDUMP_PAD('|')
 #define MNDUMP_EOL() MNDUMP_PAD('\n')
-#define MNDUMP_BYTE(idx) buf[j++] = isprint(m[(idx)]) ? m[(idx)] : ' ';
+#define MNDUMP_BYTE(idx) buf[j++] = isprint((unsigned char)m[(idx)]) ? m[(idx)] : ' ';
 
 #define MNDUMP_BITS_BE(idx)    \
     MNDUMP_BIT(idx, 0x80);     \
@@ -143,23 +143,22 @@ bytestream_dumpm(mnbytestream_t *bs, const char *m, size_t n, size_t l) {
 
 
 static void
-mndump_bits_one_line(const char *m, int sz)
+mndump_bits_one_line(char const *m, int sz)
 {
     int nwritten;
     char buf[MNDUMP_LINESZ_BITS * 2];
-    int bytesz, byteidx, bitidx;
+    unsigned bytesz, byteidx, bitidx;
     int rembits;
     int j;
 
-
     assert(sz <= MNDUMP_LINESZ_BITS);
     if ((nwritten = snprintf(
-                buf, sizeof(buf), "%016lx: ", (uintptr_t)m)) <= 0) {
+                buf, sizeof(buf), "%016" PRIx64 ": ", (uint64_t)(uintptr_t)m)) <= 0) {
         // swallow line
         goto end;
     }
 
-    bytesz = sz / 8;
+    bytesz = ((unsigned)sz) / 8;
     rembits = sz % 8;
     j = nwritten;
 
