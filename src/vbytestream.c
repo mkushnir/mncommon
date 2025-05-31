@@ -59,16 +59,18 @@ iovec_fini(void *o)
 
 
 static int
-iovec_dump_full(struct iovec *iov, UNUSED void *udata)
+iovec_dump_full(void *o, UNUSED void *udata)
 {
+    struct iovec *iov = o;
     D16(iov->iov_base, iov->iov_len);
     return 0;
 }
 
 
 static int
-iovec_dump_short(struct iovec *iov, UNUSED void *udata)
+iovec_dump_short(void *o, UNUSED void *udata)
 {
+    struct iovec *iov = o;
     TRACE("%p:%ld", iov->iov_base, iov->iov_len);
     return 0;
 }
@@ -400,8 +402,9 @@ vbytestream_buf(mnvbytestream_t *stream, size_t sz)
 
 
 static int
-_rewind(struct iovec *iov, UNUSED void *udata)
+_rewind(void *o, UNUSED void *udata)
 {
+    struct iovec *iov = o;
     if (iov->iov_base != NULL) {
         iov->iov_len = BSZ(VBYTESTREAM_IOV_BYTES(iov));
     } else {
@@ -421,7 +424,7 @@ vbytestream_rewind(mnvbytestream_t *stream)
     stream->pos.offt = 0;
     stream->pos.total = 0;
     if (stream->iov.elnum > 0) {
-        (void)array_traverse(&stream->iov, (array_traverser_t)_rewind, NULL);
+        (void)array_traverse(&stream->iov, _rewind, NULL);
     }
 }
 
@@ -446,11 +449,11 @@ vbytestream_dump(mnvbytestream_t *stream, int flags)
 
     if (flags & VBYTESTREAM_DUMP_FULL) {
         (void)vbytestream_traverse(stream,
-                                   (array_traverser_t)iovec_dump_full,
+                                   iovec_dump_full,
                                    NULL);
     } else {
         (void)vbytestream_traverse(stream,
-                                   (array_traverser_t)iovec_dump_short,
+                                   iovec_dump_short,
                                    NULL);
     }
 }

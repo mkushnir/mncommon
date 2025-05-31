@@ -54,15 +54,17 @@ profile_init(void *o)
 }
 
 static int
-profile_dump(profile_t *p, UNUSED void *udata)
+profile_dump(void *o, UNUSED void *udata)
 {
+    profile_t *p = o;
     printf("%s: n=%ld min=%ld avg=%Lf max=%ld total=%Lf\n", p->name, (long)p->n, (long)p->min, p->avg, (long)p->max, p->n * p->avg);
     return 0;
 }
 
 static int
-profile_dump_sec(profile_t *p, UNUSED void *udata)
+profile_dump_sec(void *o, UNUSED void *udata)
 {
+    profile_t *p = o;
     printf("%s: n=%ld min=%Lf avg=%Lf max=%Lf total=%Lf\n", p->name, (long)p->n,
           (long double)(p->min) / (long double)tsc_freq,
           p->avg / (long double)tsc_freq, (long double)(p->max) / (long double)tsc_freq, p->n * ((long double)(p->avg) / (long double)tsc_freq));
@@ -157,13 +159,13 @@ profile_stop(const profile_t *p)
 void
 profile_report(void)
 {
-    array_traverse(&profiles, (array_traverser_t)profile_dump, NULL);
+    array_traverse(&profiles, profile_dump, NULL);
 }
 
 void
 profile_report_sec(void)
 {
-    array_traverse(&profiles, (array_traverser_t)profile_dump_sec, NULL);
+    array_traverse(&profiles, profile_dump_sec, NULL);
 }
 
 
