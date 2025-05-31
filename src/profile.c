@@ -39,8 +39,9 @@ rdtsc(void)
 }
 
 static int
-profile_init(profile_t *p)
+profile_init(void *o)
 {
+    profile_t *p = o;
     p->name = NULL;
     p->id = -1;
     p->n = 0;
@@ -88,7 +89,7 @@ profile_init_module(void)
     }
 
     if (array_init(&profiles, sizeof(profile_t), 0,
-                   (array_initializer_t)profile_init,
+                   profile_init,
                    NULL) != 0) {
         FAIL("array_init");
     }

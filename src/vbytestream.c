@@ -19,8 +19,9 @@
 
 
 static int
-iovec_init(struct iovec *iov)
+iovec_init(void *o)
 {
+    struct iovec *iov = o;
     iov->iov_base = NULL;
     iov->iov_len = 0;
     return 0;
@@ -42,8 +43,9 @@ iovec_alloc(struct iovec *iov, size_t sz)
 
 
 static int
-iovec_fini(struct iovec *iov)
+iovec_fini(void *o)
 {
+    struct iovec *iov = o;
     if (iov->iov_base != NULL) {
         mnbytes_t *s;
 
@@ -94,8 +96,8 @@ vbytestream_init(mnvbytestream_t *stream, size_t growsz, size_t iovreserve)
     (void)array_init(&stream->iov,
                      sizeof(struct iovec),
                      0,
-                     (array_initializer_t)iovec_init,
-                     (array_finalizer_t)iovec_fini);
+                     iovec_init,
+                     iovec_fini);
 
     if (iovreserve > 0) {
         array_ensure_datasz(
