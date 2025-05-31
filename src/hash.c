@@ -648,8 +648,9 @@ hash_set_remove(mnhash_t *hash, const void *key)
 
 
 static int
-hash_set_union2_cb(UNUSED mnhash_t *b, mnhash_item_t *hit, mnhash_t *a)
+hash_set_union2_cb(UNUSED mnhash_t *b, mnhash_item_t *hit, void *udata)
 {
+    mnhash_t *a = udata;
     if (hash_get_item(a, hit->key) == NULL) {
         hash_set_item(a, hit->key, hit->value);
     }
@@ -660,13 +661,15 @@ hash_set_union2_cb(UNUSED mnhash_t *b, mnhash_item_t *hit, mnhash_t *a)
 void
 hash_set_union2(mnhash_t *a, mnhash_t *b)
 {
-    (void)hash_traverse_item(b, (hash_traverser_item_t)hash_set_union2_cb, a);
+    (void)hash_traverse_item(b, hash_set_union2_cb, a);
 }
 
 
 static int
-hash_set_union3_cb(UNUSED mnhash_t *a, mnhash_item_t *hit, mnhash_t *res)
+hash_set_union3_cb(UNUSED mnhash_t *a, mnhash_item_t *hit, void *udata)
 {
+    mnhash_t *res = udata;
+
     if (hash_get_item(res, hit->key) == NULL) {
         hash_set_item(res, hit->key, hit->value);
     }
@@ -678,10 +681,10 @@ void
 hash_set_union3(mnhash_t *res, mnhash_t *a, mnhash_t *b)
 {
     (void)hash_traverse_item(a,
-                             (hash_traverser_item_t)hash_set_union3_cb,
+                             hash_set_union3_cb,
                              res);
     (void)hash_traverse_item(b,
-                             (hash_traverser_item_t)hash_set_union3_cb,
+                             hash_set_union3_cb,
                              res);
 }
 
@@ -708,7 +711,7 @@ hash_set_diff3(mnhash_t *res, mnhash_t *a, mnhash_t *b)
         mnhash_t *b;
     } params = { res, b };
     (void)hash_traverse_item(a,
-                             (hash_traverser_item_t)hash_set_diff3_cb,
+                             hash_set_diff3_cb,
                              &params);
 }
 
@@ -738,14 +741,14 @@ hash_set_sdiff3(mnhash_t *res, mnhash_t *a, mnhash_t *b)
         mnhash_t *b;
     } params0 = { res, b };
     (void)hash_traverse_item(a,
-                             (hash_traverser_item_t)hash_set_diff3_cb,
+                             hash_set_diff3_cb,
                              &params0);
     struct {
         mnhash_t *res;
         mnhash_t *a;
     } params1 = { res, a };
     (void)hash_traverse_item(b,
-                             (hash_traverser_item_t)hash_set_sdiff3_cb,
+                             hash_set_sdiff3_cb,
                              &params1);
 }
 
@@ -772,7 +775,7 @@ hash_set_intersect3(mnhash_t *res, mnhash_t *a, mnhash_t *b)
         mnhash_t *b;
     } params = { res, b };
     (void)hash_traverse_item(a,
-                             (hash_traverser_item_t)hash_set_intersect3_cb,
+                             hash_set_intersect3_cb,
                              &params);
 }
 

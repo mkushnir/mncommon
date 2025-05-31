@@ -185,8 +185,9 @@ pset_fini(pset_t *pset)
 
 
 static int
-pset_mingen_fast(pset_item_t *it, UNUSED void *value, void *udata)
+pset_mingen_fast(void *k, UNUSED void *value, void *udata)
 {
+    pset_item_t *it = k;
     struct {
         pset_t *pset;
         double weight;
@@ -229,7 +230,7 @@ pset_pop(pset_t *pset)
     params.pset = pset;
     params.weight = 1.0;
     params.it = &it0;
-    (void)hash_traverse(&pset->d, (hash_traverser_t)pset_mingen_fast, &params);
+    (void)hash_traverse(&pset->d, pset_mingen_fast, &params);
     if (params.it != NULL) {
         //TRACE("removing %p cmprop=%ld", params.it, params.it->cmprop);
 
