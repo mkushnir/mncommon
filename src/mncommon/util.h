@@ -208,6 +208,12 @@ _Generic(a,                                            \
 #error ALIGNED is already defined. Please un-define ALIGNED before including mncommon/util.h
 #endif
 
+#if !defined(WEAK)
+#define WEAK __attribute__ ((__weak__))
+#else
+#error WEAK is already defined. Please un-define WEAK before including mncommon/util.h
+#endif
+
 #ifndef countof
 #define countof(a) (sizeof(a)/sizeof(a[0]))
 #else
