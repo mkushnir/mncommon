@@ -109,9 +109,12 @@ do {                                                                           \
 
 #ifndef NOFCOLOR
 #   define FCOLOR(b, c, s) "\033[0" b ";3" c "m" s "\033[00m"
+#   define TCOLOR(f, b, s) "\033[38;5;" #f ";48;5;" #b "m" s "\033[00m"
 #else
 #   define FCOLOR(b, c, s) s
+#   define TCOLOR(f, b, s)
 #endif
+
 #define FRED(s)         FCOLOR("0", "1", s)
 #define FGREEN(s)       FCOLOR("0", "2", s)
 #define FYELLOW(s)      FCOLOR("0", "3", s)
@@ -128,6 +131,30 @@ do {                                                                           \
 #define FBCYAN(s)       FCOLOR("1", "6", s)
 #define FBWHITE(s)      FCOLOR("1", "7", s)
 #define FBBLACK(s)      FCOLOR("1", "0", s)
+
+#define TDARKBLUE(s)    TCOLOR(18, 0, s)
+#define TDARKGREEN(s)   TCOLOR(22, 0, s)
+#define TDARKCYAN(s)    TCOLOR(36, 0, s)
+#define TDARKTORQUOISE(s) TCOLOR(44, 0, s)
+#define TDARKRED(s)     TCOLOR(52, 0, s)
+
+#define TORANGE1(s)     TCOLOR(214, 0, s)
+#define TDARKORANGE(s)  TCOLOR(208, 0, s)
+#define TRED3(s)        TCOLOR(124, 0, s)
+
+// U+2580 upper half block
+#define MNUHB "\xe2\x96\x80"
+// U+2584 lower (down) half block
+#define MNDHB "\xe2\x96\x84"
+// U+258c left half block
+#define MNLHB "\xe2\x96\x8c"
+// U+2590 right half block
+#define MNRHB "\xe2\x96\x90"
+// U+2b1c square
+#define MNSQB "\xe2\xac\x9c"
+// U+220e end of proof
+#define MNEOP "\xe2\x88\x8e"
+
 
 #ifdef __cplusplus
 }
