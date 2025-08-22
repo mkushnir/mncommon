@@ -94,6 +94,16 @@ _Generic(a,                                    \
 
 
 
+#define MNMODF(x, y)                                           \
+_Generic(y,                                                    \
+    float *: modff((float)(x), (float *)(y)),                  \
+    long double *: modfl((long double)(x), (long double *)(y)),\
+    double *: modf(((double)x), (double *)(y))                 \
+)                                                              \
+
+
+
+
 #ifdef __cplusplus
 }
 #endif
