@@ -8,6 +8,8 @@
 #   apt-get install autotools-dev autoconf libtool
 #   or apt-get install build-essential
 #
+#   Debian trixie: zlib1g
+#
 #   yum install epel-release
 #   yum group install "Development Tools"
 #   yum install openssl-devel zlib-devel libev-devel
