@@ -342,6 +342,19 @@ _Generic(a,                                            \
 #endif
 
 
+#if __STDC_VERSION__ >= 201112 && defined(MNARM_GENERIC_SUPPORT)
+#define MNABS(x)               \
+_Generic(x,                    \
+         int: abs,             \
+         long: labs,           \
+         long long llabs,      \
+         default: imaxabs)(x)  \
+
+#else
+#define MNABS(x) imaxabs(x)
+#endif
+
+
 #if __STDC_VERSION__ >= 201112 && defined(MNCOMMON_GENERIC_SUPPORT)
 #define MNTYPECHK(ty, v) _Generic((v), ty: (v), default: (ty)mn_check_type_failure(#ty))
 #else
