@@ -13,7 +13,7 @@ randint_weighted (long a, long b, size_t wsz, float const weights[static wsz])
 
         float z0 = (b - a) * u0;
 
-        idx = (int)z0;
+        idx = (int)(z0 / ((float)(b - a)) * ((float)wsz));
 
         if (!INB1(0, idx, wsz)) {
             idx = wsz - 1;
