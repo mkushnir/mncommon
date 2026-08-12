@@ -2,7 +2,6 @@
 #define MNCOMMON_FLOAT_H
 
 #include <float.h>
-#include <math.h>
 #include <tgmath.h>
 
 #ifdef __cplusplus
@@ -102,6 +101,8 @@ _Generic(y,                                                    \
 )                                                              \
 
 
+_Complex long double csinl (_Complex long double);
+_Complex long double ccosl (_Complex long double);
 
 
 #ifdef __cplusplus
