@@ -1,6 +1,13 @@
 #include <mncommon/random.h>
 #include <mncommon/util.h>
 
+/*
+ * ignore !INB1(0, idx, wsz)
+ */
+#if GCC_VERSION >= 40200
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
+
 long
 randint_weighted (long a, long b, size_t wsz, float const weights[static wsz])
 {
