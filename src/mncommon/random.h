@@ -10,7 +10,7 @@ extern "C" {
 
 long randint_weighted (long a, long b, size_t wsz, float const weights[static wsz]);
 
-long randint_biased (float a, float b, float bias);
+float randfloat_biased (float a, float b, float bias);
 
 #ifdef __cplusplus
 }

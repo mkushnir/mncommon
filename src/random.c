@@ -20,7 +20,9 @@ randint_weighted (long a, long b, size_t wsz, float const weights[static wsz])
 
         float z0 = (b - a) * u0;
 
-        idx = (int)(z0 / ((float)(b - a)) * ((float)wsz));
+        // (b-a)*u/(b-a)*w
+        //idx = (int)(z0 / ((float)(b - a)) * ((float)wsz));
+        idx = (int)(u0 * ((float)wsz));
 
         if (!INB1(0, idx, wsz)) {
             idx = wsz - 1;
@@ -38,8 +40,8 @@ randint_weighted (long a, long b, size_t wsz, float const weights[static wsz])
 }
 
 
-long
-randint_biased (float a, float b, float bias)
+float
+randfloat_biased (float a, float b, float bias)
 {
     float normed = ((float)random()) / ((float)RAND_MAX);
     float probe = a + (b - a) * normed;
