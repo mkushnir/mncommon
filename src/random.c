@@ -1,6 +1,8 @@
 #include <mncommon/random.h>
 #include <mncommon/util.h>
 
+#include <tgmath.h>
+
 /*
  * ignore !INB1(0, idx, wsz)
  */
@@ -22,7 +24,7 @@ randint_weighted (long a, long b, size_t wsz, float const weights[static wsz])
 
         // (b-a)*u/(b-a)*w
         //idx = (int)(z0 / ((float)(b - a)) * ((float)wsz));
-        idx = (int)(u0 * ((float)wsz));
+        idx = lround(u0 * ((float)wsz));
 
         if (!INB1(0, idx, wsz)) {
             idx = wsz - 1;
