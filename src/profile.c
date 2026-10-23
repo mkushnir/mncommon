@@ -57,7 +57,7 @@ static int
 profile_dump(void *o, UNUSED void *udata)
 {
     profile_t *p = o;
-    printf("%s: n=%ld min=%ld avg=%Lf max=%ld total=%Lf\n", p->name, (long)p->n, (long)p->min, p->avg, (long)p->max, p->n * p->avg);
+    printf("%s: n=%ld min=%12ld avg=%15.1Lf max=%12ld total=%15.1Lf\n", p->name, (long)p->n, (long)p->min, p->avg, (long)p->max, p->n * p->avg);
     return 0;
 }
 
@@ -65,7 +65,7 @@ static int
 profile_dump_sec(void *o, UNUSED void *udata)
 {
     profile_t *p = o;
-    printf("%s: n=%ld min=%Lf avg=%Lf max=%Lf total=%Lf\n", p->name, (long)p->n,
+    printf("%s: n=%ld min=%15.12Lf avg=%15.12Lf max=%15.12Lf total=%15.12Lf\n", p->name, (long)p->n,
           (long double)(p->min) / (long double)tsc_freq,
           p->avg / (long double)tsc_freq, (long double)(p->max) / (long double)tsc_freq, p->n * ((long double)(p->avg) / (long double)tsc_freq));
     return 0;
