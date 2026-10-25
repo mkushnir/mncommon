@@ -37,7 +37,7 @@ test0(void)
 
     for (i = 0; i < (int)countof(ss); ++i) {
         char buf[256];
-        int res;
+        UNUSED int res;
 
         memset(buf, '\0', sizeof(buf));
         res = mnbase64_encode_mime((unsigned char *)ss[i],
@@ -70,7 +70,7 @@ test1(void)
     for (i = 0; i < (int)countof(ss); ++i) {
         int j;
         char buf[256];
-        int res;
+        UNUSED int res;
 
         for (j = 0; j < ((int)strlen(ss[i]) / 3 + 1) * 4 + 4; ++j) {
             memset(buf, '\0', sizeof(buf));
@@ -190,7 +190,7 @@ test4(void)
 }
 
 int
-main(int argc, char **argv)
+main(int argc, UNUSED char **argv)
 {
     int i;
     for (i = 1; i < argc; ++i) {

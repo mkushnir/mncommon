@@ -36,7 +36,7 @@ aempty(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 static int
 aint(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
-    int res, i;
+    UNUSED int res, i;
     long v = 0;
     char buf[64];
 
@@ -54,7 +54,7 @@ aint(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 static int
 aarray(jparse_ctx_t *jctx, UNUSED jparse_value_t *jval, UNUSED void *udata)
 {
-    int res, i;
+    UNUSED int res, i;
     char buf[64];
 
     res = 0;

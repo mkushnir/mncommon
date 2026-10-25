@@ -10,7 +10,7 @@
 #include "mncommon/traversedir.h"
 
 UNUSED static void
-dumpdir(struct dirent *de)
+dumpdir(UNUSED struct dirent *de)
 {
 #if defined(_BITS_TYPESIZES_H) && defined(__INO_T_TYPE)
     TRACE("fileno=%ld reclen=%hd type=%d namelen=%ld name=%s",

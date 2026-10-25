@@ -49,7 +49,7 @@ static int
 cb(mnbtrie_node_t *node, UNUSED void *udata)
 {
     if (node->value != NULL) {
-        uint64_t key;
+        UNUSED uint64_t key;
 
         key = (uintptr_t)(node->value);
         TRACE("key=%016lx", (long)key);

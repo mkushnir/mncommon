@@ -15,7 +15,7 @@ myhash(UNUSED const void *key)
 }
 
 static int
-myfini(void *key, void *value)
+myfini(UNUSED void *key, UNUSED void *value)
 {
     TRACE("key=%p value=%p", key, value);
     return 0;
@@ -28,7 +28,7 @@ mycmp(const void *a, const void *b)
 }
 
 static int
-mycb(void *a, void *b, UNUSED void *udata)
+mycb(UNUSED void *a, UNUSED void *b, UNUSED void *udata)
 {
     TRACE("%p:%p", a, b);
     return 0;
@@ -45,8 +45,8 @@ test0(void)
         {0, 0, 0},
     };
     mnhash_t dict;
-    mnhash_item_t *v1;
-    void *v2;
+    UNUSED mnhash_item_t *v1;
+    UNUSED void *v2;
 
 
     UNITTEST_PROLOG_RAND;
@@ -133,7 +133,7 @@ my_item_cmp(my_item_t *a , my_item_t *b)
 static int
 my_item_print(UNUSED mnhash_t *dict, mnhash_item_t *dit, UNUSED void *udata)
 {
-    my_item_t *key;
+    UNUSED my_item_t *key;
 
     key = dit->key;
     TRACE("<h=%ld v=%ld>", (long)key->hash, (long)key->value);

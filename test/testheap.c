@@ -40,7 +40,7 @@ myswap(void **a, void **b)
 static int
 mycb(UNUSED mnheap_t *heap, void *pval, UNUSED void *udata)
 {
-    uint64_t *v;
+    UNUSED uint64_t *v;
 
     if (pval == NULL) {
         return -1;
@@ -55,7 +55,7 @@ static void
 test0(void)
 {
     mnheap_t heap;
-    int res;
+    UNUSED int res;
     struct {
         long rnd;
         uint64_t i;
@@ -124,7 +124,7 @@ static void
 test1(void)
 {
     mnheap_t heap;
-    int res;
+    UNUSED int res;
     struct {
         long rnd;
         uint64_t i;
@@ -286,7 +286,7 @@ test4(void)
     };
     UNITTEST_PROLOG_RAND;
     uint64_t v;
-    int res;
+    UNUSED int res;
 
     heap_init(&heap,
               sizeof(uint64_t),
@@ -320,7 +320,7 @@ test4(void)
 
 
 int
-main(int argc, char **argv)
+main(int argc, UNUSED char **argv)
 {
     int i;
 

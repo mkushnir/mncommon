@@ -107,7 +107,7 @@ run_mpool_realloc(void)
 UNUSED static void
 test1(void)
 {
-    void *p;
+    UNUSED void *p;
 
 #define f run_mpool_realloc
     mpool_ctx_reset(&mpool);

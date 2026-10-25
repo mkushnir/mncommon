@@ -65,7 +65,7 @@ file_info_fini(file_info_t *fi)
 }
 
 static int
-file_info_print(file_info_t *fi, UNUSED void *udata)
+file_info_print(UNUSED file_info_t *fi, UNUSED void *udata)
 {
     TRACE("%s", fi->path);
     return 0;

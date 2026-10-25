@@ -300,7 +300,7 @@ int
 mycb(pset_item_t *it, UNUSED void *v, void *udata)
 {
     CMTY *aggr;
-    mnbytes_t *s;
+    UNUSED mnbytes_t *s;
 
     s = it->v;
     aggr = udata;

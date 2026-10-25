@@ -55,7 +55,7 @@ rbt_fini(mnrbt_t *rbt)
 #define RBT_ASSIGN(rbt, slot, node) (slot) = node; RBT_SETRED(node); ++(rbt)->nelem
 
 void
-rbt_node_dump_tree(mnrbt_node_t *node, int level)
+rbt_node_dump_tree(mnrbt_node_t *node, UNUSED int level)
 {
     if (RBT_ISRED(node)) {
         LTRACE(level, "%02lx<-\033[01;31m%02lx\033[00m",

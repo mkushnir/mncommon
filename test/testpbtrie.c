@@ -86,7 +86,7 @@ test3(void)
 static void
 foo(mnpbtrie_t *tr, uint64_t i)
 {
-    mnpbtrie_node_t *node, *found;
+    UNUSED mnpbtrie_node_t *node, *found;
 
     node = pbtrie_add_node(tr, i);
     found = pbtrie_find_exact(tr, i);
@@ -96,7 +96,7 @@ foo(mnpbtrie_t *tr, uint64_t i)
 
 
 UNUSED static int
-mycb(mnpbtrie_node_t *node, UNUSED void *udata)
+mycb(UNUSED mnpbtrie_node_t *node, UNUSED void *udata)
 {
     TRACE("%016lx:%016lx", (unsigned long)node->xmask, (unsigned long)node->prefix);
     return 0;

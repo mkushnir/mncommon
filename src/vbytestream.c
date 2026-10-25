@@ -70,7 +70,7 @@ iovec_dump_full(void *o, UNUSED void *udata)
 static int
 iovec_dump_short(void *o, UNUSED void *udata)
 {
-    struct iovec *iov = o;
+    UNUSED struct iovec *iov = o;
     TRACE("%p:%ld", iov->iov_base, iov->iov_len);
     return 0;
 }

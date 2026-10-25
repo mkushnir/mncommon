@@ -10,7 +10,7 @@
 MEMDEBUG_DECLARE(qwe);
 
 static int
-mycb(memdebug_stat_t *st, UNUSED void *udata)
+mycb(UNUSED memdebug_stat_t *st, UNUSED void *udata)
 {
     TRACE("%s: %ld", st->name, st->nallocated);
     return 0;

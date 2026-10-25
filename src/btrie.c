@@ -62,7 +62,8 @@ btrie_node_dump(mnbtrie_node_t *n)
 int
 btrie_node_dump_cb(mnbtrie_node_t *n, void *arg)
 {
-    unsigned indent, sel;
+    UNUSED unsigned indent;
+    unsigned sel;
     int flags = (intptr_t)arg;
     test_data_t *d;
 
