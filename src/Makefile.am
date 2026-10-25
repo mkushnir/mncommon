@@ -174,7 +174,7 @@ else
 libmncommon_la_LDFLAGS =
 endif
 
-libmncommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I$(includedir)
+libmncommon_la_CFLAGS = @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c17 -I$(includedir)
 libmncommon_la_LDFLAGS += $(DEBUG_LD_FLAGS) -version-info 0:0:0 -L$(libdir)
 libmncommon_la_LIBADD = -lmndiag -lm
 

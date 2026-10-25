@@ -97,7 +97,7 @@ if ALLSTATIC
 LDFLAGS += -all-static
 endif
 
-CFLAGS += @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I../src -I$(includedir)
+CFLAGS += @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ $(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c17 -I.. -I../src -I$(includedir)
 LDFLAGS += $(DEBUG_LD_FLAGS) -L../src/.libs -L$(libdir)
 LDADD = -lmncommon -lmndiag
 
