@@ -119,7 +119,7 @@ do {                                                           \
                 _mn_jprintf_pair_bytes_tmp->data);             \
         BYTES_DECREF(&_mn_jprintf_pair_bytes_tmp);             \
     } else {                                                   \
-        (void)bytestream_nprintf( bs, 8, "null" comma);        \
+        (void)bytestream_nprintf(bs, 8, "null" comma);         \
     }                                                          \
 } while (false)                                                \
 
@@ -146,7 +146,7 @@ do {                                                           \
 
 
 #define MN_JPRINTF_ITEM_INT00(bs, value, comma)                        \
-    (void)bytestream_nprintf( bs, 1024, "%ld" comma, (intmax_t)value)  \
+    (void)bytestream_nprintf(bs, 1024, "%ld" comma, (intmax_t)value)   \
 
 
 #define MN_JPRINTF_ITEM_INT0(bs, value) \
@@ -172,7 +172,7 @@ do {                                                           \
 
 
 #define MN_JPRINTF_ITEM_FLOAT00(bs, value, comma)                      \
-    (void)bytestream_nprintf( bs, 1024, "%lf" comma, (double)value)    \
+    (void)bytestream_nprintf(bs, 1024, "%lf" comma, (double)value)     \
 
 
 #define MN_JPRINTF_ITEM_FLOAT0(bs, value) \
@@ -230,7 +230,7 @@ do {                                                           \
 
 
 #define MN_JPRINTF_ITEM_BOOL00(bs, value, comma)                               \
-    (void)bytestream_nprintf( bs, 16, "%s" comma, value ? "true" : "false")    \
+    (void)bytestream_nprintf(bs, 16, "%s" comma, value ? "true" : "false")     \
 
 
 #define MN_JPRINTF_ITEM_BOOL0(bs, value) \
